@@ -1,4 +1,5 @@
 import type { Plugin, ToolDefinition } from "@opencode-ai/plugin";
+import type { AvailableSkill } from "./agents/dynamic-agent-prompt-builder";
 import {
   createTodoContinuationEnforcer,
   createContextWindowMonitorHook,
@@ -59,7 +60,6 @@ import {
 import type { SkillScope } from "./features/opencode-skill-loader/types";
 import { createBuiltinSkills } from "./features/builtin-skills";
 import { getSystemMcpServerNames } from "./features/claude-code-mcp-loader";
-import type { AvailableSkill } from "./agents/dynamic-agent-prompt-builder";
 import {
   setMainSession,
   getMainSessionID,
@@ -107,6 +107,7 @@ import {
   OPENCODE_NATIVE_AGENTS_INJECTION_VERSION,
   injectServerAuthIntoClient,
 } from "./shared";
+import { filterDisabledTools } from "./shared/disabled-tools";
 import { loadPluginConfig } from "./plugin-config";
 import { createModelCacheState } from "./plugin-state";
 import { createConfigHandler } from "./plugin-handlers";
@@ -121,7 +122,7 @@ const OhMyOpenCodePlugin: Plugin = async (ctx) => {
 
   const pluginConfig = loadPluginConfig(ctx.directory, ctx);
   const disabledHooks = new Set(pluginConfig.disabled_hooks ?? []);
-  const disabledTools = new Set(pluginConfig.disabled_tools ?? []);
+
   const firstMessageVariantGate = createFirstMessageVariantGate();
 
   const tmuxConfig = {
@@ -249,9 +250,7 @@ const OhMyOpenCodePlugin: Plugin = async (ctx) => {
     ? createThinkingBlockValidatorHook()
     : null;
 
-  const categorySkillReminder = isHookEnabled("category-skill-reminder")
-    ? createCategorySkillReminderHook(ctx)
-    : null;
+  let categorySkillReminder: ReturnType<typeof createCategorySkillReminderHook> | null = null;
 
   const ralphLoop = isHookEnabled("ralph-loop")
     ? createRalphLoopHook(ctx, {
@@ -483,6 +482,11 @@ const OhMyOpenCodePlugin: Plugin = async (ctx) => {
       });
     },
   });
+
+  categorySkillReminder = isHookEnabled("category-skill-reminder")
+    ? createCategorySkillReminderHook(ctx, availableSkills)
+    : null;
+
   const skillMcpManager = new SkillMcpManager();
   const getSessionIDForMcp = () => getMainSessionID() || "";
   const skillTool = createSkillTool({
@@ -537,15 +541,10 @@ const OhMyOpenCodePlugin: Plugin = async (ctx) => {
     ...taskToolsRecord,
   };
 
-  const filteredTools: Record<string, ToolDefinition> =
-    disabledTools.size > 0 ? {} : allTools;
-  if (disabledTools.size > 0) {
-    for (const [toolName, toolDefinition] of Object.entries(allTools)) {
-      if (!disabledTools.has(toolName)) {
-        filteredTools[toolName] = toolDefinition;
-      }
-    }
-  }
+  const filteredTools: Record<string, ToolDefinition> = filterDisabledTools(
+    allTools,
+    pluginConfig.disabled_tools,
+  );
 
   return {
     tool: filteredTools,
@@ -891,17 +890,14 @@ const OhMyOpenCodePlugin: Plugin = async (ctx) => {
       await taskResumeInfo["tool.execute.after"](input, output);
     },
 
-    "experimental.session.compacting": async (input: { sessionID: string }) => {
+    "experimental.session.compacting": async (
+      _input: { sessionID: string },
+      output: { context: string[] },
+    ): Promise<void> => {
       if (!compactionContextInjector) {
         return;
       }
-      await compactionContextInjector({
-        sessionID: input.sessionID,
-        providerID: "anthropic",
-        modelID: "claude-opus-4-6",
-        usageRatio: 0.8,
-        directory: ctx.directory,
-      });
+      output.context.push(compactionContextInjector());
     },
   };
 };
