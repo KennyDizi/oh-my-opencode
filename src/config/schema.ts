@@ -12,6 +12,7 @@ const AgentPermissionSchema = z.object({
   edit: PermissionValue.optional(),
   bash: BashPermission.optional(),
   webfetch: PermissionValue.optional(),
+  task: PermissionValue.optional(),
   doom_loop: PermissionValue.optional(),
   external_directory: PermissionValue.optional(),
 })
@@ -100,6 +101,7 @@ export const HookNameSchema = z.enum([
   "stop-continuation-guard",
   "tasks-todowrite-disabler",
   "write-existing-file-guard",
+  "anthropic-effort",
 ])
 
 export const BuiltinCommandNameSchema = z.enum([
@@ -183,7 +185,7 @@ export const SisyphusAgentConfigSchema = z.object({
 })
 
 export const CategoryConfigSchema = z.object({
-  /** Human-readable description of the category's purpose. Shown in delegate_task prompt. */
+  /** Human-readable description of the category's purpose. Shown in task prompt. */
   description: z.string().optional(),
   model: z.string().optional(),
   variant: z.string().optional(),
