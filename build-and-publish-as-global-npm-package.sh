@@ -11,6 +11,12 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKIP_TESTS=false
 SKIP_TYPECHECK=false
 
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+LOG_FILE="$SCRIPT_DIR/build-log-${TIMESTAMP}.txt"
+
+exec > >(tee -a "$LOG_FILE")
+exec 2>&1
+
 usage() {
     echo -e "${GREEN}--- Oh-my-OpenCode: Build & Install as Global Package ---${NC}"
     echo ""
@@ -40,6 +46,7 @@ cd "$SCRIPT_DIR"
 
 echo -e "${GREEN}--- Oh-my-OpenCode: Build & Install as Global Package ---${NC}\n"
 echo "Working directory: $SCRIPT_DIR"
+echo "Log file: $LOG_FILE"
 echo ""
 
 echo -e "${YELLOW}[1/5]${NC} Installing dependencies..."
@@ -67,7 +74,7 @@ bun run build
 echo -e "${GREEN}Done${NC}\n"
 
 echo -e "${YELLOW}[5/5]${NC} Installing globally..."
-npm install -g .
+bun install -g .
 echo -e "${GREEN}Done${NC}\n"
 
 echo -e "${GREEN}--- Installation Complete ---${NC}"
