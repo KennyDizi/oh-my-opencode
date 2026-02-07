@@ -1,4 +1,5 @@
 import type { AgentPromptMetadata, BuiltinAgentName } from "./types"
+import { truncateDescription } from "../shared/truncate-description"
 
 export interface AvailableAgent {
   name: BuiltinAgentName
@@ -205,16 +206,16 @@ export function buildCategorySkillsDelegationGuide(categories: AvailableCategory
   const builtinSkills = skills.filter((s) => s.location === "plugin")
   const customSkills = skills.filter((s) => s.location !== "plugin")
 
-  const builtinRows = builtinSkills.map((s) => {
-    const desc = s.description.split(".")[0] || s.description
-    return `| \`${s.name}\` | ${desc} |`
-  })
+   const builtinRows = builtinSkills.map((s) => {
+     const desc = truncateDescription(s.description)
+     return `| \`${s.name}\` | ${desc} |`
+   })
 
-  const customRows = customSkills.map((s) => {
-    const desc = s.description.split(".")[0] || s.description
-    const source = s.location === "project" ? "project" : "user"
-    return `| \`${s.name}\` | ${desc} | ${source} |`
-  })
+   const customRows = customSkills.map((s) => {
+     const desc = truncateDescription(s.description)
+     const source = s.location === "project" ? "project" : "user"
+     return `| \`${s.name}\` | ${desc} | ${source} |`
+   })
 
   const customSkillBlock = formatCustomSkillsBlock(customRows, customSkills)
 
@@ -421,7 +422,7 @@ export function buildUltraworkSection(
 
     lines.push("**Agents** (for specialized consultation/exploration):")
     for (const agent of sortedAgents) {
-      const shortDesc = agent.description.split(".")[0] || agent.description
+      const shortDesc = agent.description.length > 120 ? agent.description.slice(0, 120) + "..." : agent.description
       const suffix = agent.name === "explore" || agent.name === "librarian" ? " (multiple)" : ""
       lines.push(`- \`${agent.name}${suffix}\`: ${shortDesc}`)
     }
