@@ -1,5 +1,5 @@
 import type { BackgroundManager } from "../../features/background-agent"
-import type { CategoriesConfig, GitMasterConfig, BrowserAutomationProvider } from "../../config/schema"
+import type { CategoriesConfig, GitMasterConfig, BrowserAutomationProvider, AgentOverrides } from "../../config/schema"
 import type { ModelFallbackInfo } from "../../features/task-toast-manager/types"
 import type { DelegateTaskArgs, ToolContextWithMetadata, OpencodeClient } from "./types"
 import { DEFAULT_CATEGORIES, CATEGORY_DESCRIPTIONS, isPlanAgent } from "./constants"
@@ -12,10 +12,10 @@ import { resolveMultipleSkillsAsync } from "../../features/opencode-skill-loader
 import { discoverSkills } from "../../features/opencode-skill-loader"
 import { getTaskToastManager } from "../../features/task-toast-manager"
 import { subagentSessions, getSessionAgent } from "../../features/claude-code-session-state"
-import { log, getAgentToolRestrictions, resolveModelPipeline, promptWithModelSuggestionRetry } from "../../shared"
+import { log, getAgentToolRestrictions, resolveModelPipeline, promptWithModelSuggestionRetry, promptSyncWithModelSuggestionRetry } from "../../shared"
 import { fetchAvailableModels, isModelAvailable } from "../../shared/model-availability"
 import { readConnectedProvidersCache } from "../../shared/connected-providers-cache"
-import { CATEGORY_MODEL_REQUIREMENTS } from "../../shared/model-requirements"
+import { AGENT_MODEL_REQUIREMENTS, CATEGORY_MODEL_REQUIREMENTS } from "../../shared/model-requirements"
 import { storeToolMetadata } from "../../features/tool-metadata-store"
 
 const SISYPHUS_JUNIOR_AGENT = "sisyphus-junior"
@@ -28,6 +28,7 @@ export interface ExecutorContext {
   gitMasterConfig?: GitMasterConfig
   sisyphusJuniorModel?: string
   browserProvider?: BrowserAutomationProvider
+  agentOverrides?: AgentOverrides
   onSyncSessionCreated?: (event: { sessionID: string; parentID: string; title: string }) => Promise<void>
 }
 
@@ -39,7 +40,7 @@ export interface ParentContext {
 }
 
 interface SessionMessage {
-  info?: { role?: string; time?: { created?: number }; agent?: string; model?: { providerID: string; modelID: string }; modelID?: string; providerID?: string }
+  info?: { role?: string; time?: { created?: number }; agent?: string; model?: { providerID: string; modelID: string }; modelID?: string; providerID?: string; variant?: string }
   parts?: Array<{ type?: string; text?: string }>
 }
 
@@ -190,6 +191,7 @@ export async function executeSyncContinuation(
   try {
     let resumeAgent: string | undefined
     let resumeModel: { providerID: string; modelID: string } | undefined
+    let resumeVariant: string | undefined
 
     try {
       const messagesResp = await client.session.messages({ path: { id: args.session_id! } })
@@ -199,6 +201,7 @@ export async function executeSyncContinuation(
         if (info?.agent || info?.model || (info?.modelID && info?.providerID)) {
           resumeAgent = info.agent
           resumeModel = info.model ?? (info.providerID && info.modelID ? { providerID: info.providerID, modelID: info.modelID } : undefined)
+          resumeVariant = info.variant
           break
         }
       }
@@ -209,52 +212,30 @@ export async function executeSyncContinuation(
       resumeModel = resumeMessage?.model?.providerID && resumeMessage?.model?.modelID
         ? { providerID: resumeMessage.model.providerID, modelID: resumeMessage.model.modelID }
         : undefined
+      resumeVariant = resumeMessage?.model?.variant
     }
 
-     await (client.session as any).promptAsync({
-       path: { id: args.session_id! },
-       body: {
-         ...(resumeAgent !== undefined ? { agent: resumeAgent } : {}),
-         ...(resumeModel !== undefined ? { model: resumeModel } : {}),
-           tools: {
-             ...(resumeAgent ? getAgentToolRestrictions(resumeAgent) : {}),
-             task: false,
-             call_omo_agent: true,
-             question: false,
-           },
-         parts: [{ type: "text", text: args.prompt }],
-       },
-     })
+    await promptSyncWithModelSuggestionRetry(client, {
+      path: { id: args.session_id! },
+      body: {
+        ...(resumeAgent !== undefined ? { agent: resumeAgent } : {}),
+        ...(resumeModel !== undefined ? { model: resumeModel } : {}),
+        ...(resumeVariant !== undefined ? { variant: resumeVariant } : {}),
+        tools: {
+          ...(resumeAgent ? getAgentToolRestrictions(resumeAgent) : {}),
+          task: false,
+          call_omo_agent: true,
+          question: false,
+        },
+        parts: [{ type: "text", text: args.prompt }],
+      },
+    })
   } catch (promptError) {
     if (toastManager) {
       toastManager.removeTask(taskId)
     }
     const errorMessage = promptError instanceof Error ? promptError.message : String(promptError)
     return `Failed to send continuation prompt: ${errorMessage}\n\nSession ID: ${args.session_id}`
-  }
-
-  const timing = getTimingConfig()
-  const pollStart = Date.now()
-  let lastMsgCount = 0
-  let stablePolls = 0
-
-  while (Date.now() - pollStart < 60000) {
-    await new Promise(resolve => setTimeout(resolve, timing.POLL_INTERVAL_MS))
-
-    const elapsed = Date.now() - pollStart
-    if (elapsed < timing.SESSION_CONTINUATION_STABILITY_MS) continue
-
-    const messagesCheck = await client.session.messages({ path: { id: args.session_id! } })
-    const msgs = ((messagesCheck as { data?: unknown }).data ?? messagesCheck) as Array<unknown>
-    const currentMsgCount = msgs.length
-
-    if (currentMsgCount > 0 && currentMsgCount === lastMsgCount) {
-      stablePolls++
-      if (stablePolls >= timing.STABILITY_POLLS_REQUIRED) break
-    } else {
-      stablePolls = 0
-      lastMsgCount = currentMsgCount
-    }
   }
 
   const messagesResult = await client.session.messages({
@@ -621,7 +602,7 @@ export async function executeSyncTask(
 
     try {
       const allowTask = isPlanAgent(agentToUse)
-      await promptWithModelSuggestionRetry(client, {
+      await promptSyncWithModelSuggestionRetry(client, {
         path: { id: sessionID },
         body: {
           agent: agentToUse,
@@ -657,70 +638,6 @@ export async function executeSyncTask(
         agent: agentToUse,
         category: args.category,
       })
-    }
-
-    const syncTiming = getTimingConfig()
-    const pollStart = Date.now()
-    let lastMsgCount = 0
-    let stablePolls = 0
-    let pollCount = 0
-
-    log("[task] Starting poll loop", { sessionID, agentToUse })
-
-    while (Date.now() - pollStart < syncTiming.MAX_POLL_TIME_MS) {
-      if (ctx.abort?.aborted) {
-        log("[task] Aborted by user", { sessionID })
-        if (toastManager && taskId) toastManager.removeTask(taskId)
-        return `Task aborted.\n\nSession ID: ${sessionID}`
-      }
-
-      await new Promise(resolve => setTimeout(resolve, syncTiming.POLL_INTERVAL_MS))
-      pollCount++
-
-      const statusResult = await client.session.status()
-      const allStatuses = (statusResult.data ?? {}) as Record<string, { type: string }>
-      const sessionStatus = allStatuses[sessionID]
-
-      if (pollCount % 10 === 0) {
-      log("[task] Poll status", {
-          sessionID,
-          pollCount,
-          elapsed: Math.floor((Date.now() - pollStart) / 1000) + "s",
-          sessionStatus: sessionStatus?.type ?? "not_in_status",
-          stablePolls,
-          lastMsgCount,
-        })
-      }
-
-      if (sessionStatus && sessionStatus.type !== "idle") {
-        stablePolls = 0
-        lastMsgCount = 0
-        continue
-      }
-
-      const elapsed = Date.now() - pollStart
-      if (elapsed < syncTiming.MIN_STABILITY_TIME_MS) {
-        continue
-      }
-
-      const messagesCheck = await client.session.messages({ path: { id: sessionID } })
-      const msgs = ((messagesCheck as { data?: unknown }).data ?? messagesCheck) as Array<unknown>
-      const currentMsgCount = msgs.length
-
-      if (currentMsgCount === lastMsgCount) {
-        stablePolls++
-        if (stablePolls >= syncTiming.STABILITY_POLLS_REQUIRED) {
-        log("[task] Poll complete - messages stable", { sessionID, pollCount, currentMsgCount })
-          break
-        }
-      } else {
-        stablePolls = 0
-        lastMsgCount = currentMsgCount
-      }
-    }
-
-    if (Date.now() - pollStart >= syncTiming.MAX_POLL_TIME_MS) {
-    log("[task] Poll timeout reached", { sessionID, pollCount, lastMsgCount, stablePolls })
     }
 
     const messagesResult = await client.session.messages({
@@ -940,8 +857,8 @@ export async function resolveSubagentExecution(
   executorCtx: ExecutorContext,
   parentAgent: string | undefined,
   categoryExamples: string
-): Promise<{ agentToUse: string; categoryModel: { providerID: string; modelID: string } | undefined; error?: string }> {
-  const { client } = executorCtx
+): Promise<{ agentToUse: string; categoryModel: { providerID: string; modelID: string; variant?: string } | undefined; error?: string }> {
+  const { client, agentOverrides } = executorCtx
 
   if (!args.subagent_type?.trim()) {
     return { agentToUse: "", categoryModel: undefined, error: `Agent name cannot be empty.` }
@@ -963,14 +880,14 @@ Sisyphus-Junior is spawned automatically when you specify a category. Pick the a
     return {
       agentToUse: "",
       categoryModel: undefined,
-    error: `You are prometheus. You cannot delegate to prometheus via task.
+    error: `You are the plan agent. You cannot delegate to plan via task.
 
 Create the work plan directly - that's your job as the planning agent.`,
     }
   }
 
   let agentToUse = agentName
-  let categoryModel: { providerID: string; modelID: string } | undefined
+  let categoryModel: { providerID: string; modelID: string; variant?: string } | undefined
 
   try {
     const agentsResult = await client.app.agents()
@@ -1007,7 +924,41 @@ Create the work plan directly - that's your job as the planning agent.`,
 
     agentToUse = matchedAgent.name
 
-    if (matchedAgent.model) {
+    const agentNameLower = agentToUse.toLowerCase()
+    const agentOverride = agentOverrides?.[agentNameLower as keyof typeof agentOverrides]
+      ?? (agentOverrides ? Object.entries(agentOverrides).find(([key]) => key.toLowerCase() === agentNameLower)?.[1] : undefined)
+    const agentRequirement = AGENT_MODEL_REQUIREMENTS[agentNameLower]
+
+    if (agentOverride?.model || agentRequirement) {
+      const connectedProviders = readConnectedProvidersCache()
+      const availableModels = await fetchAvailableModels(client, {
+        connectedProviders: connectedProviders ?? undefined,
+      })
+
+      const matchedAgentModelStr = matchedAgent.model
+        ? `${matchedAgent.model.providerID}/${matchedAgent.model.modelID}`
+        : undefined
+
+      const resolution = resolveModelPipeline({
+        intent: {
+          userModel: agentOverride?.model,
+          categoryDefaultModel: matchedAgentModelStr,
+        },
+        constraints: { availableModels },
+        policy: {
+          fallbackChain: agentRequirement?.fallbackChain,
+          systemDefaultModel: undefined,
+        },
+      })
+
+      if (resolution) {
+        const parsed = parseModelString(resolution.model)
+        if (parsed) {
+          const variantToUse = agentOverride?.variant ?? resolution.variant
+          categoryModel = variantToUse ? { ...parsed, variant: variantToUse } : parsed
+        }
+      }
+    } else if (matchedAgent.model) {
       categoryModel = matchedAgent.model
     }
   } catch {

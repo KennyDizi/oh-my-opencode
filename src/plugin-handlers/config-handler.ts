@@ -32,6 +32,7 @@ import { AGENT_NAME_MAP } from "../shared/migration";
 import { AGENT_MODEL_REQUIREMENTS } from "../shared/model-requirements";
 import { PROMETHEUS_SYSTEM_PROMPT, PROMETHEUS_PERMISSION } from "../agents/prometheus";
 import { DEFAULT_CATEGORIES } from "../tools/delegate-task/constants";
+import { buildPlanDemoteConfig } from "./plan-model-inheritance";
 import type { ModelCacheState } from "../plugin-state";
 import type { CategoryConfig } from "../config/schema";
 
@@ -385,8 +386,10 @@ export function createConfigHandler(deps: ConfigHandlerDeps) {
         : {};
 
       const planDemoteConfig = shouldDemotePlan
-           ? { mode: "subagent" as const
-          }
+        ? buildPlanDemoteConfig(
+            agentConfig["prometheus"] as Record<string, unknown> | undefined,
+            pluginConfig.agents?.plan as Record<string, unknown> | undefined,
+          )
         : undefined;
 
       config.agent = {
@@ -433,6 +436,11 @@ export function createConfigHandler(deps: ConfigHandlerDeps) {
     // In CLI run mode, deny Question tool for all agents (no TUI to answer questions)
     const isCliRunMode = process.env.OPENCODE_CLI_RUN_MODE === "true";
     const questionPermission = isCliRunMode ? "deny" : "allow";
+
+    // When task system is enabled, deny todowrite/todoread per-agent so models never see them
+    const todoPermission = pluginConfig.experimental?.task_system
+      ? { todowrite: "deny" as const, todoread: "deny" as const }
+      : {};
     
     if (agentResult.librarian) {
       const agent = agentResult.librarian as AgentWithPermission;
@@ -444,23 +452,23 @@ export function createConfigHandler(deps: ConfigHandlerDeps) {
     }
     if (agentResult["atlas"]) {
       const agent = agentResult["atlas"] as AgentWithPermission;
-      agent.permission = { ...agent.permission, task: "allow", call_omo_agent: "deny", "task_*": "allow", teammate: "allow" };
+      agent.permission = { ...agent.permission, ...todoPermission, task: "allow", call_omo_agent: "deny", "task_*": "allow", teammate: "allow" };
     }
     if (agentResult.sisyphus) {
       const agent = agentResult.sisyphus as AgentWithPermission;
-      agent.permission = { ...agent.permission, call_omo_agent: "deny", task: "allow", question: questionPermission, "task_*": "allow", teammate: "allow" };
+      agent.permission = { ...agent.permission, ...todoPermission, call_omo_agent: "deny", task: "allow", question: questionPermission, "task_*": "allow", teammate: "allow" };
     }
     if (agentResult.hephaestus) {
       const agent = agentResult.hephaestus as AgentWithPermission;
-      agent.permission = { ...agent.permission, call_omo_agent: "deny", task: "allow", question: questionPermission };
+      agent.permission = { ...agent.permission, ...todoPermission, call_omo_agent: "deny", task: "allow", question: questionPermission };
     }
     if (agentResult["prometheus"]) {
       const agent = agentResult["prometheus"] as AgentWithPermission;
-      agent.permission = { ...agent.permission, call_omo_agent: "deny", task: "allow", question: questionPermission, "task_*": "allow", teammate: "allow" };
+      agent.permission = { ...agent.permission, ...todoPermission, call_omo_agent: "deny", task: "allow", question: questionPermission, "task_*": "allow", teammate: "allow" };
     }
     if (agentResult["sisyphus-junior"]) {
       const agent = agentResult["sisyphus-junior"] as AgentWithPermission;
-      agent.permission = { ...agent.permission, task: "allow", "task_*": "allow", teammate: "allow" };
+      agent.permission = { ...agent.permission, ...todoPermission, task: "allow", "task_*": "allow", teammate: "allow" };
     }
 
     config.permission = {
