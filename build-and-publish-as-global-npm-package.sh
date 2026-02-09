@@ -49,40 +49,47 @@ echo "Working directory: $SCRIPT_DIR"
 echo "Log file: $LOG_FILE"
 echo ""
 
-echo -e "${YELLOW}[1/5]${NC} Installing dependencies..."
+echo -e "${YELLOW}[1/6]${NC} Installing dependencies..."
 bun install
 echo -e "${GREEN}Done${NC}\n"
 
 if [[ "$SKIP_TYPECHECK" = false ]]; then
-    echo -e "${YELLOW}[2/5]${NC} Running type check..."
+    echo -e "${YELLOW}[2/6]${NC} Running type check..."
     bun run typecheck
     echo -e "${GREEN}Done${NC}\n"
 else
-    echo -e "${YELLOW}[2/5]${NC} Skipping type check\n"
+    echo -e "${YELLOW}[2/6]${NC} Skipping type check\n"
 fi
 
 if [[ "$SKIP_TESTS" = false ]]; then
-    echo -e "${YELLOW}[3/5]${NC} Running tests..."
+    echo -e "${YELLOW}[3/6]${NC} Running tests..."
     bun test
     echo -e "${GREEN}Done${NC}\n"
 else
-    echo -e "${YELLOW}[3/5]${NC} Skipping tests\n"
+    echo -e "${YELLOW}[3/6]${NC} Skipping tests\n"
 fi
 
-echo -e "${YELLOW}[4/5]${NC} Building..."
+echo -e "${YELLOW}[4/6]${NC} Building..."
 bun run build
 echo -e "${GREEN}Done${NC}\n"
 
-echo -e "${YELLOW}[5/5]${NC} Installing globally..."
+echo -e "${YELLOW}[5/6]${NC} Installing globally..."
 bun install -g .
 echo -e "${GREEN}Done${NC}\n"
 
-echo -e "${GREEN}--- Installation Complete ---${NC}"
-echo ""
 if command -v oh-my-opencode &> /dev/null; then
     echo -e "Installed at: ${GREEN}$(command -v oh-my-opencode)${NC}"
     echo -e "Version: $(oh-my-opencode --version 2>/dev/null || echo 'N/A')"
+    echo ""
+    
+    echo -e "${YELLOW}[6/6]${NC} Running oh-my-opencode install..."
+    echo -e "${YELLOW}This will configure oh-my-opencode with interactive setup${NC}\n"
+    oh-my-opencode install
+    echo -e "${GREEN}Done${NC}\n"
 else
     echo -e "${YELLOW}Note: 'oh-my-opencode' command may require a new terminal session${NC}"
+    echo -e "${YELLOW}After starting a new terminal, run: oh-my-opencode install${NC}\n"
 fi
+
+echo -e "${GREEN}--- Installation Complete ---${NC}"
 echo ""
