@@ -7,7 +7,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-echo -e "${GREEN}--- Oh-my-OpenCode Update Script ---${NC}\n"
+echo -e "${GREEN}------ Oh-my-OpenCode Update Script ------${NC}\n"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
@@ -38,7 +38,7 @@ else
 fi
 
 echo ""
-echo -e "${GREEN}--- Update Complete ---${NC}"
+echo -e "${GREEN}------ Updating Process Complete ------${NC}"
 echo -e "Oh-my-OpenCode is now up to date with latest source code.${NC}"
 echo ""
 echo "Note: If you're using the local build in opencode.json,"
