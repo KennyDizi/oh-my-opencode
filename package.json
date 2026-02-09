@@ -25,8 +25,8 @@
     "./schema.json": "./dist/oh-my-opencode.schema.json"
   },
   "scripts": {
-    "build": "rslib build",
-    "build:all": "rslib build && bun run build:binaries",
+    "build": "rslib build && bun run build:schema",
+    "build:all": "rslib build && bun run build:schema && bun run build:binaries",
     "build:binaries": "bun run script/build-binaries.ts",
     "build:schema": "bun run script/build-schema.ts",
     "clean": "rslib clean",
