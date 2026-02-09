@@ -2,7 +2,7 @@ import type { BackgroundManager } from "../../features/background-agent"
 import type { CategoriesConfig, GitMasterConfig, BrowserAutomationProvider, AgentOverrides } from "../../config/schema"
 import type { ModelFallbackInfo } from "../../features/task-toast-manager/types"
 import type { DelegateTaskArgs, ToolContextWithMetadata, OpencodeClient } from "./types"
-import { DEFAULT_CATEGORIES, CATEGORY_DESCRIPTIONS, isPlanAgent } from "./constants"
+import { DEFAULT_CATEGORIES, CATEGORY_DESCRIPTIONS, isPlanFamily } from "./constants"
 import { getTimingConfig } from "./timing"
 import { parseModelString, getMessageDir, formatDuration, formatDetailedError } from "./helpers"
 import { resolveCategoryConfig } from "./categories"
@@ -14,16 +14,34 @@ import { getTaskToastManager } from "../../features/task-toast-manager"
 import { subagentSessions, getSessionAgent } from "../../features/claude-code-session-state"
 import { log, getAgentToolRestrictions, resolveModelPipeline, promptWithModelSuggestionRetry, promptSyncWithModelSuggestionRetry } from "../../shared"
 import { fetchAvailableModels, isModelAvailable } from "../../shared/model-availability"
-import { readConnectedProvidersCache } from "../../shared/connected-providers-cache"
+import * as connectedProvidersCache from "../../shared/connected-providers-cache"
 import { AGENT_MODEL_REQUIREMENTS, CATEGORY_MODEL_REQUIREMENTS } from "../../shared/model-requirements"
 import { storeToolMetadata } from "../../features/tool-metadata-store"
 
 const SISYPHUS_JUNIOR_AGENT = "sisyphus-junior"
 
+function resolveToolCallID(ctx: ToolContextWithMetadata): string | undefined {
+  if (typeof ctx.callID === "string" && ctx.callID.trim() !== "") {
+    return ctx.callID
+  }
+
+  if (typeof ctx.callId === "string" && ctx.callId.trim() !== "") {
+    return ctx.callId
+  }
+
+  if (typeof ctx.call_id === "string" && ctx.call_id.trim() !== "") {
+    return ctx.call_id
+  }
+
+  return undefined
+}
+
 export interface ExecutorContext {
   manager: BackgroundManager
   client: OpencodeClient
   directory: string
+  connectedProvidersOverride?: string[] | null
+  availableModelsOverride?: Set<string>
   userCategories?: CategoriesConfig
   gitMasterConfig?: GitMasterConfig
   sisyphusJuniorModel?: string
@@ -126,9 +144,8 @@ export async function executeBackgroundContinuation(
       },
     }
     await ctx.metadata?.(bgContMeta)
-    if (ctx.callID) {
-      storeToolMetadata(ctx.sessionID, ctx.callID, bgContMeta)
-    }
+    const bgContCallID = resolveToolCallID(ctx)
+    if (bgContCallID) storeToolMetadata(ctx.sessionID, bgContCallID, bgContMeta)
 
     return `Background task continued.
 
@@ -184,9 +201,8 @@ export async function executeSyncContinuation(
     },
   }
   await ctx.metadata?.(syncContMeta)
-  if (ctx.callID) {
-    storeToolMetadata(ctx.sessionID, ctx.callID, syncContMeta)
-  }
+  const syncContCallID = resolveToolCallID(ctx)
+  if (syncContCallID) storeToolMetadata(ctx.sessionID, syncContCallID, syncContMeta)
 
   try {
     let resumeAgent: string | undefined
@@ -339,9 +355,8 @@ export async function executeUnstableAgentTask(
       },
     }
     await ctx.metadata?.(bgTaskMeta)
-    if (ctx.callID) {
-      storeToolMetadata(ctx.sessionID, ctx.callID, bgTaskMeta)
-    }
+    const bgTaskCallID = resolveToolCallID(ctx)
+    if (bgTaskCallID) storeToolMetadata(ctx.sessionID, bgTaskCallID, bgTaskMeta)
 
     const startTime = new Date()
     const timingCfg = getTimingConfig()
@@ -486,9 +501,8 @@ export async function executeBackgroundTask(
       },
     }
     await ctx.metadata?.(unstableMeta)
-    if (ctx.callID) {
-      storeToolMetadata(ctx.sessionID, ctx.callID, unstableMeta)
-    }
+    const unstableCallID = resolveToolCallID(ctx)
+    if (unstableCallID) storeToolMetadata(ctx.sessionID, unstableCallID, unstableMeta)
 
     return `Background task launched.
 
@@ -596,12 +610,11 @@ export async function executeSyncTask(
       },
     }
     await ctx.metadata?.(syncTaskMeta)
-    if (ctx.callID) {
-      storeToolMetadata(ctx.sessionID, ctx.callID, syncTaskMeta)
-    }
+    const syncTaskCallID = resolveToolCallID(ctx)
+    if (syncTaskCallID) storeToolMetadata(ctx.sessionID, syncTaskCallID, syncTaskMeta)
 
     try {
-      const allowTask = isPlanAgent(agentToUse)
+      const allowTask = isPlanFamily(agentToUse)
       await promptSyncWithModelSuggestionRetry(client, {
         path: { id: sessionID },
         body: {
@@ -716,10 +729,15 @@ export async function resolveCategoryExecution(
 ): Promise<CategoryResolutionResult> {
   const { client, userCategories, sisyphusJuniorModel } = executorCtx
 
-  const connectedProviders = readConnectedProvidersCache()
-  const availableModels = await fetchAvailableModels(client, {
-    connectedProviders: connectedProviders ?? undefined,
-  })
+  const connectedProviders = executorCtx.connectedProvidersOverride !== undefined
+    ? executorCtx.connectedProvidersOverride
+    : connectedProvidersCache.readConnectedProvidersCache()
+
+  const availableModels = executorCtx.availableModelsOverride !== undefined
+    ? executorCtx.availableModelsOverride
+    : await fetchAvailableModels(client, {
+        connectedProviders: connectedProviders ?? undefined,
+      })
 
   const resolved = resolveCategoryConfig(args.category!, {
     userCategories,
@@ -764,7 +782,7 @@ export async function resolveCategoryExecution(
         userModel: explicitCategoryModel ?? overrideModel,
         categoryDefaultModel: resolved.model,
       },
-      constraints: { availableModels },
+       constraints: { availableModels, connectedProviders },
       policy: {
         fallbackChain: requirement.fallbackChain,
         systemDefaultModel,
@@ -876,11 +894,11 @@ Sisyphus-Junior is spawned automatically when you specify a category. Pick the a
     }
   }
 
-  if (isPlanAgent(agentName) && isPlanAgent(parentAgent)) {
+  if (isPlanFamily(agentName) && isPlanFamily(parentAgent)) {
     return {
       agentToUse: "",
       categoryModel: undefined,
-    error: `You are the plan agent. You cannot delegate to plan via task.
+    error: `You are a plan-family agent (plan/prometheus). You cannot delegate to other plan-family agents via task.
 
 Create the work plan directly - that's your job as the planning agent.`,
     }
@@ -930,26 +948,31 @@ Create the work plan directly - that's your job as the planning agent.`,
     const agentRequirement = AGENT_MODEL_REQUIREMENTS[agentNameLower]
 
     if (agentOverride?.model || agentRequirement) {
-      const connectedProviders = readConnectedProvidersCache()
-      const availableModels = await fetchAvailableModels(client, {
-        connectedProviders: connectedProviders ?? undefined,
-      })
+      const connectedProviders = executorCtx.connectedProvidersOverride !== undefined
+        ? executorCtx.connectedProvidersOverride
+        : connectedProvidersCache.readConnectedProvidersCache()
+
+      const availableModels = executorCtx.availableModelsOverride !== undefined
+        ? executorCtx.availableModelsOverride
+        : await fetchAvailableModels(client, {
+            connectedProviders: connectedProviders ?? undefined,
+          })
 
       const matchedAgentModelStr = matchedAgent.model
         ? `${matchedAgent.model.providerID}/${matchedAgent.model.modelID}`
         : undefined
 
-      const resolution = resolveModelPipeline({
-        intent: {
-          userModel: agentOverride?.model,
-          categoryDefaultModel: matchedAgentModelStr,
-        },
-        constraints: { availableModels },
-        policy: {
-          fallbackChain: agentRequirement?.fallbackChain,
-          systemDefaultModel: undefined,
-        },
-      })
+       const resolution = resolveModelPipeline({
+         intent: {
+           userModel: agentOverride?.model,
+           categoryDefaultModel: matchedAgentModelStr,
+         },
+         constraints: { availableModels, connectedProviders },
+         policy: {
+           fallbackChain: agentRequirement?.fallbackChain,
+           systemDefaultModel: undefined,
+         },
+       })
 
       if (resolution) {
         const parsed = parseModelString(resolution.model)
