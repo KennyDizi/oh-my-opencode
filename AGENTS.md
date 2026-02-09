@@ -233,6 +233,92 @@ bun run rebuild        # Clean + Build
 bun test               # 163+ test files
 ```
 
+## BUILD SYSTEM
+
+**Single Source of Truth**: `rslib.config.ts`
+
+All build paths (local development, CI, install script) use the same unified build command to ensure artifact parity.
+
+### Build Process
+
+```bash
+bun run build          # Runs: rslib build && bun run build:schema
+bun run build:all      # Runs: rslib build && bun run build:schema && bun run build:binaries
+```
+
+**Build Steps:**
+1. **rslib build** - Bundles main plugin + CLI using rslib
+   - Generates `dist/index.js` (main plugin bundle, ESM)
+   - Generates `dist/index.d.ts` (bundled type declarations)
+   - Generates `dist/cli/index.js` (CLI entry point)
+   - Externals: `bun`, `@ast-grep/napi` (not bundled)
+2. **build:schema** - Generates JSON Schema from Zod config
+   - Generates `assets/oh-my-opencode.schema.json`
+   - Used for config validation in editors
+
+### Build Artifacts
+
+| File | Size | Purpose |
+|------|------|---------|
+| `dist/index.js` | ~1.3MB | Main plugin bundle (ESM) |
+| `dist/index.d.ts` | ~96KB | Bundled TypeScript declarations |
+| `dist/cli/index.js` | ~0.25MB | CLI entry point |
+| `assets/oh-my-opencode.schema.json` | ~283B | JSON Schema for config |
+
+### Local Development
+
+```bash
+./install-latest-from-source-code.sh    # Automated install from source
+```
+
+**Install script steps:**
+1. `bun install` - Install dependencies
+2. `bun run typecheck` - Type checking
+3. `bun run build` - Full build (rslib + schema)
+4. Verify all artifacts exist:
+   - `dist/index.js`
+   - `dist/index.d.ts`
+   - `dist/cli/index.js`
+   - `assets/oh-my-opencode.schema.json` (validates JSON)
+
+### CI/CD
+
+**GitHub Actions** (`.github/workflows/publish.yml`):
+- Uses `bun run build` (same as local)
+- Adds platform binary compilation via `build:binaries` (11 platforms)
+- Publishes to npm with provenance
+- **NO manual `bun build` commands** - unified via rslib config
+
+### Configuration
+
+**rslib.config.ts:**
+```typescript
+output: {
+  target: 'node',
+  cleanDistPath: true,
+  externals: ['bun', '@ast-grep/napi'],  // Don't bundle runtime + native modules
+}
+```
+
+**package.json:**
+```json
+{
+  "build": "rslib build && bun run build:schema",
+  "build:all": "rslib build && bun run build:schema && bun run build:binaries",
+  "build:binaries": "bun run script/build-binaries.ts"
+}
+```
+
+### Platform Binaries
+
+Platform-specific CLI binaries are built for distribution:
+- darwin-arm64, darwin-x64, darwin-x64-baseline
+- linux-x64, linux-x64-baseline, linux-arm64
+- linux-x64-musl, linux-x64-musl-baseline, linux-arm64-musl
+- windows-x64, windows-x64-baseline
+
+Binaries are compiled using `bun build --compile` and published as separate packages.
+
 ## DEPLOYMENT
 
 **GitHub Actions workflow_dispatch ONLY**
