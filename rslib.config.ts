@@ -37,6 +37,6 @@ export default defineConfig({
   output: {
     target: 'node', // Bun supports Node.js APIs
     cleanDistPath: true, // Clean dist directory before build
-    externals: ['bun'], // Don't bundle 'bun' runtime imports
+    externals: ['bun', '@ast-grep/napi'], // Don't bundle 'bun' runtime and native modules
   },
 });
