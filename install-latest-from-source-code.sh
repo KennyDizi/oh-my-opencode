@@ -28,14 +28,51 @@ bun run build
 echo -e "${GREEN}✓${NC} Build completed\n"
 
 echo -e "${YELLOW}[4/4]${NC} Verifying build output..."
-if [ -f "dist/index.js" ] && [ -f "dist/index.d.ts" ]; then
-    echo -e "${GREEN}✓${NC} Build verification successful"
-    echo "  - dist/index.js exists"
-    echo "  - dist/index.d.ts exists"
+
+FAILED=0
+
+if [ -f "dist/index.js" ]; then
+    echo -e "${GREEN}✓${NC} dist/index.js exists"
 else
-    echo -e "${RED}✗${NC} Build verification failed - missing build output"
+    echo -e "${RED}✗${NC} dist/index.js missing"
+    FAILED=1
+fi
+
+if [ -f "dist/index.d.ts" ]; then
+    echo -e "${GREEN}✓${NC} dist/index.d.ts exists"
+else
+    echo -e "${RED}✗${NC} dist/index.d.ts missing"
+    FAILED=1
+fi
+
+if [ -f "dist/cli/index.js" ]; then
+    echo -e "${GREEN}✓${NC} dist/cli/index.js exists"
+else
+    echo -e "${RED}✗${NC} dist/cli/index.js missing"
+    FAILED=1
+fi
+
+if [ -f "assets/oh-my-opencode.schema.json" ]; then
+    echo -e "${GREEN}✓${NC} assets/oh-my-opencode.schema.json exists"
+    if command -v jq &> /dev/null; then
+        if jq empty assets/oh-my-opencode.schema.json 2>/dev/null; then
+            echo -e "${GREEN}✓${NC} Schema is valid JSON"
+        else
+            echo -e "${RED}✗${NC} Schema is not valid JSON"
+            FAILED=1
+        fi
+    fi
+else
+    echo -e "${RED}✗${NC} assets/oh-my-opencode.schema.json missing"
+    FAILED=1
+fi
+
+if [ $FAILED -eq 1 ]; then
+    echo -e "${RED}✗${NC} Build verification failed - missing required files"
     exit 1
 fi
+
+echo -e "${GREEN}✓${NC} Build verification successful"
 
 echo ""
 echo -e "${GREEN}------ Updating Process Complete ------${NC}"
