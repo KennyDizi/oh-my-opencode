@@ -82,13 +82,13 @@
     "typescript": "^5.9.3"
   },
   "optionalDependencies": {
-    "oh-my-opencode-darwin-arm64": "3.4.0",
-    "oh-my-opencode-darwin-x64": "3.4.0",
-    "oh-my-opencode-linux-arm64": "3.4.0",
-    "oh-my-opencode-linux-arm64-musl": "3.4.0",
-    "oh-my-opencode-linux-x64": "3.4.0",
-    "oh-my-opencode-linux-x64-musl": "3.4.0",
-    "oh-my-opencode-windows-x64": "3.4.0"
+    "oh-my-opencode-darwin-arm64": "3.4.1",
+    "oh-my-opencode-darwin-x64": "3.4.1",
+    "oh-my-opencode-linux-arm64": "3.4.1",
+    "oh-my-opencode-linux-arm64-musl": "3.4.1",
+    "oh-my-opencode-linux-x64": "3.4.1",
+    "oh-my-opencode-linux-x64-musl": "3.4.1",
+    "oh-my-opencode-windows-x64": "3.4.1"
   },
   "trustedDependencies": [
     "@ast-grep/cli",
