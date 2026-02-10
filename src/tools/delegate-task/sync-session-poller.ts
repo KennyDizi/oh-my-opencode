@@ -30,11 +30,13 @@ export async function pollSyncSession(
     agentToUse: string
     toastManager: { removeTask: (id: string) => void } | null | undefined
     taskId: string | undefined
+    anchorMessageCount?: number
   }
 ): Promise<string | null> {
   const syncTiming = getTimingConfig()
   const pollStart = Date.now()
   let pollCount = 0
+  let timedOut = false
 
   log("[task] Starting poll loop", { sessionID: input.sessionID, agentToUse: input.agentToUse })
 
@@ -48,7 +50,13 @@ export async function pollSyncSession(
     await new Promise(resolve => setTimeout(resolve, syncTiming.POLL_INTERVAL_MS))
     pollCount++
 
-    const statusResult = await client.session.status()
+    let statusResult: { data?: Record<string, { type: string }> }
+    try {
+      statusResult = await client.session.status()
+    } catch (error) {
+      log("[task] Poll status fetch failed, retrying", { sessionID: input.sessionID, error: String(error) })
+      continue
+    }
     const allStatuses = (statusResult.data ?? {}) as Record<string, { type: string }>
     const sessionStatus = allStatuses[input.sessionID]
 
@@ -65,8 +73,19 @@ export async function pollSyncSession(
       continue
     }
 
-    const messagesResult = await client.session.messages({ path: { id: input.sessionID } })
-    const msgs = ((messagesResult as { data?: unknown }).data ?? messagesResult) as SessionMessage[]
+    let messagesResult: { data?: unknown } | SessionMessage[]
+    try {
+      messagesResult = await client.session.messages({ path: { id: input.sessionID } })
+    } catch (error) {
+      log("[task] Poll messages fetch failed, retrying", { sessionID: input.sessionID, error: String(error) })
+      continue
+    }
+    const rawData = (messagesResult as { data?: unknown })?.data ?? messagesResult
+    const msgs = Array.isArray(rawData) ? (rawData as SessionMessage[]) : []
+
+    if (input.anchorMessageCount !== undefined && msgs.length <= input.anchorMessageCount) {
+      continue
+    }
 
     if (isSessionComplete(msgs)) {
       log("[task] Poll complete - terminal finish detected", { sessionID: input.sessionID, pollCount })
@@ -75,8 +94,9 @@ export async function pollSyncSession(
   }
 
   if (Date.now() - pollStart >= syncTiming.MAX_POLL_TIME_MS) {
+    timedOut = true
     log("[task] Poll timeout reached", { sessionID: input.sessionID, pollCount })
   }
 
-  return null
+  return timedOut ? `Poll timeout reached after ${syncTiming.MAX_POLL_TIME_MS}ms for session ${input.sessionID}` : null
 }
