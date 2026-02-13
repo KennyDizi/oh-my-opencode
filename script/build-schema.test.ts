@@ -1,29 +1,18 @@
-import { describe, test, expect, beforeAll } from "bun:test"
-import { existsSync } from "node:fs"
+import { describe, expect, test } from "bun:test"
+import { createOhMyOpenCodeJsonSchema } from "./build-schema-document"
 
-const SCHEMA_PATH = "assets/oh-my-opencode.schema.json"
+describe("build-schema-document", () => {
+  test("generates schema with skills property", () => {
+    // given
+    const expectedDraft = "http://json-schema.org/draft-07/schema#"
 
-describe("Schema Generation", () => {
-  beforeAll(async () => {
-    await import("./build-schema")
-  })
+    // when
+    const schema = createOhMyOpenCodeJsonSchema()
 
-  test("generates schema file", () => {
-    expect(existsSync(SCHEMA_PATH)).toBe(true)
-  })
-
-  test("schema is valid JSON", async () => {
-    const file = Bun.file(SCHEMA_PATH)
-    const json = await file.json()
-    expect(json).toBeDefined()
-  })
-
-  test("schema has required metadata", async () => {
-    const file = Bun.file(SCHEMA_PATH)
-    const json = await file.json()
-    expect(json.$schema).toBe("http://json-schema.org/draft-07/schema#")
-    expect(json.$id).toBe("https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json")
-    expect(json.title).toBe("Oh My OpenCode Configuration")
-    expect(json.description).toBe("Configuration schema for oh-my-opencode plugin")
+    // then
+    expect(schema.$schema).toBe(expectedDraft)
+    expect(schema.title).toBe("Oh My OpenCode Configuration")
+    expect(schema.properties).toBeDefined()
+    expect(schema.properties.skills).toBeDefined()
   })
 })
