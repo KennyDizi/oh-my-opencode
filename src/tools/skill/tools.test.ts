@@ -1,6 +1,6 @@
 import type { Tool as McpTool } from "@modelcontextprotocol/sdk/types.js"
 import type { ToolContext } from "@opencode-ai/plugin/tool"
-import { beforeEach, describe, expect, it, mock, spyOn } from "bun:test"
+import { afterAll, beforeEach, describe, expect, it, mock, spyOn } from "bun:test"
 import * as fs from "node:fs"
 import type { LoadedSkill } from "../../features/opencode-skill-loader/types"
 import { SkillMcpManager } from "../../features/skill-mcp-manager"
@@ -20,6 +20,10 @@ Test skill body content`
     return originalReadFileSync(path, encoding as BufferEncoding)
   },
 }))
+
+afterAll(() => {
+  mock.restore()
+})
 
 function createMockSkill(name: string, options: { agent?: string } = {}): LoadedSkill {
   return {
