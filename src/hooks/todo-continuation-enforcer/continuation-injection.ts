@@ -1,6 +1,7 @@
 import type { PluginInput } from "@opencode-ai/plugin"
 
 import type { BackgroundManager } from "../../features/background-agent"
+import { normalizeSDKResponse } from "../../shared"
 import {
   findNearestMessageWithFields,
   findNearestMessageWithFieldsFromSDK,
@@ -8,6 +9,7 @@ import {
 } from "../../features/hook-message-injector"
 import { log } from "../../shared/logger"
 import { isSqliteBackend } from "../../shared/opencode-storage-detection"
+import { getAgentConfigKey } from "../../shared/agent-display-names"
 
 import {
   CONTINUATION_PROMPT,
@@ -63,7 +65,7 @@ export async function injectContinuation(args: {
   let todos: Todo[] = []
   try {
     const response = await ctx.client.session.todo({ path: { id: sessionID } })
-    todos = (response.data ?? response) as Todo[]
+    todos = normalizeSDKResponse(response, [] as Todo[], { preferResponseOnMissingData: true })
   } catch (error) {
     log(`[${HOOK_NAME}] Failed to fetch todos`, { sessionID, error: String(error) })
     return
@@ -102,7 +104,7 @@ export async function injectContinuation(args: {
     tools = tools ?? previousMessage?.tools
   }
 
-  if (agentName && skipAgents.includes(agentName)) {
+  if (agentName && skipAgents.some(s => getAgentConfigKey(s) === getAgentConfigKey(agentName))) {
     log(`[${HOOK_NAME}] Skipped: agent in skipAgents list`, { sessionID, agent: agentName })
     return
   }

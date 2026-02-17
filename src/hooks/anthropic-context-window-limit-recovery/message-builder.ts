@@ -1,5 +1,6 @@
 import { log } from "../../shared/logger"
 import type { PluginInput } from "@opencode-ai/plugin"
+import { normalizeSDKResponse } from "../../shared"
 import { isSqliteBackend } from "../../shared/opencode-storage-detection"
 import {
   findEmptyMessages,
@@ -31,13 +32,10 @@ function messageHasContentFromSDK(message: SDKMessage): boolean {
   const parts = message.parts
   if (!parts || parts.length === 0) return false
 
-  let hasIgnoredParts = false
-
   for (const part of parts) {
     const type = part.type
     if (!type) continue
     if (IGNORE_TYPES.has(type)) {
-      hasIgnoredParts = true
       continue
     }
 
@@ -64,7 +62,7 @@ async function findEmptyMessageIdsFromSDK(
     const response = (await client.session.messages({
       path: { id: sessionID },
     })) as { data?: SDKMessage[] }
-    const messages = ((response.data ?? response) as unknown as SDKMessage[]) ?? []
+    const messages = normalizeSDKResponse(response, [] as SDKMessage[], { preferResponseOnMissingData: true })
 
     const emptyIds: string[] = []
     for (const message of messages) {
