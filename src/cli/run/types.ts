@@ -4,8 +4,8 @@ export type { OpencodeClient }
 export interface RunOptions {
   message: string
   agent?: string
+  verbose?: boolean
   directory?: string
-  timeout?: number
   port?: number
   attach?: string
   onComplete?: string
@@ -31,6 +31,7 @@ export interface RunContext {
   sessionID: string
   directory: string
   abortController: AbortController
+  verbose?: boolean
 }
 
 export interface Todo {

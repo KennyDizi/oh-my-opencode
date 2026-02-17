@@ -310,7 +310,7 @@ describe("pollForCompletion", () => {
     //#then - returns 1 (not 130/timeout), error message printed
     expect(result).toBe(1)
     const errorCalls = (console.error as ReturnType<typeof mock>).mock.calls
-    expect(errorCalls.some((call) => call[0]?.includes("Session ended with error"))).toBe(true)
+    expect(errorCalls.some((call: unknown[]) => String(call[0] ?? "").includes("Session ended with error"))).toBe(true)
   })
 
   it("returns 1 when session errors while tool is active (error not masked by tool gate)", async () => {
@@ -335,4 +335,5 @@ describe("pollForCompletion", () => {
     //#then - returns 1
     expect(result).toBe(1)
   })
+
 })

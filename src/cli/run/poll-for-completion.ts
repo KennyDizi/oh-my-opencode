@@ -34,6 +34,10 @@ export async function pollForCompletion(
   while (!abortController.signal.aborted) {
     await new Promise((resolve) => setTimeout(resolve, pollIntervalMs))
 
+    if (abortController.signal.aborted) {
+      return 130
+    }
+
     // ERROR CHECK FIRST — errors must not be masked by other gates
     if (eventState.mainSessionError) {
       errorCycleCount++
@@ -91,6 +95,10 @@ export async function pollForCompletion(
 
     const shouldExit = await checkCompletionConditions(ctx)
     if (shouldExit) {
+      if (abortController.signal.aborted) {
+        return 130
+      }
+
       consecutiveCompleteChecks++
       if (consecutiveCompleteChecks >= requiredConsecutive) {
         console.log(pc.green("\n\nAll tasks completed."))
