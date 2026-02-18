@@ -25,6 +25,7 @@ export const HookNameSchema = z.enum([
   "interactive-bash-session",
 
   "thinking-block-validator",
+  "ultrawork-model-override",
   "ralph-loop",
   "category-skill-reminder",
 
@@ -37,6 +38,7 @@ export const HookNameSchema = z.enum([
   "delegate-task-retry",
   "prometheus-md-only",
   "sisyphus-junior-notepad",
+  "no-sisyphus-gpt",
   "start-work",
   "atlas",
   "unstable-agent-babysitter",

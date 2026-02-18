@@ -7,14 +7,21 @@ import type {
   SessionErrorProps,
   MessageUpdatedProps,
   MessagePartUpdatedProps,
+  MessagePartDeltaProps,
   ToolExecuteProps,
   ToolResultProps,
   TuiToastShowProps,
 } from "./types"
 import type { EventState } from "./event-state"
 import { serializeError } from "./event-formatting"
-import { formatToolInputPreview } from "./tool-input-preview"
+import { formatToolHeader } from "./tool-input-preview"
 import { displayChars } from "./display-chars"
+import {
+  closeThinkBlock,
+  openThinkBlock,
+  renderAgentHeader,
+  writePaddedText,
+} from "./output-renderer"
 
 function getSessionId(props?: { sessionID?: string; sessionId?: string }): string | undefined {
   return props?.sessionID ?? props?.sessionId
@@ -30,6 +37,18 @@ function getPartSessionId(props?: {
   part?: { sessionID?: string; sessionId?: string }
 }): string | undefined {
   return props?.part?.sessionID ?? props?.part?.sessionId
+}
+
+function getPartMessageId(props?: {
+  part?: { messageID?: string }
+}): string | undefined {
+  return props?.part?.messageID
+}
+
+function getDeltaMessageId(props?: {
+  messageID?: string
+}): string | undefined {
+  return props?.messageID
 }
 
 export function handleSessionIdle(ctx: RunContext, payload: EventPayload, state: EventState): void {
@@ -76,16 +95,41 @@ export function handleMessagePartUpdated(ctx: RunContext, payload: EventPayload,
   const infoSid = getInfoSessionId(props)
   if ((partSid ?? infoSid) !== ctx.sessionID) return
 
-  const role = props?.info?.role ?? state.currentMessageRole
-  if (role === "user") return
+  const role = props?.info?.role
+  const mappedRole = getPartMessageId(props)
+    ? state.messageRoleById[getPartMessageId(props) ?? ""]
+    : undefined
+  if ((role ?? mappedRole) === "user") return
 
   const part = props?.part
   if (!part) return
 
+  if (part.id && part.type) {
+    state.partTypesById[part.id] = part.type
+  }
+
+  if (part.type === "reasoning") {
+    ensureThinkBlockOpen(state)
+    const reasoningText = part.text ?? ""
+    const newText = reasoningText.slice(state.lastReasoningText.length)
+    if (newText) {
+      const padded = writePaddedText(newText, state.thinkingAtLineStart)
+      process.stdout.write(pc.dim(padded.output))
+      state.thinkingAtLineStart = padded.atLineStart
+      state.hasReceivedMeaningfulWork = true
+    }
+    state.lastReasoningText = reasoningText
+    return
+  }
+
+  closeThinkBlockIfNeeded(state)
+
   if (part.type === "text" && part.text) {
     const newText = part.text.slice(state.lastPartText.length)
     if (newText) {
-      process.stdout.write(newText)
+      const padded = writePaddedText(newText, state.textAtLineStart)
+      process.stdout.write(padded.output)
+      state.textAtLineStart = padded.atLineStart
       state.hasReceivedMeaningfulWork = true
     }
     state.lastPartText = part.text
@@ -94,6 +138,44 @@ export function handleMessagePartUpdated(ctx: RunContext, payload: EventPayload,
   if (part.type === "tool") {
     handleToolPart(ctx, part, state)
   }
+}
+
+export function handleMessagePartDelta(ctx: RunContext, payload: EventPayload, state: EventState): void {
+  if (payload.type !== "message.part.delta") return
+
+  const props = payload.properties as MessagePartDeltaProps | undefined
+  const sessionID = props?.sessionID ?? props?.sessionId
+  if (sessionID !== ctx.sessionID) return
+
+  const role = getDeltaMessageId(props)
+    ? state.messageRoleById[getDeltaMessageId(props) ?? ""]
+    : undefined
+  if (role === "user") return
+
+  if (props?.field !== "text") return
+
+  const partType = props?.partID ? state.partTypesById[props.partID] : undefined
+
+  const delta = props.delta ?? ""
+  if (!delta) return
+
+  if (partType === "reasoning") {
+    ensureThinkBlockOpen(state)
+    const padded = writePaddedText(delta, state.thinkingAtLineStart)
+    process.stdout.write(pc.dim(padded.output))
+    state.thinkingAtLineStart = padded.atLineStart
+    state.lastReasoningText += delta
+    state.hasReceivedMeaningfulWork = true
+    return
+  }
+
+  closeThinkBlockIfNeeded(state)
+
+  const padded = writePaddedText(delta, state.textAtLineStart)
+  process.stdout.write(padded.output)
+  state.textAtLineStart = padded.atLineStart
+  state.lastPartText += delta
+  state.hasReceivedMeaningfulWork = true
 }
 
 function handleToolPart(
@@ -105,24 +187,26 @@ function handleToolPart(
   const status = part.state?.status
 
   if (status === "running") {
+    if (state.currentTool !== null) return
     state.currentTool = toolName
-    const inputPreview = part.state?.input
-      ? formatToolInputPreview(part.state.input)
-      : ""
+    const header = formatToolHeader(toolName, part.state?.input ?? {})
+    const suffix = header.description ? ` ${pc.dim(header.description)}` : ""
     state.hasReceivedMeaningfulWork = true
-    process.stdout.write(`\n${pc.cyan(">")} ${pc.bold(toolName)}${inputPreview}\n`)
+    process.stdout.write(`\n  ${pc.cyan(header.icon)} ${pc.bold(header.title)}${suffix}  \n`)
   }
 
   if (status === "completed" || status === "error") {
+    if (state.currentTool === null) return
     const output = part.state?.output || ""
-    const maxLen = 200
-    const preview = output.length > maxLen ? output.slice(0, maxLen) + "..." : output
-    if (preview.trim()) {
-      const lines = preview.split("\n").slice(0, 3)
-      process.stdout.write(pc.dim(`${displayChars.treeIndent}${displayChars.treeEnd} ${lines.join(`\n${displayChars.treeJoin}`)}\n`))
+    if (output.trim()) {
+      process.stdout.write(pc.dim(`  ${displayChars.treeEnd} output  \n`))
+      const padded = writePaddedText(output, true)
+      process.stdout.write(pc.dim(padded.output + (padded.atLineStart ? "" : "  ")))
+      process.stdout.write("\n")
     }
     state.currentTool = null
     state.lastPartText = ""
+    state.textAtLineStart = true
   }
 }
 
@@ -133,27 +217,38 @@ export function handleMessageUpdated(ctx: RunContext, payload: EventPayload, sta
   if (getInfoSessionId(props) !== ctx.sessionID) return
 
   state.currentMessageRole = props?.info?.role ?? null
+
+  const messageID = props?.info?.id ?? null
+  const role = props?.info?.role
+  if (messageID && role) {
+    state.messageRoleById[messageID] = role
+  }
+
   if (props?.info?.role !== "assistant") return
 
-  state.hasReceivedMeaningfulWork = true
-  state.messageCount++
-  state.lastPartText = ""
+  const isNewMessage = !messageID || messageID !== state.currentMessageId
+  if (isNewMessage) {
+    state.currentMessageId = messageID
+    state.hasReceivedMeaningfulWork = true
+    state.messageCount++
+    state.lastPartText = ""
+    state.lastReasoningText = ""
+    state.hasPrintedThinkingLine = false
+    state.lastThinkingSummary = ""
+    state.textAtLineStart = true
+    state.thinkingAtLineStart = false
+    closeThinkBlockIfNeeded(state)
+  }
 
   const agent = props?.info?.agent ?? null
   const model = props?.info?.modelID ?? null
-  if (agent !== state.currentAgent || model !== state.currentModel) {
+  const variant = props?.info?.variant ?? null
+  if (agent !== state.currentAgent || model !== state.currentModel || variant !== state.currentVariant) {
     state.currentAgent = agent
     state.currentModel = model
-    printAgentHeader(agent, model)
+    state.currentVariant = variant
+    renderAgentHeader(agent, model, variant, state.agentColorsByName)
   }
-}
-
-function printAgentHeader(agent: string | null, model: string | null): void {
-  if (!agent && !model) return
-  const agentLabel = agent ? pc.bold(pc.magenta(agent)) : ""
-  const modelLabel = model ? pc.dim(model) : ""
-  const separator = agent && model ? " " : ""
-  process.stdout.write(`\n${agentLabel}${separator}${modelLabel}\n`)
 }
 
 export function handleToolExecute(ctx: RunContext, payload: EventPayload, state: EventState): void {
@@ -162,14 +257,17 @@ export function handleToolExecute(ctx: RunContext, payload: EventPayload, state:
   const props = payload.properties as ToolExecuteProps | undefined
   if (getSessionId(props) !== ctx.sessionID) return
 
+  closeThinkBlockIfNeeded(state)
+
+  if (state.currentTool !== null) return
+
   const toolName = props?.name || "unknown"
   state.currentTool = toolName
-  const inputPreview = props?.input
-    ? formatToolInputPreview(props.input)
-    : ""
+  const header = formatToolHeader(toolName, props?.input ?? {})
+  const suffix = header.description ? ` ${pc.dim(header.description)}` : ""
 
   state.hasReceivedMeaningfulWork = true
-  process.stdout.write(`\n${pc.cyan(">")} ${pc.bold(toolName)}${inputPreview}\n`)
+  process.stdout.write(`\n  ${pc.cyan(header.icon)} ${pc.bold(header.title)}${suffix}  \n`)
 }
 
 export function handleToolResult(ctx: RunContext, payload: EventPayload, state: EventState): void {
@@ -178,17 +276,21 @@ export function handleToolResult(ctx: RunContext, payload: EventPayload, state: 
   const props = payload.properties as ToolResultProps | undefined
   if (getSessionId(props) !== ctx.sessionID) return
 
-  const output = props?.output || ""
-  const maxLen = 200
-  const preview = output.length > maxLen ? output.slice(0, maxLen) + "..." : output
+  closeThinkBlockIfNeeded(state)
 
-  if (preview.trim()) {
-    const lines = preview.split("\n").slice(0, 3)
-    process.stdout.write(pc.dim(`${displayChars.treeIndent}${displayChars.treeEnd} ${lines.join(`\n${displayChars.treeJoin}`)}\n`))
+  if (state.currentTool === null) return
+
+  const output = props?.output || ""
+  if (output.trim()) {
+    process.stdout.write(pc.dim(`  ${displayChars.treeEnd} output  \n`))
+    const padded = writePaddedText(output, true)
+    process.stdout.write(pc.dim(padded.output + (padded.atLineStart ? "" : "  ")))
+    process.stdout.write("\n")
   }
 
   state.currentTool = null
   state.lastPartText = ""
+  state.textAtLineStart = true
 }
 
 export function handleTuiToast(_ctx: RunContext, payload: EventPayload, state: EventState): void {
@@ -205,4 +307,21 @@ export function handleTuiToast(_ctx: RunContext, payload: EventPayload, state: E
       state.lastError = `${title}${message}`
     }
   }
+}
+
+function ensureThinkBlockOpen(state: EventState): void {
+  if (state.inThinkBlock) return
+  openThinkBlock()
+  state.inThinkBlock = true
+  state.hasPrintedThinkingLine = false
+  state.thinkingAtLineStart = false
+}
+
+function closeThinkBlockIfNeeded(state: EventState): void {
+  if (!state.inThinkBlock) return
+  closeThinkBlock()
+  state.inThinkBlock = false
+  state.lastThinkingLineWidth = 0
+  state.lastThinkingSummary = ""
+  state.thinkingAtLineStart = false
 }

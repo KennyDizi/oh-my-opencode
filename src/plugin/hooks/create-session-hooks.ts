@@ -20,10 +20,12 @@ import {
   createStartWorkHook,
   createPrometheusMdOnlyHook,
   createSisyphusJuniorNotepadHook,
+  createNoSisyphusGptHook,
   createQuestionLabelTruncatorHook,
   createPreemptiveCompactionHook,
 } from "../../hooks"
 import { createAnthropicEffortHook } from "../../hooks/anthropic-effort"
+import { createUltraworkModelOverrideHook } from "../../hooks/ultrawork-model-override"
 import {
   detectExternalNotificationPlugin,
   getNotificationConflictWarning,
@@ -50,9 +52,11 @@ export type SessionHooks = {
   startWork: ReturnType<typeof createStartWorkHook> | null
   prometheusMdOnly: ReturnType<typeof createPrometheusMdOnlyHook> | null
   sisyphusJuniorNotepad: ReturnType<typeof createSisyphusJuniorNotepadHook> | null
+  noSisyphusGpt: ReturnType<typeof createNoSisyphusGptHook> | null
   questionLabelTruncator: ReturnType<typeof createQuestionLabelTruncatorHook>
   taskResumeInfo: ReturnType<typeof createTaskResumeInfoHook>
   anthropicEffort: ReturnType<typeof createAnthropicEffortHook> | null
+  ultraworkModelOverride: ReturnType<typeof createUltraworkModelOverrideHook> | null
 }
 
 export function createSessionHooks(args: {
@@ -156,11 +160,19 @@ export function createSessionHooks(args: {
     ? safeHook("sisyphus-junior-notepad", () => createSisyphusJuniorNotepadHook(ctx))
     : null
 
+  const noSisyphusGpt = isHookEnabled("no-sisyphus-gpt")
+    ? safeHook("no-sisyphus-gpt", () => createNoSisyphusGptHook(ctx))
+    : null
+
   const questionLabelTruncator = createQuestionLabelTruncatorHook()
   const taskResumeInfo = createTaskResumeInfoHook()
 
   const anthropicEffort = isHookEnabled("anthropic-effort")
     ? safeHook("anthropic-effort", () => createAnthropicEffortHook())
+    : null
+
+  const ultraworkModelOverride = isHookEnabled("ultrawork-model-override")
+    ? safeHook("ultrawork-model-override", () => createUltraworkModelOverrideHook({ agents: pluginConfig.agents }))
     : null
 
   return {
@@ -181,8 +193,10 @@ export function createSessionHooks(args: {
     startWork,
     prometheusMdOnly,
     sisyphusJuniorNotepad,
+    noSisyphusGpt,
     questionLabelTruncator,
     taskResumeInfo,
     anthropicEffort,
+    ultraworkModelOverride,
   }
 }
