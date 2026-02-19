@@ -32,17 +32,19 @@ export const AgentOverrideConfigSchema = z.object({
       budgetTokens: z.number().optional(),
     })
     .optional(),
-  /** Ultrawork model override configuration. */
-  ultrawork: z.object({
-    model: z.string(),
-    variant: z.string().optional(),
-  }).optional(),
   /** Reasoning effort level (OpenAI). Overrides category and default settings. */
   reasoningEffort: z.enum(["low", "medium", "high", "xhigh"]).optional(),
   /** Text verbosity level. */
   textVerbosity: z.enum(["low", "medium", "high"]).optional(),
   /** Provider-specific options. Passed directly to OpenCode SDK. */
   providerOptions: z.record(z.string(), z.unknown()).optional(),
+  /** Per-message ultrawork override model/variant when ultrawork keyword is detected. */
+  ultrawork: z
+    .object({
+      model: z.string().optional(),
+      variant: z.string().optional(),
+    })
+    .optional(),
 })
 
 export const AgentOverridesSchema = z.object({

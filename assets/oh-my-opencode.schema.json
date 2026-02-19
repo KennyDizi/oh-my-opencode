@@ -80,7 +80,6 @@
           "non-interactive-env",
           "interactive-bash-session",
           "thinking-block-validator",
-          "ultrawork-model-override",
           "ralph-loop",
           "category-skill-reminder",
           "compaction-context-injector",
@@ -102,7 +101,8 @@
           "tasks-todowrite-disabler",
           "write-existing-file-guard",
           "anthropic-effort",
-          "hashline-read-enhancer"
+          "hashline-read-enhancer",
+          "hashline-edit-diff-enhancer"
         ]
       }
     },
@@ -285,21 +285,6 @@
               ],
               "additionalProperties": false
             },
-            "ultrawork": {
-              "type": "object",
-              "properties": {
-                "model": {
-                  "type": "string"
-                },
-                "variant": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "model"
-              ],
-              "additionalProperties": false
-            },
             "reasoningEffort": {
               "type": "string",
               "enum": [
@@ -323,6 +308,18 @@
                 "type": "string"
               },
               "additionalProperties": {}
+            },
+            "ultrawork": {
+              "type": "object",
+              "properties": {
+                "model": {
+                  "type": "string"
+                },
+                "variant": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
             }
           },
           "additionalProperties": false
@@ -482,21 +479,6 @@
               ],
               "additionalProperties": false
             },
-            "ultrawork": {
-              "type": "object",
-              "properties": {
-                "model": {
-                  "type": "string"
-                },
-                "variant": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "model"
-              ],
-              "additionalProperties": false
-            },
             "reasoningEffort": {
               "type": "string",
               "enum": [
@@ -520,6 +502,18 @@
                 "type": "string"
               },
               "additionalProperties": {}
+            },
+            "ultrawork": {
+              "type": "object",
+              "properties": {
+                "model": {
+                  "type": "string"
+                },
+                "variant": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
             }
           },
           "additionalProperties": false
@@ -679,21 +673,6 @@
               ],
               "additionalProperties": false
             },
-            "ultrawork": {
-              "type": "object",
-              "properties": {
-                "model": {
-                  "type": "string"
-                },
-                "variant": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "model"
-              ],
-              "additionalProperties": false
-            },
             "reasoningEffort": {
               "type": "string",
               "enum": [
@@ -717,6 +696,18 @@
                 "type": "string"
               },
               "additionalProperties": {}
+            },
+            "ultrawork": {
+              "type": "object",
+              "properties": {
+                "model": {
+                  "type": "string"
+                },
+                "variant": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
             }
           },
           "additionalProperties": false
@@ -876,21 +867,6 @@
               ],
               "additionalProperties": false
             },
-            "ultrawork": {
-              "type": "object",
-              "properties": {
-                "model": {
-                  "type": "string"
-                },
-                "variant": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "model"
-              ],
-              "additionalProperties": false
-            },
             "reasoningEffort": {
               "type": "string",
               "enum": [
@@ -914,6 +890,18 @@
                 "type": "string"
               },
               "additionalProperties": {}
+            },
+            "ultrawork": {
+              "type": "object",
+              "properties": {
+                "model": {
+                  "type": "string"
+                },
+                "variant": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
             }
           },
           "additionalProperties": false
@@ -1073,21 +1061,6 @@
               ],
               "additionalProperties": false
             },
-            "ultrawork": {
-              "type": "object",
-              "properties": {
-                "model": {
-                  "type": "string"
-                },
-                "variant": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "model"
-              ],
-              "additionalProperties": false
-            },
             "reasoningEffort": {
               "type": "string",
               "enum": [
@@ -1111,6 +1084,18 @@
                 "type": "string"
               },
               "additionalProperties": {}
+            },
+            "ultrawork": {
+              "type": "object",
+              "properties": {
+                "model": {
+                  "type": "string"
+                },
+                "variant": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
             }
           },
           "additionalProperties": false
@@ -1270,21 +1255,6 @@
               ],
               "additionalProperties": false
             },
-            "ultrawork": {
-              "type": "object",
-              "properties": {
-                "model": {
-                  "type": "string"
-                },
-                "variant": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "model"
-              ],
-              "additionalProperties": false
-            },
             "reasoningEffort": {
               "type": "string",
               "enum": [
@@ -1308,6 +1278,18 @@
                 "type": "string"
               },
               "additionalProperties": {}
+            },
+            "ultrawork": {
+              "type": "object",
+              "properties": {
+                "model": {
+                  "type": "string"
+                },
+                "variant": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
             }
           },
           "additionalProperties": false
@@ -1467,21 +1449,6 @@
               ],
               "additionalProperties": false
             },
-            "ultrawork": {
-              "type": "object",
-              "properties": {
-                "model": {
-                  "type": "string"
-                },
-                "variant": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "model"
-              ],
-              "additionalProperties": false
-            },
             "reasoningEffort": {
               "type": "string",
               "enum": [
@@ -1505,6 +1472,18 @@
                 "type": "string"
               },
               "additionalProperties": {}
+            },
+            "ultrawork": {
+              "type": "object",
+              "properties": {
+                "model": {
+                  "type": "string"
+                },
+                "variant": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
             }
           },
           "additionalProperties": false
@@ -1664,21 +1643,6 @@
               ],
               "additionalProperties": false
             },
-            "ultrawork": {
-              "type": "object",
-              "properties": {
-                "model": {
-                  "type": "string"
-                },
-                "variant": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "model"
-              ],
-              "additionalProperties": false
-            },
             "reasoningEffort": {
               "type": "string",
               "enum": [
@@ -1702,6 +1666,18 @@
                 "type": "string"
               },
               "additionalProperties": {}
+            },
+            "ultrawork": {
+              "type": "object",
+              "properties": {
+                "model": {
+                  "type": "string"
+                },
+                "variant": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
             }
           },
           "additionalProperties": false
@@ -1861,21 +1837,6 @@
               ],
               "additionalProperties": false
             },
-            "ultrawork": {
-              "type": "object",
-              "properties": {
-                "model": {
-                  "type": "string"
-                },
-                "variant": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "model"
-              ],
-              "additionalProperties": false
-            },
             "reasoningEffort": {
               "type": "string",
               "enum": [
@@ -1899,6 +1860,18 @@
                 "type": "string"
               },
               "additionalProperties": {}
+            },
+            "ultrawork": {
+              "type": "object",
+              "properties": {
+                "model": {
+                  "type": "string"
+                },
+                "variant": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
             }
           },
           "additionalProperties": false
@@ -2058,21 +2031,6 @@
               ],
               "additionalProperties": false
             },
-            "ultrawork": {
-              "type": "object",
-              "properties": {
-                "model": {
-                  "type": "string"
-                },
-                "variant": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "model"
-              ],
-              "additionalProperties": false
-            },
             "reasoningEffort": {
               "type": "string",
               "enum": [
@@ -2096,6 +2054,18 @@
                 "type": "string"
               },
               "additionalProperties": {}
+            },
+            "ultrawork": {
+              "type": "object",
+              "properties": {
+                "model": {
+                  "type": "string"
+                },
+                "variant": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
             }
           },
           "additionalProperties": false
@@ -2255,21 +2225,6 @@
               ],
               "additionalProperties": false
             },
-            "ultrawork": {
-              "type": "object",
-              "properties": {
-                "model": {
-                  "type": "string"
-                },
-                "variant": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "model"
-              ],
-              "additionalProperties": false
-            },
             "reasoningEffort": {
               "type": "string",
               "enum": [
@@ -2293,6 +2248,18 @@
                 "type": "string"
               },
               "additionalProperties": {}
+            },
+            "ultrawork": {
+              "type": "object",
+              "properties": {
+                "model": {
+                  "type": "string"
+                },
+                "variant": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
             }
           },
           "additionalProperties": false
@@ -2452,21 +2419,6 @@
               ],
               "additionalProperties": false
             },
-            "ultrawork": {
-              "type": "object",
-              "properties": {
-                "model": {
-                  "type": "string"
-                },
-                "variant": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "model"
-              ],
-              "additionalProperties": false
-            },
             "reasoningEffort": {
               "type": "string",
               "enum": [
@@ -2490,6 +2442,18 @@
                 "type": "string"
               },
               "additionalProperties": {}
+            },
+            "ultrawork": {
+              "type": "object",
+              "properties": {
+                "model": {
+                  "type": "string"
+                },
+                "variant": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
             }
           },
           "additionalProperties": false
@@ -2649,21 +2613,6 @@
               ],
               "additionalProperties": false
             },
-            "ultrawork": {
-              "type": "object",
-              "properties": {
-                "model": {
-                  "type": "string"
-                },
-                "variant": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "model"
-              ],
-              "additionalProperties": false
-            },
             "reasoningEffort": {
               "type": "string",
               "enum": [
@@ -2687,6 +2636,18 @@
                 "type": "string"
               },
               "additionalProperties": {}
+            },
+            "ultrawork": {
+              "type": "object",
+              "properties": {
+                "model": {
+                  "type": "string"
+                },
+                "variant": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
             }
           },
           "additionalProperties": false
@@ -2846,21 +2807,6 @@
               ],
               "additionalProperties": false
             },
-            "ultrawork": {
-              "type": "object",
-              "properties": {
-                "model": {
-                  "type": "string"
-                },
-                "variant": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "model"
-              ],
-              "additionalProperties": false
-            },
             "reasoningEffort": {
               "type": "string",
               "enum": [
@@ -2884,6 +2830,18 @@
                 "type": "string"
               },
               "additionalProperties": {}
+            },
+            "ultrawork": {
+              "type": "object",
+              "properties": {
+                "model": {
+                  "type": "string"
+                },
+                "variant": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
             }
           },
           "additionalProperties": false

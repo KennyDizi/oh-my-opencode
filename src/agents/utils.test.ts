@@ -18,8 +18,8 @@ describe("createBuiltinAgents with model overrides", () => {
         "anthropic/claude-opus-4-6",
         "kimi-for-coding/k2p5",
         "opencode/kimi-k2.5-free",
-        "zai-coding-plan/glm-4.7",
-        "opencode/glm-4.7-free",
+        "zai-coding-plan/glm-5",
+        "opencode/big-pickle",
       ])
     )
 
@@ -259,8 +259,8 @@ describe("createBuiltinAgents with model overrides", () => {
         "anthropic/claude-opus-4-6",
         "kimi-for-coding/k2p5",
         "opencode/kimi-k2.5-free",
-        "zai-coding-plan/glm-4.7",
-        "opencode/glm-4.7-free",
+        "zai-coding-plan/glm-5",
+        "opencode/big-pickle",
         "openai/gpt-5.2",
       ])
     )
@@ -505,8 +505,8 @@ describe("createBuiltinAgents without systemDefaultModel", () => {
         "anthropic/claude-opus-4-6",
         "kimi-for-coding/k2p5",
         "opencode/kimi-k2.5-free",
-        "zai-coding-plan/glm-4.7",
-        "opencode/glm-4.7-free",
+        "zai-coding-plan/glm-5",
+        "opencode/big-pickle",
       ])
     )
 
