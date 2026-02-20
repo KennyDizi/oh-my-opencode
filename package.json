@@ -62,6 +62,7 @@
     "@modelcontextprotocol/sdk": "^1.26.0",
     "@opencode-ai/plugin": "^1.2.9",
     "@opencode-ai/sdk": "^1.2.9",
+    "codex": "^0.2.3",
     "commander": "^14.0.3",
     "detect-libc": "^2.1.2",
     "js-yaml": "^4.1.1",
