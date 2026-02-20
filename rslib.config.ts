@@ -39,6 +39,7 @@ export default defineConfig({
     cleanDistPath: true, // Clean dist directory before build
     externals: {
       bun: 'module bun', // ESM runtime — use import
+      'bun:sqlite': 'module bun:sqlite', // Bun built-in SQLite module
       '@ast-grep/napi': 'node-commonjs @ast-grep/napi', // Native CJS module — use createRequire
     },
   },

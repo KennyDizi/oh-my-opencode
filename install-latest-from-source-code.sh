@@ -15,19 +15,37 @@ cd "$SCRIPT_DIR"
 echo "Working directory: $SCRIPT_DIR"
 echo ""
 
-echo -e "${YELLOW}[1/4]${NC} Installing dependencies with Bun..."
+echo -e "${YELLOW}[1/5]${NC} Installing dependencies with Bun..."
 bun install
 echo -e "${GREEN}✓${NC} Dependencies installed\n"
 
-echo -e "${YELLOW}[2/4]${NC} Running type check..."
+echo -e "${YELLOW}[2/5]${NC} Migrating @opencode-ai/sdk module structure..."
+SDK_DIR="node_modules/@opencode-ai/sdk"
+if [ -d "$SDK_DIR/dist/src" ]; then
+    cd "$SDK_DIR/dist"
+    ln -sf src/index.js index.js 2>/dev/null || true
+    ln -sf src/index.d.ts index.d.ts 2>/dev/null || true
+    ln -sf src/client.js client.js 2>/dev/null || true
+    ln -sf src/client.d.ts client.d.ts 2>/dev/null || true
+    ln -sf src/server.js server.js 2>/dev/null || true
+    ln -sf src/server.d.ts server.d.ts 2>/dev/null || true
+    ln -sf src/v2 v2 2>/dev/null || true
+    ln -sf src/gen gen 2>/dev/null || true
+    cd "$SCRIPT_DIR"
+    echo -e "${GREEN}✓${NC} SDK structure migrated\n"
+else
+    echo -e "${GREEN}✓${NC} SDK structure OK (already migrated or not needed)\n"
+fi
+
+echo -e "${YELLOW}[3/5]${NC} Running type check..."
 bun run typecheck
 echo -e "${GREEN}✓${NC} Type check passed\n"
 
-echo -e "${YELLOW}[3/4]${NC} Building project with Bun..."
+echo -e "${YELLOW}[4/5]${NC} Building project with Bun..."
 bun run build
 echo -e "${GREEN}✓${NC} Build completed\n"
 
-echo -e "${YELLOW}[4/4]${NC} Verifying build output..."
+echo -e "${YELLOW}[5/5]${NC} Verifying build output..."
 
 FAILED=0
 
