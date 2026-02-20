@@ -92,6 +92,7 @@
           "prometheus-md-only",
           "sisyphus-junior-notepad",
           "no-sisyphus-gpt",
+          "no-hephaestus-non-gpt",
           "start-work",
           "atlas",
           "unstable-agent-babysitter",
@@ -126,6 +127,9 @@
       "items": {
         "type": "string"
       }
+    },
+    "hashline_edit": {
+      "type": "boolean"
     },
     "agents": {
       "type": "object",
@@ -3138,7 +3142,7 @@
         "safe_hook_creation": {
           "type": "boolean"
         },
-        "hashline_edit": {
+        "disable_omo_env": {
           "type": "boolean"
         }
       },

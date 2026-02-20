@@ -644,6 +644,55 @@ describe("OhMyOpenCodeConfigSchema - browser_automation_engine", () => {
   })
 })
 
+describe("OhMyOpenCodeConfigSchema - hashline_edit", () => {
+  test("accepts hashline_edit as true", () => {
+    //#given
+    const input = { hashline_edit: true }
+
+    //#when
+    const result = OhMyOpenCodeConfigSchema.safeParse(input)
+
+    //#then
+    expect(result.success).toBe(true)
+    expect(result.data?.hashline_edit).toBe(true)
+  })
+
+  test("accepts hashline_edit as false", () => {
+    //#given
+    const input = { hashline_edit: false }
+
+    //#when
+    const result = OhMyOpenCodeConfigSchema.safeParse(input)
+
+    //#then
+    expect(result.success).toBe(true)
+    expect(result.data?.hashline_edit).toBe(false)
+  })
+
+  test("hashline_edit is optional", () => {
+    //#given
+    const input = { auto_update: true }
+
+    //#when
+    const result = OhMyOpenCodeConfigSchema.safeParse(input)
+
+    //#then
+    expect(result.success).toBe(true)
+    expect(result.data?.hashline_edit).toBeUndefined()
+  })
+
+  test("rejects non-boolean hashline_edit", () => {
+    //#given
+    const input = { hashline_edit: "true" }
+
+    //#when
+    const result = OhMyOpenCodeConfigSchema.safeParse(input)
+
+    //#then
+    expect(result.success).toBe(false)
+  })
+})
+
 describe("ExperimentalConfigSchema feature flags", () => {
   test("accepts plugin_load_timeout_ms as number", () => {
     //#given
@@ -699,9 +748,9 @@ describe("ExperimentalConfigSchema feature flags", () => {
     }
   })
 
-  test("accepts hashline_edit as true", () => {
+  test("accepts disable_omo_env as true", () => {
     //#given
-    const config = { hashline_edit: true }
+    const config = { disable_omo_env: true }
 
     //#when
     const result = ExperimentalConfigSchema.safeParse(config)
@@ -709,13 +758,13 @@ describe("ExperimentalConfigSchema feature flags", () => {
     //#then
     expect(result.success).toBe(true)
     if (result.success) {
-      expect(result.data.hashline_edit).toBe(true)
+      expect(result.data.disable_omo_env).toBe(true)
     }
   })
 
-  test("accepts hashline_edit as false", () => {
+  test("accepts disable_omo_env as false", () => {
     //#given
-    const config = { hashline_edit: false }
+    const config = { disable_omo_env: false }
 
     //#when
     const result = ExperimentalConfigSchema.safeParse(config)
@@ -723,11 +772,11 @@ describe("ExperimentalConfigSchema feature flags", () => {
     //#then
     expect(result.success).toBe(true)
     if (result.success) {
-      expect(result.data.hashline_edit).toBe(false)
+      expect(result.data.disable_omo_env).toBe(false)
     }
   })
 
-  test("hashline_edit is optional", () => {
+  test("disable_omo_env is optional", () => {
     //#given
     const config = { safe_hook_creation: true }
 
@@ -737,13 +786,13 @@ describe("ExperimentalConfigSchema feature flags", () => {
     //#then
     expect(result.success).toBe(true)
     if (result.success) {
-      expect(result.data.hashline_edit).toBeUndefined()
+      expect(result.data.disable_omo_env).toBeUndefined()
     }
   })
 
-  test("rejects non-boolean hashline_edit", () => {
+  test("rejects non-boolean disable_omo_env", () => {
     //#given
-    const config = { hashline_edit: "true" }
+    const config = { disable_omo_env: "true" }
 
     //#when
     const result = ExperimentalConfigSchema.safeParse(config)
@@ -751,6 +800,7 @@ describe("ExperimentalConfigSchema feature flags", () => {
     //#then
     expect(result.success).toBe(false)
   })
+
 })
 
 describe("GitMasterConfigSchema", () => {

@@ -981,6 +981,34 @@ Available hooks: `todo-continuation-enforcer`, `context-window-monitor`, `sessio
 
 **Note on `auto-update-checker` and `startup-toast`**: The `startup-toast` hook is a sub-feature of `auto-update-checker`. To disable only the startup toast notification while keeping update checking enabled, add `"startup-toast"` to `disabled_hooks`. To disable all update checking features (including the toast), add `"auto-update-checker"` to `disabled_hooks`.
 
+## Hashline Edit
+
+Oh My OpenCode replaces OpenCode's built-in `Edit` tool with a hash-anchored version that uses `LINE#ID` references (e.g. `5#VK`) instead of bare line numbers. This prevents stale-line edits by validating content hash before applying each change.
+
+Enabled by default. Set `hashline_edit: false` to opt out and restore standard file editing.
+
+```json
+{
+  "hashline_edit": false
+}
+```
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `hashline_edit` | `true` | Enable hash-anchored `Edit` tool and companion hooks. When `false`, falls back to standard editing without hash validation. |
+
+When enabled, two companion hooks are also active:
+
+- **`hashline-read-enhancer`** — Appends `LINE#ID:content` annotations to `Read` output so agents always have fresh anchors.
+- **`hashline-edit-diff-enhancer`** — Shows a unified diff in `Edit` / `Write` output for immediate change visibility.
+
+To disable only the hooks while keeping the hash-anchored Edit tool:
+
+```json
+{
+  "disabled_hooks": ["hashline-read-enhancer", "hashline-edit-diff-enhancer"]
+}
+
 ## Disabled Commands
 
 Disable specific built-in commands via `disabled_commands` in `~/.config/opencode/oh-my-opencode.json` or `.opencode/oh-my-opencode.json`:
@@ -1133,6 +1161,7 @@ Opt-in experimental features that may change or be removed in future versions. U
     "truncate_all_tool_outputs": true,
     "aggressive_truncation": true,
     "auto_resume": true,
+    "disable_omo_env": false,
     "dynamic_context_pruning": {
       "enabled": false,
       "notification": "detailed",
@@ -1164,6 +1193,7 @@ Opt-in experimental features that may change or be removed in future versions. U
 | `truncate_all_tool_outputs` | `false` | Truncates ALL tool outputs instead of just whitelisted tools (Grep, Glob, LSP, AST-grep). Tool output truncator is enabled by default - disable via `disabled_hooks`.                         |
 | `aggressive_truncation`     | `false` | When token limit is exceeded, aggressively truncates tool outputs to fit within limits. More aggressive than the default truncation behavior. Falls back to summarize/revert if insufficient. |
 | `auto_resume`               | `false` | Automatically resumes session after successful recovery from thinking block errors or thinking disabled violations. Extracts last user message and continues.                             |
+| `disable_omo_env`           | `false` | When `true`, disables auto-injected `<omo-env>` block generation (date, time, timezone, locale). When unset or `false`, current behavior is preserved. Setting this to `true` will improve the cache hit rate and reduce the API cost. |
 | `dynamic_context_pruning`    | See below | Dynamic context pruning configuration for managing context window usage automatically. See [Dynamic Context Pruning](#dynamic-context-pruning) below.                              |
 
 ### Dynamic Context Pruning
