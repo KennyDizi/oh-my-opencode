@@ -1,54 +1,67 @@
 import { describe, expect, test } from "bun:test"
-import { clearSessionModel, setSessionModel } from "../../shared/session-model-state"
+import type { Model } from "@opencode-ai/sdk"
 import { createBeastModeSystemHook, BEAST_MODE_SYSTEM_PROMPT } from "./hook"
+
+const makeModel = (providerID: string, id: string): Model =>
+  ({
+    id,
+    providerID,
+    name: id,
+    api: { id: "", url: "", npm: "" },
+    capabilities: {
+      temperature: true,
+      reasoning: false,
+      attachment: false,
+      toolcall: true,
+      input: { text: true, audio: false, image: false, video: false, pdf: false },
+      output: { text: true, audio: false, image: false, video: false },
+    },
+  }) as unknown as Model
 
 describe("beast-mode-system hook", () => {
   test("injects beast mode prompt for copilot gpt-4.1", async () => {
     //#given
-    const sessionID = "ses_beast"
-    setSessionModel(sessionID, { providerID: "github-copilot", modelID: "gpt-4.1" })
     const hook = createBeastModeSystemHook()
     const output = { system: [] as string[] }
 
     //#when
-    await hook["experimental.chat.system.transform"]?.({ sessionID }, output)
+    await hook["experimental.chat.system.transform"]?.(
+      { sessionID: "ses_beast", model: makeModel("github-copilot", "gpt-4.1") },
+      output,
+    )
 
     //#then
     expect(output.system[0]).toContain("Beast Mode")
     expect(output.system[0]).toContain(BEAST_MODE_SYSTEM_PROMPT.trim().slice(0, 20))
-
-    clearSessionModel(sessionID)
   })
 
   test("does not inject for other models", async () => {
     //#given
-    const sessionID = "ses_no_beast"
-    setSessionModel(sessionID, { providerID: "anthropic", modelID: "gpt-5.3-codex" })
     const hook = createBeastModeSystemHook()
     const output = { system: [] as string[] }
 
     //#when
-    await hook["experimental.chat.system.transform"]?.({ sessionID }, output)
+    await hook["experimental.chat.system.transform"]?.(
+      { sessionID: "ses_no_beast", model: makeModel("anthropic", "claude-3-5-sonnet") },
+      output,
+    )
 
     //#then
     expect(output.system.length).toBe(0)
-
-    clearSessionModel(sessionID)
   })
 
   test("avoids duplicate insertion", async () => {
     //#given
-    const sessionID = "ses_dupe"
-    setSessionModel(sessionID, { providerID: "github-copilot", modelID: "gpt-4.1" })
     const hook = createBeastModeSystemHook()
     const output = { system: [BEAST_MODE_SYSTEM_PROMPT] }
 
     //#when
-    await hook["experimental.chat.system.transform"]?.({ sessionID }, output)
+    await hook["experimental.chat.system.transform"]?.(
+      { sessionID: "ses_dupe", model: makeModel("github-copilot", "gpt-4.1") },
+      output,
+    )
 
     //#then
     expect(output.system.length).toBe(1)
-
-    clearSessionModel(sessionID)
   })
 })
