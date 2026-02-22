@@ -2,18 +2,63 @@ function normalizeTokens(text: string): string {
   return text.replace(/\s+/g, "")
 }
 
+function stripAllWhitespace(text: string): string {
+  return normalizeTokens(text)
+}
+
+export function stripTrailingContinuationTokens(text: string): string {
+  return text.replace(/(?:&&|\|\||\?\?|\?|:|=|,|\+|-|\*|\/|\.|\()\s*$/u, "")
+}
+
+export function stripMergeOperatorChars(text: string): string {
+  return text.replace(/[|&?]/g, "")
+}
+
 function leadingWhitespace(text: string): string {
   const match = text.match(/^\s*/)
   return match ? match[0] : ""
 }
 
 export function restoreOldWrappedLines(originalLines: string[], replacementLines: string[]): string[] {
-  if (replacementLines.length <= 1) return replacementLines
-  if (originalLines.length !== replacementLines.length) return replacementLines
-  const original = normalizeTokens(originalLines.join("\n"))
-  const replacement = normalizeTokens(replacementLines.join("\n"))
-  if (original !== replacement) return replacementLines
-  return originalLines
+  if (originalLines.length === 0 || replacementLines.length < 2) return replacementLines
+
+  const canonicalToOriginal = new Map<string, { line: string; count: number }>()
+  for (const line of originalLines) {
+    const canonical = stripAllWhitespace(line)
+    const existing = canonicalToOriginal.get(canonical)
+    if (existing) {
+      existing.count += 1
+    } else {
+      canonicalToOriginal.set(canonical, { line, count: 1 })
+    }
+  }
+
+  const candidates: { start: number; len: number; replacement: string; canonical: string }[] = []
+  for (let start = 0; start < replacementLines.length; start += 1) {
+    for (let len = 2; len <= 10 && start + len <= replacementLines.length; len += 1) {
+      const canonicalSpan = stripAllWhitespace(replacementLines.slice(start, start + len).join(""))
+      const original = canonicalToOriginal.get(canonicalSpan)
+      if (original && original.count === 1 && canonicalSpan.length >= 6) {
+        candidates.push({ start, len, replacement: original.line, canonical: canonicalSpan })
+      }
+    }
+  }
+  if (candidates.length === 0) return replacementLines
+
+  const canonicalCounts = new Map<string, number>()
+  for (const candidate of candidates) {
+    canonicalCounts.set(candidate.canonical, (canonicalCounts.get(candidate.canonical) ?? 0) + 1)
+  }
+
+  const uniqueCandidates = candidates.filter((candidate) => (canonicalCounts.get(candidate.canonical) ?? 0) === 1)
+  if (uniqueCandidates.length === 0) return replacementLines
+
+  uniqueCandidates.sort((a, b) => b.start - a.start)
+  const correctedLines = [...replacementLines]
+  for (const candidate of uniqueCandidates) {
+    correctedLines.splice(candidate.start, candidate.len, candidate.replacement)
+  }
+  return correctedLines
 }
 
 export function maybeExpandSingleLineMerge(
@@ -32,13 +77,37 @@ export function maybeExpandSingleLineMerge(
   let offset = 0
   let orderedMatch = true
   for (const part of parts) {
-    const idx = merged.indexOf(part, offset)
+    let idx = merged.indexOf(part, offset)
+    let matchedLen = part.length
+    if (idx === -1) {
+      const stripped = stripTrailingContinuationTokens(part)
+      if (stripped !== part) {
+        idx = merged.indexOf(stripped, offset)
+        if (idx !== -1) matchedLen = stripped.length
+      }
+    }
+    if (idx === -1) {
+      const segment = merged.slice(offset)
+      const segmentStripped = stripMergeOperatorChars(segment)
+      const partStripped = stripMergeOperatorChars(part)
+      const fuzzyIdx = segmentStripped.indexOf(partStripped)
+      if (fuzzyIdx !== -1) {
+        let strippedPos = 0
+        let originalPos = 0
+        while (strippedPos < fuzzyIdx && originalPos < segment.length) {
+          if (!/[|&?]/.test(segment[originalPos])) strippedPos += 1
+          originalPos += 1
+        }
+        idx = offset + originalPos
+        matchedLen = part.length
+      }
+    }
     if (idx === -1) {
       orderedMatch = false
       break
     }
     indices.push(idx)
-    offset = idx + part.length
+    offset = idx + matchedLen
   }
 
   const expanded: string[] = []
