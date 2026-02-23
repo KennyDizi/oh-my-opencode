@@ -59,7 +59,7 @@
     "@ast-grep/napi": "^0.41.0",
     "@clack/prompts": "^1.0.1",
     "@code-yeongyu/comment-checker": "^0.7.0",
-    "@modelcontextprotocol/sdk": "^1.26.0",
+    "@modelcontextprotocol/sdk": "^1.27.0",
     "@opencode-ai/plugin": "^1.2.10",
     "@opencode-ai/sdk": "^1.2.10",
     "codex": "^0.2.3",
