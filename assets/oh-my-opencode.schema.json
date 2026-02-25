@@ -960,6 +960,9 @@
                 }
               },
               "additionalProperties": false
+            },
+            "allow_non_gpt_model": {
+              "type": "boolean"
             }
           },
           "additionalProperties": false
