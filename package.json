@@ -105,6 +105,9 @@
     "oh-my-opencode-windows-x64": "3.10.0",
     "oh-my-opencode-windows-x64-baseline": "3.10.0"
   },
+  "overrides": {
+    "@opencode-ai/sdk": "^1.2.17"
+  },
   "trustedDependencies": [
     "@ast-grep/cli",
     "@ast-grep/napi",
