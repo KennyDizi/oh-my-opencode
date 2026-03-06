@@ -60,8 +60,8 @@
     "@clack/prompts": "^1.1.0",
     "@code-yeongyu/comment-checker": "^0.7.0",
     "@modelcontextprotocol/sdk": "^1.27.1",
-    "@opencode-ai/plugin": "^1.2.18",
-    "@opencode-ai/sdk": "^1.2.18",
+    "@opencode-ai/plugin": "^1.2.20",
+    "@opencode-ai/sdk": "^1.2.20",
     "codex": "^0.2.3",
     "commander": "^14.0.3",
     "detect-libc": "^2.1.2",
@@ -93,20 +93,20 @@
     "typescript": "^5.9.3"
   },
   "optionalDependencies": {
-    "oh-my-opencode-darwin-arm64": "3.10.1",
-    "oh-my-opencode-darwin-x64": "3.10.1",
-    "oh-my-opencode-darwin-x64-baseline": "3.10.1",
-    "oh-my-opencode-linux-arm64": "3.10.1",
-    "oh-my-opencode-linux-arm64-musl": "3.10.1",
-    "oh-my-opencode-linux-x64": "3.10.1",
-    "oh-my-opencode-linux-x64-baseline": "3.10.1",
-    "oh-my-opencode-linux-x64-musl": "3.10.1",
-    "oh-my-opencode-linux-x64-musl-baseline": "3.10.1",
-    "oh-my-opencode-windows-x64": "3.10.1",
-    "oh-my-opencode-windows-x64-baseline": "3.10.1"
+    "oh-my-opencode-darwin-arm64": "3.10.0",
+    "oh-my-opencode-darwin-x64": "3.10.0",
+    "oh-my-opencode-darwin-x64-baseline": "3.10.0",
+    "oh-my-opencode-linux-arm64": "3.10.0",
+    "oh-my-opencode-linux-arm64-musl": "3.10.0",
+    "oh-my-opencode-linux-x64": "3.10.0",
+    "oh-my-opencode-linux-x64-baseline": "3.10.0",
+    "oh-my-opencode-linux-x64-musl": "3.10.0",
+    "oh-my-opencode-linux-x64-musl-baseline": "3.10.0",
+    "oh-my-opencode-windows-x64": "3.10.0",
+    "oh-my-opencode-windows-x64-baseline": "3.10.0"
   },
   "overrides": {
-    "@opencode-ai/sdk": "^1.2.18"
+    "@opencode-ai/sdk": "^1.2.20"
   },
   "trustedDependencies": [
     "@ast-grep/cli",
