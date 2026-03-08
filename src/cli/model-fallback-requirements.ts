@@ -13,6 +13,7 @@ export const CLI_AGENT_MODEL_REQUIREMENTS: Record<string, ModelRequirement> = {
         variant: "max",
       },
       { providers: ["kimi-for-coding"], model: "k2p5" },
+      { providers: ["openai", "github-copilot", "opencode"], model: "gpt-5.4", variant: "medium" },
       { providers: ["zai-coding-plan", "opencode"], model: "glm-5" },
     ],
     requiresAnyModel: true,
@@ -67,7 +68,7 @@ export const CLI_AGENT_MODEL_REQUIREMENTS: Record<string, ModelRequirement> = {
     fallbackChain: [
       {
         providers: ["openai", "opencode"],
-        model: "gpt-5.3-codex",
+        model: "gpt-5.4",
         variant: "medium",
       },
       { providers: ["kimi-for-coding"], model: "k2p5" },

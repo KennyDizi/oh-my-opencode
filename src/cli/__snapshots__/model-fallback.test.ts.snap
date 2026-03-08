@@ -213,7 +213,7 @@ exports[`generateModelConfig single native provider uses OpenAI models when only
       "variant": "xhigh",
     },
     "multimodal-looker": {
-      "model": "openai/gpt-5.3-codex",
+      "model": "openai/gpt-5.4",
       "variant": "medium",
     },
     "oracle": {
@@ -223,6 +223,10 @@ exports[`generateModelConfig single native provider uses OpenAI models when only
     "prometheus": {
       "model": "openai/gpt-5.4",
       "variant": "high",
+    },
+    "sisyphus": {
+      "model": "openai/gpt-5.4",
+      "variant": "medium",
     },
   },
   "categories": {
@@ -282,7 +286,7 @@ exports[`generateModelConfig single native provider uses OpenAI models with isMa
       "variant": "xhigh",
     },
     "multimodal-looker": {
-      "model": "openai/gpt-5.3-codex",
+      "model": "openai/gpt-5.4",
       "variant": "medium",
     },
     "oracle": {
@@ -292,6 +296,10 @@ exports[`generateModelConfig single native provider uses OpenAI models with isMa
     "prometheus": {
       "model": "openai/gpt-5.4",
       "variant": "high",
+    },
+    "sisyphus": {
+      "model": "openai/gpt-5.4",
+      "variant": "medium",
     },
   },
   "categories": {
@@ -472,7 +480,7 @@ exports[`generateModelConfig all native providers uses preferred models from fal
       "variant": "xhigh",
     },
     "multimodal-looker": {
-      "model": "openai/gpt-5.3-codex",
+      "model": "openai/gpt-5.4",
       "variant": "medium",
     },
     "oracle": {
@@ -547,7 +555,7 @@ exports[`generateModelConfig all native providers uses preferred models with isM
       "variant": "xhigh",
     },
     "multimodal-looker": {
-      "model": "openai/gpt-5.3-codex",
+      "model": "openai/gpt-5.4",
       "variant": "medium",
     },
     "oracle": {
@@ -623,7 +631,7 @@ exports[`generateModelConfig fallback providers uses OpenCode Zen models when on
       "variant": "xhigh",
     },
     "multimodal-looker": {
-      "model": "opencode/gpt-5.3-codex",
+      "model": "opencode/gpt-5.4",
       "variant": "medium",
     },
     "oracle": {
@@ -698,7 +706,7 @@ exports[`generateModelConfig fallback providers uses OpenCode Zen models with is
       "variant": "xhigh",
     },
     "multimodal-looker": {
-      "model": "opencode/gpt-5.3-codex",
+      "model": "opencode/gpt-5.4",
       "variant": "medium",
     },
     "oracle": {
@@ -1017,7 +1025,7 @@ exports[`generateModelConfig mixed provider scenarios uses Claude + OpenCode Zen
       "variant": "xhigh",
     },
     "multimodal-looker": {
-      "model": "opencode/gpt-5.3-codex",
+      "model": "opencode/gpt-5.4",
       "variant": "medium",
     },
     "oracle": {
@@ -1092,7 +1100,7 @@ exports[`generateModelConfig mixed provider scenarios uses OpenAI + Copilot comb
       "variant": "xhigh",
     },
     "multimodal-looker": {
-      "model": "openai/gpt-5.3-codex",
+      "model": "openai/gpt-5.4",
       "variant": "medium",
     },
     "oracle": {
@@ -1294,7 +1302,7 @@ exports[`generateModelConfig mixed provider scenarios uses all fallback provider
       "variant": "xhigh",
     },
     "multimodal-looker": {
-      "model": "opencode/gpt-5.3-codex",
+      "model": "opencode/gpt-5.4",
       "variant": "medium",
     },
     "oracle": {
@@ -1369,7 +1377,7 @@ exports[`generateModelConfig mixed provider scenarios uses all providers togethe
       "variant": "xhigh",
     },
     "multimodal-looker": {
-      "model": "openai/gpt-5.3-codex",
+      "model": "openai/gpt-5.4",
       "variant": "medium",
     },
     "oracle": {
@@ -1444,7 +1452,7 @@ exports[`generateModelConfig mixed provider scenarios uses all providers with is
       "variant": "xhigh",
     },
     "multimodal-looker": {
-      "model": "openai/gpt-5.3-codex",
+      "model": "openai/gpt-5.4",
       "variant": "medium",
     },
     "oracle": {
