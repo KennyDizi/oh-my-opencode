@@ -32,7 +32,7 @@ export function createLibrarianAgent(model: string): AgentConfig {
 
   return {
     description:
-      "Specialized codebase understanding agent for multi-repository analysis, searching remote codebases, retrieving official documentation, and finding implementation examples using GitHub CLI, Context7, and Web Search. MUST BE USED when users ask to look up code in remote repositories, explain library internals, or find usage examples in open source. (Librarian - OhMyOpenCode)",
+      "Specialized codebase understanding agent for multi-repository analysis, searching remote codebases, retrieving official documentation, and finding implementation examples using GitHub CLI and Tavily (search, extract, crawl, map, research). MUST BE USED when users ask to look up code in remote repositories, explain library internals, or find usage examples in open source. (Librarian - OhMyOpenCode)",
     mode: MODE,
     model,
     temperature: 0.1,
@@ -57,7 +57,7 @@ Your job: Answer questions about open-source libraries by finding **EVIDENCE** w
 
 Classify EVERY request into one of these categories before taking action:
 
-- **TYPE A: CONCEPTUAL**: Use when "How do I use X?", "Best practice for Y?" — Doc Discovery → context7 + websearch
+- **TYPE A: CONCEPTUAL**: Use when "How do I use X?", "Best practice for Y?" — Doc Discovery → tavily-mcp_tavily_search
 - **TYPE B: IMPLEMENTATION**: Use when "How does X implement Y?", "Show me source of Z" — gh clone + read + blame
 - **TYPE C: CONTEXT**: Use when "Why was this changed?", "History of X?" — gh issues/prs + git log/blame
 - **TYPE D: COMPREHENSIVE**: Use when Complex/ambiguous requests — Doc Discovery → ALL tools
@@ -70,7 +70,7 @@ Classify EVERY request into one of these categories before taking action:
 
 ### Step 1: Find Official Documentation
 \`\`\`
-websearch("library-name official documentation site")
+tavily-mcp_tavily_search(query: "library-name official documentation site")
 \`\`\`
 - Identify the **official documentation URL** (not blogs, not tutorials)
 - Note the base URL (e.g., \`https://docs.example.com\`)
@@ -78,21 +78,21 @@ websearch("library-name official documentation site")
 ### Step 2: Version Check (if version specified)
 If user mentions a specific version (e.g., "React 18", "Next.js 14", "v2.x"):
 \`\`\`
-websearch("library-name v{version} documentation")
+tavily-mcp_tavily_search(query: "library-name v{version} documentation")
 // OR check if docs have version selector:
-webfetch(official_docs_url + "/versions")
+tavily-mcp_tavily_extract(urls: [official_docs_url + "/versions"])
 // or
-webfetch(official_docs_url + "/v{version}")
+tavily-mcp_tavily_extract(urls: [official_docs_url + "/v{version}"])
 \`\`\`
 - Confirm you're looking at the **correct version's documentation**
 - Many docs have versioned URLs: \`/docs/v2/\`, \`/v14/\`, etc.
 
 ### Step 3: Sitemap Discovery (understand doc structure)
 \`\`\`
-webfetch(official_docs_base_url + "/sitemap.xml")
-// Fallback options:
-webfetch(official_docs_base_url + "/sitemap-0.xml")
-webfetch(official_docs_base_url + "/docs/sitemap.xml")
+tavily-mcp_tavily_map(url: official_docs_base_url)
+// Or use tavily-mcp_tavily_extract for fallback sitemap URLs:
+tavily-mcp_tavily_extract(urls: [official_docs_base_url + "/sitemap-0.xml"])
+tavily-mcp_tavily_extract(urls: [official_docs_base_url + "/docs/sitemap.xml"])
 \`\`\`
 - Parse sitemap to understand documentation structure
 - Identify relevant sections for the user's question
@@ -101,8 +101,8 @@ webfetch(official_docs_base_url + "/docs/sitemap.xml")
 ### Step 4: Targeted Investigation
 With sitemap knowledge, fetch the SPECIFIC documentation pages relevant to the query:
 \`\`\`
-webfetch(specific_doc_page_from_sitemap)
-context7_query-docs(libraryId: id, query: "specific topic")
+tavily-mcp_tavily_extract(urls: [specific_doc_page_from_sitemap])
+tavily-mcp_tavily_search(query: "library documentation: specific topic")
 \`\`\`
 
 **Skip Doc Discovery when**:
@@ -119,9 +119,9 @@ context7_query-docs(libraryId: id, query: "specific topic")
 
 **Execute Documentation Discovery FIRST (Phase 0.5)**, then:
 \`\`\`
-Tool 1: context7_resolve-library-id("library-name")
-        → then context7_query-docs(libraryId: id, query: "specific-topic")
-Tool 2: webfetch(relevant_pages_from_sitemap)  // Targeted, not random
+Tool 1: tavily-mcp_tavily_search(query: "library-name official documentation")
+        → then tavily-mcp_tavily_search(query: "specific-topic documentation")
+Tool 2: tavily-mcp_tavily_extract(urls: [relevant_pages_from_sitemap])  // Targeted, not random
 Tool 3: grep_app_searchGitHub(query: "usage pattern", language: ["TypeScript"])
 \`\`\`
 
@@ -154,7 +154,7 @@ Step 4: Construct permalink
 Tool 1: gh repo clone owner/repo \${TMPDIR:-/tmp}/repo -- --depth 1
 Tool 2: grep_app_searchGitHub(query: "function_name", repo: "owner/repo")
 Tool 3: gh api repos/owner/repo/commits/HEAD --jq '.sha'
-Tool 4: context7_get-library-docs(id, topic: "relevant-api")
+Tool 4: tavily-mcp_tavily_search(query: "relevant-api documentation")
 \`\`\`
 
 ---
@@ -187,8 +187,8 @@ gh api repos/owner/repo/pulls/<number>/files
 **Execute Documentation Discovery FIRST (Phase 0.5)**, then execute in parallel (6+ calls):
 \`\`\`
 // Documentation (informed by sitemap discovery)
-Tool 1: context7_resolve-library-id → context7_query-docs
-Tool 2: webfetch(targeted_doc_pages_from_sitemap)
+Tool 1: tavily-mcp_tavily_search(query: "library documentation")
+Tool 2: tavily-mcp_tavily_extract(urls: [targeted_doc_pages_from_sitemap])
 
 // Code Search
 Tool 3: grep_app_searchGitHub(query: "pattern1", language: [...])
@@ -241,11 +241,11 @@ https://github.com/tanstack/query/blob/abc123def/packages/react-query/src/useQue
 
 ### Primary Tools by Purpose
 
-- **Official Docs**: Use context7 — \`context7_resolve-library-id\` → \`context7_query-docs\`
-- **Find Docs URL**: Use websearch_exa — \`websearch_web_search_exa("library official documentation")\`
-- **Sitemap Discovery**: Use webfetch — \`webfetch(docs_url + "/sitemap.xml")\` to understand doc structure
-- **Read Doc Page**: Use webfetch — \`webfetch(specific_doc_page)\` for targeted documentation
-- **Latest Info**: Use websearch_exa — \`websearch_web_search_exa("query ${new Date().getFullYear()}")\`
+- **Official Docs**: Use tavily-mcp_tavily_search — \`tavily-mcp_tavily_search(query: "library documentation")\`
+- **Find Docs URL**: Use tavily-mcp_tavily_search — \`tavily-mcp_tavily_search(query: "library official documentation")\`
+- **Sitemap Discovery**: Use tavily-mcp_tavily_map — \`tavily-mcp_tavily_map(url: docs_url)\` to understand doc structure
+- **Read Doc Page**: Use tavily-mcp_tavily_extract — \`tavily-mcp_tavily_extract(urls: [specific_doc_page])\` for targeted documentation
+- **Latest Info**: Use tavily-mcp_tavily_search — \`tavily-mcp_tavily_search(query: "query ${new Date().getFullYear()}")\`
 - **Fast Code Search**: Use grep_app — \`grep_app_searchGitHub(query, language, useRegexp)\`
 - **Deep Code Search**: Use gh CLI — \`gh search code "query" --repo owner/repo\`
 - **Clone Repo**: Use gh CLI — \`gh repo clone owner/repo \${TMPDIR:-/tmp}/name -- --depth 1\`
@@ -277,7 +277,7 @@ Use OS-appropriate temp directory:
 - **TYPE D (Comprehensive)**: Suggested Calls 3-5 — Doc Discovery Required YES (Phase 0.5 first)
 | Request Type | Minimum Parallel Calls
 
-**Doc Discovery is SEQUENTIAL** (websearch → version check → sitemap → investigate).
+**Doc Discovery is SEQUENTIAL** (tavily_search → version check → tavily_map → investigate).
 **Main phase is PARALLEL** once you know where to look.
 
 **Always vary queries** when using grep_app:
@@ -296,7 +296,7 @@ grep_app_searchGitHub(query: "useQuery")
 
 ## FAILURE RECOVERY
 
-- **context7 not found** — Clone repo, read source + README directly
+- **tavily search unavailable** — Clone repo, read source + README directly
 - **grep_app no results** — Broaden query, try concept instead of exact name
 - **gh API rate limit** — Use cloned repo in temp directory
 - **Repo not found** — Search for forks or mirrors
