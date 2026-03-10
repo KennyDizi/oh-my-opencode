@@ -61,8 +61,8 @@
     "@clack/prompts": "^1.1.0",
     "@code-yeongyu/comment-checker": "^0.7.0",
     "@modelcontextprotocol/sdk": "^1.27.1",
-    "@opencode-ai/plugin": "^1.2.23",
-    "@opencode-ai/sdk": "^1.2.23",
+    "@opencode-ai/plugin": "^1.2.24",
+    "@opencode-ai/sdk": "^1.2.24",
     "codex": "^0.2.3",
     "commander": "^14.0.3",
     "detect-libc": "^2.1.2",
@@ -107,7 +107,7 @@
     "oh-my-opencode-windows-x64-baseline": "3.11.2"
   },
   "overrides": {
-    "@opencode-ai/sdk": "^1.2.23"
+    "@opencode-ai/sdk": "^1.2.24"
   },
   "trustedDependencies": [
     "@ast-grep/cli",
