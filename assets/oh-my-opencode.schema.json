@@ -3732,11 +3732,16 @@
         "include_co_authored_by": {
           "default": true,
           "type": "boolean"
+        },
+        "git_env_prefix": {
+          "default": "GIT_MASTER=1",
+          "type": "string"
         }
       },
       "required": [
         "commit_footer",
-        "include_co_authored_by"
+        "include_co_authored_by",
+        "git_env_prefix"
       ],
       "additionalProperties": false
     },
