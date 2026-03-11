@@ -1,6 +1,6 @@
 {
   "name": "oh-my-opencode",
-  "version": "3.11.0",
+  "version": "3.11.2",
   "description": "The Best AI Agent Harness - Batteries-Included OpenCode Plugin with Multi-Model Orchestration, Parallel Background Agents, and Crafted LSP/AST Tools",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -56,6 +56,7 @@
   },
   "homepage": "https://github.com/code-yeongyu/oh-my-openagent#readme",
   "dependencies": {
+    "@ai-sdk/openai": "^3.0.41",
     "@ast-grep/cli": "^0.41.1",
     "@ast-grep/napi": "^0.41.1",
     "@clack/prompts": "^1.1.0",
