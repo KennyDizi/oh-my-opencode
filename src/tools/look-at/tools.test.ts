@@ -1,5 +1,5 @@
 import type { ToolContext } from "@opencode-ai/plugin/tool"
-import { describe, expect, mock, test } from "bun:test"
+import { setVisionCapableModelsCache } from "../../shared/vision-capable-models-cache"
 import { createLookAt, normalizeArgs, validateArgs } from "./tools"
 
 describe("look-at tool", () => {
@@ -255,6 +255,8 @@ describe("look-at tool", () => {
     // when LookAt tool executed
     // then model info should be passed to sync prompt
     test("passes multimodal-looker model to sync prompt when available", async () => {
+      setVisionCapableModelsCache(new Map([["google/gemini-3-flash", { providerID: "google", modelID: "gemini-3-flash" }]]))
+
       let promptBody: any
 
       const mockClient = {
