@@ -1,8 +1,13 @@
 import type { ToolContext } from "@opencode-ai/plugin/tool"
-import { setVisionCapableModelsCache } from "../../shared/vision-capable-models-cache"
+import { afterEach, describe, expect, mock, test } from "bun:test"
+import { clearVisionCapableModelsCache, setVisionCapableModelsCache } from "../../shared/vision-capable-models-cache"
 import { createLookAt, normalizeArgs, validateArgs } from "./tools"
 
 describe("look-at tool", () => {
+  afterEach(() => {
+    clearVisionCapableModelsCache()
+  })
+
   describe("normalizeArgs", () => {
     // given LLM might use `path` instead of `file_path`
     // when called with path parameter
