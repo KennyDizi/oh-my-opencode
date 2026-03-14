@@ -52,10 +52,10 @@ else
     FAILED=1
 fi
 
-if [ -f "assets/oh-my-opencode.schema.json" ]; then
-    echo -e "${GREEN}✓${NC} assets/oh-my-opencode.schema.json exists"
+if [ -f "assets/oh-my-openagent.schema.json" ]; then
+    echo -e "${GREEN}✓${NC} assets/oh-my-openagent.schema.json exists"
     if command -v jq &> /dev/null; then
-        if jq empty assets/oh-my-opencode.schema.json 2>/dev/null; then
+        if jq empty assets/oh-my-openagent.schema.json 2>/dev/null; then
             echo -e "${GREEN}✓${NC} Schema is valid JSON"
         else
             echo -e "${RED}✗${NC} Schema is not valid JSON"
@@ -63,7 +63,7 @@ if [ -f "assets/oh-my-opencode.schema.json" ]; then
         fi
     fi
 else
-    echo -e "${RED}✗${NC} assets/oh-my-opencode.schema.json missing"
+    echo -e "${RED}✗${NC} assets/oh-my-openagent.schema.json missing"
     FAILED=1
 fi
 
