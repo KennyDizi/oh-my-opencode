@@ -7,7 +7,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-echo -e "${GREEN}------ Oh-my-OpenAgent Update Script ------${NC}\n"
+echo -e "${GREEN}------ Oh-my-OpenCode Update Script ------${NC}\n"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
@@ -52,10 +52,10 @@ else
     FAILED=1
 fi
 
-if [ -f "assets/oh-my-openagent.schema.json" ]; then
-    echo -e "${GREEN}✓${NC} assets/oh-my-openagent.schema.json exists"
+if [ -f "assets/oh-my-opencode.schema.json" ]; then
+    echo -e "${GREEN}✓${NC} assets/oh-my-opencode.schema.json exists"
     if command -v jq &> /dev/null; then
-        if jq empty assets/oh-my-openagent.schema.json 2>/dev/null; then
+        if jq empty assets/oh-my-opencode.schema.json 2>/dev/null; then
             echo -e "${GREEN}✓${NC} Schema is valid JSON"
         else
             echo -e "${RED}✗${NC} Schema is not valid JSON"
@@ -63,7 +63,7 @@ if [ -f "assets/oh-my-openagent.schema.json" ]; then
         fi
     fi
 else
-    echo -e "${RED}✗${NC} assets/oh-my-openagent.schema.json missing"
+    echo -e "${RED}✗${NC} assets/oh-my-opencode.schema.json missing"
     FAILED=1
 fi
 
@@ -76,6 +76,6 @@ echo -e "${GREEN}✓${NC} Build verification successful"
 
 echo ""
 echo -e "${GREEN}------ Updating Process Complete ------${NC}"
-echo -e "${GREEN}Oh-my-OpenAgent${NC} is now up to date with latest source code."
+echo -e "${GREEN}Oh-my-OpenCode${NC} is now up to date with latest source code."
 echo "Note: If you're using the local build in opencode.json,"
 echo -e "      restart ${GREEN}OpenCode${NC} to load the changes."
