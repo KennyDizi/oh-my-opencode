@@ -4,23 +4,23 @@ import { getRuleInjectionFilePath } from "./output-path";
 import { createSessionCacheStore } from "./cache";
 import { createRuleInjectionProcessor } from "./injector";
 
-interface ToolExecuteInput {
+export interface ToolExecuteInput {
   tool: string;
   sessionID: string;
   callID: string;
 }
 
-interface ToolExecuteOutput {
+export interface ToolExecuteOutput {
   title: string;
   output: string;
   metadata: unknown;
 }
 
-interface ToolExecuteBeforeOutput {
+export interface ToolExecuteBeforeOutput {
   args: unknown;
 }
 
-interface EventInput {
+export interface EventInput {
   event: {
     type: string;
     properties?: unknown;

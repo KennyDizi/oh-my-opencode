@@ -13,7 +13,7 @@ function isOpus46(modelID: string): boolean {
   return OPUS_4_6_PATTERN.test(normalized)
 }
 
-interface ChatParamsInput {
+export interface ChatParamsInput {
   sessionID: string
   agent: { name?: string }
   model: { providerID: string; modelID: string }
@@ -21,7 +21,7 @@ interface ChatParamsInput {
   message: { variant?: string }
 }
 
-interface ChatParamsOutput {
+export interface ChatParamsOutput {
   temperature?: number
   topP?: number
   topK?: number

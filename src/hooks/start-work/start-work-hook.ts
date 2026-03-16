@@ -17,12 +17,12 @@ import { parseUserRequest } from "./parse-user-request"
 
 export const HOOK_NAME = "start-work" as const
 
-interface StartWorkHookInput {
+export interface StartWorkHookInput {
   sessionID: string
   messageID?: string
 }
 
-interface StartWorkHookOutput {
+export interface StartWorkHookOutput {
   parts: Array<{ type: string; text?: string }>
 }
 

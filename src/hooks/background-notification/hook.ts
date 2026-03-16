@@ -1,19 +1,19 @@
 import type { BackgroundManager } from "../../features/background-agent"
 
-interface Event {
+export interface Event {
   type: string
   properties?: Record<string, unknown>
 }
 
-interface EventInput {
+export interface EventInput {
   event: Event
 }
 
-interface ChatMessageInput {
+export interface ChatMessageInput {
   sessionID: string
 }
 
-interface ChatMessageOutput {
+export interface ChatMessageOutput {
   parts: Array<{ type: string; text?: string; [key: string]: unknown }>
 }
 

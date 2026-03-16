@@ -9,19 +9,19 @@ import type { AgentUsageState } from "./types";
 import { getSessionAgent } from "../../features/claude-code-session-state";
 import { getAgentConfigKey } from "../../shared/agent-display-names";
 
-interface ToolExecuteInput {
+export interface ToolExecuteInput {
   tool: string;
   sessionID: string;
   callID: string;
 }
 
-interface ToolExecuteOutput {
+export interface ToolExecuteOutput {
   title: string;
   output: string;
   metadata: unknown;
 }
 
-interface EventInput {
+export interface EventInput {
   event: {
     type: string;
     properties?: unknown;

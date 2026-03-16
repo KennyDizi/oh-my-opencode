@@ -6,20 +6,20 @@ import { tokenizeCommand, findSubcommand, extractSessionNameFromTokens } from ".
 import { getOrCreateState, isOmoSession, killAllTrackedSessions } from "./state-manager";
 import { subagentSessions } from "../../features/claude-code-session-state";
 
-interface ToolExecuteInput {
+export interface ToolExecuteInput {
   tool: string;
   sessionID: string;
   callID: string;
   args?: Record<string, unknown>;
 }
 
-interface ToolExecuteOutput {
+export interface ToolExecuteOutput {
   title: string;
   output: string;
   metadata: unknown;
 }
 
-interface EventInput {
+export interface EventInput {
   event: {
     type: string;
     properties?: unknown;

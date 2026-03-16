@@ -36,14 +36,14 @@ const DELEGATION_TOOLS = new Set([
    "call_omo_agent",
 ])
 
-interface ToolExecuteInput {
+export interface ToolExecuteInput {
   tool: string
   sessionID: string
   callID: string
   agent?: string
 }
 
-interface ToolExecuteOutput {
+export interface ToolExecuteOutput {
   title: string
   output: string
   metadata: unknown

@@ -16,7 +16,7 @@
 
 import type { Message, Part } from "@opencode-ai/sdk"
 
-interface MessageWithParts {
+export interface MessageWithParts {
   info: Message
   parts: Part[]
 }

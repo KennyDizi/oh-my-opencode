@@ -1,13 +1,14 @@
 import { defineConfig } from '@rslib/core';
+import { RsdoctorRspackPlugin } from '@rsdoctor/rspack-plugin';
 
 export default defineConfig({
   lib: [
-    // Main plugin entry
     {
       format: 'esm',
       bundle: true,
       dts: {
         bundle: true,
+        tsgo: true, // 10x faster DTS generation
       },
       output: {
         distPath: './dist',
@@ -18,11 +19,11 @@ export default defineConfig({
         },
       },
     },
-    // CLI entry
     {
       format: 'esm',
       dts: {
         bundle: false,
+        tsgo: true, // 10x faster DTS generation
       },
       output: {
         distPath: './dist/cli',
@@ -35,12 +36,12 @@ export default defineConfig({
     },
   ],
   output: {
-    target: 'node', // Bun supports Node.js APIs
-    cleanDistPath: true, // Clean dist directory before build
+    target: 'node',
+    cleanDistPath: true,
     externals: {
-      bun: 'module bun', // ESM runtime — use import
-      'bun:sqlite': 'module bun:sqlite', // Bun built-in SQLite module
-      '@ast-grep/napi': 'node-commonjs @ast-grep/napi', // Native CJS module — use createRequire
+      bun: 'module bun',
+      'bun:sqlite': 'module bun:sqlite',
+      '@ast-grep/napi': 'node-commonjs @ast-grep/napi',
     },
-  },
+  }
 });

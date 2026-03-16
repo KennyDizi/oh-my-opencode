@@ -67,7 +67,7 @@ export function createContextInjectorHook(collector: ContextCollector) {
   }
 }
 
-interface MessageWithParts {
+export interface MessageWithParts {
   info: Message
   parts: Part[]
 }

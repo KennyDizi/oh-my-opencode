@@ -151,7 +151,7 @@ bunx oh-my-opencode run     # Non-interactive session
 - Plugin load timeout: 10s for Claude Code plugins
 - Model fallback priority: Claude > OpenAI > Gemini > Copilot > OpenCode Zen > Z.ai > Kimi
 - Config migration runs automatically on legacy keys (agent names, hook names, model versions)
-- Build: bun build (ESM) + tsc --emitDeclarationOnly, externals: @ast-grep/napi
+- Build: rslib (ESM + bundled DTS via rspack), externals: @ast-grep/napi, bun, bun:sqlite
 - Test setup: `test-setup.ts` preloaded via bunfig.toml, mock-heavy tests run in isolation in CI
 - 98 barrel export files (index.ts) establish module boundaries
 - Architecture rules enforced via `.sisyphus/rules/modular-code-enforcement.md`
