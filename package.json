@@ -97,17 +97,17 @@
     "typescript": "^5.9.3"
   },
   "optionalDependencies": {
-    "oh-my-opencode-darwin-arm64": "3.11.2",
-    "oh-my-opencode-darwin-x64": "3.11.2",
-    "oh-my-opencode-darwin-x64-baseline": "3.11.2",
-    "oh-my-opencode-linux-arm64": "3.11.2",
-    "oh-my-opencode-linux-arm64-musl": "3.11.2",
-    "oh-my-opencode-linux-x64": "3.11.2",
-    "oh-my-opencode-linux-x64-baseline": "3.11.2",
-    "oh-my-opencode-linux-x64-musl": "3.11.2",
-    "oh-my-opencode-linux-x64-musl-baseline": "3.11.2",
-    "oh-my-opencode-windows-x64": "3.11.2",
-    "oh-my-opencode-windows-x64-baseline": "3.11.2"
+    "oh-my-opencode-darwin-arm64": "3.12.0",
+    "oh-my-opencode-darwin-x64": "3.12.0",
+    "oh-my-opencode-darwin-x64-baseline": "3.12.0",
+    "oh-my-opencode-linux-arm64": "3.12.0",
+    "oh-my-opencode-linux-arm64-musl": "3.12.0",
+    "oh-my-opencode-linux-x64": "3.12.0",
+    "oh-my-opencode-linux-x64-baseline": "3.12.0",
+    "oh-my-opencode-linux-x64-musl": "3.12.0",
+    "oh-my-opencode-linux-x64-musl-baseline": "3.12.0",
+    "oh-my-opencode-windows-x64": "3.12.0",
+    "oh-my-opencode-windows-x64-baseline": "3.12.0"
   },
   "overrides": {
     "@opencode-ai/sdk": "^1.2.27"
