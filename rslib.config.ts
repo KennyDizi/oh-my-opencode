@@ -1,47 +1,46 @@
-import { defineConfig } from '@rslib/core';
-import { RsdoctorRspackPlugin } from '@rsdoctor/rspack-plugin';
+import { defineConfig } from "@rslib/core";
 
 export default defineConfig({
   lib: [
     {
-      format: 'esm',
+      format: "esm",
       bundle: true,
       dts: {
         bundle: true,
         tsgo: true, // 10x faster DTS generation
       },
       output: {
-        distPath: './dist',
+        distPath: "./dist",
       },
       source: {
         entry: {
-          index: './src/index.ts',
+          index: "./src/index.ts",
         },
       },
     },
     {
-      format: 'esm',
+      format: "esm",
       dts: {
         bundle: false,
         tsgo: true, // 10x faster DTS generation
       },
       output: {
-        distPath: './dist/cli',
+        distPath: "./dist/cli",
       },
       source: {
         entry: {
-          index: './src/cli/index.ts',
+          index: "./src/cli/index.ts",
         },
       },
     },
   ],
   output: {
-    target: 'node',
+    target: "node",
     cleanDistPath: true,
     externals: {
-      bun: 'module bun',
-      'bun:sqlite': 'module bun:sqlite',
-      '@ast-grep/napi': 'node-commonjs @ast-grep/napi',
+      bun: "module bun",
+      "bun:sqlite": "module bun:sqlite",
+      "@ast-grep/napi": "node-commonjs @ast-grep/napi",
     },
-  }
+  },
 });
