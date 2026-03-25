@@ -1,19 +1,20 @@
-import { statSync } from "node:fs"
 import type { PluginInput } from "@opencode-ai/plugin"
+import { statSync } from "node:fs"
 import {
+  appendSessionId,
+  clearBoulderState,
+  createBoulderState,
+  findPrometheusPlans,
+  getPlanName,
+  getPlanProgress,
   readBoulderState,
   writeBoulderState,
-  appendSessionId,
-  findPrometheusPlans,
-  getPlanProgress,
-  createBoulderState,
-  getPlanName,
-  clearBoulderState,
 } from "../../features/boulder-state"
-import { log } from "../../shared/logger"
 import { updateSessionAgent } from "../../features/claude-code-session-state"
-import { detectWorktreePath } from "./worktree-detector"
+import { getAgentDisplayName } from "../../shared/agent-display-names"
+import { log } from "../../shared/logger"
 import { parseUserRequest } from "./parse-user-request"
+import { detectWorktreePath } from "./worktree-detector"
 
 export const HOOK_NAME = "start-work" as const
 
@@ -23,6 +24,7 @@ export interface StartWorkHookInput {
 }
 
 export interface StartWorkHookOutput {
+  message?: Record<string, unknown>
   parts: Array<{ type: string; text?: string }>
 }
 
@@ -79,6 +81,9 @@ export function createStartWorkHook(ctx: PluginInput) {
 
       log(`[${HOOK_NAME}] Processing start-work command`, { sessionID: input.sessionID })
       updateSessionAgent(input.sessionID, "atlas")
+      if (output.message) {
+        output.message["agent"] = getAgentDisplayName("atlas")
+      }
 
       const existingState = readBoulderState(ctx.directory)
       const sessionId = input.sessionID
