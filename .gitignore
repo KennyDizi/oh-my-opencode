@@ -38,3 +38,6 @@ notepad.md
 oauth-success.html
 *.bun-build
 .omx/
+.opencode/
+opencode.json
+.agents/
