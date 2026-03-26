@@ -1,6 +1,6 @@
 {
   "name": "oh-my-opencode",
-  "version": "3.13.1",
+  "version": "3.14.0",
   "description": "The Best AI Agent Harness - Batteries-Included OpenCode Plugin with Multi-Model Orchestration, Parallel Background Agents, and Crafted LSP/AST Tools",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -64,8 +64,8 @@
     "@clack/prompts": "^1.1.0",
     "@code-yeongyu/comment-checker": "^0.7.0",
     "@modelcontextprotocol/sdk": "^1.28.0",
-    "@opencode-ai/plugin": "^1.3.2",
-    "@opencode-ai/sdk": "^1.3.2",
+    "@opencode-ai/plugin": "^1.3.3",
+    "@opencode-ai/sdk": "^1.3.3",
     "ai": "^6.0.138",
     "codex": "^0.2.3",
     "commander": "^14.0.3",
@@ -99,17 +99,17 @@
     "typescript": "^6.0.2"
   },
   "optionalDependencies": {
-    "oh-my-opencode-darwin-arm64": "3.13.1",
-    "oh-my-opencode-darwin-x64": "3.13.1",
-    "oh-my-opencode-darwin-x64-baseline": "3.13.1",
-    "oh-my-opencode-linux-arm64": "3.13.1",
-    "oh-my-opencode-linux-arm64-musl": "3.13.1",
-    "oh-my-opencode-linux-x64": "3.13.1",
-    "oh-my-opencode-linux-x64-baseline": "3.13.1",
-    "oh-my-opencode-linux-x64-musl": "3.13.1",
-    "oh-my-opencode-linux-x64-musl-baseline": "3.13.1",
-    "oh-my-opencode-windows-x64": "3.13.1",
-    "oh-my-opencode-windows-x64-baseline": "3.13.1"
+    "oh-my-opencode-darwin-arm64": "3.14.0",
+    "oh-my-opencode-darwin-x64": "3.14.0",
+    "oh-my-opencode-darwin-x64-baseline": "3.14.0",
+    "oh-my-opencode-linux-arm64": "3.14.0",
+    "oh-my-opencode-linux-arm64-musl": "3.14.0",
+    "oh-my-opencode-linux-x64": "3.14.0",
+    "oh-my-opencode-linux-x64-baseline": "3.14.0",
+    "oh-my-opencode-linux-x64-musl": "3.14.0",
+    "oh-my-opencode-linux-x64-musl-baseline": "3.14.0",
+    "oh-my-opencode-windows-x64": "3.14.0",
+    "oh-my-opencode-windows-x64-baseline": "3.14.0"
   },
   "overrides": {
     "@opencode-ai/sdk": "^1.2.27"
