@@ -2,13 +2,16 @@ export const CODE_BLOCK_PATTERN = /```[\s\S]*?```/g
 export const INLINE_CODE_PATTERN = /`[^`]+`/g
 
 // Re-export from submodules
-export { isPlannerAgent, isNonOmoAgent, getUltraworkMessage } from "./ultrawork"
-export { SEARCH_PATTERN, SEARCH_MESSAGE } from "./search"
-export { ANALYZE_PATTERN, ANALYZE_MESSAGE } from "./analyze"
+export { ANALYZE_MESSAGE, ANALYZE_PATTERN } from "./analyze";
+export { SEARCH_MESSAGE, SEARCH_PATTERN } from "./search";
+export {
+  getUltraworkMessage,
+  isNonOmoAgent,
+  isPlannerAgent,
+} from "./ultrawork";
 
-import { getUltraworkMessage } from "./ultrawork"
-import { SEARCH_PATTERN, SEARCH_MESSAGE } from "./search"
-import { ANALYZE_PATTERN, ANALYZE_MESSAGE } from "./analyze"
+import { SEARCH_MESSAGE, SEARCH_PATTERN } from "./search";
+import { getUltraworkMessage } from "./ultrawork";
 
 export type KeywordDetector = {
   pattern: RegExp
@@ -33,14 +36,16 @@ CONTEXT GATHERING (parallel):
 - 1-2 explore agents (codebase patterns, implementations)
 - 1-2 librarian agents (if external library involved)
 - Direct tools: Grep, AST-grep, LSP for targeted searches
+- tavily-mcp_tavily_search MCP tool (for latest techniques, current best practices)
 
 IF COMPLEX - DO NOT STRUGGLE ALONE. Consult specialists:
 - **Oracle**: Conventional problems (architecture, debugging, complex logic)
 - **Artistry**: Non-conventional problems (different approach needed)
+- **sequentialthinking-tools_sequentialthinking_tools** MCP tool: Systematic step-by-step reasoning for complex goals
 
 SYNTHESIZE findings before proceeding.
 ---
 MANDATORY delegate_task params: ALWAYS include load_skills=[] and run_in_background when calling delegate_task.
 Example: delegate_task(subagent_type="explore", prompt="...", run_in_background=true, load_skills=[])`,
   },
-]
+];

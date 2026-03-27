@@ -19,11 +19,11 @@ CONTEXT GATHERING (parallel):
 - 1-2 explore agents (codebase patterns, implementations)
 - 1-2 librarian agents (if external library involved)
 - Direct tools: Grep, AST-grep, LSP for targeted searches
-- tavily-mcp_tavily_search MCP tool (for latest techniques, current best practices)
+- tavily-mcp_tavily_search MCP tool (for latest techniques, current best practices and online resources)
 
 IF COMPLEX - DO NOT STRUGGLE ALONE. Consult specialists:
 - **Oracle**: Conventional problems (architecture, debugging, complex logic)
 - **Artistry**: Non-conventional problems (different approach needed)
-- **sequentialthinking-tools**: Systematic step-by-step reasoning for complex goals
+- **sequentialthinking-tools_sequentialthinking_tools** MCP tool: Systematic step-by-step reasoning for complex goals
 
 SYNTHESIZE findings before proceeding.`;
