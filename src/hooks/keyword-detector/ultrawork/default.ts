@@ -293,7 +293,9 @@ NOW.
 
 </ultrawork-mode>
 
-`
+---
+
+`;
 
 export function getDefaultUltraworkMessage(): string {
   return ULTRAWORK_DEFAULT_MESSAGE
