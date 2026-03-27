@@ -10,7 +10,7 @@ import {
   readBoulderState,
   writeBoulderState,
 } from "../../features/boulder-state"
-import { updateSessionAgent } from "../../features/claude-code-session-state"
+import { isAgentRegistered, updateSessionAgent } from "../../features/claude-code-session-state"
 import { getAgentDisplayName } from "../../shared/agent-display-names"
 import { log } from "../../shared/logger"
 import { parseUserRequest } from "./parse-user-request"
@@ -80,9 +80,14 @@ export function createStartWorkHook(ctx: PluginInput) {
       if (!promptText.includes("<session-context>")) return
 
       log(`[${HOOK_NAME}] Processing start-work command`, { sessionID: input.sessionID })
-      updateSessionAgent(input.sessionID, "atlas")
-      if (output.message) {
-        output.message["agent"] = getAgentDisplayName("atlas")
+      const atlasDisplayName = getAgentDisplayName("atlas")
+      if (isAgentRegistered("atlas") || isAgentRegistered(atlasDisplayName)) {
+        updateSessionAgent(input.sessionID, "atlas")
+        if (output.message) {
+          output.message["agent"] = atlasDisplayName
+        }
+      } else {
+        log(`[${HOOK_NAME}] Atlas agent not available, continuing with current agent`, { sessionID: input.sessionID })
       }
 
       const existingState = readBoulderState(ctx.directory)
