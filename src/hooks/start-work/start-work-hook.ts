@@ -1,5 +1,5 @@
-import type { PluginInput } from "@opencode-ai/plugin"
-import { statSync } from "node:fs"
+import type { PluginInput } from "@opencode-ai/plugin";
+import { statSync } from "node:fs";
 import {
   appendSessionId,
   clearBoulderState,
@@ -9,31 +9,39 @@ import {
   getPlanProgress,
   readBoulderState,
   writeBoulderState,
-} from "../../features/boulder-state"
-import { getSessionAgent, isAgentRegistered, updateSessionAgent } from "../../features/claude-code-session-state"
-import { getAgentDisplayName } from "../../shared/agent-display-names"
-import { log } from "../../shared/logger"
-import { parseUserRequest } from "./parse-user-request"
-import { detectWorktreePath } from "./worktree-detector"
+} from "../../features/boulder-state";
+import {
+  getSessionAgent,
+  isAgentRegistered,
+  updateSessionAgent,
+} from "../../features/claude-code-session-state";
+import { getAgentDisplayName } from "../../shared/agent-display-names";
+import { log } from "../../shared/logger";
+import { parseUserRequest } from "./parse-user-request";
+import { detectWorktreePath } from "./worktree-detector";
 
-export const HOOK_NAME = "start-work" as const
+export const HOOK_NAME = "start-work" as const;
 
 export interface StartWorkHookInput {
-  sessionID: string
-  messageID?: string
+  sessionID: string;
+  messageID?: string;
 }
 
 export interface StartWorkHookOutput {
-  message?: Record<string, unknown>
-  parts: Array<{ type: string; text?: string }>
+  message?: Record<string, unknown>;
+  parts: Array<{ type: string; text?: string }>;
 }
 
 function findPlanByName(plans: string[], requestedName: string): string | null {
-  const lowerName = requestedName.toLowerCase()
-  const exactMatch = plans.find((p) => getPlanName(p).toLowerCase() === lowerName)
-  if (exactMatch) return exactMatch
-  const partialMatch = plans.find((p) => getPlanName(p).toLowerCase().includes(lowerName))
-  return partialMatch || null
+  const lowerName = requestedName.toLowerCase();
+  const exactMatch = plans.find(
+    (p) => getPlanName(p).toLowerCase() === lowerName,
+  );
+  if (exactMatch) return exactMatch;
+  const partialMatch = plans.find((p) =>
+    getPlanName(p).toLowerCase().includes(lowerName),
+  );
+  return partialMatch || null;
 }
 
 function createWorktreeActiveBlock(worktreePath: string): string {
@@ -45,78 +53,97 @@ function createWorktreeActiveBlock(worktreePath: string): string {
 **CRITICAL — DO NOT FORGET**: You are working inside a git worktree. ALL operations MUST be performed exclusively within this worktree directory.
 - Every file read, write, edit, and git operation MUST target paths under: \`${worktreePath}\`
 - When delegating tasks to subagents, you MUST include the worktree path in your delegation prompt so they also operate exclusively within the worktree
-- NEVER operate on the main repository directory — always use the worktree path above`
+- NEVER operate on the main repository directory — always use the worktree path above`;
 }
 
-function resolveWorktreeContext(
-  explicitWorktreePath: string | null,
-): { worktreePath: string | undefined; block: string } {
+function resolveWorktreeContext(explicitWorktreePath: string | null): {
+  worktreePath: string | undefined;
+  block: string;
+} {
   if (explicitWorktreePath === null) {
-    return { worktreePath: undefined, block: "" }
+    return { worktreePath: undefined, block: "" };
   }
 
-  const validatedPath = detectWorktreePath(explicitWorktreePath)
+  const validatedPath = detectWorktreePath(explicitWorktreePath);
   if (validatedPath) {
-    return { worktreePath: validatedPath, block: createWorktreeActiveBlock(validatedPath) }
+    return {
+      worktreePath: validatedPath,
+      block: createWorktreeActiveBlock(validatedPath),
+    };
   }
 
   return {
     worktreePath: undefined,
     block: `\n**Worktree** (needs setup): \`git worktree add ${explicitWorktreePath} <branch>\`, then add \`"worktree_path"\` to boulder.json`,
-  }
+  };
 }
 
 export function createStartWorkHook(ctx: PluginInput) {
   return {
-    "chat.message": async (input: StartWorkHookInput, output: StartWorkHookOutput): Promise<void> => {
-      const parts = output.parts
+    "chat.message": async (
+      input: StartWorkHookInput,
+      output: StartWorkHookOutput,
+    ): Promise<void> => {
+      const parts = output.parts;
       const promptText =
         parts
           ?.filter((p) => p.type === "text" && p.text)
           .map((p) => p.text)
           .join("\n")
-          .trim() || ""
+          .trim() || "";
 
-      if (!promptText.includes("<session-context>")) return
+      if (!promptText.includes("<session-context>")) return;
 
-      log(`[${HOOK_NAME}] Processing start-work command`, { sessionID: input.sessionID })
+      log(`[${HOOK_NAME}] Processing start-work command`, {
+        sessionID: input.sessionID,
+      });
       const activeAgent = isAgentRegistered("atlas")
         ? "atlas"
-        : getSessionAgent(input.sessionID) ?? "sisyphus"
-      const activeAgentDisplayName = getAgentDisplayName(activeAgent)
-      updateSessionAgent(input.sessionID, activeAgent)
+        : (getSessionAgent(input.sessionID) ?? "sisyphus");
+      const activeAgentDisplayName = getAgentDisplayName(activeAgent);
+      updateSessionAgent(input.sessionID, activeAgent);
       if (output.message) {
-        output.message["agent"] = activeAgentDisplayName
+        output.message["agent"] = activeAgentDisplayName;
       }
 
-      const existingState = readBoulderState(ctx.directory)
-      const sessionId = input.sessionID
-      const timestamp = new Date().toISOString()
+      const existingState = readBoulderState(ctx.directory);
+      const sessionId = input.sessionID;
+      const timestamp = new Date().toISOString();
 
-      const { planName: explicitPlanName, explicitWorktreePath } = parseUserRequest(promptText)
-      const { worktreePath, block: worktreeBlock } = resolveWorktreeContext(explicitWorktreePath)
+      const { planName: explicitPlanName, explicitWorktreePath } =
+        parseUserRequest(promptText);
+      const { worktreePath, block: worktreeBlock } =
+        resolveWorktreeContext(explicitWorktreePath);
 
-      let contextInfo = ""
+      let contextInfo = "";
 
       if (explicitPlanName) {
-        log(`[${HOOK_NAME}] Explicit plan name requested: ${explicitPlanName}`, { sessionID: input.sessionID })
+        log(
+          `[${HOOK_NAME}] Explicit plan name requested: ${explicitPlanName}`,
+          { sessionID: input.sessionID },
+        );
 
-        const allPlans = findPrometheusPlans(ctx.directory)
-        const matchedPlan = findPlanByName(allPlans, explicitPlanName)
+        const allPlans = findPrometheusPlans(ctx.directory);
+        const matchedPlan = findPlanByName(allPlans, explicitPlanName);
 
         if (matchedPlan) {
-          const progress = getPlanProgress(matchedPlan)
+          const progress = getPlanProgress(matchedPlan);
 
           if (progress.isComplete) {
             contextInfo = `
 ## Plan Already Complete
 
 The requested plan "${getPlanName(matchedPlan)}" has been completed.
-All ${progress.total} tasks are done. Create a new plan with: /plan "your task"`
+All ${progress.total} tasks are done. Create a new plan with: /plan "your task"`;
           } else {
-            if (existingState) clearBoulderState(ctx.directory)
-            const newState = createBoulderState(matchedPlan, sessionId, activeAgent, worktreePath)
-            writeBoulderState(ctx.directory, newState)
+            if (existingState) clearBoulderState(ctx.directory);
+            const newState = createBoulderState(
+              matchedPlan,
+              sessionId,
+              activeAgent,
+              worktreePath,
+            );
+            writeBoulderState(ctx.directory, newState);
 
             contextInfo = `
 ## Auto-Selected Plan
@@ -128,17 +155,19 @@ All ${progress.total} tasks are done. Create a new plan with: /plan "your task"`
 **Started**: ${timestamp}
 ${worktreeBlock}
 
-boulder.json has been created. Read the plan and begin execution.`
+boulder.json has been created. Read the plan and begin execution.`;
           }
         } else {
-          const incompletePlans = allPlans.filter((p) => !getPlanProgress(p).isComplete)
+          const incompletePlans = allPlans.filter(
+            (p) => !getPlanProgress(p).isComplete,
+          );
           if (incompletePlans.length > 0) {
             const planList = incompletePlans
               .map((p, i) => {
-                const prog = getPlanProgress(p)
-                return `${i + 1}. [${getPlanName(p)}] - Progress: ${prog.completed}/${prog.total}`
+                const prog = getPlanProgress(p);
+                return `${i + 1}. [${getPlanName(p)}] - Progress: ${prog.completed}/${prog.total}`;
               })
-              .join("\n")
+              .join("\n");
 
             contextInfo = `
 ## Plan Not Found
@@ -148,35 +177,39 @@ Could not find a plan matching "${explicitPlanName}".
 Available incomplete plans:
 ${planList}
 
-Ask the user which plan to work on.`
+Ask the user which plan to work on.`;
           } else {
             contextInfo = `
 ## Plan Not Found
 
 Could not find a plan matching "${explicitPlanName}".
-No incomplete plans available. Create a new plan with: /plan "your task"`
+No incomplete plans available. Create a new plan with: /plan "your task"`;
           }
         }
       } else if (existingState) {
-        const progress = getPlanProgress(existingState.active_plan)
+        const progress = getPlanProgress(existingState.active_plan);
 
         if (!progress.isComplete) {
-          const effectiveWorktree = worktreePath ?? existingState.worktree_path
+          const effectiveWorktree = worktreePath ?? existingState.worktree_path;
 
           if (worktreePath !== undefined) {
-            const updatedSessions = existingState.session_ids.includes(sessionId)
+            const updatedSessions = existingState.session_ids.includes(
+              sessionId,
+            )
               ? existingState.session_ids
-              : [...existingState.session_ids, sessionId]
+              : [...existingState.session_ids, sessionId];
             writeBoulderState(ctx.directory, {
               ...existingState,
               worktree_path: worktreePath,
               session_ids: updatedSessions,
-            })
+            });
           } else {
-            appendSessionId(ctx.directory, sessionId)
+            appendSessionId(ctx.directory, sessionId);
           }
 
-          const worktreeDisplay = effectiveWorktree ? createWorktreeActiveBlock(effectiveWorktree) : worktreeBlock
+          const worktreeDisplay = effectiveWorktree
+            ? createWorktreeActiveBlock(effectiveWorktree)
+            : worktreeBlock;
 
           contextInfo = `
 ## Active Work Session Found
@@ -190,40 +223,49 @@ No incomplete plans available. Create a new plan with: /plan "your task"`
 ${worktreeDisplay}
 
 The current session (${sessionId}) has been added to session_ids.
-Read the plan file and continue from the first unchecked task.`
+Read the plan file and continue from the first unchecked task.`;
         } else {
           contextInfo = `
 ## Previous Work Complete
 
 The previous plan (${existingState.plan_name}) has been completed.
-Looking for new plans...`
+Looking for new plans...`;
         }
       }
 
       if (
         (!existingState && !explicitPlanName) ||
-        (existingState && !explicitPlanName && getPlanProgress(existingState.active_plan).isComplete)
+        (existingState &&
+          !explicitPlanName &&
+          getPlanProgress(existingState.active_plan).isComplete)
       ) {
-        const plans = findPrometheusPlans(ctx.directory)
-        const incompletePlans = plans.filter((p) => !getPlanProgress(p).isComplete)
+        const plans = findPrometheusPlans(ctx.directory);
+        const incompletePlans = plans.filter(
+          (p) => !getPlanProgress(p).isComplete,
+        );
 
         if (plans.length === 0) {
           contextInfo += `
 ## No Plans Found
 
 No Prometheus plan files found at .sisyphus/plans/
-Use Prometheus to create a work plan first: /plan "your task"`
+Use Prometheus to create a work plan first: /plan "your task"`;
         } else if (incompletePlans.length === 0) {
           contextInfo += `
 
 ## All Plans Complete
 
-All ${plans.length} plan(s) are complete. Create a new plan with: /plan "your task"`
+All ${plans.length} plan(s) are complete. Create a new plan with: /plan "your task"`;
         } else if (incompletePlans.length === 1) {
-          const planPath = incompletePlans[0]
-          const progress = getPlanProgress(planPath)
-          const newState = createBoulderState(planPath, sessionId, activeAgent, worktreePath)
-          writeBoulderState(ctx.directory, newState)
+          const planPath = incompletePlans[0];
+          const progress = getPlanProgress(planPath);
+          const newState = createBoulderState(
+            planPath,
+            sessionId,
+            activeAgent,
+            worktreePath,
+          );
+          writeBoulderState(ctx.directory, newState);
 
           contextInfo += `
 
@@ -236,15 +278,15 @@ All ${plans.length} plan(s) are complete. Create a new plan with: /plan "your ta
 **Started**: ${timestamp}
 ${worktreeBlock}
 
-boulder.json has been created. Read the plan and begin execution.`
+boulder.json has been created. Read the plan and begin execution.`;
         } else {
           const planList = incompletePlans
             .map((p, i) => {
-              const progress = getPlanProgress(p)
-              const modified = new Date(statSync(p).mtimeMs).toISOString()
-              return `${i + 1}. [${getPlanName(p)}] - Modified: ${modified} - Progress: ${progress.completed}/${progress.total}`
+              const progress = getPlanProgress(p);
+              const modified = new Date(statSync(p).mtimeMs).toISOString();
+              return `${i + 1}. [${getPlanName(p)}] - Modified: ${modified} - Progress: ${progress.completed}/${progress.total}`;
             })
-            .join("\n")
+            .join("\n");
 
           contextInfo += `
 
@@ -258,24 +300,24 @@ ${planList}
 
 Ask the user which plan to work on. Present the options above and wait for their response.
 ${worktreeBlock}
-</system-reminder>`
+</system-reminder>`;
         }
       }
 
-      const idx = output.parts.findIndex((p) => p.type === "text" && p.text)
+      const idx = output.parts.findIndex((p) => p.type === "text" && p.text);
       if (idx >= 0 && output.parts[idx].text) {
         output.parts[idx].text = output.parts[idx].text
           .replace(/\$SESSION_ID/g, sessionId)
-          .replace(/\$TIMESTAMP/g, timestamp)
+          .replace(/\$TIMESTAMP/g, timestamp);
 
-        output.parts[idx].text += `\n\n---\n${contextInfo}`
+        output.parts[idx].text += `\n\n---\n${contextInfo}`;
       }
 
       log(`[${HOOK_NAME}] Context injected`, {
         sessionID: input.sessionID,
         hasExistingState: !!existingState,
         worktreePath,
-      })
+      });
     },
-  }
+  };
 }
