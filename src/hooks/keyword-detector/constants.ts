@@ -36,7 +36,7 @@ CONTEXT GATHERING (parallel):
 - 1-2 explore agents (codebase patterns, implementations)
 - 1-2 librarian agents (if external library involved)
 - Direct tools: Grep, AST-grep, LSP for targeted searches
-- tavily-mcp_tavily_search MCP tool (for latest techniques, current best practices)
+- tavily-mcp_tavily_search MCP tool (for latest techniques, current best practices, and online resources)
 
 IF COMPLEX - DO NOT STRUGGLE ALONE. Consult specialists:
 - **Oracle**: Conventional problems (architecture, debugging, complex logic)
@@ -45,6 +45,7 @@ IF COMPLEX - DO NOT STRUGGLE ALONE. Consult specialists:
 
 SYNTHESIZE findings before proceeding.
 ---
+
 MANDATORY delegate_task params: ALWAYS include load_skills=[] and run_in_background when calling delegate_task.
 Example: delegate_task(subagent_type="explore", prompt="...", run_in_background=true, load_skills=[])`,
   },
