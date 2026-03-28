@@ -33,15 +33,20 @@ export const KEYWORD_DETECTORS: KeywordDetector[] = [
     message: `[analyze-mode]
 ANALYSIS MODE. Gather context before diving deep:
 CONTEXT GATHERING (parallel):
-- 1-2 explore agents (codebase patterns, implementations)
-- 1-2 librarian agents (if external library involved)
-- Direct tools: Grep, AST-grep, LSP for targeted searches
-- tavily-mcp_tavily_search MCP tool (for latest techniques, current best practices, and online resources)
+  - 1-2 explore agents (codebase patterns, implementations)
+  - 1-2 librarian agents (if external library involved)
+  - Direct tools: Grep, AST-grep, LSP for targeted searches
+  - tavily-mcp_tavily_search MCP tool (for latest techniques, current best practices, and online resources)
 
 IF COMPLEX - DO NOT STRUGGLE ALONE. Consult specialists:
-- **Oracle**: Conventional problems (architecture, debugging, complex logic)
-- **Artistry**: Non-conventional problems (different approach needed)
-- **sequentialthinking-tools_sequentialthinking_tools** MCP tool: Systematic step-by-step reasoning for complex goals
+  - **Oracle**: Conventional problems (architecture, debugging, complex logic)
+  - **Artistry**: Non-conventional problems (different approach needed)
+  - **sequentialthinking-tools_sequentialthinking_tools** MCP tool: Systematic step-by-step reasoning for complex goals
+
+SKILL DISCOVERY: Before diving into analysis, use the find-skills skill to discover conforming skills for the task:
+  - skill(name="find-skills", user_message="[describe what you need]") — searches the open agent skills ecosystem for relevant skills
+  - Skills provide specialized knowledge, workflows, and embedded MCP servers that make analysis more effective
+  - Always check find-skills BEFORE starting manual analysis — an existing skill may handle the task far better
 
 SYNTHESIZE findings before proceeding.
 ---
