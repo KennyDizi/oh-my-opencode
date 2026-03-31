@@ -293,7 +293,6 @@ NOW.
 
 </ultrawork-mode>
 
----
 
 `;
 

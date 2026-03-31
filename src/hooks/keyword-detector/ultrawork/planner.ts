@@ -136,7 +136,6 @@ ${ULTRAWORK_PLANNER_SECTION}
 
 </ultrawork-mode>
 
----
 
 `;
 }

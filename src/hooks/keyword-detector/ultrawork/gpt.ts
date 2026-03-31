@@ -166,7 +166,6 @@ A task is complete when:
 
 </ultrawork-mode>
 
----
 
 `;
 
