@@ -18,14 +18,14 @@ import { detectWorktreePath } from "./worktree-detector"
 
 export const HOOK_NAME = "start-work" as const
 
-interface StartWorkHookInput {
-  sessionID: string
-  messageID?: string
+export interface StartWorkHookInput {
+  sessionID: string;
+  messageID?: string;
 }
 
-interface StartWorkHookOutput {
-  message?: Record<string, unknown>
-  parts: Array<{ type: string; text?: string }>
+export interface StartWorkHookOutput {
+  message?: Record<string, unknown>;
+  parts: Array<{ type: string; text?: string }>;
 }
 
 function findPlanByName(plans: string[], requestedName: string): string | null {
