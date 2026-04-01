@@ -16,7 +16,7 @@ export const SEARCH_MESSAGE = `[search-mode]
 MAXIMIZE SEARCH EFFORT. Launch multiple background agents IN PARALLEL:
   - explore agents (codebase patterns, file structures, ast-grep)
   - librarian agents (remote repos, official docs, GitHub examples)
-  - tavily-mcp_tavily_search MCP tool (for latest techniques, current best practices and online resources)
+  - tavily-mcp_tavily_search MCP tool to reflect with the latest techniques, current best practices and online resources
   - tracelattice_sequentialthinking_tools MCP tool: Systematic step-by-step reasoning for complex goals, tasks that require deep thought and careful analysis, or when you find yourself stuck.
   - Plus direct tools: Grep, ripgrep (rg), ast-grep (sg)
 
