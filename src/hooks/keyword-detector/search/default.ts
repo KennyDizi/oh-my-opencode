@@ -17,7 +17,7 @@ MAXIMIZE SEARCH EFFORT. Launch multiple background agents IN PARALLEL:
   - explore agents (codebase patterns, file structures, ast-grep)
   - librarian agents (remote repos, official docs, GitHub examples)
   - tavily-mcp_tavily_search MCP tool (for latest techniques, current best practices and online resources)
-  - sequentialthinking-tools_sequentialthinking_tools MCP tool: Systematic step-by-step reasoning for complex goals
+  - tracelattice_sequentialthinking_tools MCP tool: Systematic step-by-step reasoning for complex goals, tasks that require deep thought and careful analysis, or when you find yourself stuck.
   - Plus direct tools: Grep, ripgrep (rg), ast-grep (sg)
 
 SKILL DISCOVERY: Before diving into search, use the find-skills skill to discover conforming skills for the task:

@@ -41,7 +41,7 @@ CONTEXT GATHERING (parallel):
 IF COMPLEX - DO NOT STRUGGLE ALONE. Consult specialists:
   - **Oracle**: Conventional problems (architecture, debugging, complex logic)
   - **Artistry**: Non-conventional problems (different approach needed)
-  - **sequentialthinking-tools_sequentialthinking_tools** MCP tool: Systematic step-by-step reasoning for complex goals
+  - **tracelattice_sequentialthinking_tools** MCP tool: Systematic step-by-step reasoning for complex goals, tasks that require deep thought and careful analysis, or when you find yourself stuck.
 
 SKILL DISCOVERY: Before diving into analysis, use the find-skills skill to discover conforming skills for the task:
   - skill(name="find-skills", user_message="[describe what you need]") — searches the open agent skills ecosystem for relevant skills
