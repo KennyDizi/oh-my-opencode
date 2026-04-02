@@ -4,27 +4,27 @@ import { log } from "../../shared/logger"
 
 const TOOL_RESULT_PLACEHOLDER = "Tool output unavailable (context compacted)"
 
-type ToolUsePart = {
+export type ToolUsePart = {
   type: "tool_use"
   id: string
   [key: string]: unknown
 }
 
-type ToolResultPart = {
+export type ToolResultPart = {
   type: "tool_result"
   tool_use_id: string
   content: string
   [key: string]: unknown
 }
 
-type TransformPart = Part | ToolUsePart | ToolResultPart
+export type TransformPart = Part | ToolUsePart | ToolResultPart
 
-type TransformMessageInfo = Message | {
+export type TransformMessageInfo = Message | {
   role: "user"
   sessionID?: string
 }
 
-interface MessageWithParts {
+export interface MessageWithParts {
   info: TransformMessageInfo
   parts: TransformPart[]
 }
