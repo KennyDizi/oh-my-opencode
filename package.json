@@ -79,7 +79,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@microsoft/api-extractor": "^7.57.8",
+    "@microsoft/api-extractor": "^7.58.0",
     "@rsdoctor/core": "^1.5.7",
     "@rsdoctor/rspack-plugin": "^1.5.7",
     "@rslib/core": "^0.20.2",
@@ -92,7 +92,7 @@
     "@types/js-yaml": "^4.0.9",
     "@types/picomatch": "^4.0.2",
     "bun-types": "^1.3.11",
-    "electron-to-chromium": "^1.5.330",
+    "electron-to-chromium": "^1.5.331",
     "github-flavored-markdown": "^1.0.1",
     "lru-cache": "^11.2.7",
     "rimraf": "^6.1.3",
