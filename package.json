@@ -66,7 +66,7 @@
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@opencode-ai/plugin": "^1.3.13",
     "@opencode-ai/sdk": "^1.3.13",
-    "ai": "^6.0.145",
+    "ai": "^6.0.146",
     "codex": "^0.2.3",
     "commander": "^14.0.3",
     "detect-libc": "^2.1.2",
@@ -79,7 +79,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@microsoft/api-extractor": "^7.58.0",
+    "@microsoft/api-extractor": "^7.58.1",
     "@rsdoctor/core": "^1.5.7",
     "@rsdoctor/rspack-plugin": "^1.5.7",
     "@rslib/core": "^0.20.3",
