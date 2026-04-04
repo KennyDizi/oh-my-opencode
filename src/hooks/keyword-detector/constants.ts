@@ -1,17 +1,12 @@
 export const CODE_BLOCK_PATTERN = /```[\s\S]*?```/g
 export const INLINE_CODE_PATTERN = /`[^`]+`/g
 
-// Re-export from submodules
-export { ANALYZE_MESSAGE, ANALYZE_PATTERN } from "./analyze";
-export { SEARCH_MESSAGE, SEARCH_PATTERN } from "./search";
-export {
-  getUltraworkMessage,
-  isNonOmoAgent,
-  isPlannerAgent,
-} from "./ultrawork";
+export { ANALYZE_MESSAGE, ANALYZE_PATTERN } from "./analyze"
+export { SEARCH_MESSAGE, SEARCH_PATTERN } from "./search"
+export { getUltraworkMessage, isNonOmoAgent, isPlannerAgent } from "./ultrawork"
 
-import { SEARCH_MESSAGE, SEARCH_PATTERN } from "./search";
-import { getUltraworkMessage } from "./ultrawork";
+import { SEARCH_MESSAGE, SEARCH_PATTERN } from "./search"
+import { getUltraworkMessage } from "./ultrawork"
 
 export type KeywordDetector = {
   pattern: RegExp
