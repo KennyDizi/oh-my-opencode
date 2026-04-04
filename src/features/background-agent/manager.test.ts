@@ -1,15 +1,6 @@
 declare const require: (name: string) => any
 const { describe, test, expect, beforeEach, afterEach, afterAll, spyOn, mock } = require("bun:test")
 
-mock.module("../../shared/connected-providers-cache", () => ({
-  readConnectedProvidersCache: () => null,
-  readProviderModelsCache: () => null,
-  hasConnectedProvidersCache: () => false,
-  hasProviderModelsCache: () => false,
-  writeProviderModelsCache: () => {},
-  updateConnectedProvidersCache: () => {},
-}))
-
 afterAll(() => { mock.restore() })
 
 import { getSessionPromptParams, clearSessionPromptParams } from "../../shared/session-prompt-params-state"
@@ -21,6 +12,15 @@ import { MIN_IDLE_TIME_MS } from "./constants"
 import { BackgroundManager } from "./manager"
 import { ConcurrencyManager } from "./concurrency"
 import { initTaskToastManager, _resetTaskToastManagerForTesting } from "../task-toast-manager/manager"
+
+mock.module("../../shared/connected-providers-cache", () => ({
+  readConnectedProvidersCache: () => null,
+  readProviderModelsCache: () => null,
+  hasConnectedProvidersCache: () => false,
+  hasProviderModelsCache: () => false,
+  writeProviderModelsCache: () => {},
+  updateConnectedProvidersCache: () => {},
+}))
 mock.restore()
 
 
@@ -5019,6 +5019,66 @@ describe("BackgroundManager.handleEvent - non-tool event lastUpdate", () => {
 
     //#then - task should still be running (delta event refreshed lastUpdate)
     expect(task.status).toBe("running")
+  })
+
+  test("should complete idle task without fetching messages after output event was observed", async () => {
+    //#given - a running task with observed output from message part events
+    let messagesCallCount = 0
+    let todoCallCount = 0
+    const sessionID = "session-output-cached-idle"
+    const client = {
+      session: {
+        prompt: async () => ({}),
+        promptAsync: async () => ({}),
+        abort: async () => ({}),
+        messages: async () => {
+          messagesCallCount += 1
+          return {
+            data: [
+              {
+                info: { role: "assistant" },
+                parts: [{ type: "text", text: "ok" }],
+              },
+            ],
+          }
+        },
+        todo: async () => {
+          todoCallCount += 1
+          return { data: [] }
+        },
+      },
+    }
+    const manager = new BackgroundManager({ client, directory: tmpdir() } as unknown as PluginInput)
+    stubNotifyParentSession(manager)
+
+    const task: BackgroundTask = {
+      id: "task-output-cached-idle",
+      sessionID,
+      parentSessionID: "parent-session",
+      parentMessageID: "msg-1",
+      description: "idle cached output task",
+      prompt: "test",
+      agent: "explore",
+      status: "running",
+      startedAt: new Date(Date.now() - (MIN_IDLE_TIME_MS + 10)),
+    }
+    getTaskMap(manager).set(task.id, task)
+
+    manager.handleEvent({
+      type: "message.part.updated",
+      properties: { sessionID, type: "text" },
+    })
+
+    //#when - session.idle fires after output event was already observed
+    manager.handleEvent({ type: "session.idle", properties: { sessionID } })
+
+    //#then - task completes without refetching session.messages
+    await new Promise((resolve) => setTimeout(resolve, 10))
+    expect(task.status).toBe("completed")
+    expect(messagesCallCount).toBe(0)
+    expect(todoCallCount).toBe(1)
+
+    manager.shutdown()
   })
 })
 
