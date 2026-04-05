@@ -3,7 +3,10 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 
-import { discoverInstalledPlugins } from "./discovery"
+// NOTE: Do NOT import discoverInstalledPlugins at top level.
+// loader.test.ts in the same directory mocks "./discovery" with name: "demo",
+// and when run-ci-tests.ts groups this directory together, that mock leaks.
+// Dynamic import inside each test avoids the contamination.
 
 const originalClaudePluginsHome = process.env.CLAUDE_PLUGINS_HOME
 const temporaryDirectories: string[] = []
@@ -16,18 +19,17 @@ function createTemporaryDirectory(prefix: string): string {
 
 describe("discoverInstalledPlugins", () => {
   beforeEach(() => {
-    // Mock logger to avoid noise in test output and force process isolation in CI
     mock.module("../../shared/logger", () => ({
       log: () => {},
     }))
-    
+
     const pluginsHome = createTemporaryDirectory("omo-claude-plugins-")
     process.env.CLAUDE_PLUGINS_HOME = pluginsHome
   })
 
   afterEach(() => {
     mock.restore()
-    
+
     if (originalClaudePluginsHome === undefined) {
       delete process.env.CLAUDE_PLUGINS_HOME
     } else {
@@ -39,10 +41,9 @@ describe("discoverInstalledPlugins", () => {
     }
   })
 
-  it("preserves scoped package name from npm plugin keys", () => {
+  it("preserves scoped package name from npm plugin keys", async () => {
     //#given
     const pluginsHome = process.env.CLAUDE_PLUGINS_HOME as string
-    // Use unique temp directory with scoped path to prevent cross-test contamination
     const installPathBase = createTemporaryDirectory("omo-scoped-plugin-")
     const installPath = join(installPathBase, "@myorg", "my-plugin")
     mkdirSync(installPath, { recursive: true })
@@ -68,7 +69,11 @@ describe("discoverInstalledPlugins", () => {
     )
 
     //#when
-    const discovered = discoverInstalledPlugins({ pluginsHomeOverride: pluginsHome })
+    const { discoverInstalledPlugins } = await import(`./discovery?t=${Date.now()}-1`)
+    const discovered = discoverInstalledPlugins({
+      pluginsHomeOverride: pluginsHome,
+      loadPluginManifestOverride: () => null,
+    })
 
     //#then
     expect(discovered.errors).toHaveLength(0)
@@ -76,10 +81,9 @@ describe("discoverInstalledPlugins", () => {
     expect(discovered.plugins[0]?.name).toBe("@myorg/my-plugin")
   })
 
-  it("derives package name from file URL plugin keys", () => {
+  it("derives package name from file URL plugin keys", async () => {
     //#given
     const pluginsHome = process.env.CLAUDE_PLUGINS_HOME as string
-    // Use unique temp directory directly to prevent cross-test contamination
     const installPath = createTemporaryDirectory("omo-fileurl-plugin-")
 
     const databasePath = join(pluginsHome, "installed_plugins.json")
@@ -103,7 +107,11 @@ describe("discoverInstalledPlugins", () => {
     )
 
     //#when
-    const discovered = discoverInstalledPlugins({ pluginsHomeOverride: pluginsHome })
+    const { discoverInstalledPlugins } = await import(`./discovery?t=${Date.now()}-2`)
+    const discovered = discoverInstalledPlugins({
+      pluginsHomeOverride: pluginsHome,
+      loadPluginManifestOverride: () => null,
+    })
 
     //#then
     expect(discovered.errors).toHaveLength(0)
@@ -111,10 +119,9 @@ describe("discoverInstalledPlugins", () => {
     expect(discovered.plugins[0]?.name).toBe("oh-my-opencode")
   })
 
-  it("derives canonical package name from npm plugin keys", () => {
+  it("derives canonical package name from npm plugin keys", async () => {
     //#given
     const pluginsHome = process.env.CLAUDE_PLUGINS_HOME as string
-    // Use unique temp directory directly to prevent cross-test contamination
     const installPath = createTemporaryDirectory("omo-npm-plugin-")
 
     const databasePath = join(pluginsHome, "installed_plugins.json")
@@ -138,7 +145,11 @@ describe("discoverInstalledPlugins", () => {
     )
 
     //#when
-    const discovered = discoverInstalledPlugins({ pluginsHomeOverride: pluginsHome })
+    const { discoverInstalledPlugins } = await import(`./discovery?t=${Date.now()}-3`)
+    const discovered = discoverInstalledPlugins({
+      pluginsHomeOverride: pluginsHome,
+      loadPluginManifestOverride: () => null,
+    })
 
     //#then
     expect(discovered.errors).toHaveLength(0)
