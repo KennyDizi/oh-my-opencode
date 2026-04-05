@@ -9,7 +9,9 @@ import { createSkillTool } from "./tools"
 
 const originalReadFileSync = fs.readFileSync.bind(fs)
 
-async function importFreshSkillToolModule(): Promise<typeof import("./tools")> {
+let createSkillTool: typeof import("../tools").createSkillTool
+
+beforeEach(async () => {
   mock.module("node:fs", () => ({
     ...fs,
     readFileSync: (path: string, encoding?: string) => {
@@ -22,13 +24,10 @@ Test skill body content`
       return originalReadFileSync(path, encoding as BufferEncoding)
     },
   }))
-
-  const module = await import(`./tools?test=${Date.now()}-${Math.random()}`)
-  mock.restore()
-  return module
-}
-
-const { createSkillTool } = await importFreshSkillToolModule()
+  
+  const module = await import("../tools")
+  createSkillTool = module.createSkillTool
+})
 
 afterAll(() => {
   mock.restore()
