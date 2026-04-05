@@ -36,7 +36,17 @@ async function injectContinuation(input: {
   worktreePath?: string
 }): Promise<void> {
   const remaining = input.progress.total - input.progress.completed
-  input.sessionState.lastContinuationInjectedAt = Date.now()
+  if (input.sessionState.isInjectingContinuation) {
+    scheduleRetry({
+      ctx: input.ctx,
+      sessionID: input.sessionID,
+      sessionState: input.sessionState,
+      options: input.options,
+    })
+    return
+  }
+
+  input.sessionState.isInjectingContinuation = true
 
   try {
     const currentBoulder = readBoulderState(input.ctx.directory)
@@ -47,7 +57,7 @@ async function injectContinuation(input: {
       ? getTaskSessionState(input.ctx.directory, currentTask.key)
       : null
 
-    await injectBoulderContinuation({
+    const result = await injectBoulderContinuation({
       ctx: input.ctx,
       sessionID: input.sessionID,
       planName: input.planName,
@@ -60,9 +70,46 @@ async function injectContinuation(input: {
       backgroundManager: input.options?.backgroundManager,
       sessionState: input.sessionState,
     })
+
+    if (result === "injected") {
+      if (input.sessionState.pendingRetryTimer) {
+        clearTimeout(input.sessionState.pendingRetryTimer)
+        input.sessionState.pendingRetryTimer = undefined
+      }
+      input.sessionState.lastContinuationInjectedAt = Date.now()
+      return
+    }
+
+    if (result === "skipped_background_tasks") {
+      scheduleRetry({
+        ctx: input.ctx,
+        sessionID: input.sessionID,
+        sessionState: input.sessionState,
+        options: input.options,
+      })
+      return
+    }
+
+    if (result === "failed") {
+      scheduleRetry({
+        ctx: input.ctx,
+        sessionID: input.sessionID,
+        sessionState: input.sessionState,
+        options: input.options,
+      })
+    }
   } catch (error) {
     log(`[${HOOK_NAME}] Failed to inject boulder continuation`, { sessionID: input.sessionID, error })
     input.sessionState.promptFailureCount += 1
+    input.sessionState.lastFailureAt = Date.now()
+    scheduleRetry({
+      ctx: input.ctx,
+      sessionID: input.sessionID,
+      sessionState: input.sessionState,
+      options: input.options,
+    })
+  } finally {
+    input.sessionState.isInjectingContinuation = false
   }
 }
 
@@ -83,6 +130,14 @@ function scheduleRetry(input: {
     if (sessionState.promptFailureCount >= MAX_CONSECUTIVE_PROMPT_FAILURES) return
     if (sessionState.waitingForFinalWaveApproval) return
 
+    const now = Date.now()
+    if (
+      sessionState.lastContinuationInjectedAt
+      && now - sessionState.lastContinuationInjectedAt < CONTINUATION_COOLDOWN_MS
+    ) {
+      return
+    }
+
     const currentBoulder = readBoulderState(ctx.directory)
     if (!currentBoulder) return
     if (!currentBoulder.session_ids?.includes(sessionID)) return
@@ -90,7 +145,10 @@ function scheduleRetry(input: {
     const currentProgress = getPlanProgress(currentBoulder.active_plan)
     if (currentProgress.isComplete) return
     if (options?.isContinuationStopped?.(sessionID)) return
-    if (hasRunningBackgroundTasks(sessionID, options)) return
+    if (hasRunningBackgroundTasks(sessionID, options)) {
+      scheduleRetry({ ctx, sessionID, sessionState, options })
+      return
+    }
 
     await injectContinuation({
       ctx,
@@ -194,6 +252,7 @@ export async function handleAtlasSessionIdle(input: {
   }
 
   if (hasRunningBackgroundTasks(sessionID, options)) {
+    scheduleRetry({ ctx, sessionID, sessionState, options })
     log(`[${HOOK_NAME}] Skipped: background tasks running`, { sessionID })
     return
   }
