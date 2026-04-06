@@ -3,12 +3,10 @@ import {
   readBoulderState
 } from "../../features/boulder-state"
 import {
-  getSessionAgent,
   isAgentRegistered,
   updateSessionAgent,
 } from "../../features/claude-code-session-state"
 import {
-  getAgentConfigKey,
   getAgentDisplayName,
   getAgentListDisplayName,
 } from "../../shared/agent-display-names"
@@ -76,18 +74,9 @@ export function createStartWorkHook(ctx: PluginInput) {
     }
 
     log(`[${HOOK_NAME}] Processing start-work command`, { sessionID: input.sessionID })
-    const currentSessionAgent = getSessionAgent(input.sessionID)
-    const currentSessionAgentKey = currentSessionAgent
-      ? getAgentConfigKey(currentSessionAgent)
-      : undefined
-    const activeAgent = currentSessionAgent
-      && currentSessionAgentKey
-      && currentSessionAgentKey !== "prometheus"
-      && currentSessionAgentKey !== "atlas"
-        ? currentSessionAgent
-        : isAgentRegistered("atlas")
-          ? "atlas"
-          : "sisyphus"
+    const activeAgent = isAgentRegistered("atlas")
+      ? "atlas"
+      : "sisyphus"
     const activeAgentDisplayName = activeAgent === "atlas"
       ? getAgentListDisplayName(activeAgent)
       : getAgentDisplayName(activeAgent)
