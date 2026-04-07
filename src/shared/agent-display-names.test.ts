@@ -150,6 +150,14 @@ describe("getAgentConfigKey", () => {
     expect(getAgentConfigKey("atlas - plan executor")).toBe("atlas")
   })
 
+  it("resolves legacy parenthesized display names", () => {
+    // given legacy parenthesized display name from old configs/sessions
+    // when getAgentConfigKey called
+    // then resolves to canonical config key
+    expect(getAgentConfigKey("Sisyphus (Ultraworker)")).toBe("sisyphus")
+    expect(getAgentConfigKey("Atlas (Plan Executor)")).toBe("atlas")
+  })
+
   it("passes through lowercase config keys unchanged", () => {
     // given lowercase config key "prometheus"
     // when getAgentConfigKey called
@@ -204,7 +212,7 @@ describe("normalizeAgentForPrompt", () => {
 
 describe("normalizeAgentForPromptKey", () => {
   it("converts built-in display names to config keys", () => {
-    expect(normalizeAgentForPromptKey("Sisyphus - Ultraworker")).toBe("sisyphus")
+    expect(normalizeAgentForPromptKey("Sisyphus (Ultraworker)")).toBe("sisyphus")
   })
 
   it("preserves custom agents", () => {
@@ -235,5 +243,16 @@ describe("AGENT_DISPLAY_NAMES", () => {
     // when checking the constant
     // then contains all expected mappings
     expect(AGENT_DISPLAY_NAMES).toEqual(expectedMappings)
+  })
+
+  it("all display names must be HTTP-header-safe (no parentheses)", () => {
+    // given all agent display names
+    const httpHeaderUnsafe = /[()]/
+
+    // when checking each display name
+    for (const [key, displayName] of Object.entries(AGENT_DISPLAY_NAMES)) {
+      // then none should contain parentheses
+      expect(httpHeaderUnsafe.test(displayName)).toBe(false)
+    }
   })
 })
