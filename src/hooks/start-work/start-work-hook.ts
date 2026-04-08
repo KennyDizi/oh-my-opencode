@@ -4,14 +4,9 @@ import {
 } from "../../features/boulder-state"
 import {
   isAgentRegistered,
+  resolveRegisteredAgentName,
   updateSessionAgent,
 } from "../../features/claude-code-session-state"
-import {
-  getAgentDisplayName,
-  getAgentListDisplayName,
-  stripAgentListSortPrefix,
-} from "../../shared/agent-display-names"
-import { log } from "../../shared/logger"
 import { buildStartWorkContextInfo } from "./context-info-builder"
 import { parseUserRequest } from "./parse-user-request"
 import { createWorktreeActiveBlock } from "./worktree-block"
@@ -78,12 +73,9 @@ export function createStartWorkHook(ctx: PluginInput) {
     const activeAgent = isAgentRegistered("atlas")
       ? "atlas"
       : "sisyphus"
-    const activeAgentDisplayName = activeAgent === "atlas"
-      ? getAgentListDisplayName(activeAgent)
-      : getAgentDisplayName(activeAgent)
     updateSessionAgent(input.sessionID, activeAgent)
     if (output.message) {
-      output.message["agent"] = stripAgentListSortPrefix(activeAgentDisplayName)
+      output.message["agent"] = resolveRegisteredAgentName(activeAgent) ?? activeAgent
     }
 
     const existingState = readBoulderState(ctx.directory)
