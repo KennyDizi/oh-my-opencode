@@ -9,6 +9,7 @@ import {
 import {
   getAgentDisplayName,
   getAgentListDisplayName,
+  stripAgentListSortPrefix,
 } from "../../shared/agent-display-names"
 import { log } from "../../shared/logger"
 import { buildStartWorkContextInfo } from "./context-info-builder"
@@ -82,7 +83,7 @@ export function createStartWorkHook(ctx: PluginInput) {
       : getAgentDisplayName(activeAgent)
     updateSessionAgent(input.sessionID, activeAgent)
     if (output.message) {
-      output.message["agent"] = activeAgentDisplayName
+      output.message["agent"] = stripAgentListSortPrefix(activeAgentDisplayName)
     }
 
     const existingState = readBoulderState(ctx.directory)
