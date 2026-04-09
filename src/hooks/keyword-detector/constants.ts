@@ -31,17 +31,17 @@ CONTEXT GATHERING (parallel):
   - 1-2 explore agents (codebase patterns, implementations)
   - 1-2 librarian agents (if external library involved)
   - Direct tools: Grep, AST-grep, LSP for targeted searches
-  - tavily-mcp_tavily_search MCP tool to reflect with the latest techniques, current best practices, and online resources
+  - **tavily-mcp_tavily_search** MCP tool to reflect with the latest techniques, current best practices, and online resources
 
 IF COMPLEX - DO NOT STRUGGLE ALONE. Consult specialists:
   - **Oracle**: Conventional problems (architecture, debugging, complex logic)
   - **Artistry**: Non-conventional problems (different approach needed)
   - **tracelattice_sequentialthinking_tools** MCP tool: Systematic step-by-step reasoning for complex goals, tasks that require deep thought and careful analysis, or when you find yourself stuck.
 
-SKILL DISCOVERY: Before diving into analysis, use the find-skills skill to discover conforming skills for the task:
+SKILL DISCOVERY: Before diving into analysis, use the **find-skills** skill to discover conforming skills for the task:
   - skill(name="find-skills", user_message="[describe what you need]") — searches the open agent skills ecosystem for relevant skills
   - Skills provide specialized knowledge, workflows, and embedded MCP servers that make analysis more effective
-  - Always check find-skills BEFORE starting manual analysis — an existing skill may handle the task far better
+  - Always check **find-skills** BEFORE starting manual analysis — an existing skill may handle the task far better
 
 SYNTHESIZE findings before proceeding.
 ---
