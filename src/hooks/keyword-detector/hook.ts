@@ -15,20 +15,26 @@ import type { ContextCollector } from "../../features/context-injector"
 import type { RalphLoopHook } from "../ralph-loop"
 import { parseRalphLoopArguments } from "../ralph-loop/command-arguments"
 
-const ULTRAWORK_KEYWORD_PATTERN = /\b(ultrawork|ulw)\b/i
-const LEADING_ULTRAWORK_PATTERN = /^\s*(ultrawork|ulw)\b/i
-const TRAILING_GREETING_ULTRAWORK_PATTERN = /^\s*(?:hi|hello|hey|hiya|greetings)(?:\s+there)?\s+(ultrawork|ulw)\s*$/i
+const ULTRAWORK_LONGHAND_PATTERN = /\bultrawork\b/i
+const ULW_SHORTHAND_PATTERN = /\bulw\b/i
+const GREETING_PREFIX_ULTRAWORK_PATTERN = /^\s*(?:hi|hello|hey|hiya|greetings)(?:\s+there)?(?:[!,.:;-]+\s*|\s+)(ultrawork|ulw)\b/i
 
-function extractUltraworkTask(cleanText: string): string {
-  if (TRAILING_GREETING_ULTRAWORK_PATTERN.test(cleanText)) {
-    return ""
-  }
-
-  return cleanText.replace(ULTRAWORK_KEYWORD_PATTERN, "").trim()
+function normalizeUltraworkTask(taskText: string): string {
+  return taskText.replace(/\s+/g, " ").trim()
 }
 
-function hasEdgeUltraworkKeyword(cleanText: string): boolean {
-  return LEADING_ULTRAWORK_PATTERN.test(cleanText) || TRAILING_GREETING_ULTRAWORK_PATTERN.test(cleanText)
+function extractUltraworkTask(cleanText: string): string {
+  const greetingPrefixedMatch = cleanText.match(GREETING_PREFIX_ULTRAWORK_PATTERN)
+
+  if (greetingPrefixedMatch) {
+    return normalizeUltraworkTask(cleanText.slice(greetingPrefixedMatch[0].length))
+  }
+
+  if (ULW_SHORTHAND_PATTERN.test(cleanText)) {
+    return normalizeUltraworkTask(cleanText.replace(ULW_SHORTHAND_PATTERN, " "))
+  }
+
+  return normalizeUltraworkTask(cleanText.replace(ULTRAWORK_LONGHAND_PATTERN, " "))
 }
 
 export function createKeywordDetectorHook(
@@ -83,16 +89,6 @@ export function createKeywordDetectorHook(
         detectedKeywords = detectedKeywords.filter((k) => k.type !== "ultrawork")
         if (preFilterCount > detectedKeywords.length) {
           log(`[keyword-detector] Filtered ultrawork keywords for planner agent`, { sessionID: input.sessionID, agent: currentAgent })
-        }
-      }
-
-      if (!hasEdgeUltraworkKeyword(cleanText)) {
-        const preFilterCount = detectedKeywords.length
-        detectedKeywords = detectedKeywords.filter((k) => k.type !== "ultrawork")
-        if (preFilterCount > detectedKeywords.length) {
-          log(`[keyword-detector] Filtered non-edge ultrawork keyword`, {
-            sessionID: input.sessionID,
-          })
         }
       }
 
