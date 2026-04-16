@@ -11,6 +11,7 @@ import { formatDetailedError } from "./error-formatting"
 import { syncTaskDeps, type SyncTaskDeps } from "./sync-task-deps"
 import { setSessionFallbackChain, clearSessionFallbackChain } from "../../hooks/model-fallback/hook"
 import { retrySyncPromptWithFallbacks } from "./sync-task-fallback"
+import { buildTaskMetadataBlock } from "../../features/tool-metadata-store/task-metadata-contract"
 
 export async function executeSyncTask(
   args: DelegateTaskArgs,
@@ -37,7 +38,7 @@ export async function executeSyncTask(
       spawnReservation = await manager.reserveSubagentSpawn(parentContext.sessionID)
     }
 
-    // Depth/descendant guard. We must NOT silently fall back to childDepth: 1
+    // Depth guard. We must NOT silently fall back to childDepth: 1
     // when the manager is unavailable or lacks the spawn methods, because that
     // would let subagents recurse without bound. The only safe fallback is
     // when the manager genuinely cannot enforce limits (legacy SDK), in which
@@ -51,7 +52,7 @@ export async function executeSyncTask(
     } else {
       log(
         "[task] WARNING: BackgroundManager has no spawn enforcement methods (reserveSubagentSpawn / assertCanSpawn). " +
-        "Depth and descendant limits cannot be enforced for this task. This indicates an old SDK or a misconfiguration.",
+        "Depth limits cannot be enforced for this task. This indicates an old SDK or a misconfiguration.",
         { parentSessionID: parentContext.sessionID }
       )
       spawnContext = {
@@ -122,6 +123,7 @@ export async function executeSyncTask(
         load_skills: args.load_skills,
         description: args.description,
         run_in_background: args.run_in_background,
+        taskId: sessionID,
         sessionId: sessionID,
         sync: true,
         spawnDepth: spawnContext.childDepth,
@@ -210,9 +212,12 @@ Agent: ${agentToUse}${args.category ? ` (category: ${args.category})` : ""}${mod
 
 ${result.textContent || "(No text output)"}
 
-<task_metadata>
-session_id: ${sessionID}
-</task_metadata>`
+${buildTaskMetadataBlock({
+        sessionId: sessionID,
+        taskId: sessionID,
+        agent: agentToUse,
+        category: args.category,
+      })}`
     } finally {
       if (toastManager && taskId !== undefined) {
         toastManager.removeTask(taskId)

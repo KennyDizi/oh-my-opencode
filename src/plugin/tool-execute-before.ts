@@ -1,14 +1,14 @@
-import type { PluginContext } from "./types"
 import { randomUUID } from "node:crypto"
+import type { PluginContext } from "./types"
 
-import { getMainSessionID } from "../features/claude-code-session-state"
 import { clearBoulderState } from "../features/boulder-state"
-import { log } from "../shared"
-import { stripInvisibleAgentCharacters } from "../shared/agent-display-names"
-import { resolveSessionAgent } from "./session-agent-resolver"
+import { getMainSessionID } from "../features/claude-code-session-state"
 import { parseRalphLoopArguments } from "../hooks/ralph-loop/command-arguments"
 import { ULTRAWORK_VERIFICATION_PROMISE } from "../hooks/ralph-loop/constants"
 import { readState, writeState } from "../hooks/ralph-loop/storage"
+import { log } from "../shared"
+import { stripInvisibleAgentCharacters } from "../shared/agent-display-names"
+import { resolveSessionAgent } from "./session-agent-resolver"
 
 import type { CreatedHooks } from "../create-hooks"
 
@@ -98,13 +98,17 @@ export function createToolExecuteBeforeHandler(args: {
 
     if (input.tool === "task") {
       const argsObject = output.args
+      const category = typeof argsObject.category === "string" ? argsObject.category : undefined
       const subagentType = typeof argsObject.subagent_type === "string" ? argsObject.subagent_type : undefined
-      const sessionId = typeof argsObject.session_id === "string" ? argsObject.session_id : undefined
+      const taskId = typeof argsObject.task_id === "string" ? argsObject.task_id : undefined
 
-      if (!subagentType && sessionId) {
-        const resolvedAgent = await resolveSessionAgent(ctx.client, sessionId)
+      if (category) {
+        argsObject.subagent_type = "sisyphus-junior"
+      } else if (!subagentType && taskId) {
+        const resolvedAgent = await resolveSessionAgent(ctx.client, taskId)
         argsObject.subagent_type = resolvedAgent ?? "continue"
       }
+
       const normalizedSubagentType =
         typeof argsObject.subagent_type === "string" ? stripInvisibleAgentCharacters(argsObject.subagent_type) : undefined
       const prompt = typeof argsObject.prompt === "string" ? argsObject.prompt : ""
