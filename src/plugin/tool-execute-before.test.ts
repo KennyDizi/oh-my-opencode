@@ -101,19 +101,27 @@ describe("createToolExecuteBeforeHandler", () => {
       }
     }
 
-    test("does not set subagent_type when category is provided without subagent_type", async () => {
+    test("sets subagent_type to sisyphus-junior when category is provided without subagent_type", async () => {
       //#given
-      const ctx = createCtxWithSessionMessages()
-      const handler = createToolExecuteBeforeHandler({ ctx, hooks: emptyHooks })
-      const input = { tool: "task", sessionID: "ses_123", callID: "call_1" }
-      const output = { args: { category: "quick", description: "Test" } as Record<string, unknown> }
+      const ctx = createCtxWithSessionMessages();
+      const handler = createToolExecuteBeforeHandler({
+        ctx,
+        hooks: emptyHooks,
+      });
+      const input = { tool: "task", sessionID: "ses_123", callID: "call_1" };
+      const output = {
+        args: { category: "quick", description: "Test" } as Record<
+          string,
+          unknown
+        >,
+      };
 
       //#when
-      await handler(input, output)
+      await handler(input, output);
 
       //#then
-      expect(output.args.subagent_type).toBeUndefined()
-    })
+      expect(output.args.subagent_type).toBe("sisyphus-junior");
+    });
 
     test("preserves existing subagent_type when explicitly provided", async () => {
       //#given
@@ -129,19 +137,28 @@ describe("createToolExecuteBeforeHandler", () => {
       expect(output.args.subagent_type).toBe("plan")
     })
 
-    test("preserves existing subagent_type when category is also provided", async () => {
+    test("sets subagent_type to sisyphus-junior when category provided with different subagent_type", async () => {
       //#given
-      const ctx = createCtxWithSessionMessages()
-      const handler = createToolExecuteBeforeHandler({ ctx, hooks: emptyHooks })
-      const input = { tool: "task", sessionID: "ses_123", callID: "call_1" }
-      const output = { args: { category: "quick", subagent_type: "oracle", description: "Test" } as Record<string, unknown> }
+      const ctx = createCtxWithSessionMessages();
+      const handler = createToolExecuteBeforeHandler({
+        ctx,
+        hooks: emptyHooks,
+      });
+      const input = { tool: "task", sessionID: "ses_123", callID: "call_1" };
+      const output = {
+        args: {
+          category: "quick",
+          subagent_type: "oracle",
+          description: "Test",
+        } as Record<string, unknown>,
+      };
 
       //#when
-      await handler(input, output)
+      await handler(input, output);
 
       //#then
-      expect(output.args.subagent_type).toBe("oracle")
-    })
+      expect(output.args.subagent_type).toBe("sisyphus-junior");
+    });
 
     test("resolves subagent_type from session first message when task_id is provided without subagent_type", async () => {
       //#given
@@ -335,4 +352,4 @@ describe("createToolRegistry", () => {
   })
 })
 
-export {}
+export {};
