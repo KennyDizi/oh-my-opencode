@@ -58,7 +58,7 @@
   },
   "homepage": "https://github.com/code-yeongyu/oh-my-openagent#readme",
   "dependencies": {
-    "@ai-sdk/anthropic": "^3.0.69",
+    "@ai-sdk/anthropic": "^3.0.70",
     "@ai-sdk/openai": "^3.0.53",
     "@ast-grep/cli": "^0.42.1",
     "@ast-grep/napi": "^0.42.1",
@@ -67,7 +67,7 @@
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@opencode-ai/plugin": "^1.4.6",
     "@opencode-ai/sdk": "^1.4.6",
-    "ai": "^6.0.162",
+    "ai": "^6.0.165",
     "codex": "^0.2.3",
     "commander": "^14.0.3",
     "detect-libc": "^2.1.2",
