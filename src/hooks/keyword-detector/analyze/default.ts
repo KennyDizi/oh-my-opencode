@@ -18,7 +18,7 @@ ANALYSIS MODE. Gather context before diving deep:
 CONTEXT GATHERING (parallel):
   - 1-2 explore agents (codebase patterns, implementations)
   - 1-2 librarian agents (if external library involved)
-  - Direct tools: Grep, AST-grep, LSP for targeted searches
+  - Direct tools: **cocoindex-code_search** MCP tool - an effective (AST-based) semantic code search tool for entire codebase, LSP for targeted searches. Only fallback to Grep, AST-grep, or keyword search if cocoindex doesn't yield results.
   - **tavily-mcp_tavily_search** MCP tool to reflect with the latest techniques, current best practices and online resources
 
 IF COMPLEX - DO NOT STRUGGLE ALONE. Consult specialists:
