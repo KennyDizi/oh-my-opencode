@@ -41,6 +41,7 @@ export default defineConfig({
       bun: "module bun",
       "bun:sqlite": "module bun:sqlite",
       "@ast-grep/napi": "node-commonjs @ast-grep/napi",
+      zod: "module zod",
     },
   },
 });
