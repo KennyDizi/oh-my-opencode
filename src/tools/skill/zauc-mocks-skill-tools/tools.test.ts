@@ -11,8 +11,7 @@ import { join } from "node:path"
 import { clearSkillCache } from "../../../features/opencode-skill-loader/skill-content"
 import type { LoadedSkill } from "../../../features/opencode-skill-loader/types"
 import { SkillMcpManager } from "../../../features/skill-mcp-manager"
-import type { CommandInfo } from "../../slashcommand/types"
-import { createSkillTool } from "./tools"
+import type { CommandInfo } from "../../slashcommand/types";
 
 const originalReadFileSync = fs.readFileSync.bind(fs)
 
