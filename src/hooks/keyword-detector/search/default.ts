@@ -18,7 +18,7 @@ MAXIMIZE SEARCH EFFORT. Launch multiple background agents IN PARALLEL:
   - librarian agents (remote repos, official docs, GitHub examples)
   - **tavily-mcp_tavily_search** MCP tool to reflect with the latest techniques, current best practices and online resources
   - **tracelattice_sequentialthinking_tools** MCP tool: Systematic step-by-step reasoning for complex goals, tasks that require deep thought and careful analysis, or when you find yourself stuck.
-  - Direct tools: **cocoindex-code_search** MCP tool - an effective (AST-based) semantic code search tool for entire codebase, LSP for targeted searches. Only fallback to Grep, AST-grep, or keyword search if cocoindex doesn't yield results.
+  - Direct tools: **cocoindex-code_search** MCP tool (ONLY if it is available), Grep, AST-grep, LSP for targeted searches.
 
 SKILL DISCOVERY: Before diving into search, use the **find-skills** skill to discover conforming skills for the task:
   - skill(name="find-skills", user_message="[describe what you need]") — searches the open agent skills ecosystem for relevant skills
