@@ -41,3 +41,4 @@ oauth-success.html
 .opencode/
 opencode.json
 .agents/
+.dori-sync/
