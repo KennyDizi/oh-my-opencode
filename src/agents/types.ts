@@ -98,7 +98,10 @@ export function isGpt5_3CodexModel(model: string): boolean {
 
 export function isClaudeOpus47Model(model: string): boolean {
   const modelName = extractModelName(model).toLowerCase().replaceAll(".", "-");
-  return modelName.includes("claude-opus-4-7");
+  return (
+    modelName.includes("claude-opus-4-7") ||
+    modelName.includes("claude-opus-4.7")
+  );
 }
 
 const GEMINI_PROVIDERS = ["google/", "google-vertex/"];
