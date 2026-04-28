@@ -42,3 +42,5 @@ oauth-success.html
 opencode.json
 .agents/
 .dori-sync/
+# CocoIndex Code (ccc)
+/.cocoindex_code/
