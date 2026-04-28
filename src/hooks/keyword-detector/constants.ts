@@ -43,6 +43,13 @@ SKILL DISCOVERY: Before diving into analysis, use the **find-skills** skill to d
   - Skills provide specialized knowledge, workflows, and embedded MCP servers that make analysis more effective
   - Always check **find-skills** BEFORE starting manual analysis — an existing skill may handle the task far better
 
+Here is the codebase search flow:
+<search_flow>
+1. Start with **cocoindex-code_search** MCP tool for semantic/conceptual queries
+2. Use Grep/AST-grep for exact pattern matching when you know the specific code
+3. Use \`ccc search --refresh <terms>\` from CLI as fallback
+</search_flow>
+
 SYNTHESIZE findings before proceeding.
 ---
 
