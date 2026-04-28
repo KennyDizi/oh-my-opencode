@@ -19,7 +19,7 @@ CONTEXT GATHERING (parallel):
   - 1-2 explore agents (codebase patterns, implementations)
   - 1-2 librarian agents (if external library involved)
   - Direct tools: **cocoindex-code_search** MCP tool (ONLY if it is available), Grep, AST-grep, LSP for targeted searches.
-  - **tavily-mcp_tavily_search** MCP tool to reflect with the latest techniques, current best practices and online resources
+  - **tavily-mcp_tavily_search** MCP tool to reflect with the latest techniques, current best practices, and online resources
 
 IF COMPLEX - DO NOT STRUGGLE ALONE. Consult specialists:
   - **Oracle**: Conventional problems (architecture, debugging, complex logic)
@@ -38,4 +38,8 @@ Here is the codebase search flow:
 3. Use \`ccc search --refresh <terms>\` from CLI as fallback
 </search_flow>
 
-SYNTHESIZE findings before proceeding.`;
+SYNTHESIZE findings before proceeding.
+---
+
+MANDATORY delegate_task params: ALWAYS include load_skills=[] and run_in_background when calling delegate_task.
+Example: delegate_task(subagent_type="explore", prompt="...", run_in_background=true, load_skills=[])`;
