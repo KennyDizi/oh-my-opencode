@@ -1,8 +1,8 @@
-import type { AgentConfig } from "@opencode-ai/sdk"
-import type { AgentMode, AgentPromptMetadata } from "./types"
-import { createAgentToolRestrictions } from "../shared/permission-compat"
+import type { AgentConfig } from "@opencode-ai/sdk";
+import { createAgentToolRestrictions } from "../shared/permission-compat";
+import type { AgentMode, AgentPromptMetadata } from "./types";
 
-const MODE: AgentMode = "subagent"
+const MODE: AgentMode = "subagent";
 
 export const EXPLORE_PROMPT_METADATA: AgentPromptMetadata = {
   category: "exploration",
@@ -10,7 +10,10 @@ export const EXPLORE_PROMPT_METADATA: AgentPromptMetadata = {
   promptAlias: "Explore",
   keyTrigger: "2+ modules involved → fire `explore` background",
   triggers: [
-    { domain: "Explore", trigger: "Find existing codebase structure, patterns and styles" },
+    {
+      domain: "Explore",
+      trigger: "Find existing codebase structure, patterns and styles",
+    },
   ],
   useWhen: [
     "Multiple search angles needed",
@@ -22,13 +25,20 @@ export const EXPLORE_PROMPT_METADATA: AgentPromptMetadata = {
     "Single keyword/pattern suffices",
     "Known file location",
   ],
-}
+};
 
 export function createExploreAgent(model: string): AgentConfig {
   const restrictions = createAgentToolRestrictions(
     ["write", "edit", "apply_patch", "task", "call_omo_agent"],
-    ["lsp_symbols", "lsp_goto_definition", "lsp_find_references", "lsp_diagnostics", "ast_grep_search"],
-  )
+    [
+      "lsp_symbols",
+      "lsp_goto_definition",
+      "lsp_find_references",
+      "lsp_diagnostics",
+      "ast_grep_search",
+      "cocoindex-code_search",
+    ],
+  );
 
   return {
     description:
@@ -104,16 +114,18 @@ Your response has **FAILED** if:
 - **No emojis**: Keep output clean and parseable
 - **No file creation**: Report findings as message text, never write files
 
-## Tool Strategy
+## Search Flow (Follow This Order)
 
-Use the right tool for the job:
-- **Semantic search** (definitions, references): LSP tools
-- **Structural patterns** (function shapes, class structures): ast_grep_search  
-- **Text patterns** (strings, comments, logs): grep
-- **File patterns** (find by name/extension): glob
-- **History/evolution** (when added, who changed): git commands
+1. **Semantic search first** — use \`cocoindex-code_search\` MCP tool for conceptual/natural language queries ("find auth logic", "where is X implemented"). If this tool is unavailable or returns no results, fall through to step 2 immediately.
+2. **Exact pattern matching** — use \`grep\` or \`ast_grep_search\` when you know the specific code, symbol name, or string. Also use these as fallback when \`cocoindex-code_search\` MCP tool is not available.
+3. **CLI fallback** — use \`ccc search --refresh <terms>\` via bash if both semantic and grep searches yield insufficient results.
+
+Additional tools by need:
+- **Definitions/references**: LSP tools (\`lsp_goto_definition\`, \`lsp_find_references\`, \`lsp_symbols\`) — use when you need precise symbol navigation
+- **File discovery**: glob (find by name/extension)
+- **History/evolution**: git commands (when added, who changed)
 
 Flood with parallel calls. Cross-validate findings across multiple tools.`,
-  }
+  };
 }
-createExploreAgent.mode = MODE
+createExploreAgent.mode = MODE;
