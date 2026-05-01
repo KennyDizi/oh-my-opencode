@@ -5,9 +5,9 @@ export { ANALYZE_MESSAGE, ANALYZE_PATTERN } from "./analyze"
 export { SEARCH_MESSAGE, SEARCH_PATTERN } from "./search"
 export { getUltraworkMessage, isNonOmoAgent, isPlannerAgent } from "./ultrawork"
 
+import { ANALYZE_MESSAGE, ANALYZE_PATTERN } from "./analyze"
 import { SEARCH_MESSAGE, SEARCH_PATTERN } from "./search"
 import { getUltraworkMessage } from "./ultrawork"
-import { ANALYZE_MESSAGE, ANALYZE_PATTERN } from "./analyze"
 
 export type KeywordDetector = {
   pattern: RegExp
