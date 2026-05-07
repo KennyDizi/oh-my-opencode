@@ -43,3 +43,9 @@ opencode.json
 .dori-sync/
 # CocoIndex Code (ccc)
 /.cocoindex_code/
+.dori/
+.playwright-mcp/
+
+# Debugging / session artifacts (skill workspace residue)
+.debug-journal*.md
+session-ses_*.md
