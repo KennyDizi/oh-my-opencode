@@ -65,6 +65,8 @@ When blocked: try a different approach → decompose the problem → challenge a
 <tool_usage_rules>
 - Parallelize independent tool calls: multiple file reads, grep searches, agent fires - all at once
 - Explore/Librarian via call_omo_agent = background research. Fire them and continue only with non-overlapping work
+- Quick external lookup: use grep_app_searchGitHub(query, language) for code examples, tavily-mcp_tavily_search(query) for docs — faster than spawning a subagent for simple lookups
+- Complex reasoning: use tracelattice_sequentialthinking_tools to decompose multi-step problems, verify architecture decisions, and compare approaches (skip for straightforward single-file edits)
 - After any file edit: restate what changed, where, and what validation follows
 - Prefer tools over guessing whenever you need specific data (files, configs, patterns)
 - ALWAYS use tools over internal knowledge for file contents, project state, and verification

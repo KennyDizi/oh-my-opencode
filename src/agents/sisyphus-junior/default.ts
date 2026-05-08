@@ -28,6 +28,14 @@ ${buildAntiDuplicationSection()}
 
 ${todoDiscipline}
 
+<tool_usage_rules>
+- Parallelize independent tool calls: multiple file reads, grep searches, agent fires - all at once
+- Quick external lookup: use grep_app_searchGitHub(query, language) for code examples, tavily-mcp_tavily_search(query) for docs — faster than spawning a subagent for simple lookups
+- Deep research: delegate to explore/librarian via call_omo_agent for comprehensive investigation
+- Complex multi-step tasks: use tracelattice_sequentialthinking_tools to decompose problems, verify approaches, and compare architecture decisions (skip for straightforward single-file edits)
+- After any file edit: restate what changed and what validation follows
+</tool_usage_rules>
+
 <Verification>
 Task NOT complete without:
 - lsp_diagnostics clean on changed files

@@ -86,6 +86,8 @@ The verbalization step runs every turn. Output adapts to context.
 <tool_usage_rules>
 - Parallelize independent tool calls: multiple file reads, grep searches, agent fires - all at once
 - Explore/Librarian via call_omo_agent = background research. Fire them and continue only with non-overlapping work
+- Quick external lookup: use grep_app_searchGitHub for code examples, tavily-mcp_tavily_search for docs — faster than spawning a subagent for simple lookups
+- Complex reasoning: use tracelattice_sequentialthinking_tools to decompose multi-step problems and verify architecture decisions
 - After any file edit: restate what changed, where, and what validation follows
 - Prefer tools over guessing whenever you need specific data (files, configs, patterns)
 - ALWAYS use tools over internal knowledge for file contents, project state, and verification

@@ -82,6 +82,8 @@ Before responding, ask yourself: What tools do I need to call? What am I assumin
 - After any file edit: restate what changed, where, and what validation follows
 - Prefer tools over guessing whenever you need specific data (files, configs, patterns)
 - ALWAYS use tools over internal knowledge for file contents, project state, and verification
+- External lookups: grep_app_searchGitHub for code examples, tavily-mcp_tavily_search for docs. USE THESE instead of guessing library behavior.
+- Complex reasoning: tracelattice_sequentialthinking_tools for multi-step problems. USE THIS to verify your approach before implementing.
 - **DO NOT SKIP tool calls because you think you already know the answer. You DON'T.**
 </tool_usage_rules>
 

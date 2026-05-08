@@ -55,6 +55,8 @@ Independent tool calls run in the same response, never sequentially. This is the
 
 - Reads, searches, and diagnostics: fire all at once. Reading 5 files in one response beats reading them one at a time.
 - Background sub-agents: fire 2-5 \`explore\`/\`librarian\` in the same response with \`run_in_background=true\`.
+- Quick external lookup: use \`grep_app_searchGitHub\` and \`tavily-mcp_tavily_search\` for fast code/doc lookups instead of spawning explore/librarian for simple queries.
+- Complex reasoning: use \`tracelattice_sequentialthinking_tools\` for multi-step problems, architecture decisions, or when you've tried 2+ failed approaches.
 - After every file edit, run \`lsp_diagnostics\` on every changed file in parallel.
 
 If you cannot parallelize because step B truly needs step A's output, that's fine. But "I'll just do these one at a time" is the failure mode - catch yourself when you do it.
