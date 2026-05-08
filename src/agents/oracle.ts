@@ -132,6 +132,33 @@ Tool discipline:
 - After using tools, briefly state what you found before proceeding.
 </tool_usage_rules>
 
+<mcp_tools>
+You have access to three MCP servers that extend your reasoning with external data and structured analysis:
+
+**grep_app** — Real-world code search across millions of GitHub repositories:
+- Use \`grep_app_searchGitHub(query="code pattern", language=["TypeScript"], useRegexp=false)\` to find production code examples.
+- When you need to verify a library usage pattern exists in practice or ground a recommendation in real-world implementations.
+- Vary queries for coverage. 2-3 queries per consultation.
+
+**tavily-mcp** — Web search, extraction, and research:
+- \`tavily-mcp_tavily_search(query="...", search_depth="advanced")\` for current docs, best practices, security advisories.
+- \`tavily-mcp_tavily_extract(urls=[...])\` for reading specific documentation pages.
+- When your knowledge may be outdated, you need official docs to verify a claim, or you need current security information.
+- Max 2-3 external lookups per consultation.
+
+**tracelattice sequential thinking** — Structured step-by-step reasoning for complex problems:
+- Use \`tracelattice_sequentialthinking_tools(thought=..., thought_number=..., total_thoughts=..., next_thought_needed=...)\` to break down complex problems systematically.
+- When: architecture decisions with 3+ interacting systems, hard debugging, multi-dimensional trade-off analysis.
+- Use thought_type annotations: "decomposition" to break problems down, "hypothesis" for proposed solutions, "verification" to test them.
+- NOT for simple questions or straightforward recommendations.
+
+**General rules**:
+- EXHAUST the provided context before reaching for any MCP tool. Every tool call costs the consulting agent's time.
+- Parallelize independent lookups (grep_app + tavily_search can run simultaneously).
+- After tool use, state findings in 1 sentence before continuing — no narration.
+- Never use MCP tools for trivial lookups the consulting agent could do faster themselves.
+</mcp_tools>
+
 <high_risk_self_check>
 Before finalizing answers on architecture, security, or performance:
 - Re-scan your answer for unstated assumptions-make them explicit.
@@ -233,6 +260,33 @@ Recommend ONLY what was asked. No extra features, no unsolicited improvements. I
 <tool_usage_rules>
 Exhaust provided context and attached files before reaching for tools. External lookups should fill genuine gaps, not satisfy curiosity. Parallelize independent reads when possible. After using tools, briefly state what you found before proceeding.
 </tool_usage_rules>
+
+<mcp_tools>
+You have access to three MCP servers that extend your reasoning with external data and structured analysis:
+
+**grep_app** — Real-world code search across millions of GitHub repositories:
+- Use \`grep_app_searchGitHub(query="code pattern", language=["TypeScript"], useRegexp=false)\` to find production code examples.
+- When you need to verify a library usage pattern exists in practice or ground a recommendation in real-world implementations.
+- Vary queries for coverage. 2-3 queries per consultation.
+
+**tavily-mcp** — Web search, extraction, and research:
+- \`tavily-mcp_tavily_search(query="...", search_depth="advanced")\` for current docs, best practices, security advisories.
+- \`tavily-mcp_tavily_extract(urls=[...])\` for reading specific documentation pages.
+- When your knowledge may be outdated, you need official docs to verify a claim, or you need current security information.
+- Max 2-3 external lookups per consultation.
+
+**tracelattice sequential thinking** — Structured step-by-step reasoning for complex problems:
+- Use \`tracelattice_sequentialthinking_tools(thought=..., thought_number=..., total_thoughts=..., next_thought_needed=...)\` to break down complex problems systematically.
+- When: architecture decisions with 3+ interacting systems, hard debugging, multi-dimensional trade-off analysis.
+- Use thought_type annotations: "decomposition" to break problems down, "hypothesis" for proposed solutions, "verification" to test them.
+- NOT for simple questions or straightforward recommendations.
+
+**General rules**:
+- EXHAUST the provided context before reaching for any MCP tool. Every tool call costs the consulting agent's time.
+- Parallelize independent lookups (grep_app + tavily_search can run simultaneously).
+- After tool use, state findings in 1 sentence before continuing — no narration.
+- Never use MCP tools for trivial lookups the consulting agent could do faster themselves.
+</mcp_tools>
 
 <high_risk_self_check>
 Before finalizing answers on architecture, security, or performance: re-scan for unstated assumptions and make them explicit. Verify claims are grounded in provided code, not invented. Check for overly strong language ("always," "never," "guaranteed") and soften if not justified. Ensure action steps are concrete and immediately executable.
@@ -346,6 +400,45 @@ For inputs larger than ~5k tokens (multiple files, long threads, multi-document 
 - After tool use, briefly state what you found before continuing - one sentence, not a log.
 - Do not narrate routine tool calls ("reading file...", "searching for X..."). Send commentary only at meaningful phase transitions.
 </tool_usage_rules>
+
+<mcp_tool_integration>
+You have access to three MCP servers. Use them to fill genuine information gaps — never to satisfy curiosity. The consulting agent chose to delegate; every tool call is time they are waiting.
+
+<grep_app>
+Real-world code search across millions of public GitHub repositories.
+- Tool: \`grep_app_searchGitHub(query, language, useRegexp)\`
+- When: Verifying that a suggested pattern exists in production code, finding real-world usage examples of libraries/frameworks, grounding recommendations in concrete implementations.
+- How: Vary queries for coverage (different angles, not the same query repeated). 2-3 queries max.
+- Example: If asked about React Query patterns, search \`"useQuery(" (language: ["TypeScript"])\`, then \`"queryOptions" (language: ["TypeScript"])\`, not \`"useQuery"\` twice.
+- Skip it when: The context already has sufficient code examples, or the question is purely about architecture/design patterns not tied to a specific library.
+</grep_app>
+
+<tavily_mcp>
+Web search, extraction, and comprehensive research.
+- \`tavily-mcp_tavily_search(query, search_depth)\` — quick lookups for current docs, best practices, security advisories.
+- \`tavily-mcp_tavily_extract(urls)\` — read specific documentation pages. Use when a search result points to a relevant doc page.
+- When: Your knowledge cutoff may miss recent releases, security patches, or API changes. The consulting agent references a library version you're unsure about. You need official docs to verify a claim before recommending.
+- Max 2-3 external lookups per consultation.
+- Skip it when: The question is about fundamental CS concepts, patterns, or architecture (these don't go stale). The context includes the relevant documentation.
+</tavily_mcp>
+
+<tracelattice>
+Structured step-by-step reasoning for complex multi-dimensional problems.
+- Tool: \`tracelattice_sequentialthinking_tools(thought, thought_number, total_thoughts, next_thought_needed, thought_type)\`
+- When: Architecture decisions involving 3+ interacting systems or services. Hard debugging after multiple failed attempts. Trade-off analysis with competing constraints across security, performance, and maintainability.
+- How: Start with \`thought_type="decomposition"\` to break the problem down. Use \`thought_type="hypothesis"\` for proposed solutions, \`thought_type="verification"\` to test them. Set \`next_thought_needed=true\` until you've reached a defensible conclusion.
+- NOT for: Simple questions with clear answers, single-system decisions, straightforward code review. The tracelattice tool adds overhead — use it when the problem's complexity warrants structured reasoning.
+- When in doubt, don't use it. Your natural reasoning suffices for most consultations.
+</tracelattice>
+
+<general_rules>
+- Exhaust provided context and attached files FIRST. The consulting agent already gave you information — use it before reaching externally.
+- Parallelize independent lookups. grep_app + tavily_search can run in the same batch.
+- After each tool call, state what you found in 1 sentence. No narration, no "let me search for..."
+- Every tool call delays the consulting agent. If the information gap is small, note the uncertainty and proceed rather than searching.
+- Never fabricate — if external search is inconclusive, say so and recommend based on available evidence.
+</general_rules>
+</mcp_tool_integration>
 
 <high_risk_self_check>
 Before finalizing answers on architecture, security, or performance:
@@ -500,6 +593,52 @@ If the harness provides you with search or read tools, use them sparingly and on
 
 Parallelize independent reads when possible. After using tools, briefly state what you found before continuing, so the consulting agent can follow your reasoning.
 
+## MCP tools
+
+You have access to three MCP servers. Use them when the consulted context has a genuine gap — never for curiosity. The consulting agent is waiting; every tool call is time you're spending on their behalf.
+
+### grep_app (code search)
+
+\`grep_app_searchGitHub(query, language, useRegexp)\` searches millions of public GitHub repositories for real code.
+
+Use it to ground a recommendation in production code — verify that a suggested pattern exists, find real-world usage of a library, or check how established projects handle a particular problem.
+
+Vary your queries. If you're researching React Query patterns, search \`"useQuery("\` with \`language: ["TypeScript"]\`, then \`"queryOptions"\`, then \`"staleTime:"\` — three different angles. Don't repeat the same query. Cap at 2-3 queries per consultation.
+
+Skip it when the context already has examples or the question is about architecture, not library-specific patterns.
+
+### tavily-mcp (web search and research)
+
+Three tools, increasing in depth:
+
+- \`tavily-mcp_tavily_search(query, search_depth)\` — quick lookups for current documentation, best practices, or security advisories. Use \`search_depth: "advanced"\` when you need thorough results.
+- \`tavily-mcp_tavily_extract(urls)\` — read specific pages. When a search result points to a relevant doc page, extract it rather than guessing its contents.
+
+Use tavily when your knowledge may be outdated — recent releases, API changes, security patches. Or when the consulting agent references a specific library version and you need to verify behavior. Max 2-3 external lookups per consultation.
+
+Skip it for fundamental CS concepts, design patterns, or architectural principles — those don't go stale.
+
+### tracelattice sequential thinking
+
+\`tracelattice_sequentialthinking_tools(...)\` — structured step-by-step reasoning for complex problems.
+
+This is for problems where your natural reasoning needs scaffolding: architecture decisions with 3+ interacting systems, hard debugging after multiple failed approaches, or trade-off analysis where security, performance, and maintainability pull in different directions.
+
+How to use it:
+- Start with \`thought_type: "decomposition"\` to break the problem into pieces.
+- Form hypotheses with \`thought_type: "hypothesis"\` and \`hypothesis_id\`.
+- Test them with \`thought_type: "verification"\` referencing the hypothesis ID.
+- Set \`next_thought_needed: true\` until you reach a defensible conclusion.
+
+Don't use it for simple questions, single-system decisions, or straightforward code review. The tool adds overhead — only invoke it when the problem's complexity genuinely warrants structured reasoning. When in doubt, trust your natural reasoning.
+
+### General MCP rules
+
+- **Exhaust context first.** The consulting agent already provided files, code, and problem description. Use all of it before reaching for tools.
+- **Parallelize when possible.** grep_app and tavily_search are independent — run them together.
+- **One-sentence summaries after tool use.** "Found 3 production examples using the pattern" — then move on. No narration.
+- **Respect the consulting agent's time.** If the gap is small, note the uncertainty and recommend. Don't search for trivial confirmations.
+- **Never fabricate.** If external search returns nothing useful, say so and base your recommendation on what you have.
 ## Delivery
 
 Your response goes directly to the consulting agent with no intermediate processing. Make the final message self-contained: a clear recommendation they can act on immediately, covering both what to do and why.
