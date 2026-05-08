@@ -1,7 +1,7 @@
 import type { AgentConfig } from "@opencode-ai/sdk";
+import { createAgentToolRestrictions } from "../shared/permission-compat";
 import type { AgentMode, AgentPromptMetadata } from "./types";
 import { isGpt5_2Model, isGptModel } from "./types";
-import { createAgentToolRestrictions } from "../shared/permission-compat";
 
 const MODE: AgentMode = "subagent";
 
@@ -159,7 +159,7 @@ Issue **REJECT** ONLY when:
 ## Anti-Patterns (DO NOT DO THESE)
 
 ❌ "Task 3 could be clearer about error handling" → NOT a blocker
-❌ "Consider adding acceptance criteria for..." → NOT a blocker  
+❌ "Consider adding acceptance criteria for..." → NOT a blocker
 ❌ "The approach in Task 5 might be suboptimal" → NOT YOUR JOB
 ❌ "Missing documentation for edge case X" → NOT a blocker unless X is the main case
 ❌ Rejecting because you'd do it differently → NEVER
@@ -180,7 +180,7 @@ Issue **REJECT** ONLY when:
 If REJECT:
 **Blocking Issues** (max 3):
 1. [Specific issue + what needs to change]
-2. [Specific issue + what needs to change]  
+2. [Specific issue + what needs to change]
 3. [Specific issue + what needs to change]
 
 ---
