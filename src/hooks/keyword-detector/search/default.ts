@@ -21,9 +21,9 @@ MAXIMIZE SEARCH EFFORT. Launch multiple background agents IN PARALLEL:
   - Direct tools: **cocoindex-code_search** MCP tool (ONLY if it is available), Grep, AST-grep, LSP for targeted searches.
 
 SKILL DISCOVERY: Before diving into search, use the **find-skills** skill to discover conforming skills for the task:
-  - skill(name="find-skills", user_message="[describe what you need]") — searches the open agent skills ecosystem for relevant skills
+  - skill(name="find-skills", user_message="[describe what you need]") - searches the open agent skills ecosystem for relevant skills
   - Skills provide specialized knowledge, workflows, and embedded MCP servers that make search more effective
-  - Always check **find-skills** BEFORE starting manual searches — an existing skill may handle the task far better
+  - Always check **find-skills** BEFORE starting manual searches - an existing skill may handle the task far better
 
 Here is the codebase search flow:
 <search_flow>
