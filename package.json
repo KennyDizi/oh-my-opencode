@@ -78,13 +78,13 @@
     "jsonc-parser": "^3.3.1",
     "picocolors": "^1.1.1",
     "picomatch": "^4.0.4",
-    "posthog-node": "^5.33.4",
+    "posthog-node": "^5.33.7",
     "vscode-jsonrpc": "^8.2.1",
     "zod-to-json-schema": "^3.25.2"
   },
   "devDependencies": {
-    "@opentui/core": "0.2.6",
-    "@opentui/solid": "0.2.6",
+    "@opentui/core": "0.2.7",
+    "@opentui/solid": "0.2.7",
     "@microsoft/api-extractor": "^7.58.7",
     "@rsdoctor/core": "^1.5.11",
     "@rsdoctor/rspack-plugin": "^1.5.11",
@@ -96,7 +96,7 @@
     "@rushstack/ts-command-line": "^5.3.9",
     "@types/jest": "^30.0.0",
     "@types/js-yaml": "^4.0.9",
-    "@types/node": "^25.6.2",
+    "@types/node": "^25.7.0",
     "@types/picomatch": "^4.0.3",
     "bun-types": "^1.3.13",
     "electron-to-chromium": "^1.5.353",
@@ -117,6 +117,13 @@
     "oh-my-opencode-linux-x64-musl-baseline": "4.0.0",
     "oh-my-opencode-windows-x64": "4.0.0",
     "oh-my-opencode-windows-x64-baseline": "4.0.0"
+  },
+  "overrides": {
+    "hono": "^4.12.18",
+    "@hono/node-server": "^1.19.14",
+    "express-rate-limit": "^8.5.1",
+    "fast-uri": "^3.1.2",
+    "path-to-regexp": "^8.4.2"
   },
   "trustedDependencies": [
     "@ast-grep/cli",
