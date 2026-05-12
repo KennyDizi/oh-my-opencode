@@ -8,10 +8,10 @@ import { afterAll, beforeEach, describe, expect, it, mock, spyOn } from "bun:tes
 import * as fs from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
+import { unsafeTestValue } from "../../../../test-support/unsafe-test-value"
 import { clearSkillCache } from "../../../features/opencode-skill-loader/skill-content"
 import type { LoadedSkill } from "../../../features/opencode-skill-loader/types"
-import { SkillMcpManager } from "../../../features/skill-mcp-manager"
-import type { CommandInfo } from "../../slashcommand/types";
+import type { CommandInfo } from "../../slashcommand/types"
 
 const originalReadFileSync = fs.readFileSync.bind(fs)
 
@@ -205,7 +205,7 @@ describe("skill tool - agent restriction", () => {
     // given
     const loadedSkills = [createMockSkill("sisyphus-only-skill", { agent: "sisyphus" })]
     const tool = createSkillTool({ skills: loadedSkills })
-    const contextWithoutAgent = { ...mockContext, agent: undefined as unknown as string }
+    const contextWithoutAgent = { ...mockContext, agent: unsafeTestValue<string>(undefined) }
 
     // when / #then
     return expect(tool.execute({ name: "sisyphus-only-skill" }, contextWithoutAgent)).rejects.toThrow(
