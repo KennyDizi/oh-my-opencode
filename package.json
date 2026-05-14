@@ -37,7 +37,8 @@
     "postinstall": "node postinstall.mjs",
     "prepublishOnly": "bun run clean && bun run build",
     "test:model-capabilities": "bun test src/shared/model-capability-aliases.test.ts src/shared/model-capability-guardrails.test.ts src/shared/model-capabilities.test.ts src/cli/doctor/checks/model-resolution.test.ts --bail",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsgo --noEmit",
+    "typecheck:script": "tsgo --noEmit -p script/tsconfig.json",
     "test": "bun run script/run-ci-tests.ts"
   },
   "keywords": [
@@ -67,8 +68,8 @@
     "@clack/prompts": "^1.4.0",
     "@code-yeongyu/comment-checker": "^0.7.0",
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "@opencode-ai/plugin": "^1.14.48",
-    "@opencode-ai/sdk": "^1.14.48",
+    "@opencode-ai/plugin": "^1.14.50",
+    "@opencode-ai/sdk": "^1.14.50",
     "ai": "^6.0.182",
     "codex": "^0.2.3",
     "commander": "^14.0.3",
@@ -83,8 +84,8 @@
     "zod-to-json-schema": "^3.25.2"
   },
   "devDependencies": {
-    "@opentui/core": "0.2.8",
-    "@opentui/solid": "0.2.8",
+    "@opentui/core": "0.2.9",
+    "@opentui/solid": "0.2.9",
     "@microsoft/api-extractor": "^7.58.7",
     "@rsdoctor/core": "^1.5.11",
     "@rsdoctor/rspack-plugin": "^1.5.11",
@@ -99,7 +100,7 @@
     "@types/node": "^25.7.0",
     "@types/picomatch": "^4.0.3",
     "bun-types": "^1.3.14",
-    "electron-to-chromium": "^1.5.354",
+    "electron-to-chromium": "^1.5.355",
     "github-flavored-markdown": "^1.0.1",
     "lru-cache": "^11.3.6",
     "rimraf": "^6.1.3",
