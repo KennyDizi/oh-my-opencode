@@ -109,6 +109,7 @@ type PendingParentWake = {
   notifications: string[]
   shouldReply: boolean
   dispatchedAt?: number
+  toolCallDeferralStartedAt?: number
 }
 
 type ParentWakeSessionMessage = {
@@ -145,6 +146,7 @@ type ResumeTaskSnapshot = {
 const PENDING_PARENT_WAKE_RETRY_MS = 1_000
 const PENDING_PARENT_WAKE_DEBOUNCE_MS = 100
 const PARENT_WAKE_ACCEPTED_MESSAGE_SKEW_MS = 5_000
+const PARENT_WAKE_TOOL_CALL_DEFER_MAX_MS = 5_000
 
 interface MessagePartInfo {
   id?: string
@@ -818,7 +820,7 @@ export class BackgroundManager {
         ? `\n- Error: ${failedError}`
         : ""
       const retryModel = formatAttemptModelSummary(boundAttempt) ?? task.retryNotification.nextModel
-      this.queuePendingNotification(
+      this.queuePendingParentWake(
         task.parentSessionId,
         `<system-reminder>
 [BACKGROUND TASK RETRY SESSION READY]
@@ -829,7 +831,10 @@ export class BackgroundManager {
 **Retry link:** ${retrySessionUrl}${failedSessionLine}${failedModelLine}${failedErrorLine}${retryModel ? `\n- Model: \`${retryModel}\`` : ""}
 
 The fallback retry session is now created and can be inspected directly.
-</system-reminder>`
+</system-reminder>`,
+        {},
+        false,
+        PENDING_PARENT_WAKE_DEBOUNCE_MS,
       )
       task.retryNotification = undefined
     }
@@ -1377,6 +1382,9 @@ The fallback retry session is now created and can be inspected directly.
       notifications: [...wake.notifications],
       shouldReply: wake.shouldReply,
       ...(wake.dispatchedAt !== undefined ? { dispatchedAt: wake.dispatchedAt } : {}),
+      ...(wake.toolCallDeferralStartedAt !== undefined
+        ? { toolCallDeferralStartedAt: wake.toolCallDeferralStartedAt }
+        : {}),
     }
   }
 
@@ -1407,6 +1415,8 @@ The fallback retry session is now created and can be inspected directly.
       return false
     }
 
+    await settleAfterSessionIdle()
+
     if (await this.hasAcceptedMessageAfterDispatchedParentWake(sessionID, wake)) {
       this.clearDispatchedParentWake(sessionID)
       log("[background-agent] Ignored late parent wake failure after assistant output:", {
@@ -1422,6 +1432,7 @@ The fallback retry session is now created and can be inspected directly.
       pendingWake.notifications.unshift(...wake.notifications)
       pendingWake.shouldReply = pendingWake.shouldReply || wake.shouldReply
       pendingWake.promptContext = wake.promptContext
+      pendingWake.toolCallDeferralStartedAt ??= wake.toolCallDeferralStartedAt
     } else {
       this.pendingParentWakes.set(sessionID, this.cloneParentWake(wake))
     }
@@ -1528,9 +1539,18 @@ The fallback retry session is now created and can be inspected directly.
     ) ?? false
   }
 
-  private async shouldDeferParentWakeForSessionHistory(sessionID: string): Promise<boolean> {
+  private async shouldDeferParentWakeForSessionHistory(sessionID: string, wake: PendingParentWake): Promise<boolean> {
     const messages = await this.loadParentWakeSessionMessages(sessionID)
     if (!this.latestAssistantTurnIsWaitingOnTools(messages)) {
+      delete wake.toolCallDeferralStartedAt
+      return false
+    }
+    const now = Date.now()
+    wake.toolCallDeferralStartedAt ??= now
+    if (wake.shouldReply && now - wake.toolCallDeferralStartedAt >= PARENT_WAKE_TOOL_CALL_DEFER_MAX_MS) {
+      log("[background-agent] Sending parent wake after stale tool-call deferral window:", {
+        sessionID,
+      })
       return false
     }
     log("[background-agent] Deferred parent wake because latest assistant turn is waiting on tool results:", {
@@ -2069,7 +2089,7 @@ The fallback retry session is now created and can be inspected directly.
         const failedModelLine = failedModel ? `\n- Failed model: \`${failedModel}\`` : ""
         const failedErrorLine = previousAttempt?.error ? `\n- Error: ${previousAttempt.error}` : ""
         const nextModel = formatAttemptModelSummary(currentAttempt)
-        this.queuePendingNotification(
+        this.queuePendingParentWake(
           task.parentSessionId,
           `<system-reminder>
 [BACKGROUND TASK RETRYING]
@@ -2077,7 +2097,10 @@ The fallback retry session is now created and can be inspected directly.
 **Description:** ${task.description}${sourceText}${failedSessionLine}${failedModelLine}${failedErrorLine}${nextModel ? `\n- Next model: \`${nextModel}\`` : ""}
 
 The task was re-queued on a fallback model after a retryable failure.
-</system-reminder>`
+</system-reminder>`,
+          {},
+          false,
+          PENDING_PARENT_WAKE_DEBOUNCE_MS,
         )
       },
     })
@@ -2111,23 +2134,15 @@ The task was re-queued on a fallback model after a retryable failure.
     this.pendingNotifications.set(sessionID, existingNotifications)
   }
 
-  injectPendingNotificationsIntoChatMessage(output: { parts: Array<{ type: string; text?: string; [key: string]: unknown }> }, sessionID: string): void {
+  injectPendingNotificationsIntoChatMessage(_output: { parts: Array<{ type: string; text?: string; [key: string]: unknown }> }, sessionID: string): void {
     const pendingNotifications = this.pendingNotifications.get(sessionID)
     if (!pendingNotifications || pendingNotifications.length === 0) {
       return
     }
 
-    this.pendingNotifications.delete(sessionID)
     const notificationContent = pendingNotifications.join("\n\n")
-    const firstTextPartIndex = output.parts.findIndex((part) => part.type === "text")
-
-    if (firstTextPartIndex === -1) {
-      output.parts.unshift(createInternalAgentTextPart(notificationContent))
-      return
-    }
-
-    const originalText = output.parts[firstTextPartIndex].text ?? ""
-    output.parts[firstTextPartIndex].text = `${notificationContent}\n\n---\n\n${originalText}`
+    this.pendingNotifications.delete(sessionID)
+    this.queuePendingParentWake(sessionID, notificationContent, {}, false, PENDING_PARENT_WAKE_DEBOUNCE_MS)
   }
 
   /**
@@ -2696,15 +2711,16 @@ The task was re-queued on a fallback model after a retryable failure.
       return
     }
 
-    if (await this.shouldDeferParentWakeForSessionHistory(sessionID)) {
-      this.schedulePendingParentWakeFlush(sessionID)
-      return
-    }
-
     const latestWake = this.pendingParentWakes.get(sessionID)
     if (!latestWake) {
       return
     }
+
+    if (await this.shouldDeferParentWakeForSessionHistory(sessionID, latestWake)) {
+      this.schedulePendingParentWakeFlush(sessionID)
+      return
+    }
+
     this.pendingParentWakes.delete(sessionID)
 
     const notificationContent = latestWake.notifications.join("\n\n")
@@ -2735,6 +2751,7 @@ The task was re-queued on a fallback model after a retryable failure.
           pendingWake.notifications.unshift(...latestWake.notifications)
           pendingWake.shouldReply = pendingWake.shouldReply || latestWake.shouldReply
           pendingWake.promptContext = latestWake.promptContext
+          pendingWake.toolCallDeferralStartedAt ??= latestWake.toolCallDeferralStartedAt
         } else {
           this.pendingParentWakes.set(sessionID, latestWake)
         }
@@ -2748,7 +2765,16 @@ The task was re-queued on a fallback model after a retryable failure.
       log("[background-agent] Sent deferred parent wake:", { sessionID })
       this.trackDispatchedParentWake(sessionID, latestWake)
     } catch (error) {
-      this.queuePendingNotification(sessionID, notificationContent)
+      const pendingWake = this.pendingParentWakes.get(sessionID)
+      if (pendingWake) {
+        pendingWake.notifications.unshift(...latestWake.notifications)
+        pendingWake.shouldReply = pendingWake.shouldReply || latestWake.shouldReply
+        pendingWake.promptContext = latestWake.promptContext
+        pendingWake.toolCallDeferralStartedAt ??= latestWake.toolCallDeferralStartedAt
+      } else {
+        this.pendingParentWakes.set(sessionID, latestWake)
+      }
+      this.schedulePendingParentWakeFlush(sessionID)
       log("[background-agent] Failed to send deferred parent wake:", { sessionID, error })
     }
   }
