@@ -391,6 +391,44 @@ describe("createAutoSlashCommandHook", () => {
       ])
     })
 
+    it("should not inject template when parts already contain auto-slash-command tags (cross-handler dedup)", async () => {
+      //#given - output already has tags injected by chat.message handler
+      const hook = createAutoSlashCommandHook()
+      const input = createCommandInput("ralph-loop")
+      const existingTaggedText = `<auto-slash-command>\nsome template content\n</auto-slash-command>`
+      const output: CommandExecuteBeforeOutput = {
+        parts: [{ type: "text", text: existingTaggedText }],
+      }
+
+      //#when - command.execute.before fires (as it does when user types /command)
+      await hook["command.execute.before"](input, output)
+
+      //#then - parts unchanged, no second injection
+      expect(output.parts.length).toBe(1)
+      expect(output.parts[0].text).toBe(existingTaggedText)
+    })
+
+    it("should strip raw native <command-instruction> parts when auto-slash-command tags already present", async () => {
+      //#given - chat.message injected tagged template, OpenCode also added raw native part
+      const hook = createAutoSlashCommandHook()
+      const input = createCommandInput("ralph-loop")
+      const taggedPart = `<auto-slash-command>\nsome template content\n</auto-slash-command>`
+      const nativePart = `<command-instruction>\nraw opencode content\n</command-instruction>\n\n<user-request>\narg\n</user-request>`
+      const output: CommandExecuteBeforeOutput = {
+        parts: [
+          { type: "text", text: taggedPart },
+          { type: "text", text: nativePart },
+        ],
+      }
+
+      //#when - command.execute.before fires
+      await hook["command.execute.before"](input, output)
+
+      //#then - native part stripped, tagged part preserved
+      expect(output.parts.length).toBe(1)
+      expect(output.parts[0].text).toBe(taggedPart)
+    })
+
   })
   describe("skills as slash commands", () => {
     function createTestSkill(name: string, template: string): LoadedSkill {
