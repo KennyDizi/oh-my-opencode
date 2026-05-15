@@ -30,3 +30,15 @@ describe("Sisyphus background task ID guidance", () => {
     })
   }
 })
+
+describe("Sisyphus GPT-5.5 file-reference guidance", () => {
+  test("#given GPT-5.5 Sisyphus prompt #when a user mentions a file path #then routing is not blocked by mandatory reads", () => {
+    // given, when
+    const prompt = buildGpt55SisyphusPrompt("gpt-5.5", [])
+
+    // then
+    expect(prompt).not.toContain("read it before answering, routing, or editing")
+    expect(prompt).toMatch(/specific readable file path[\s\S]*before making file-content claims or edits/)
+    expect(prompt).toMatch(/Do not treat incidental file-path mentions[\s\S]*block intent routing/)
+  })
+})
