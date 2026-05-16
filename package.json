@@ -66,10 +66,10 @@
     "@ast-grep/cli": "^0.42.2",
     "@ast-grep/napi": "^0.42.2",
     "@clack/prompts": "^1.4.0",
-    "@code-yeongyu/comment-checker": "^0.7.0",
+    "@code-yeongyu/comment-checker": "^0.7.1",
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "@opencode-ai/plugin": "^1.15.1",
-    "@opencode-ai/sdk": "^1.15.1",
+    "@opencode-ai/plugin": "^1.15.3",
+    "@opencode-ai/sdk": "^1.15.3",
     "ai": "^6.0.184",
     "codex": "^0.2.3",
     "commander": "^14.0.3",
@@ -120,7 +120,7 @@
     "oh-my-opencode-windows-x64-baseline": "4.1.2"
   },
   "overrides": {
-    "hono": "^4.12.18",
+    "hono": "^4.12.19",
     "@hono/node-server": "^2.0.2",
     "express-rate-limit": "^8.5.2",
     "fast-uri": "^3.1.2",
