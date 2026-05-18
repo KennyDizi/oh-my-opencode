@@ -1,7 +1,7 @@
 {
-  "name": "oh-my-opencode-linux-arm64",
-  "version": "4.1.2",
-  "description": "Platform-specific binary for oh-my-opencode (linux-arm64)",
+  "name": "oh-my-opencode-linux-x64-musl-baseline",
+  "version": "4.2.0",
+  "description": "Platform-specific binary for oh-my-opencode (linux-x64-musl-baseline, no AVX2)",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -11,10 +11,10 @@
     "linux"
   ],
   "cpu": [
-    "arm64"
+    "x64"
   ],
   "libc": [
-    "glibc"
+    "musl"
   ],
   "files": [
     "bin"

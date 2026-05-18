@@ -54,3 +54,4 @@ opencode.json
 # Debugging / session artifacts (skill workspace residue)
 .debug-journal*.md
 session-ses_*.md
+plans/
