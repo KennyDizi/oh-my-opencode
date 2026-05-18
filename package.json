@@ -12,7 +12,8 @@
   "files": [
     "dist",
     "bin",
-    "postinstall.mjs"
+    "postinstall.mjs",
+    "vendor/lsp-tools-mcp/dist"
   ],
   "exports": {
     ".": {
@@ -26,7 +27,8 @@
     "./schema.json": "./dist/oh-my-opencode.schema.json"
   },
   "scripts": {
-    "build": "rslib build && bun run build:schema",
+    "build": "bun build src/index.ts --outdir dist --target bun --format esm --external @ast-grep/napi --external zod && bun run build:node-require-shim && tsc --emitDeclarationOnly && bun build src/cli/index.ts --outdir dist/cli --target bun --format esm --external @ast-grep/napi && bun run build:schema",
+    "build:lsp-tools-mcp": "npm ci --prefix vendor/lsp-tools-mcp && npm run build --prefix vendor/lsp-tools-mcp",
     "build:node-require-shim": "bun run script/patch-node-require-shim.ts",
     "build:all": "rslib build && bun run build:schema && bun run build:binaries",
     "build:binaries": "bun run script/build-binaries.ts",
@@ -35,7 +37,7 @@
     "clean": "rm -rf dist",
     "prepare": "bun run build",
     "postinstall": "node postinstall.mjs",
-    "prepublishOnly": "bun run clean && bun run build",
+    "prepublishOnly": "bun run clean && bun run build:lsp-tools-mcp && bun run build",
     "test:model-capabilities": "bun test src/shared/model-capability-aliases.test.ts src/shared/model-capability-guardrails.test.ts src/shared/model-capabilities.test.ts src/cli/doctor/checks/model-resolution.test.ts --bail",
     "typecheck": "tsgo --noEmit",
     "typecheck:script": "tsgo --noEmit -p script/tsconfig.json",
@@ -84,8 +86,8 @@
     "zod-to-json-schema": "^3.25.2"
   },
   "devDependencies": {
-    "@opentui/core": "0.2.13",
-    "@opentui/solid": "0.2.13",
+    "@opentui/core": "0.2.14",
+    "@opentui/solid": "0.2.14",
     "@microsoft/api-extractor": "^7.58.7",
     "@rsdoctor/core": "^1.5.11",
     "@rsdoctor/rspack-plugin": "^1.5.11",
