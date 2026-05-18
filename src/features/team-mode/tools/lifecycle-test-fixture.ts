@@ -2,6 +2,7 @@
 
 import { mock } from "bun:test"
 import { randomUUID } from "node:crypto"
+import { Effect } from "effect"
 
 import { Effect } from "effect"
 import type { ToolContext } from "@opencode-ai/plugin/tool"
