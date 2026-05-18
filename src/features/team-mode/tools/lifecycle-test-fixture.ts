@@ -1,16 +1,15 @@
 /// <reference types="bun-types" />
 
-import { mock } from "bun:test"
-import { randomUUID } from "node:crypto"
-import { Effect } from "effect"
+import { mock } from "bun:test";
+import { Effect } from "effect";
+import { randomUUID } from "node:crypto";
 
-import { Effect } from "effect"
-import type { ToolContext } from "@opencode-ai/plugin/tool"
+import type { ToolContext } from "@opencode-ai/plugin/tool";
 
-import { TeamModeConfigSchema } from "../../../config/schema/team-mode"
-import type { OpencodeClient } from "../../../tools/delegate-task/types"
-import type { BackgroundManager } from "../../background-agent/manager"
-import type { RuntimeState, TeamSpec } from "../types"
+import { TeamModeConfigSchema } from "../../../config/schema/team-mode";
+import type { OpencodeClient } from "../../../tools/delegate-task/types";
+import type { BackgroundManager } from "../../background-agent/manager";
+import type { RuntimeState, TeamSpec } from "../types";
 
 const runtimes = new Map<string, RuntimeState>()
 const teamRuns = new Map<string, string>()
