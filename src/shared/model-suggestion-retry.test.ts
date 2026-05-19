@@ -1,4 +1,5 @@
-import { describe, it, expect, mock } from "bun:test"
+import { afterEach, describe, it, expect, mock } from "bun:test"
+import { dispatchInternalPrompt, releaseAllPromptAsyncReservationsForTesting } from "./prompt-async-gate"
 import { parseModelSuggestion, promptWithModelSuggestionRetry, promptSyncWithModelSuggestionRetry } from "./model-suggestion-retry"
 import { unsafeTestValue } from "../../test-support/unsafe-test-value"
 
@@ -212,6 +213,11 @@ describe("parseModelSuggestion", () => {
 })
 
 describe("promptWithModelSuggestionRetry", () => {
+  afterEach(() => {
+    // then
+    releaseAllPromptAsyncReservationsForTesting()
+  })
+
   it("should succeed on first try without retry", async () => {
     // given a client where promptAsync succeeds
     const promptMock = mock(() => Promise.resolve())
@@ -291,6 +297,42 @@ describe("promptWithModelSuggestionRetry", () => {
     expect(promptMock).toHaveBeenCalledTimes(1)
   })
 
+  it("#given same-source retry observes a peer reservation #when it rejects #then the peer hold remains reserved", async () => {
+    // given
+    const promptMock = mock(async () => undefined)
+    const client = {
+      session: {
+        promptAsync: promptMock,
+      },
+    }
+    const args = {
+      path: { id: "session-peer-reservation" },
+      body: {
+        parts: [{ type: "text", text: "hello" }],
+        model: { providerID: "anthropic", modelID: "claude-sonnet-4" },
+      },
+    }
+
+    // when
+    await promptWithModelSuggestionRetry(unsafeTestValue(client), args)
+    await expect(
+      promptWithModelSuggestionRetry(unsafeTestValue(client), args)
+    ).rejects.toThrow("promptAsync skipped by gate: reserved")
+    const third = await dispatchInternalPrompt({
+      mode: "async",
+      client,
+      sessionID: "session-peer-reservation",
+      input: args,
+      source: "test:third",
+      settleMs: 0,
+      postDispatchHoldMs: 0,
+    })
+
+    // then
+    expect(third).toEqual({ status: "reserved", reservedBy: "model-suggestion-retry" })
+    expect(promptMock).toHaveBeenCalledTimes(1)
+  })
+
   it("should throw error from promptAsync directly on model-not-found error", async () => {
     // given a client that fails with model-not-found error
     const promptMock = mock().mockRejectedValueOnce({
@@ -361,6 +403,67 @@ describe("promptWithModelSuggestionRetry", () => {
 
     // and should call promptAsync only once
     expect(promptMock).toHaveBeenCalledTimes(1)
+  })
+
+  it("#given promptAsync throws after dispatch was attempted #when caller observes the error #then the post-dispatch hold remains reserved", async () => {
+    // given
+    const promptMock = mock().mockRejectedValueOnce(new Error("JSON Parse error: Unexpected EOF"))
+    const client = { session: { promptAsync: promptMock } }
+    const args = {
+      path: { id: "session-failed-async-hold" },
+      body: {
+        parts: [{ type: "text", text: "hello" }],
+        model: { providerID: "anthropic", modelID: "claude-sonnet-4" },
+      },
+    }
+
+    // when
+    await expect(
+      promptWithModelSuggestionRetry(unsafeTestValue(client), args)
+    ).rejects.toThrow("Unexpected EOF")
+    const second = await dispatchInternalPrompt({
+      mode: "async",
+      client,
+      sessionID: "session-failed-async-hold",
+      input: args,
+      source: "test:after-failed-async",
+      settleMs: 0,
+      postDispatchHoldMs: 0,
+    })
+
+    // then
+    expect(second).toEqual({ status: "reserved", reservedBy: "model-suggestion-retry" })
+    expect(promptMock).toHaveBeenCalledTimes(1)
+  })
+
+  it("#given promptAsync rejects before acceptance with an agent lookup error #when retried immediately #then the reservation is released", async () => {
+    // given
+    const promptMock = mock()
+      .mockRejectedValueOnce(new Error("Agent not found: missing-agent"))
+      .mockResolvedValueOnce(undefined)
+    const client = { session: { promptAsync: promptMock } }
+    const args = {
+      path: { id: "session-agent-preaccept-failure" },
+      body: {
+        agent: "missing-agent",
+        parts: [{ type: "text", text: "hello" }],
+      },
+    }
+
+    // when
+    await expect(
+      promptWithModelSuggestionRetry(unsafeTestValue(client), args)
+    ).rejects.toThrow("Agent not found")
+    await promptWithModelSuggestionRetry(unsafeTestValue(client), {
+      ...args,
+      body: {
+        ...args.body,
+        agent: "general",
+      },
+    })
+
+    // then
+    expect(promptMock).toHaveBeenCalledTimes(2)
   })
 
   it("should pass all body fields through to promptAsync", async () => {

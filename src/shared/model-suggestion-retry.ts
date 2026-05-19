@@ -33,6 +33,15 @@ function extractMessage(error: unknown): string {
   return String(error)
 }
 
+function isAgentResolutionError(error: unknown): boolean {
+  const message = extractMessage(error)
+  return message.includes("Agent not found") || message.includes("agent.name")
+}
+
+function shouldReleaseReservationAfterFailedAsyncPrompt(error: unknown): boolean {
+  return parseModelSuggestion(error) !== null || isAgentResolutionError(error)
+}
+
 export function parseModelSuggestion(error: unknown): ModelSuggestionInfo | null {
   if (!error) return null
 
@@ -123,7 +132,9 @@ export async function promptWithModelSuggestionRetry(
     if (timeoutContext.wasTimedOut()) {
       throw new Error(`promptAsync timed out after ${timeoutMs}ms`)
     }
-    releasePromptAsyncReservation(args.path.id, "model-suggestion-retry")
+    if (shouldReleaseReservationAfterFailedAsyncPrompt(error)) {
+      releasePromptAsyncReservation(args.path.id, "model-suggestion-retry")
+    }
     throw error
   } finally {
     timeoutContext.cleanup()
