@@ -42,7 +42,11 @@ import { buildTeamIdleWakeHintClient } from "./build-team-idle-wake-hint-client"
 import { createTeamLeadOrphanHandler } from "../hooks/team-session-events/team-lead-orphan-handler";
 import { createTeamMemberErrorHandler } from "../hooks/team-session-events/team-member-error-handler";
 import { createTeamMemberStatusHandler } from "../hooks/team-session-events/team-member-status-handler";
-import { dispatchInternalPrompt, releasePromptAsyncReservation } from "../hooks/shared/prompt-async-gate";
+import {
+  dispatchInternalPrompt,
+  isInternalPromptDispatchAccepted,
+  releasePromptAsyncReservation,
+} from "../hooks/shared/prompt-async-gate";
 
 import type { CreatedHooks } from "../create-hooks";
 import type { Managers } from "../create-managers";
@@ -338,7 +342,7 @@ export function createEventHandler(args: {
     ? createTeamLeadOrphanHandler(teamModeConfig, managers.tmuxSessionManager, managers.backgroundManager)
     : undefined;
   const teamMemberErrorHandler = teamModeConfig
-    ? createTeamMemberErrorHandler(teamModeConfig)
+    ? createTeamMemberErrorHandler(teamModeConfig, { client: pluginContext.client })
     : undefined;
   const teamMemberStatusHandler = teamModeConfig
     ? createTeamMemberStatusHandler(teamModeConfig)
@@ -517,9 +521,10 @@ export function createEventHandler(args: {
           client: pluginContext.client,
           sessionID,
           source: `model-fallback:${source}`,
+          queueBehavior: "defer",
           input: promptBody,
         });
-        if (promptResult.status === "dispatched") {
+        if (isInternalPromptDispatchAccepted(promptResult)) {
           dispatched = true;
         } else if (promptResult.status === "failed") {
           const error = promptResult.error;
@@ -535,9 +540,10 @@ export function createEventHandler(args: {
         client: pluginContext.client,
         sessionID,
         source: `model-fallback:${source}:sync`,
+        queueBehavior: "defer",
         input: promptBody,
       });
-      if (promptResult.status === "dispatched") {
+      if (isInternalPromptDispatchAccepted(promptResult)) {
         dispatched = true;
       } else if (promptResult.status === "failed") {
         log("[event] model-fallback prompt failed", { sessionID, source, error: promptResult.error });
@@ -951,6 +957,7 @@ export function createEventHandler(args: {
               client: pluginContext.client,
               sessionID,
               source: "session-recovery:post-compaction-continue",
+              queueBehavior: "defer",
               input: {
                 path: { id: sessionID },
                 body: { parts: [createInternalAgentContinuationTextPart("continue")] },
@@ -959,7 +966,7 @@ export function createEventHandler(args: {
             });
             if (promptResult.status === "failed") {
               log("[event] recovery continue prompt failed", { sessionID, error: promptResult.error });
-            } else if (promptResult.status !== "dispatched") {
+            } else if (!isInternalPromptDispatchAccepted(promptResult)) {
               log("[event] recovery continue prompt skipped by gate", { sessionID, status: promptResult.status });
             }
           }
