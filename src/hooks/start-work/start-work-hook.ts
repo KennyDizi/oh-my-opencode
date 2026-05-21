@@ -1,5 +1,5 @@
 import type { PluginInput } from "@opencode-ai/plugin";
-import { readBoulderState } from "../../features/boulder-state";
+import { findPrometheusPlans, readBoulderState } from "../../features/boulder-state";
 import {
   isAgentRegistered,
   resolveRegisteredAgentName,
@@ -8,6 +8,7 @@ import {
 import { log } from "../../shared";
 import { buildStartWorkContextInfo } from "./context-info-builder";
 import { parseUserRequest } from "./parse-user-request";
+import { findRecentSessionPlanPath } from "./session-plan-affinity";
 import { createWorktreeActiveBlock } from "./worktree-block";
 import { detectWorktreePath } from "./worktree-detector";
 
@@ -86,10 +87,16 @@ export function createStartWorkHook(ctx: PluginInput) {
     const sessionId = input.sessionID;
     const timestamp = new Date().toISOString();
 
-    const { planName: explicitPlanName, explicitWorktreePath } =
-      parseUserRequest(promptText);
-    const { worktreePath, block: worktreeBlock } =
-      resolveWorktreeContext(explicitWorktreePath);
+    const { planName: explicitPlanName, explicitWorktreePath } = parseUserRequest(promptText)
+    const { worktreePath, block: worktreeBlock } = resolveWorktreeContext(explicitWorktreePath)
+    const preferredPlanPath = explicitPlanName
+      ? null
+      : await findRecentSessionPlanPath({
+          client: ctx.client,
+          directory: ctx.directory,
+          sessionID: sessionId,
+          availablePlans: findPrometheusPlans(ctx.directory),
+        })
 
     const contextInfo = buildStartWorkContextInfo({
       ctx,
@@ -100,7 +107,8 @@ export function createStartWorkHook(ctx: PluginInput) {
       activeAgent,
       worktreePath,
       worktreeBlock,
-    });
+      preferredPlanPath,
+    })
 
     const idx = output.parts.findIndex((p) => p.type === "text" && p.text);
     if (idx >= 0 && output.parts[idx].text) {
@@ -114,6 +122,7 @@ export function createStartWorkHook(ctx: PluginInput) {
     log(`[${HOOK_NAME}] Context injected`, {
       sessionID: input.sessionID,
       hasExistingState: !!existingState,
+      preferredPlanPath,
       worktreePath,
     });
   };

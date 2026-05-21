@@ -25,10 +25,7 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./cli": {
-      "types": "./dist/cli",
-      "import": "./dist/cli/index.js"
-    },
+    "./server": "./dist/index.js",
     "./schema.json": "./dist/oh-my-opencode.schema.json"
   },
   "scripts": {
@@ -77,9 +74,9 @@
     "@clack/prompts": "^1.4.0",
     "@code-yeongyu/comment-checker": "^0.8.0",
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "@opencode-ai/plugin": "^1.15.5",
-    "@opencode-ai/sdk": "^1.15.5",
-    "ai": "^6.0.185",
+    "@opencode-ai/plugin": "^1.15.6",
+    "@opencode-ai/sdk": "^1.15.6",
+    "ai": "^6.0.187",
     "codex": "^0.2.3",
     "commander": "^14.0.3",
     "detect-libc": "^2.1.2",
@@ -89,13 +86,13 @@
     "jsonc-parser": "^3.3.1",
     "picocolors": "^1.1.1",
     "picomatch": "^4.0.4",
-    "posthog-node": "^5.34.6",
+    "posthog-node": "^5.34.7",
     "vscode-jsonrpc": "^8.2.1",
     "zod-to-json-schema": "^3.25.2"
   },
   "devDependencies": {
-    "@opentui/core": "0.2.14",
-    "@opentui/solid": "0.2.14",
+    "@opentui/core": "0.2.15",
+    "@opentui/solid": "0.2.15",
     "@microsoft/api-extractor": "^7.58.7",
     "@rsdoctor/core": "^1.5.11",
     "@rsdoctor/rspack-plugin": "^1.5.11",
