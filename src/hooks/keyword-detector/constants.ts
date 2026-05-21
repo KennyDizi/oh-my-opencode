@@ -1,18 +1,14 @@
 export const CODE_BLOCK_PATTERN = /```[\s\S]*?```/g
 export const INLINE_CODE_PATTERN = /`[^`]+`/g
 
-export { ANALYZE_MESSAGE, ANALYZE_PATTERN } from "./analyze"
-export { HYPERPLAN_MESSAGE, HYPERPLAN_PATTERN } from "./hyperplan"
-export { SEARCH_MESSAGE, SEARCH_PATTERN } from "./search"
-export { TEAM_MESSAGE, TEAM_PATTERN } from "./team"
-export { getUltraworkMessage, isNonOmoAgent, isPlannerAgent } from "./ultrawork"
-
 import type { KeywordType } from "../../config/schema/keyword-detector"
 import { ANALYZE_MESSAGE, ANALYZE_PATTERN } from "./analyze"
 import { HYPERPLAN_MESSAGE, HYPERPLAN_PATTERN } from "./hyperplan"
 import { SEARCH_MESSAGE, SEARCH_PATTERN } from "./search"
 import { TEAM_MESSAGE, TEAM_PATTERN } from "./team"
-import { getUltraworkMessage } from "./ultrawork"
+import { getUltraworkMessage, isNonOmoAgent, isPlannerAgent } from "./ultrawork"
+
+export { ANALYZE_MESSAGE, ANALYZE_PATTERN, getUltraworkMessage, HYPERPLAN_MESSAGE, HYPERPLAN_PATTERN, isNonOmoAgent, isPlannerAgent, SEARCH_MESSAGE, SEARCH_PATTERN, TEAM_MESSAGE, TEAM_PATTERN }
 
 // Hyperplan-ultrawork combo: strict adjacency, both word orders
 export const HYPERPLAN_ULTRAWORK_PATTERN =
