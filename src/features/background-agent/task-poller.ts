@@ -16,9 +16,11 @@ import {
 } from "./constants"
 import { abortWithTimeout } from "./abort-with-timeout"
 import { removeTaskToastTracking } from "./remove-task-toast-tracking"
-import { MIN_SESSION_GONE_POLLS, verifySessionExists } from "./session-existence"
+import { checkSessionExistence, MIN_SESSION_GONE_POLLS } from "./session-existence"
 
 import { isActiveSessionStatus } from "./session-status-classifier"
+import { getSessionActivityFromClient, type SessionActivityResolver } from "./session-activity"
+import { refreshTaskActivityFromSession } from "./task-activity-refresh"
 
 const TERMINAL_TASK_STATUSES = new Set<BackgroundTask["status"]>([
   "completed",
@@ -120,6 +122,7 @@ export async function checkAndInterruptStaleTasks(args: {
   notifyParentSession: (task: BackgroundTask) => Promise<void>
   sessionStatuses?: SessionStatusMap
   onTaskInterrupted?: (task: BackgroundTask) => void
+  getSessionActivity?: SessionActivityResolver
 }): Promise<void> {
   const {
     tasks,
@@ -137,6 +140,8 @@ export async function checkAndInterruptStaleTasks(args: {
   const abortPromises: Array<Promise<unknown>> = []
 
   const messageStalenessMs = config?.messageStalenessTimeoutMs ?? DEFAULT_MESSAGE_STALENESS_TIMEOUT_MS
+  const getSessionActivity = args.getSessionActivity
+    ?? ((id: string) => getSessionActivityFromClient(client, id, directory))
 
   for (const task of tasks) {
     if (task.status !== "running") continue
@@ -157,6 +162,9 @@ export async function checkAndInterruptStaleTasks(args: {
 
     const sessionGone = sessionMissing && (task.consecutiveMissedPolls ?? 0) >= MIN_SESSION_GONE_POLLS
     const shouldSkipInactivityTimeout = task.teamRunId !== undefined && !sessionGone
+    const shouldRefreshFromSessionActivity = !sessionGone
+      && sessionStatus !== undefined
+      && isActiveSessionStatus(sessionStatus)
 
     if (!task.progress?.lastUpdate) {
       if (shouldSkipInactivityTimeout) continue
@@ -164,9 +172,19 @@ export async function checkAndInterruptStaleTasks(args: {
       const effectiveTimeout = sessionGone ? sessionGoneTimeoutMs : messageStalenessMs
       if (runtime <= effectiveTimeout) continue
 
-      if (sessionGone && await verifySessionExists(client, sessionID, directory)) {
-        task.consecutiveMissedPolls = 0
-        continue
+      if (shouldRefreshFromSessionActivity) {
+        const activityRefresh = await refreshTaskActivityFromSession(task, getSessionActivity)
+        if (activityRefresh.type === "unavailable") continue
+        if (activityRefresh.type === "activity" && now - activityRefresh.activityTime <= effectiveTimeout) continue
+      }
+
+      if (sessionGone) {
+        const existence = await checkSessionExistence(client, sessionID, directory)
+        if (existence === "exists") {
+          task.consecutiveMissedPolls = 0
+          continue
+        }
+        if (existence === "unknown") continue
       }
 
       const staleMinutes = Math.round(runtime / 60000)
@@ -197,14 +215,30 @@ export async function checkAndInterruptStaleTasks(args: {
 
     if (runtime < MIN_RUNTIME_BEFORE_STALE_MS) continue
 
-    const timeSinceLastUpdate = now - task.progress.lastUpdate.getTime()
+    let timeSinceLastUpdate = now - task.progress.lastUpdate.getTime()
     const effectiveStaleTimeout = sessionGone ? sessionGoneTimeoutMs : staleTimeoutMs
     if (timeSinceLastUpdate <= effectiveStaleTimeout) continue
+
+    if (shouldRefreshFromSessionActivity) {
+      const activityRefresh = await refreshTaskActivityFromSession(task, getSessionActivity)
+      if (activityRefresh.type === "unavailable") continue
+      const refreshedLastUpdate = task.progress?.lastUpdate.getTime()
+        ?? (activityRefresh.type === "activity" ? activityRefresh.activityTime : undefined)
+      if (refreshedLastUpdate !== undefined && now - refreshedLastUpdate <= effectiveStaleTimeout) continue
+      if (refreshedLastUpdate !== undefined) {
+        timeSinceLastUpdate = now - refreshedLastUpdate
+      }
+    }
+
     if (task.status !== "running") continue
 
-    if (sessionGone && await verifySessionExists(client, sessionID, directory)) {
-      task.consecutiveMissedPolls = 0
-      continue
+    if (sessionGone) {
+      const existence = await checkSessionExistence(client, sessionID, directory)
+      if (existence === "exists") {
+        task.consecutiveMissedPolls = 0
+        continue
+      }
+      if (existence === "unknown") continue
     }
 
     const staleMinutes = Math.round(timeSinceLastUpdate / 60000)
