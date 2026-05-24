@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test"
-import { ParentWakeNotifier } from "./parent-wake-notifier"
 import {
   releaseAllPromptAsyncReservationsForTesting,
   releasePromptAsyncReservation,
 } from "../../hooks/shared/prompt-async-gate"
+import { ParentWakeNotifier } from "./parent-wake-notifier"
 
 type PromptAsyncCall = {
   path: { id: string }
@@ -124,6 +124,30 @@ describe("ParentWakeNotifier — same-source reservation requeue (BUG-E)", () =>
       notifier.queuePendingParentWake(sessionID, "wake A", { agent: "sisyphus" }, true)
       await notifier.flushPendingParentWake(sessionID)
       releaseParentWakeHold(sessionID)
+      await notifier.flushPendingParentWake(sessionID)
+
+      // then
+      expect(promptAsyncCalls).toHaveLength(1)
+      expect(notifier.getPendingParentWakes().has(sessionID)).toBe(false)
+    } finally {
+      notifier.shutdown()
+      releaseAllPromptAsyncReservationsForTesting()
+    }
+  })
+
+  test("#given a dispatched parent wake is still tracked after the hold expires #when the same wake arrives again #then it is dropped instead of starting a second stream", async () => {
+    // given
+    const { notifier, promptAsyncCalls } = createNotifier()
+    const sessionID = "parent-dispatched-window-duplicate"
+    notifier.queuePendingParentWake(sessionID, "wake A", { agent: "sisyphus" }, true)
+
+    try {
+      await notifier.flushPendingParentWake(sessionID)
+      expect(promptAsyncCalls).toHaveLength(1)
+      releaseParentWakeHold(sessionID)
+
+      // when
+      notifier.queuePendingParentWake(sessionID, "wake A", { agent: "sisyphus" }, true)
       await notifier.flushPendingParentWake(sessionID)
 
       // then
