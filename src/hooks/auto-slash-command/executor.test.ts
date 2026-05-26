@@ -16,6 +16,19 @@ const ENV_KEYS = [
 type EnvKey = (typeof ENV_KEYS)[number]
 type EnvSnapshot = Record<EnvKey, string | undefined>
 
+function countOccurrences(text: string, needle: string): number {
+  return text.split(needle).length - 1
+}
+
+function extractTaggedContent(text: string, tagName: string): string {
+  const openTag = `<${tagName}>`
+  const closeTag = `</${tagName}>`
+  const start = text.indexOf(openTag)
+  const end = text.indexOf(closeTag)
+  if (start < 0 || end < start) return ""
+  return text.slice(start + openTag.length, end)
+}
+
 function writePluginFixture(baseDir: string): void {
   const claudeConfigDir = join(baseDir, "claude-config")
   const pluginsHome = join(claudeConfigDir, "plugins")
@@ -139,6 +152,53 @@ describe("auto-slash command executor plugin dispatch", () => {
     expect(result.replacementText).toContain("**Scope**: plugin")
   })
 
+  it("#given manual project command #when rendered #then command body appears only inside command-instruction", async () => {
+    // given
+    const projectDir = join(tempDir, "manual-project")
+    const commandDir = join(projectDir, ".claude", "commands")
+    const commandName = "single-body-command"
+    const bodySentinel = "UNIQUE_MANUAL_COMMAND_BODY_SENTINEL"
+    mkdirSync(commandDir, { recursive: true })
+    writeFileSync(
+      join(commandDir, `${commandName}.md`),
+      `---\ndescription: Single body command\n---\n${bodySentinel}\n`,
+    )
+
+    // when
+    const result = await executeSlashCommand(
+      {
+        command: commandName,
+        args: "",
+        raw: `/${commandName}`,
+      },
+      {
+        skills: [],
+        pluginsEnabled: false,
+        directory: projectDir,
+      },
+    )
+
+    // then
+    expect(result.success).toBe(true)
+    const replacementText = result.replacementText ?? ""
+    expect(countOccurrences(replacementText, "<auto-slash-command>")).toBe(1)
+    expect(countOccurrences(replacementText, "</auto-slash-command>")).toBe(1)
+    expect(countOccurrences(replacementText, "<command-instruction>")).toBe(1)
+    expect(countOccurrences(replacementText, "</command-instruction>")).toBe(1)
+    expect(countOccurrences(replacementText, bodySentinel)).toBe(1)
+
+    const autoSlashCommandContent = extractTaggedContent(replacementText, "auto-slash-command")
+    expect(autoSlashCommandContent).toContain(`# /${commandName} Command`)
+    expect(autoSlashCommandContent).toContain("**Description**: Single body command")
+    expect(autoSlashCommandContent).toContain("**Scope**: project")
+    expect(autoSlashCommandContent).not.toContain(bodySentinel)
+    expect(autoSlashCommandContent).not.toContain("<command-instruction>")
+    expect(replacementText).not.toContain("## Command Instructions")
+
+    const commandInstructionContent = extractTaggedContent(replacementText, "command-instruction")
+    expect(commandInstructionContent).toContain(bodySentinel)
+  })
+
   it("excludes marketplace commands when plugins are disabled via config toggle", async () => {
     const result = await executeSlashCommand(
       {
@@ -248,6 +308,53 @@ describe("auto-slash command executor plugin dispatch", () => {
     expect(result.success).toBe(true)
     expect(result.replacementText).not.toContain("<user-request>")
     expect(result.replacementText).not.toContain("</user-request>")
+  })
+
+  it("#given skill slash command #when rendered #then skill body appears only inside skill-instruction", async () => {
+    // given
+    const bodySentinel = "UNIQUE_SKILL_BODY_SENTINEL"
+    const skill: LoadedSkill = {
+      name: "body-skill",
+      definition: {
+        name: "body-skill",
+        description: "Body skill",
+        template: `<skill-instruction>\n${bodySentinel}\n</skill-instruction>\n\n<user-request>\n$ARGUMENTS\n</user-request>`,
+      },
+      scope: "user",
+    }
+
+    // when
+    const result = await executeSlashCommand(
+      {
+        command: "body-skill",
+        args: "apply carefully",
+        raw: "/body-skill apply carefully",
+      },
+      {
+        skills: [skill],
+        pluginsEnabled: false,
+      },
+    )
+
+    // then
+    expect(result.success).toBe(true)
+    const replacementText = result.replacementText ?? ""
+    expect(countOccurrences(replacementText, "<auto-slash-command>")).toBe(1)
+    expect(countOccurrences(replacementText, "</auto-slash-command>")).toBe(1)
+    expect(countOccurrences(replacementText, "<skill-instruction>")).toBe(1)
+    expect(countOccurrences(replacementText, "</skill-instruction>")).toBe(1)
+    expect(replacementText).not.toContain("<command-instruction>")
+    expect(replacementText).not.toContain("</command-instruction>")
+    expect(countOccurrences(replacementText, bodySentinel)).toBe(1)
+
+    const autoSlashCommandContent = extractTaggedContent(replacementText, "auto-slash-command")
+    expect(autoSlashCommandContent).toContain("# /body-skill Command")
+    expect(autoSlashCommandContent).toContain("**Scope**: skill")
+    expect(autoSlashCommandContent).not.toContain(bodySentinel)
+    expect(autoSlashCommandContent).not.toContain("<skill-instruction>")
+
+    const skillInstructionContent = extractTaggedContent(replacementText, "skill-instruction")
+    expect(skillInstructionContent).toContain(bodySentinel)
   })
 
   it("keeps skill user-request tags when arguments are present", async () => {

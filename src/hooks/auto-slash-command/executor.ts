@@ -4,6 +4,14 @@ import { resolveFileReferencesInText } from "../../shared/file-reference-resolve
 import { discoverAllSkills, type LoadedSkill, type LazyContentLoader } from "../../features/opencode-skill-loader"
 import * as commandDiscovery from "../../tools/slashcommand/command-discovery"
 import type { CommandInfo as DiscoveredCommandInfo, CommandMetadata } from "../../tools/slashcommand/types"
+import {
+  AUTO_SLASH_COMMAND_TAG_CLOSE,
+  AUTO_SLASH_COMMAND_TAG_OPEN,
+  NATIVE_COMMAND_TAG_CLOSE,
+  NATIVE_COMMAND_TAG_OPEN,
+  SKILL_INSTRUCTION_TAG_CLOSE,
+  SKILL_INSTRUCTION_TAG_OPEN,
+} from "./constants"
 import type { ParsedSlashCommand } from "./types"
 
 interface SkillCommandInfo {
@@ -34,6 +42,23 @@ function removeEmptyUserRequestBlocks(content: string, args: string): string {
   }
 
   return content.replace(EMPTY_USER_REQUEST_BLOCK_PATTERN, "\n")
+}
+
+function formatInstructionContent(content: string, scope: CommandInfo["scope"]): string {
+  const trimmed = content.trim()
+  if (trimmed.includes(NATIVE_COMMAND_TAG_OPEN) || trimmed.includes(SKILL_INSTRUCTION_TAG_OPEN)) {
+    return trimmed
+  }
+
+  if (scope === "skill") {
+    return `${SKILL_INSTRUCTION_TAG_OPEN}\n${trimmed}\n${SKILL_INSTRUCTION_TAG_CLOSE}`
+  }
+
+  return `${NATIVE_COMMAND_TAG_OPEN}\n${trimmed}\n${NATIVE_COMMAND_TAG_CLOSE}`
+}
+
+function formatAutoSlashCommandMetadata(content: string): string {
+  return `${AUTO_SLASH_COMMAND_TAG_OPEN}\n${content.trim()}\n${AUTO_SLASH_COMMAND_TAG_CLOSE}`
 }
 
 function skillToCommandInfo(skill: LoadedSkill): SkillCommandInfo {
@@ -117,7 +142,6 @@ async function formatCommandTemplate(cmd: CommandInfo, args: string): Promise<st
 
   sections.push(`**Scope**: ${cmd.scope}\n`)
   sections.push("---\n")
-  sections.push("## Command Instructions\n")
 
   let content = cmd.content || ""
   if (!content && cmd.lazyContentLoader) {
@@ -133,15 +157,10 @@ async function formatCommandTemplate(cmd: CommandInfo, args: string): Promise<st
     .replace(/\$\{user_message\}/g, resolvedArguments)
     .replace(/\$ARGUMENTS/g, resolvedArguments)
   const finalContent = removeEmptyUserRequestBlocks(substitutedContent, resolvedArguments)
-  sections.push(finalContent.trim())
+  const metadata = formatAutoSlashCommandMetadata(sections.join("\n"))
+  const instructionContent = formatInstructionContent(finalContent, cmd.scope)
 
-  if (args.trim()) {
-    sections.push("\n\n---\n")
-    sections.push("## User Request\n")
-    sections.push(args)
-  }
-
-  return sections.join("\n")
+  return `${metadata}\n\n${instructionContent}`
 }
 
 export interface ExecuteResult {

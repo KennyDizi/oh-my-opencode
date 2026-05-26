@@ -36,6 +36,19 @@ function createMockOutput(text: string): AutoSlashCommandHookOutput {
   }
 }
 
+function countOccurrences(text: string, needle: string): number {
+  return text.split(needle).length - 1
+}
+
+function extractTaggedContent(text: string, tagName: string): string {
+  const openTag = `<${tagName}>`
+  const closeTag = `</${tagName}>`
+  const start = text.indexOf(openTag)
+  const end = text.indexOf(closeTag)
+  if (start < 0 || end < start) return ""
+  return text.slice(start + openTag.length, end)
+}
+
 describe("createAutoSlashCommandHook", () => {
   let tempDir = ""
   let originalWorkingDirectory = ""
@@ -425,6 +438,42 @@ describe("createAutoSlashCommandHook", () => {
       expect(tagCount).toBe(1)
     })
 
+    it("does not duplicate a native command-instruction body when manual command output already contains it", async () => {
+      //#given
+      const projectDir = join(tempDir, "native-command-instruction-project")
+      const commandDir = join(projectDir, ".claude", "commands")
+      const commandName = "native-body-command"
+      const bodySentinel = "NATIVE_COMMAND_BODY_SENTINEL"
+      mkdirSync(commandDir, { recursive: true })
+      writeFileSync(
+        join(commandDir, `${commandName}.md`),
+        `---\ndescription: Native body command\n---\n${bodySentinel}\n`,
+      )
+      const hook = createAutoSlashCommandHook({ directory: projectDir })
+      const input = createCommandInput(commandName)
+      const output: CommandExecuteBeforeOutput = {
+        parts: [
+          {
+            type: "text",
+            text: `<command-instruction>\n${bodySentinel}\n</command-instruction>`,
+          },
+        ],
+      }
+
+      //#when
+      await hook["command.execute.before"](input, output)
+
+      //#then
+      expect(output.parts).toHaveLength(2)
+      const autoSlashCommandText = output.parts[0]?.text ?? ""
+      const combinedText = output.parts.map(part => part.text ?? "").join("\n")
+      expect(autoSlashCommandText).toContain("<auto-slash-command>")
+      expect(autoSlashCommandText).toContain("**Scope**: project")
+      expect(extractTaggedContent(autoSlashCommandText, "auto-slash-command")).not.toContain(bodySentinel)
+      expect(countOccurrences(combinedText, bodySentinel)).toBe(1)
+      expect(countOccurrences(combinedText, "<command-instruction>")).toBe(1)
+    })
+
   })
   describe("skills as slash commands", () => {
     function createTestSkill(name: string, template: string): LoadedSkill {
@@ -532,6 +581,42 @@ describe("createAutoSlashCommandHook", () => {
       expect(output.parts[0].text).toContain("/my-test-skill Command")
       expect(output.parts[0].text).toContain("Skill template for command execute")
       expect(output.parts[0].text).toContain("extra args")
+    })
+
+    it("does not duplicate a native skill-instruction body when manual skill output already contains it", async () => {
+      // given
+      const bodySentinel = "NATIVE_SKILL_BODY_SENTINEL"
+      const skill = createTestSkill(
+        "native-body-skill",
+        `<skill-instruction>\n${bodySentinel}\n</skill-instruction>\n\n<user-request>\n$ARGUMENTS\n</user-request>`,
+      )
+      const hook = createAutoSlashCommandHook({ skills: [skill] })
+      const input: CommandExecuteBeforeInput = {
+        command: "native-body-skill",
+        sessionID: `test-session-skill-native-${Date.now()}-${Math.random()}`,
+        arguments: "extra args",
+      }
+      const output: CommandExecuteBeforeOutput = {
+        parts: [
+          {
+            type: "text",
+            text: `<skill-instruction>\n${bodySentinel}\n</skill-instruction>`,
+          },
+        ],
+      }
+
+      // when
+      await hook["command.execute.before"](input, output)
+
+      // then
+      expect(output.parts).toHaveLength(2)
+      const autoSlashCommandText = output.parts[0]?.text ?? ""
+      const combinedText = output.parts.map(part => part.text ?? "").join("\n")
+      expect(autoSlashCommandText).toContain("<auto-slash-command>")
+      expect(autoSlashCommandText).toContain("**Scope**: skill")
+      expect(extractTaggedContent(autoSlashCommandText, "auto-slash-command")).not.toContain(bodySentinel)
+      expect(countOccurrences(combinedText, bodySentinel)).toBe(1)
+      expect(countOccurrences(combinedText, "<skill-instruction>")).toBe(1)
     })
 
     it("removes empty user-request tags from command.execute.before output that is already tagged", async () => {

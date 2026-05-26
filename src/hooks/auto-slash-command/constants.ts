@@ -3,8 +3,10 @@ export const HOOK_NAME = "auto-slash-command" as const
 export const AUTO_SLASH_COMMAND_TAG_OPEN = "<auto-slash-command>"
 export const AUTO_SLASH_COMMAND_TAG_CLOSE = "</auto-slash-command>"
 
-export const NATIVE_COMMAND_TAG_OPEN = "<command-instruction>";
-export const NATIVE_COMMAND_TAG_CLOSE = "</command-instruction>";
+export const NATIVE_COMMAND_TAG_OPEN = "<command-instruction>"
+export const NATIVE_COMMAND_TAG_CLOSE = "</command-instruction>"
+export const SKILL_INSTRUCTION_TAG_OPEN = "<skill-instruction>"
+export const SKILL_INSTRUCTION_TAG_CLOSE = "</skill-instruction>"
 
 export const SLASH_COMMAND_PATTERN = /^\/([a-zA-Z@][\w.:@/-]*)\s*(.*)/
 

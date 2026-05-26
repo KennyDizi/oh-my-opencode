@@ -1,5 +1,5 @@
 import { afterAll, beforeEach, describe, expect, it, mock, spyOn } from "bun:test"
-import { AUTO_SLASH_COMMAND_TAG_OPEN } from "../constants"
+import { AUTO_SLASH_COMMAND_TAG_CLOSE, AUTO_SLASH_COMMAND_TAG_OPEN } from "../constants"
 import type {
   AutoSlashCommandHookInput,
   AutoSlashCommandHookOutput,
@@ -14,7 +14,7 @@ type AutoSlashCommandModule = typeof import("../hook")
 const executeSlashCommandMock = mock(
   async (parsed: { command: string; args: string; raw: string }) => ({
     success: true,
-    replacementText: parsed.raw,
+    replacementText: `${AUTO_SLASH_COMMAND_TAG_OPEN}\n${parsed.raw}\n${AUTO_SLASH_COMMAND_TAG_CLOSE}`,
   })
 )
 

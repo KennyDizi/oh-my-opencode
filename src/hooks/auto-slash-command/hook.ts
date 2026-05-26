@@ -4,6 +4,8 @@ import { resolveSessionEventID } from "../../shared/event-session-id"
 import {
   AUTO_SLASH_COMMAND_TAG_CLOSE,
   AUTO_SLASH_COMMAND_TAG_OPEN,
+  NATIVE_COMMAND_TAG_OPEN,
+  SKILL_INSTRUCTION_TAG_OPEN,
 } from "./constants"
 import {
   detectSlashCommand,
@@ -73,6 +75,43 @@ function partsContainAutoSlashCommandTags(parts: Array<{ text?: string }>): bool
       || part.text.includes(AUTO_SLASH_COMMAND_TAG_CLOSE)
     )
   )
+}
+
+function partsContainNativeInstructionTags(parts: Array<{ text?: string }>): boolean {
+  return parts.some((part) =>
+    typeof part.text === "string"
+    && (
+      part.text.includes(NATIVE_COMMAND_TAG_OPEN)
+      || part.text.includes(SKILL_INSTRUCTION_TAG_OPEN)
+    )
+  )
+}
+
+function extractAutoSlashCommandBlock(content: string): string {
+  const start = content.indexOf(AUTO_SLASH_COMMAND_TAG_OPEN)
+  const end = content.indexOf(AUTO_SLASH_COMMAND_TAG_CLOSE)
+  if (start < 0 || end < start) {
+    return content
+  }
+
+  return content.slice(start, end + AUTO_SLASH_COMMAND_TAG_CLOSE.length)
+}
+
+function ensureAutoSlashCommandBlock(content: string): string {
+  if (content.includes(AUTO_SLASH_COMMAND_TAG_OPEN) && content.includes(AUTO_SLASH_COMMAND_TAG_CLOSE)) {
+    return content
+  }
+
+  return `${AUTO_SLASH_COMMAND_TAG_OPEN}\n${content}\n${AUTO_SLASH_COMMAND_TAG_CLOSE}`
+}
+
+function selectReplacementText(content: string, existingParts: Array<{ text?: string }>): string {
+  const replacementText = ensureAutoSlashCommandBlock(content)
+  if (!partsContainNativeInstructionTags(existingParts)) {
+    return replacementText
+  }
+
+  return extractAutoSlashCommandBlock(replacementText)
 }
 
 export interface AutoSlashCommandHookOptions {
@@ -160,7 +199,7 @@ export function createAutoSlashCommandHook(options?: AutoSlashCommandHookOptions
         return
       }
 
-      const taggedContent = `${AUTO_SLASH_COMMAND_TAG_OPEN}\n${result.replacementText}\n${AUTO_SLASH_COMMAND_TAG_CLOSE}`
+      const taggedContent = selectReplacementText(result.replacementText, output.parts)
       output.parts[idx].text = taggedContent
 
       log(`[auto-slash-command] Replaced message with command template`, {
@@ -219,7 +258,7 @@ export function createAutoSlashCommandHook(options?: AutoSlashCommandHookOptions
         eventID ? undefined : COMMAND_EXECUTE_FALLBACK_DEDUP_TTL_MS
       )
 
-      const taggedContent = `${AUTO_SLASH_COMMAND_TAG_OPEN}\n${result.replacementText}\n${AUTO_SLASH_COMMAND_TAG_CLOSE}`
+      const taggedContent = selectReplacementText(result.replacementText, output.parts)
 
       const idx = findSlashCommandPartIndex(output.parts)
       if (idx >= 0) {
