@@ -31,7 +31,7 @@ export function createToolContext(sessionID: string): ToolContext {
     worktree: "/project",
     abort: new AbortController().signal,
     metadata: () => {},
-    ask: () => Promise.resolve(),
+    ask: async () => undefined,
   }
 }
 

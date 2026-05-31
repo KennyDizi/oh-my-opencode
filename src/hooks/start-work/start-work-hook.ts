@@ -1,11 +1,15 @@
 import type { PluginInput } from "@opencode-ai/plugin";
-import { findPrometheusPlans, readBoulderState } from "../../features/boulder-state";
+import {
+  findPrometheusPlans,
+  normalizeSessionId,
+  readBoulderState,
+} from "../../features/boulder-state";
 import {
   isAgentRegistered,
   resolveRegisteredAgentName,
   updateSessionAgent,
 } from "../../features/claude-code-session-state";
-import { log } from "../../shared";
+import { log } from "../../shared/logger";
 import { buildStartWorkContextInfo } from "./context-info-builder";
 import { parseUserRequest } from "./parse-user-request";
 import { findRecentSessionPlanPath } from "./session-plan-affinity";
@@ -83,9 +87,9 @@ export function createStartWorkHook(ctx: PluginInput) {
         resolveRegisteredAgentName(activeAgent) ?? activeAgent;
     }
 
-    const existingState = readBoulderState(ctx.directory);
-    const sessionId = input.sessionID;
-    const timestamp = new Date().toISOString();
+    const existingState = readBoulderState(ctx.directory)
+    const sessionId = normalizeSessionId(input.sessionID, "opencode")
+    const timestamp = new Date().toISOString()
 
     const { planName: explicitPlanName, explicitWorktreePath } = parseUserRequest(promptText)
     const { worktreePath, block: worktreeBlock } = resolveWorktreeContext(explicitWorktreePath)
