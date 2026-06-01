@@ -66,16 +66,82 @@ describe("createSkillContext", () => {
       // then
       expect(result.mergedSkills.some((skill) => skill.name === "security-research")).toBe(true)
       expect(result.mergedSkills.some((skill) => skill.name === "security-review")).toBe(true)
-      expect(result.availableSkills).toContainEqual({
-        name: "security-research",
-        description: expect.stringContaining("security research"),
-        location: "plugin",
+      const securityResearch = result.availableSkills.find((skill) => skill.name === "security-research")
+      const securityReview = result.availableSkills.find((skill) => skill.name === "security-review")
+      expect(securityResearch?.location).toBe("plugin")
+      expect(securityResearch?.description).toContain("security research")
+      expect(securityReview?.location).toBe("plugin")
+      expect(securityReview?.description).toContain("/security-review")
+    } finally {
+      discoverConfigSourceSkillsSpy.mockRestore()
+      discoverUserClaudeSkillsSpy.mockRestore()
+      discoverProjectClaudeSkillsSpy.mockRestore()
+      discoverOpencodeGlobalSkillsSpy.mockRestore()
+      discoverOpencodeProjectSkillsSpy.mockRestore()
+      discoverProjectAgentsSkillsSpy.mockRestore()
+      discoverGlobalAgentsSkillsSpy.mockRestore()
+      getSystemMcpServerNamesSpy.mockRestore()
+    }
+  })
+
+  it("exposes extracted shared builtin skills to the OMO skill tool context", async () => {
+    // given
+    const discoverConfigSourceSkillsSpy = spyOn(
+      skillLoader,
+      "discoverConfigSourceSkills",
+    ).mockResolvedValue([])
+    const discoverUserClaudeSkillsSpy = spyOn(
+      skillLoader,
+      "discoverUserClaudeSkills",
+    ).mockResolvedValue([])
+    const discoverProjectClaudeSkillsSpy = spyOn(
+      skillLoader,
+      "discoverProjectClaudeSkills",
+    ).mockResolvedValue([])
+    const discoverOpencodeGlobalSkillsSpy = spyOn(
+      skillLoader,
+      "discoverOpencodeGlobalSkills",
+    ).mockResolvedValue([])
+    const discoverOpencodeProjectSkillsSpy = spyOn(
+      skillLoader,
+      "discoverOpencodeProjectSkills",
+    ).mockResolvedValue([])
+    const discoverProjectAgentsSkillsSpy = spyOn(
+      skillLoader,
+      "discoverProjectAgentsSkills",
+    ).mockResolvedValue([])
+    const discoverGlobalAgentsSkillsSpy = spyOn(
+      skillLoader,
+      "discoverGlobalAgentsSkills",
+    ).mockResolvedValue([])
+    const getSystemMcpServerNamesSpy = spyOn(
+      mcpLoader,
+      "getSystemMcpServerNames",
+    ).mockReturnValue(new Set<string>())
+
+    const pluginConfig = OhMyOpenCodeConfigSchema.parse({
+      browser_automation_engine: { provider: "agent-browser" },
+      disabled_skills: ["playwright"],
+      team_mode: { enabled: true },
+    })
+
+    try {
+      // when
+      const result = await createSkillContext({
+        directory: testDirectory,
+        pluginConfig,
       })
-      expect(result.availableSkills).toContainEqual({
-        name: "security-review",
-        description: expect.stringContaining("/security-review"),
-        location: "plugin",
-      })
+
+      // then
+      for (const name of ["frontend-ui-ux", "init-deep", "remove-ai-slops"] as const) {
+        const merged = result.mergedSkills.find((skill) => skill.name === name)
+        expect(merged?.scope).toBe("builtin")
+        expect(merged?.definition.template).toBeString()
+        expect(merged?.definition.template?.length).toBeGreaterThan(0)
+        const available = result.availableSkills.find((skill) => skill.name === name)
+        expect(available?.location).toBe("plugin")
+        expect(typeof available?.description).toBe("string")
+      }
     } finally {
       discoverConfigSourceSkillsSpy.mockRestore()
       discoverUserClaudeSkillsSpy.mockRestore()
@@ -159,7 +225,11 @@ describe("createSkillContext", () => {
     // given
     const discoveredDevBrowserSkill = {
       name: "dev-browser",
-      definition: { description: "Discovered dev-browser skill" },
+      definition: {
+        name: "dev-browser",
+        description: "Discovered dev-browser skill",
+        template: "Discovered dev-browser body",
+      },
       scope: "user" as const,
     }
 
