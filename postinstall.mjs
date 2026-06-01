@@ -1,7 +1,7 @@
 // postinstall.mjs
 // Runs after npm install to verify platform binary is available
 
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import {
   getPlatformPackageCandidates,
@@ -90,6 +90,10 @@ function getPackageBaseName() {
   }
 }
 
+function isSourceCheckout() {
+  return existsSync(new URL("./src", import.meta.url));
+}
+
 function main() {
   const { platform, arch } = process;
   const libcFamily = getLibcFamily();
@@ -101,6 +105,10 @@ function main() {
     console.warn(`⚠ oh-my-opencode requires OpenCode >= ${MIN_OPENCODE_VERSION}`);
     console.warn(`  Detected: ${versionCheck.version}`);
     console.warn(`  Please update OpenCode to avoid compatibility issues.`);
+  }
+
+  if (isSourceCheckout()) {
+    return;
   }
 
   try {
