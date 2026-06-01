@@ -40,7 +40,13 @@ Size each worker to the task — never spend `xhigh` on a one-liner, never send 
 | External library / docs research | `librarian` | role default | role default |
 | Final verification audit | `codex-ultrawork-reviewer` | role default | role default |
 
-Every worker message MUST carry: goal + exact files in scope; the baseline characterization test pinning current behavior when the task touches existing code, then the failing test / reproduction required before production code; constraints + project rules; the verification commands to run; the ONE Manual-QA channel and the exact evidence artifact to capture. Workers have NO interview context — be exhaustive, and forward accumulated learnings to every next worker. Do not use `list_agents` as a polling or status tool in long or high-context runs; it can replay large agent status and latest-message payloads. Track spawned agent names locally, use `wait_agent` for completion, send targeted followups only when needed, and `close_agent` after integrating each result.
+Every worker message MUST carry: goal + exact files in scope; the baseline characterization test pinning current behavior when the task touches existing code, then the failing test / reproduction required before production code; constraints + project rules; the verification commands to run; the ONE Manual-QA channel and the exact evidence artifact to capture. Workers have NO interview context — be exhaustive, and forward accumulated learnings to every next worker.
+
+Codex subagent reliability:
+- Start every `spawn_agent` message with `TASK: <imperative assignment>`, then name `DELIVERABLE`, `SCOPE`, and `VERIFY`. State that it is an executable assignment, not a context handoff.
+- Prefer `fork_turns: "none"` unless full history is truly required; paste only the context the child needs. Full-history forks can make the child continue old parent context instead of the delegated task.
+- Do not use `list_agents` as a polling or status tool in long or high-context runs; it can replay large agent status and latest-message payloads. Track spawned agent names locally, use `wait_agent` for completion signals, targeted followups only when needed, and `close_agent` after integrating each result.
+- Treat `wait_agent` as a mailbox signal, not proof of completion, content, or errors. After two waits with no substantive result, send one targeted followup: `TASK STILL ACTIVE: return <deliverable> or BLOCKED: <reason>`. If still silent or ack-only, record inconclusive, do not count it as pass/review approval, close if safe, and respawn a smaller `fork_turns: "none"` task with the missing deliverable.
 
 ## Artifacts
 - `.omo/ulw-loop/brief.md`: original brief and durable constraints.
@@ -53,30 +59,29 @@ Every worker message MUST carry: goal + exact files in scope; the baseline chara
 Do all three steps before execution. No edits, goal tools, or checkpointing before bootstrap completes.
 
 ### 1. Create goals from the brief
-Resolve the CLI before the first command. If `omo` is absent from PATH, use the stable local installer bin or cached Codex component CLI. This is the same ulw-loop CLI, so PATH absence is not a blocker. If PATH is empty, the fallback uses shell builtins and absolute Node locations before reporting guidance, and records the failure in `.omo/ulw-loop/bootstrap-notepad.md`.
+Resolve the CLI before the first command. If `omo` is absent from PATH or does not support `ulw-loop`, use the stable local installer bin or cached Codex component CLI. This is the same ulw-loop CLI, so PATH absence is not a blocker. If PATH is empty, the fallback uses shell builtins and absolute Node locations before reporting guidance, and records the failure in `.omo/ulw-loop/bootstrap-notepad.md`.
 ```sh
-if command -v omo >/dev/null 2>&1; then
-  ULW_LOOP_CLI=omo
-else
-  CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
-  ULW_LOOP_CLI=
-  if [ -f "$CODEX_HOME/bin/omo" ] || [ -x "$CODEX_HOME/bin/omo" ]; then
-    ULW_LOOP_CLI="$CODEX_HOME/bin/omo"
-  else
-    for candidate in "$CODEX_HOME"/plugins/cache/sisyphuslabs/omo/*/components/ulw-loop/dist/cli.js; do
-      [ -f "$candidate" ] || continue
-      ULW_LOOP_CLI="$candidate"
-    done
-  fi
+CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
+ULW_LOOP_NODE="$(command -v node 2>/dev/null || true)"
+if [ -z "$ULW_LOOP_NODE" ]; then
+  for candidate in /opt/homebrew/bin/node /usr/local/bin/node /usr/bin/node; do
+    [ -x "$candidate" ] || continue
+    ULW_LOOP_NODE="$candidate"
+    break
+  done
+fi
 
-  ULW_LOOP_NODE="$(command -v node 2>/dev/null || true)"
-  if [ -z "$ULW_LOOP_NODE" ]; then
-    for candidate in /opt/homebrew/bin/node /usr/local/bin/node /usr/bin/node; do
-      [ -x "$candidate" ] || continue
-      ULW_LOOP_NODE="$candidate"
+ULW_LOOP_CLI=
+if command -v omo >/dev/null 2>&1 && omo ulw-loop help >/dev/null 2>&1; then
+  ULW_LOOP_CLI=omo
+elif [ -n "$ULW_LOOP_NODE" ]; then
+  for candidate in "$HOME/.local/bin/omo" "$CODEX_HOME/bin/omo" "$CODEX_HOME"/plugins/cache/sisyphuslabs/omo/*/components/ulw-loop/dist/cli.js; do
+    [ -f "$candidate" ] || [ -x "$candidate" ] || continue
+    if "$ULW_LOOP_NODE" "$candidate" ulw-loop help >/dev/null 2>&1; then
+      ULW_LOOP_CLI="$candidate"
       break
-    done
-  fi
+    fi
+  done
 
   if [ -n "$ULW_LOOP_CLI" ] && [ -n "$ULW_LOOP_NODE" ]; then
     omo() { "$ULW_LOOP_NODE" "$ULW_LOOP_CLI" "$@"; }
@@ -86,7 +91,7 @@ fi
 if [ -z "${ULW_LOOP_CLI:-}" ]; then
   /bin/mkdir -p .omo/ulw-loop 2>/dev/null || mkdir -p .omo/ulw-loop 2>/dev/null || true
   NOTE="${NOTE:-.omo/ulw-loop/bootstrap-notepad.md}"
-  printf '%s\n' "omo executable missing from PATH; cached ulw-loop CLI not found under ${CODEX_HOME:-$HOME/.codex}." >> "$NOTE" 2>/dev/null || true
+  printf '%s\n' "No ulw-loop-capable omo executable found; PATH omo may be the OpenCode CLI without the Codex ulw-loop subcommand, and cached ulw-loop CLI was not found under ${CODEX_HOME:-$HOME/.codex}." >> "$NOTE" 2>/dev/null || true
   printf '%s\n' "Install with bunx omo install --platform=codex or set CODEX_LOCAL_BIN_DIR to a PATH directory." >&2
 fi
 ```
