@@ -97,7 +97,7 @@ const mockContext: ToolContext = {
 }
 
 describe("skill tool - synchronous description", () => {
-  it("includes available_items immediately when skills are pre-provided", () => {
+  it("omits pre-provided skills from available_items by default", () => {
     // given
     const loadedSkills = [createMockSkill("test-skill")]
 
@@ -105,11 +105,11 @@ describe("skill tool - synchronous description", () => {
     const tool = createSkillTool({ skills: loadedSkills })
 
     // then
-    expect(tool.description).toContain("<available_items>")
-    expect(tool.description).toContain("test-skill")
+    expect(tool.description).not.toContain("<available_items>")
+    expect(tool.description).not.toContain("test-skill")
   })
 
-  it("includes all pre-provided skills in available_items immediately", () => {
+  it("includes all pre-provided skills in available_items when explicitly requested", () => {
     // given
     const loadedSkills = [
       createMockSkill("playwright"),
@@ -118,7 +118,10 @@ describe("skill tool - synchronous description", () => {
     ]
 
     // when
-    const tool = createSkillTool({ skills: loadedSkills })
+    const tool = createSkillTool({
+      skills: loadedSkills,
+      includeSkillsInDescription: true,
+    })
 
     // then
     expect(tool.description).toContain("<available_items>")
@@ -479,7 +482,11 @@ describe("skill tool - ordering and priority", () => {
     ]
 
     //#when: creating tool with both
-    const tool = createSkillTool({ skills, commands })
+    const tool = createSkillTool({
+      skills,
+      commands,
+      includeSkillsInDescription: true,
+    })
 
     //#then: skills should appear as <command> items with / prefix, listed before regular commands
     const desc = tool.description
@@ -501,7 +508,10 @@ describe("skill tool - ordering and priority", () => {
     ]
 
     //#when: creating tool
-    const tool = createSkillTool({ skills })
+    const tool = createSkillTool({
+      skills,
+      includeSkillsInDescription: true,
+    })
 
     //#then: should be sorted by priority
     const desc = tool.description
@@ -547,9 +557,9 @@ describe("skill tool - ordering and priority", () => {
     //#when: creating tool
     const tool = createSkillTool({ skills, commands })
 
-    //#then: should include priority info
+    //#then
     expect(tool.description).toContain("Priority: project > user > opencode > builtin/plugin")
-    expect(tool.description).toContain("Skills listed before commands")
+    expect(tool.description).not.toContain("Skills listed before commands")
   })
 
   it("uses <available_items> wrapper with unified command format", () => {
@@ -560,12 +570,12 @@ describe("skill tool - ordering and priority", () => {
     //#when: creating tool
     const tool = createSkillTool({ skills, commands })
 
-    //#then: should use unified wrapper with all items as commands
+    //#then
     expect(tool.description).toContain("<available_items>")
     expect(tool.description).toContain("</available_items>")
     expect(tool.description).not.toContain("<skill>")
     expect(tool.description).toContain("<command>")
-    expect(tool.description).toContain("/test-skill")
+    expect(tool.description).not.toContain("/test-skill")
     expect(tool.description).toContain("/test-cmd")
   })
 })
@@ -644,7 +654,10 @@ describe("skill tool - agent-restricted skill visibility in description", () => 
     ]
 
     // when: tool is created with these skills (as tool-registry would inject them)
-    const tool = createSkillTool({ skills: loadedSkills })
+    const tool = createSkillTool({
+      skills: loadedSkills,
+      includeSkillsInDescription: true,
+    })
 
     // then: oracle-only skill must NOT appear in the description
     expect(tool.description).toContain("public-skill")
@@ -656,7 +669,10 @@ describe("skill tool - agent-restricted skill visibility in description", () => 
     const loadedSkills = [createMockSkill("public-skill")]
 
     // when
-    const tool = createSkillTool({ skills: loadedSkills })
+    const tool = createSkillTool({
+      skills: loadedSkills,
+      includeSkillsInDescription: true,
+    })
 
     // then
     expect(tool.description).toContain("public-skill")
@@ -727,7 +743,7 @@ describe("skill tool - dynamic description cache invalidation", () => {
       expect(cachedError?.message).toContain('Skill or command "second-skill" not found.')
 
       clearSkillCache()
-      const refreshedTool = createSkillTool({})
+      const refreshedTool = createSkillTool({ includeSkillsInDescription: true })
 
       // when
       const refreshedResult = await refreshedTool.execute({ name: "second-skill" }, mockContext)
@@ -753,6 +769,7 @@ describe("skill tool - browserProvider forwarding", () => {
     const tool = createSkillTool({
       skills: [agentBrowserSkill],
       browserProvider: "agent-browser",
+      includeSkillsInDescription: true,
     })
 
     // when: executing skill("agent-browser")
@@ -770,6 +787,7 @@ describe("skill tool - browserProvider forwarding", () => {
     const tool = createSkillTool({
       skills: [agentBrowserSkill],
       browserProvider: "agent-browser",
+      includeSkillsInDescription: true,
     })
 
     // then
@@ -782,6 +800,7 @@ describe("skill tool - nativeSkills integration", () => {
     //#given
     const tool = createSkillTool({
       skills: [createMockSkill("seeded-skill")],
+      includeSkillsInDescription: true,
       nativeSkills: {
         all() {
           return [{
