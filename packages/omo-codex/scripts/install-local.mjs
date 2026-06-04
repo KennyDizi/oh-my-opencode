@@ -11,7 +11,7 @@ import {
 	pruneMarketplaceCache,
 	pruneMarketplacePluginCaches,
 } from "./install/cache.mjs";
-import { linkCachedPluginAgents } from "./install/agents.mjs";
+import { capturePreservedAgentReasoning, linkCachedPluginAgents } from "./install/agents.mjs";
 import { updateCodexConfig } from "./install/config.mjs";
 import {
 	emptyProjectLocalCodexCleanupResult,
@@ -98,6 +98,9 @@ export async function installMarketplaceLocally(options = {}) {
 			sourcePath,
 			version,
 		});
+		if (marketplace.name === "sisyphuslabs" && plugin.name === "omo") {
+			await writeLazyCodexInstallSnapshot({ pluginRoot: plugin.path, repoRoot });
+		}
 		const binLinks = await linkCachedPluginBins({ binDir, pluginRoot: plugin.path, platform });
 		for (const link of binLinks) {
 			log(`Linked ${link.name} -> ${link.target}`);
@@ -106,10 +109,11 @@ export async function installMarketplaceLocally(options = {}) {
 		installed.push(plugin);
 	}
 
+	const preservedReasoning = await capturePreservedAgentReasoning({ codexHome });
 	const agentSourceRoots = await agentSourceRootsForInstall({ codexHome, marketplace, installed, pluginSources });
 	for (const plugin of installed) {
 		const pluginRoot = agentSourceRoots.get(plugin.name) ?? plugin.path;
-		const agentLinks = await linkCachedPluginAgents({ codexHome, pluginRoot, platform });
+		const agentLinks = await linkCachedPluginAgents({ codexHome, pluginRoot, platform, preservedReasoning });
 		for (const link of agentLinks) {
 			log(`Linked agent ${link.name} -> ${link.target}`);
 			const agentName = agentNameFromToml(link.name);
@@ -223,6 +227,36 @@ function nonEmptyEnvValue(env, key) {
 
 function legacyCacheMarketplaces(marketplaceName) {
 	return marketplaceName === "sisyphuslabs" ? SISYPHUS_LEGACY_CACHE_MARKETPLACES : [];
+}
+
+async function writeLazyCodexInstallSnapshot({ pluginRoot, repoRoot }) {
+	const manifest = await readDistributionManifest(repoRoot);
+	if (manifest === undefined) return;
+	await writeFile(
+		join(pluginRoot, "lazycodex-install.json"),
+		`${JSON.stringify(
+			{
+				packageName: manifest.name,
+				version: manifest.version,
+			},
+			null,
+			"\t",
+		)}\n`,
+	);
+}
+
+async function readDistributionManifest(repoRoot) {
+	try {
+		const parsed = JSON.parse(await readFile(join(repoRoot, "package.json"), "utf8"));
+		if (typeof parsed.version !== "string" || parsed.version.trim().length === 0) return undefined;
+		return {
+			name: typeof parsed.name === "string" && parsed.name.trim().length > 0 ? parsed.name.trim() : "lazycodex-ai",
+			version: parsed.version.trim(),
+		};
+	} catch (error) {
+		if (error instanceof Error) return undefined;
+		throw error;
+	}
 }
 
 export function resolveDefaultRepoRoot() {
