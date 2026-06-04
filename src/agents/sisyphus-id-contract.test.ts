@@ -1,11 +1,24 @@
 /// <reference types="bun-types" />
 
 import { describe, expect, test } from "bun:test"
+import { buildKimiK26SisyphusJuniorPrompt } from "./sisyphus-junior/kimi-k2-6"
 import { buildClaudeOpus47SisyphusPrompt } from "./sisyphus/claude-opus-4-7"
 import { buildDefaultSisyphusPrompt } from "./sisyphus/default"
 import { buildGpt54SisyphusPrompt } from "./sisyphus/gpt-5-4"
 import { buildGpt55SisyphusPrompt } from "./sisyphus/gpt-5-5"
 import { buildKimiK26SisyphusPrompt } from "./sisyphus/kimi-k2-6"
+
+function expectKimiToolLoopGuardrail(prompt: string): void {
+  const guardrail = prompt.match(/<tool_loop_guard>[\s\S]*?<\/tool_loop_guard>/)?.[0] ?? ""
+
+  expect(guardrail).toContain("<tool_loop_guard>")
+  expect(guardrail).toMatch(/\bsame tool\b/i)
+  expect(guardrail).toMatch(/\bsame arguments\b/i)
+  expect(guardrail).toMatch(/\btwice\b|\b2\b/i)
+  expect(guardrail).toMatch(/\bthird\b|\b3\b/i)
+  expect(guardrail).toMatch(/\bstop\b/i)
+  expect(guardrail).toMatch(/\bloop\b/i)
+}
 
 describe("Sisyphus background task ID guidance", () => {
   const promptBuilders = [
@@ -42,14 +55,16 @@ describe("Sisyphus background task ID guidance", () => {
   })
 })
 
-describe("Sisyphus GPT-5.5 file-reference guidance", () => {
-  test("#given GPT-5.5 Sisyphus prompt #when a user mentions a file path #then routing is not blocked by mandatory reads", () => {
-    // given, when
-    const prompt = buildGpt55SisyphusPrompt("gpt-5.5", [])
+describe("Kimi tool-call loop guardrails", () => {
+  test("#given Kimi Sisyphus prompt #when tool use is described #then identical tool calls are bounded", () => {
+    const prompt = buildKimiK26SisyphusPrompt("opencode-go/kimi-k2.6", [])
 
-    // then
-    expect(prompt).not.toContain("read it before answering, routing, or editing")
-    expect(prompt).toMatch(/specific readable file path[\s\S]*before making file-content claims or edits/)
-    expect(prompt).toMatch(/Do not treat incidental file-path mentions[\s\S]*block intent routing/)
+    expectKimiToolLoopGuardrail(prompt)
+  })
+
+  test("#given Kimi Sisyphus-Junior prompt #when tool use is described #then identical tool calls are bounded", () => {
+    const prompt = buildKimiK26SisyphusJuniorPrompt(false)
+
+    expectKimiToolLoopGuardrail(prompt)
   })
 })
