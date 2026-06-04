@@ -1,7 +1,7 @@
 // postinstall.mjs
 // Runs after npm install to verify platform binary is available
 
-import { readFileSync, readdirSync, rmSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, rmSync } from "node:fs";
 import { createRequire } from "node:module";
 import { homedir } from "node:os";
 import { join } from "node:path";
@@ -76,7 +76,7 @@ function getLibcFamily() {
   if (process.platform !== "linux") {
     return undefined;
   }
-  
+
   try {
     const detectLibc = require("detect-libc");
     return detectLibc.familySync();
