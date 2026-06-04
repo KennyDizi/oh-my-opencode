@@ -1,7 +1,7 @@
 import type { AgentConfig } from "@opencode-ai/sdk";
 import { createAgentToolRestrictions } from "../shared/permission-compat";
 import type { AgentMode, AgentPromptMetadata } from "./types";
-import { isGpt5_5Model, isGptModel } from "./types";
+import { buildClaudeThinkingConfig, isGpt5_5Model, isGptModel } from "./types";
 
 const MODE: AgentMode = "subagent";
 
@@ -546,7 +546,7 @@ export function createOracleAgent(model: string): AgentConfig {
 
   return {
     ...base,
-    thinking: { type: "enabled", budgetTokens: 32000 },
+    ...buildClaudeThinkingConfig(model),
   } as AgentConfig;
 }
 createOracleAgent.mode = MODE;

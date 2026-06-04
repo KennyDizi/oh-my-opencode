@@ -1,7 +1,7 @@
 import type { AgentConfig } from "@opencode-ai/sdk";
 import { createAgentToolRestrictions } from "../shared/permission-compat";
 import type { AgentMode, AgentPromptMetadata } from "./types";
-import { isGptModel } from "./types";
+import { buildClaudeThinkingConfig, isGptModel } from "./types";
 
 const MODE: AgentMode = "subagent";
 
@@ -329,7 +329,7 @@ export function createMomusAgent(model: string): AgentConfig {
 
   return {
     ...base,
-    thinking: { type: "enabled", budgetTokens: 32000 },
+    ...buildClaudeThinkingConfig(model),
   } as AgentConfig;
 }
 createMomusAgent.mode = MODE;

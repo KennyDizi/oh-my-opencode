@@ -13,7 +13,7 @@ import {
   latestAssistantTurnBlocksInternalPrompt,
   latestAssistantTurnHasUnansweredQuestion,
 } from "../../shared/prompt-async-gate/pending-tool-turn"
-import type { PromptDispatchClient } from "../../shared/prompt-async-gate/types"
+import { PromptDispatchClient } from "../../shared/prompt-async-gate/types"
 import {
   cloneParentWake,
   isRedundantParentWake,
@@ -21,6 +21,12 @@ import {
   type ParentWakePromptContext,
   type PendingParentWake,
 } from "./parent-wake-dedupe"
+import {
+  createEmptyAssistantTurnRetryDedupeKey,
+  latestAssistantTurnHasFreshToolActivity,
+  latestAssistantTurnHasToolBlock,
+  latestAssistantTurnIsCompletedEmptyNoProgress,
+} from "./parent-wake-history-state"
 import { getParentWakeMessageCreatedAt } from "./parent-wake-message-activity"
 
 type OpencodeClient = PluginInput["client"]
@@ -186,6 +192,7 @@ export class ParentWakeNotifier {
       return
     }
 
+    const emptyAssistantTurnRetry = latestWake.allowEmptyAssistantTurnRetry === true
     const toolWaitDecision = await this.shouldDeferParentWakeForSessionHistory(sessionID, latestWake)
     if (toolWaitDecision.defer) {
       this.schedulePendingParentWakeFlush(sessionID)
@@ -225,6 +232,7 @@ export class ParentWakeNotifier {
         client: this.deps.client,
         sessionID,
         source: "background-agent-parent-wake",
+        ...(emptyAssistantTurnRetry ? { dedupeKey: createEmptyAssistantTurnRetryDedupeKey(latestWake) } : {}),
         settleMs: 0,
         queueBehavior: "defer",
         checkStatus: true,
@@ -277,6 +285,7 @@ export class ParentWakeNotifier {
         return
       }
       log("[background-agent] Sent deferred parent wake:", { sessionID })
+      delete latestWake.allowEmptyAssistantTurnRetry
       this.trackDispatchedParentWake(sessionID, latestWake, dispatchStartedAt)
     } catch (error) {
       this.requeueWake(sessionID, latestWake)
@@ -318,6 +327,20 @@ export class ParentWakeNotifier {
       sessionID,
       reason,
     })
+    return true
+  }
+
+  requeueDispatchedParentWakeAfterEmptyAssistantTurn(sessionID: string): boolean {
+    const wake = this.dispatchedParentWakes.get(sessionID)
+    if (!wake) {
+      return false
+    }
+
+    this.clearDispatchedParentWake(sessionID)
+    wake.allowEmptyAssistantTurnRetry = true
+    this.requeueWake(sessionID, wake)
+    this.schedulePendingParentWakeFlush(sessionID, 0)
+    log("[background-agent] Requeued dispatched parent wake after empty assistant turn:", { sessionID })
     return true
   }
 
@@ -512,15 +535,29 @@ export class ParentWakeNotifier {
     const latestAssistantHasUnansweredQuestion = latestAssistantTurnHasUnansweredQuestion(messages)
     if (!latestAssistantBlocksPrompt) {
       delete wake.toolCallDeferralStartedAt
+      delete wake.allowEmptyAssistantTurnRetry
       return { defer: false, skipPromptGateToolStateCheck: false }
     }
     const now = Date.now()
     wake.toolCallDeferralStartedAt ??= now
+    if (wake.allowEmptyAssistantTurnRetry && latestAssistantTurnIsCompletedEmptyNoProgress(messages)) {
+      log("[background-agent] Retrying parent wake after completed empty assistant turn:", { sessionID })
+      return { defer: false, skipPromptGateToolStateCheck: true }
+    }
     if (latestAssistantHasUnansweredQuestion) {
       log("[background-agent] Deferred parent wake because latest assistant question awaits user response:", {
         sessionID,
       })
       return { defer: true, skipPromptGateToolStateCheck: false }
+    }
+    if (
+      now - wake.toolCallDeferralStartedAt >= this.options.toolCallDeferMaxMs
+      && latestAssistantTurnHasToolBlock(messages)
+      && !latestAssistantTurnHasFreshToolActivity(messages, now, this.options.toolCallDeferMaxMs)
+    ) {
+      delete wake.toolCallDeferralStartedAt
+      log("[background-agent] Retrying parent wake after stale tool-call deferral:", { sessionID })
+      return { defer: false, skipPromptGateToolStateCheck: true }
     }
     log("[background-agent] Deferred parent wake because latest assistant turn blocks internal prompts:", {
       sessionID,
@@ -559,6 +596,7 @@ export class ParentWakeNotifier {
       pendingWake.shouldReply = pendingWake.shouldReply || latestWake.shouldReply
       pendingWake.promptContext = latestWake.promptContext
       pendingWake.toolCallDeferralStartedAt ??= latestWake.toolCallDeferralStartedAt
+      pendingWake.allowEmptyAssistantTurnRetry ||= latestWake.allowEmptyAssistantTurnRetry
       return
     }
     this.pendingParentWakes.set(sessionID, cloneParentWake(latestWake))
