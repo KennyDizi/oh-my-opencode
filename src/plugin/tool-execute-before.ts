@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto"
 import type { PluginContext } from "./types"
 
 import { clearBoulderState } from "../features/boulder-state"
-import { parseRalphLoopArguments } from "../hooks/ralph-loop/command-arguments"
+import { isRalphLoopResumeArgument, parseRalphLoopArguments } from "../hooks/ralph-loop/command-arguments"
 import { ULTRAWORK_VERIFICATION_PROMISE } from "../hooks/ralph-loop/constants"
 import { readState, writeState } from "../hooks/ralph-loop/storage"
 import { log, replaceToolArgs } from "../shared"
@@ -168,24 +168,30 @@ export function createToolExecuteBeforeHandler(args: {
       if (command === "ralph-loop" && sessionID) {
         const rawArgs = getLoopCommandArguments(output.args, "ralph-loop")
         const parsedArguments = parseRalphLoopArguments(rawArgs)
-
-        hooks.ralphLoop.startLoop(sessionID, parsedArguments.prompt, {
-          maxIterations: parsedArguments.maxIterations,
-          completionPromise: parsedArguments.completionPromise,
-          strategy: parsedArguments.strategy,
-        })
+        const resumed = isRalphLoopResumeArgument(rawArgs)
+          && hooks.ralphLoop.resumeLoop?.(sessionID) === true
+        if (!resumed) {
+          hooks.ralphLoop.startLoop(sessionID, parsedArguments.prompt, {
+            maxIterations: parsedArguments.maxIterations,
+            completionPromise: parsedArguments.completionPromise,
+            strategy: parsedArguments.strategy,
+          })
+        }
       } else if (command === "cancel-ralph" && sessionID) {
         hooks.ralphLoop.cancelLoop(sessionID)
       } else if (command === "ulw-loop" && sessionID) {
         const rawArgs = getLoopCommandArguments(output.args, "ulw-loop")
         const parsedArguments = parseRalphLoopArguments(rawArgs)
-
-        hooks.ralphLoop.startLoop(sessionID, parsedArguments.prompt, {
-          ultrawork: true,
-          maxIterations: parsedArguments.maxIterations,
-          completionPromise: parsedArguments.completionPromise,
-          strategy: parsedArguments.strategy,
-        })
+        const resumed = isRalphLoopResumeArgument(rawArgs)
+          && hooks.ralphLoop.resumeLoop?.(sessionID) === true
+        if (!resumed) {
+          hooks.ralphLoop.startLoop(sessionID, parsedArguments.prompt, {
+            ultrawork: true,
+            maxIterations: parsedArguments.maxIterations,
+            completionPromise: parsedArguments.completionPromise,
+            strategy: parsedArguments.strategy,
+          })
+        }
       }
     }
 
