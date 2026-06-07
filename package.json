@@ -116,7 +116,7 @@
     "jsonc-parser": "^3.3.1",
     "picocolors": "^1.1.1",
     "picomatch": "^4.0.4",
-    "posthog-node": "^5.36.3",
+    "posthog-node": "^5.36.4",
     "vscode-jsonrpc": "^9.0.0",
     "zod-to-json-schema": "^3.25.2"
   },
