@@ -26,7 +26,6 @@ import {
   buildAntiDuplicationSection,
   buildAntiPatternsSection,
   buildCategorySkillsDelegationGuide,
-  buildConsensusSection,
   buildDelegationTable,
   buildExploreSection,
   buildHardBlocksSection,
@@ -62,7 +61,6 @@ export function buildClaudeOpus47SisyphusPrompt(
   );
   const delegationTable = buildDelegationTable(availableAgents);
   const oracleSection = buildOracleSection(availableAgents);
-  const consensusSection = buildConsensusSection(availableTools);
   const hardBlocks = buildHardBlocksSection();
   const antiPatterns = buildAntiPatternsSection();
   const parallelDelegationSection = buildParallelDelegationSection(model, availableCategories);
@@ -407,8 +405,6 @@ If verification fails: fix issues YOU caused. Do NOT fix pre-existing issues unl
 </behavior_instructions>
 
 ${oracleSection}
-
-${consensusSection}
 
 ${taskManagementSection}
 
