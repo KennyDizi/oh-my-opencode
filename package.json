@@ -107,7 +107,7 @@
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@opencode-ai/plugin": "^1.16.2",
     "@opencode-ai/sdk": "^1.16.2",
-    "ai": "^6.0.197",
+    "ai": "^6.0.198",
     "codex": "^0.2.3",
     "commander": "^15.0.0",
     "detect-libc": "^2.1.2",
@@ -116,12 +116,12 @@
     "jsonc-parser": "^3.3.1",
     "picocolors": "^1.1.1",
     "picomatch": "^4.0.4",
-    "posthog-node": "^5.36.4",
+    "posthog-node": "^5.36.6",
     "vscode-jsonrpc": "^9.0.0",
     "zod-to-json-schema": "^3.25.2"
   },
   "devDependencies": {
-    "@microsoft/api-extractor": "^7.58.7",
+    "@microsoft/api-extractor": "^7.58.8",
     "@rushstack/node-core-library": "^5.23.1",
     "@rushstack/problem-matcher": "^0.2.1",
     "@rushstack/terminal": "^0.24.0",
@@ -165,7 +165,7 @@
     "oh-my-opencode-windows-x64-baseline": "4.8.0"
   },
   "overrides": {
-    "hono": "^4.12.23",
+    "hono": "^4.12.24",
     "@hono/node-server": "^2.0.4",
     "express-rate-limit": "^8.5.2",
     "fast-uri": "^3.1.2",
