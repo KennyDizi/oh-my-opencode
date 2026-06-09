@@ -145,7 +145,7 @@
     "@types/node": "^25.9.2",
     "@types/picomatch": "^4.0.3",
     "bun-types": "^1.3.14",
-    "electron-to-chromium": "^1.5.368",
+    "electron-to-chromium": "^1.5.369",
     "github-flavored-markdown": "^1.0.1",
     "lru-cache": "^11.5.1",
     "rimraf": "^6.1.3",
@@ -165,7 +165,7 @@
     "oh-my-opencode-windows-x64-baseline": "4.8.1"
   },
   "overrides": {
-    "hono": "^4.12.24",
+    "hono": "^4.12.25",
     "@hono/node-server": "^2.0.4",
     "express-rate-limit": "^8.5.2",
     "fast-uri": "^3.1.2",
