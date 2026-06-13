@@ -114,7 +114,7 @@
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@opencode-ai/plugin": "^1.17.4",
     "@opencode-ai/sdk": "^1.17.4",
-    "ai": "^6.0.203",
+    "ai": "^6.0.204",
     "codex": "^0.2.3",
     "commander": "^15.0.0",
     "detect-libc": "^2.1.2",
@@ -128,11 +128,11 @@
     "zod-to-json-schema": "^3.25.2"
   },
   "devDependencies": {
-    "@microsoft/api-extractor": "^7.58.8",
+    "@microsoft/api-extractor": "^7.58.9",
     "@rushstack/node-core-library": "^5.23.1",
     "@rushstack/problem-matcher": "^0.2.1",
     "@rushstack/terminal": "^0.24.0",
-    "@rushstack/ts-command-line": "^5.3.9",
+    "@rushstack/ts-command-line": "^5.3.10",
     "@types/jest": "^30.0.0",
     "@oh-my-opencode/ast-grep-core": "workspace:*",
     "@oh-my-opencode/ast-grep-mcp": "workspace:*",
