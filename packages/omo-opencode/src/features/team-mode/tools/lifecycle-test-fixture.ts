@@ -5,10 +5,10 @@ import { randomUUID } from "node:crypto";
 
 import type { ToolContext, ToolResult } from "@opencode-ai/plugin/tool";
 
-import { TeamModeConfigSchema } from "../../../config/schema/team-mode";
-import type { OpencodeClient } from "../../../tools/delegate-task/types";
-import type { BackgroundManager } from "../../background-agent/manager";
-import type { RuntimeState, TeamSpec } from "../types";
+import { TeamModeConfigSchema } from "../../../config/schema/team-mode"
+import type { OpencodeClient } from "../../../tools/delegate-task/types"
+import type { BackgroundManager } from "../../background-agent/manager"
+import type { RuntimeState, TeamSpec } from "@oh-my-opencode/team-core/types"
 
 const runtimes = new Map<string, RuntimeState>()
 const teamRuns = new Map<string, string>()
