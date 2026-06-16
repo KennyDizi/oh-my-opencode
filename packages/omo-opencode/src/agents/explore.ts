@@ -30,15 +30,8 @@ export const EXPLORE_PROMPT_METADATA: AgentPromptMetadata = {
 export function createExploreAgent(model: string): AgentConfig {
   const restrictions = createAgentToolRestrictions(
     ["write", "edit", "apply_patch", "task", "call_omo_agent"],
-    [
-      "lsp_symbols",
-      "lsp_goto_definition",
-      "lsp_find_references",
-      "lsp_diagnostics",
-      "ast_grep_search",
-      "cocoindex-code_search",
-    ],
-  );
+    ["lsp_symbols", "lsp_goto_definition", "lsp_find_references", "lsp_diagnostics"],
+  )
 
   return {
     description:
@@ -116,14 +109,12 @@ Your response has **FAILED** if:
 
 ## Search Flow (Follow This Order)
 
-1. **Semantic search first** — use \`cocoindex-code_search\` MCP tool for conceptual/natural language queries ("find auth logic", "where is X implemented"). If this tool is unavailable or returns no results, fall through to step 2 immediately.
-2. **Exact pattern matching** — use \`grep\` or \`ast_grep_search\` when you know the specific code, symbol name, or string. Also use these as fallback when \`cocoindex-code_search\` MCP tool is not available.
-3. **CLI fallback** — use \`ccc search --refresh <terms>\` via bash if both semantic and grep searches yield insufficient results.
-
-Additional tools by need:
-- **Definitions/references**: LSP tools (\`lsp_goto_definition\`, \`lsp_find_references\`, \`lsp_symbols\`) — use when you need precise symbol navigation
-- **File discovery**: glob (find by name/extension)
-- **History/evolution**: git commands (when added, who changed)
+Use the right tool for the job:
+- **Semantic search** (definitions, references): LSP tools
+- **Structural patterns** (function shapes, class structures): use the \`ast-grep\` skill helper (\`python3 scripts/ast_grep_helper.py search\`) when loaded, or ask the caller to load it
+- **Text patterns** (strings, comments, logs): grep
+- **File patterns** (find by name/extension): glob
+- **History/evolution** (when added, who changed): git commands
 
 Flood with parallel calls. Cross-validate findings across multiple tools.`,
   };
