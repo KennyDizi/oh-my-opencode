@@ -211,5 +211,8 @@
     "@ast-grep/cli",
     "@ast-grep/napi",
     "@code-yeongyu/comment-checker"
-  ]
+  ],
+  "allowScripts": {
+    "file:../.bun/@code-yeongyu+comment-checker@0.8.0/node_modules/@code-yeongyu/comment-checker": true
+  }
 }
