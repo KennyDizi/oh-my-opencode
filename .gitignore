@@ -66,3 +66,4 @@ plans/
 .claude/*
 !.claude/skills
 !.claude/commands
+!.claude/settings.json
