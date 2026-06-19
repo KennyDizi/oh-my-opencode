@@ -193,6 +193,27 @@ test("#given an initialized team #when init re-runs #then it is a resume-safe no
 	}
 });
 
+test("#given status #when the team has fewer than two members #then it warns that a team needs at least two", async () => {
+	// given
+	const dir = await mkTmp();
+	try {
+		runCli(["init", "--name", "Crew", "--session-name", "sess", "--session", "demo"], dir);
+		runCli(["add-member", "--team", "demo", "--id", "A", "--focus", "x", "--lens", "area", "--deliverable", "d"], dir);
+
+		// when --- one member only
+		const one = runCli(["status", "--team", "demo"], dir);
+		// and --- a second, distinct member
+		runCli(["add-member", "--team", "demo", "--id", "B", "--focus", "y", "--lens", "perspective", "--deliverable", "d"], dir);
+		const two = runCli(["status", "--team", "demo"], dir);
+
+		// then
+		assert.match(one.stdout, /at least (?:two|2)/i, "a one-member team is flagged understaffed");
+		assert.doesNotMatch(two.stdout, /at least (?:two|2)/i, "a two-member team is not flagged");
+	} finally {
+		await rm(dir, { recursive: true, force: true });
+	}
+});
+
 test("#given a symlinked .omo/teams #when init runs #then it refuses before writing through the symlink", async (t) => {
 	// given
 	if (!(await canCreateSymlink())) {
@@ -215,5 +236,32 @@ test("#given a symlinked .omo/teams #when init runs #then it refuses before writ
 	} finally {
 		await rm(dir, { recursive: true, force: true });
 		await rm(outside, { recursive: true, force: true });
+	}
+});
+
+test("#given team.mjs invoked through a symlinked scripts dir #when init runs #then the main guard still fires", async (t) => {
+	// given --- mirror a symlinked install: the skills dir is a symlink to the repo, so the
+	// script is invoked through a symlink path while node resolves its module url to the realpath.
+	if (!(await canCreateSymlink())) {
+		t.skip("symbolic links are unavailable in this environment");
+		return;
+	}
+	const dir = await mkTmp();
+	try {
+		const linkedScripts = join(dir, "linked-scripts");
+		await symlink(join(root, "skills", "teammode", "scripts"), linkedScripts, "dir");
+
+		// when --- run the script through the symlink path
+		const res = spawnSync(
+			process.execPath,
+			[join(linkedScripts, "team.mjs"), "init", "--name", "Crew", "--session-name", "s", "--session", "demo"],
+			{ cwd: dir, encoding: "utf8" },
+		);
+
+		// then --- main() runs (the guard matches by realpath, not the literal argv path)
+		assert.equal(res.status, 0, res.stderr);
+		assert.match(res.stdout, /created:/, "the script executes when invoked via a symlinked scripts dir");
+	} finally {
+		await rm(dir, { recursive: true, force: true });
 	}
 });

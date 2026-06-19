@@ -17,8 +17,9 @@
 //   node "<skill-root>/scripts/team.mjs" guide        --team <id>
 
 import { randomUUID } from "node:crypto";
+import { realpathSync } from "node:fs";
 import { rm, writeFile } from "node:fs/promises";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { buildGuide, buildMemberPrompt } from "./team-guide.mjs";
 import {
 	addMember,
@@ -26,6 +27,8 @@ import {
 	bindThread,
 	buildTeam,
 	ensureTeamDir,
+	isUnderstaffed,
+	MIN_MEMBERS,
 	readTeam,
 	resolveTeamDir,
 	setMemberStatus,
@@ -165,6 +168,11 @@ const handlers = {
 		for (const m of team.members) {
 			process.stdout.write(`  ${m.id} (${m.lens}) ${m.focus} -> ${m.deliverable || "(no deliverable)"} [${m.status}]${m.threadId ? ` thread=${m.threadId}` : ""}${m.cwd ? ` cwd=${m.cwd}` : ""}\n`);
 		}
+		if (isUnderstaffed(team)) {
+			process.stdout.write(
+				`WARNING: a team needs at least ${MIN_MEMBERS} members; this team has ${team.members.length}. A single-member team is not a team - add another distinct slice or use a subagent.\n`,
+			);
+		}
 	},
 
 	async guide(cwd, flags) {
@@ -184,7 +192,20 @@ async function main() {
 	await handler(process.cwd(), parseFlags(rest));
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+// Symlink-robust main-module check: a symlinked install invokes this file through a symlink
+// path while node resolves import.meta.url to the realpath, so compare the resolved real paths
+// (falling back to the literal url comparison if a path cannot be resolved).
+function isInvokedAsScript() {
+	const entry = process.argv[1];
+	if (!entry) return false;
+	try {
+		return realpathSync(fileURLToPath(import.meta.url)) === realpathSync(entry);
+	} catch {
+		return import.meta.url === pathToFileURL(entry).href;
+	}
+}
+
+if (isInvokedAsScript()) {
 	await main().catch((error) => {
 		process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
 		process.exit(1);
