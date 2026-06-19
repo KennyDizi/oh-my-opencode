@@ -7104,7 +7104,7 @@ async function rewriteCachedManifestRoot(pluginRoot, fromRoot, toRoot) {
 // packages/omo-codex/src/install/codex-hook-targets.ts
 import { readFile as readFile6 } from "node:fs/promises";
 import { join as join8, sep as sep4 } from "node:path";
-var PLUGIN_ROOT_TARGET_PATTERN = /\$\{PLUGIN_ROOT\}\/([^"']+)/g;
+var PLUGIN_ROOT_TARGET_PATTERN = /\$\{PLUGIN_ROOT\}[\\/]+([^"']+)/g;
 async function findMissingHookCommandTargets(pluginRoot) {
   const commands = [];
   for (const manifestPath of await hookManifestPaths(pluginRoot)) {
@@ -7120,7 +7120,7 @@ async function findMissingHookCommandTargets(pluginRoot) {
       const targetSuffix = match[1];
       if (targetSuffix === undefined)
         continue;
-      const target = join8(pluginRoot, ...targetSuffix.split("/"));
+      const target = join8(pluginRoot, ...targetSuffix.split(/[\\/]+/));
       if (seen.has(target))
         continue;
       seen.add(target);
@@ -7165,6 +7165,8 @@ function collectCommands(value, commands) {
     return;
   if (value["type"] === "command" && typeof value["command"] === "string")
     commands.push(value["command"]);
+  if (value["type"] === "command" && typeof value["commandWindows"] === "string")
+    commands.push(value["commandWindows"]);
   for (const entry of Object.values(value))
     collectCommands(entry, commands);
 }
