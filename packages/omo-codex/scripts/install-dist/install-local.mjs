@@ -6115,7 +6115,7 @@ function createPostHogClient(source, options = {}) {
     osProvider: options.osProvider ?? resolveOsProvider(),
     product: createCodexTelemetryProductConfig(),
     source,
-    transportFactory: options.transportFactory
+    transportFactory: options.transportFactory ?? transportFactoryOverride ?? undefined
   });
   if (!client.enabled) {
     return NO_OP_POSTHOG;
@@ -6166,7 +6166,7 @@ function __setActivityStateProviderForTesting(provider) {
 function __resetActivityStateProviderForTesting() {
   activityStateProviderOverride = null;
 }
-var osProviderOverride2 = null, activityStateProviderOverride = null, NO_OP_POSTHOG;
+var osProviderOverride2 = null, activityStateProviderOverride = null, transportFactoryOverride = null, NO_OP_POSTHOG;
 var init_posthog = __esm(() => {
   init_src();
   init_diagnostics2();
