@@ -187,7 +187,7 @@
     "oh-my-opencode-windows-x64-baseline": "4.13.0"
   },
   "overrides": {
-    "hono": "^4.12.26",
+    "hono": "^4.12.27",
     "@hono/node-server": "^2.0.6",
     "express-rate-limit": "^8.5.2",
     "fast-uri": "^4.0.0",
