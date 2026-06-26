@@ -12900,6 +12900,13 @@ function messageIsTerminalNoReplyUser(message) {
   const initiatorMessage = toInternalInitiatorMessageLike(message);
   return initiatorMessage !== undefined && isTerminalNoReplyUserMessage(initiatorMessage);
 }
+function messageHasInternalInitiatorMarker(message) {
+  const initiatorMessage = toInternalInitiatorMessageLike(message);
+  if (initiatorMessage === undefined) {
+    return false;
+  }
+  return (initiatorMessage.parts ?? []).some((part) => part.type === "text" && typeof part.text === "string" && hasInternalInitiatorMarker(part.text));
+}
 var QUESTION_TOOL_NAMES = new Set(["question", "ask_user_question", "askuserquestion"]);
 function partToolName(part) {
   if (typeof part.name === "string") {
@@ -13072,6 +13079,9 @@ function latestAssistantTurnBlocksInternalPrompt(messages) {
           continue;
         }
         if (!sawAssistantAfterLatestUser) {
+          if (messageHasInternalInitiatorMarker(message)) {
+            continue;
+          }
           return true;
         }
         continue;
