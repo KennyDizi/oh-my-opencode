@@ -6739,6 +6739,20 @@ async function linkCachedPluginBins(input) {
   }
   return linked;
 }
+async function removeCachedManagedNpmBinShims(pluginRoot) {
+  const binLinks = await discoverPackageBins(pluginRoot);
+  if (binLinks.length === 0)
+    return;
+  const npmBinDir = join4(pluginRoot, "node_modules", ".bin");
+  if (!await isFileSystemEntry(npmBinDir))
+    return;
+  const managedBinNames = new Set(binLinks.map((link) => link.name));
+  for (const name of managedBinNames) {
+    for (const suffix of ["", ".cmd", ".ps1"]) {
+      await rm2(join4(npmBinDir, `${name}${suffix}`), { force: true });
+    }
+  }
+}
 async function linkRootRuntimeBin(input) {
   const cliPath = join4(input.repoRoot, "dist", "cli", "index.js");
   if (!await isFile(cliPath))
@@ -6769,6 +6783,16 @@ async function linkCachedPluginBin(binDir, link, platform) {
 async function isFile(path) {
   try {
     return (await stat(path)).isFile();
+  } catch (error) {
+    if (isNodeErrorWithCode(error) && error.code === "ENOENT")
+      return false;
+    throw error;
+  }
+}
+async function isFileSystemEntry(path) {
+  try {
+    await stat(path);
+    return true;
   } catch (error) {
     if (isNodeErrorWithCode(error) && error.code === "ENOENT")
       return false;
@@ -7407,6 +7431,7 @@ async function installCachedPlugin(input) {
     await rewriteCachedPackageLocalFileDependencies(tempPath, input.sourcePath);
     await copyBundledMcpRuntimeDists({ pluginRoot: tempPath, sourceRoot: input.sourcePath });
     await maybeRunNpmInstall(tempPath, input.runCommand, ["ci", "--omit=dev"]);
+    await removeCachedManagedNpmBinShims(tempPath);
     if (input.buildSource === false)
       await maybeRunNpmSyncSkills(tempPath, input.runCommand);
     await rewriteCachedMcpManifest(tempPath, input.sourcePath);
@@ -8434,27 +8459,47 @@ function isRootSetting2(line, key) {
 var CODEX_MULTI_AGENT_V2_HEADER = "features.multi_agent_v2";
 var CODEX_MULTI_AGENT_V2_MAX_CONCURRENT_THREADS_PER_SESSION = 1e4;
 function ensureCodexMultiAgentV2Config(config) {
-  const normalizedConfig = removeLegacyAgentsMaxThreadsSetting(removeFeatureFlagSetting(config, "multi_agent_v2"));
+  const featureFlag = removeFeatureFlagSetting(config, "multi_agent_v2");
+  const normalizedConfig = removeLegacyAgentsMaxThreadsSetting(featureFlag.config);
   const section = findTomlSection(normalizedConfig, CODEX_MULTI_AGENT_V2_HEADER);
   const maxThreadsValue = CODEX_MULTI_AGENT_V2_MAX_CONCURRENT_THREADS_PER_SESSION.toString();
   if (!section) {
+    const enabledSetting = featureFlag.value === false ? `enabled = false
+` : "";
     return appendBlock(normalizedConfig, `[${CODEX_MULTI_AGENT_V2_HEADER}]
+${enabledSetting}max_concurrent_threads_per_session = ${maxThreadsValue}
+`);
+  }
+  const withPreservedDisable = featureFlag.value === false ? replaceOrInsertSetting(normalizedConfig, section, "enabled", "false") : normalizedConfig;
+  const updatedSection = featureFlag.value === false ? findTomlSection(withPreservedDisable, CODEX_MULTI_AGENT_V2_HEADER) : section;
+  if (!updatedSection) {
+    return appendBlock(withPreservedDisable, `[${CODEX_MULTI_AGENT_V2_HEADER}]
+enabled = false
 max_concurrent_threads_per_session = ${maxThreadsValue}
 `);
   }
-  return replaceOrInsertSetting(normalizedConfig, section, "max_concurrent_threads_per_session", maxThreadsValue);
+  return replaceOrInsertSetting(withPreservedDisable, updatedSection, "max_concurrent_threads_per_session", maxThreadsValue);
 }
 function removeFeatureFlagSetting(config, featureName) {
   const section = findTomlSection(config, "features");
   if (!section)
-    return config;
-  return removeSetting(config, section, featureName);
+    return { config, value: null };
+  return {
+    config: removeSetting(config, section, featureName),
+    value: readBooleanSetting(section.text, featureName)
+  };
 }
 function removeLegacyAgentsMaxThreadsSetting(config) {
   const section = findTomlSection(config, "agents");
   if (!section)
     return config;
   return removeSetting(config, section, "max_threads");
+}
+function readBooleanSetting(sectionText, key) {
+  const match = new RegExp(`^\\s*${escapeRegExp(key)}\\s*=\\s*(true|false)\\s*(?:#.*)?$`, "m").exec(sectionText);
+  if (!match)
+    return null;
+  return match[1] === "true";
 }
 
 // packages/omo-codex/src/install/codex-config-toml.ts
