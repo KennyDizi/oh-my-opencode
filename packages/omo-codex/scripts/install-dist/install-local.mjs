@@ -6701,7 +6701,7 @@ function posixRuntimeWrapper(cliPath, codexHome, binDir, nodeCliPath) {
     `export CODEX_HOME="\${CODEX_HOME:-${escapedCodexHome}}"`,
     'if [ "$1" = "ulw-loop" ] && [ -x "' + escapedUlwLoopBin + '" ]; then',
     "  shift",
-    '  exec "' + escapedUlwLoopBin + '" "$@"',
+    '  exec "' + escapedUlwLoopBin + '" ulw-loop "$@"',
     "fi",
     `if [ "\${OMO_RUNTIME:-}" = "node" ] && [ -f "${nodeCli}" ]; then`,
     `  exec node "${nodeCli}" "$@"`,
@@ -6743,7 +6743,7 @@ function windowsRuntimeWrapper(cliPath, codexHome, binDir, nodeCliPath) {
     ...windowsNodeDiscoveryLines(),
     `if "%~1"=="ulw-loop" if exist "${ulwLoopBin}" (`,
     "  shift /1",
-    `  "${ulwLoopBin}" %*`,
+    `  "${ulwLoopBin}" ulw-loop %*`,
     "  exit /b %ERRORLEVEL%",
     ")",
     `if "%OMO_RUNTIME%"=="node" if defined OMO_NODE_BINARY if exist "${nodeCliPath}" (`,
@@ -7536,6 +7536,7 @@ async function installCachedPlugin(input) {
     await copyDirectory(input.sourcePath, tempPath);
     await rewriteCachedPackageLocalFileDependencies(tempPath, input.sourcePath);
     await copyBundledMcpRuntimeDists({ pluginRoot: tempPath, sourceRoot: input.sourcePath });
+    await copyRootRuntimeDists({ pluginRoot: tempPath, sourcePath: input.sourcePath });
     await maybeRunNpmInstall(tempPath, input.runCommand, ["ci", "--omit=dev"]);
     await removeCachedManagedNpmBinShims(tempPath);
     if (input.buildSource === false)
@@ -7617,6 +7618,29 @@ function shouldCopyPluginPath(path, root) {
     return true;
   const parts = relative4.split(sep5);
   return !parts.some((part) => part === ".git" || part === "node_modules");
+}
+async function copyRootRuntimeDists(input) {
+  const repoRoot = repoRootForCodexPluginSource(input.sourcePath);
+  if (repoRoot === null)
+    return;
+  for (const runtimePath of ["dist/cli", "dist/cli-node"]) {
+    const sourcePath = join11(repoRoot, runtimePath);
+    if (!await fileExistsStrict(join11(sourcePath, "index.js")))
+      continue;
+    await mkdir3(dirname4(join11(input.pluginRoot, runtimePath)), { recursive: true });
+    await cp2(sourcePath, join11(input.pluginRoot, runtimePath), { recursive: true });
+  }
+}
+function repoRootForCodexPluginSource(sourcePath) {
+  const codexPackageRoot = dirname4(sourcePath);
+  const packagesRoot = dirname4(codexPackageRoot);
+  if (basename3(sourcePath) !== "plugin")
+    return null;
+  if (basename3(codexPackageRoot) !== "omo-codex")
+    return null;
+  if (basename3(packagesRoot) !== "packages")
+    return null;
+  return dirname4(packagesRoot);
 }
 // packages/omo-codex/src/install/codex-cache-prune.ts
 import { lstat as lstat4, readdir as readdir3, rm as rm4, stat as stat3 } from "node:fs/promises";
@@ -8211,7 +8235,7 @@ function ensureMarketplaceBlock(config, marketplaceName, source) {
 }
 
 // packages/omo-codex/src/install/codex-config-permissions.ts
-var AUTONOMOUS_FEATURES = ["multi_agent", "child_agents_md", "unified_exec", "goals"];
+var AUTONOMOUS_FEATURES = ["multi_agent", "unified_exec", "goals"];
 function ensureAutonomousPermissions(config) {
   let next = replaceOrInsertRootSetting(config, "approval_policy", JSON.stringify("never"));
   next = replaceOrInsertRootSetting(next, "sandbox_mode", JSON.stringify("danger-full-access"));
@@ -8631,7 +8655,6 @@ async function updateCodexConfig(input) {
   config = ensureFeatureEnabled(config, "plugins");
   config = ensureFeatureEnabled(config, "plugin_hooks");
   config = ensureFeatureEnabled(config, "multi_agent");
-  config = ensureFeatureEnabled(config, "child_agents_md");
   config = removeUnsupportedCodexMultiAgentModeConfig(config);
   config = ensureCodexReasoningConfig(config, await readCodexModelCatalog(input.repoRoot));
   config = ensureCodexMultiAgentV2Config(config);
@@ -14147,7 +14170,9 @@ function codexMarketplaceSource(marketplaceRoot) {
 }
 
 // packages/omo-codex/src/install/lazycodex-cli-args.ts
-var CODEX_ONLY_ERROR = "lazycodex-ai installs the Codex Light edition only. Use the omo installer for OpenCode or both-platform installs.";
+var LAZYCODEX_INSTALL_TARGETS = ["codex", "claude-code", "gemini"];
+var ALL_PLATFORM_ALIASES = new Set(["all", "all-platforms", "multi", "*"]);
+var LAZYCODEX_INSTALL_TARGET_SET = new Set(LAZYCODEX_INSTALL_TARGETS);
 var PASSTHROUGH_COMMANDS = new Set([
   "doctor",
   "cleanup",
@@ -14159,14 +14184,24 @@ var PASSTHROUGH_COMMANDS = new Set([
 ]);
 function parseLazyCodexInstallCliArgs(argv) {
   const args = [...argv];
-  if (args.length === 0)
-    return { kind: "install", autonomousPermissions: undefined, repoRoot: undefined };
+  if (args.length === 0) {
+    return {
+      kind: "install",
+      targets: [...LAZYCODEX_INSTALL_TARGETS],
+      noTui: false,
+      skipAuth: false,
+      autonomousPermissions: undefined,
+      repoRoot: undefined
+    };
+  }
   let repoRoot;
   let command;
   let dryRun = false;
   let noTui = false;
   let skipAuth = false;
   let autonomousPermissions;
+  let allPlatforms = false;
+  const platforms = [];
   let index = 0;
   while (index < args.length) {
     const arg = args[index];
@@ -14199,10 +14234,19 @@ function parseLazyCodexInstallCliArgs(argv) {
       index += 1;
       continue;
     }
+    if (arg === "--all-platforms") {
+      allPlatforms = true;
+      index += 1;
+      continue;
+    }
     if (arg === "--platform") {
       const platform = readOptionValue(args, index, "--platform");
-      if (platform !== "codex")
-        throw new Error(CODEX_ONLY_ERROR);
+      const parsedPlatform = parseInstallTarget(platform);
+      if (parsedPlatform === "all") {
+        allPlatforms = true;
+      } else {
+        platforms.push(parsedPlatform);
+      }
       index += 2;
       continue;
     }
@@ -14210,8 +14254,12 @@ function parseLazyCodexInstallCliArgs(argv) {
       const platform = arg.slice("--platform=".length);
       if (platform.trim().length === 0)
         throw new Error("--platform requires a value");
-      if (platform !== "codex")
-        throw new Error(CODEX_ONLY_ERROR);
+      const parsedPlatform = parseInstallTarget(platform);
+      if (parsedPlatform === "all") {
+        allPlatforms = true;
+      } else {
+        platforms.push(parsedPlatform);
+      }
       index += 1;
       continue;
     }
@@ -14249,18 +14297,33 @@ function parseLazyCodexInstallCliArgs(argv) {
     }
     throw new Error(`Unsupported lazycodex-ai install option: ${String(arg)}`);
   }
+  const targets = resolveInstallTargets(platforms, allPlatforms);
   if (!dryRun)
-    return { kind: "install", autonomousPermissions, repoRoot };
+    return { kind: "install", targets, noTui, skipAuth, autonomousPermissions, repoRoot };
   return {
     kind: "command",
     command: command ?? "install",
     dryRun,
+    targets,
     noTui,
     skipAuth,
     autonomousPermissions,
     repoRoot,
     args: []
   };
+}
+function parseInstallTarget(platform) {
+  const normalized = platform.trim();
+  if (ALL_PLATFORM_ALIASES.has(normalized))
+    return "all";
+  if (LAZYCODEX_INSTALL_TARGET_SET.has(normalized))
+    return normalized;
+  throw new Error(`Unsupported lazycodex-ai install platform: ${platform} (expected codex, claude-code, gemini, or all)`);
+}
+function resolveInstallTargets(platforms, allPlatforms) {
+  if (allPlatforms || platforms.length === 0)
+    return [...LAZYCODEX_INSTALL_TARGETS];
+  return [...new Set(platforms)];
 }
 function parseUpdateArgs(args, startIndex, initialDryRun, initialRepoRoot) {
   let dryRun = initialDryRun;
@@ -14301,8 +14364,10 @@ function formatLazyCodexInstallHelp() {
   const passthrough = [...PASSTHROUGH_COMMANDS].sort().join(", ");
   return [
     "Usage: lazycodex-ai install [--no-tui] [--codex-autonomous|--no-codex-autonomous] [--repo-root <path>]",
+    "       lazycodex-ai install [--platform codex|claude-code|gemini|all] [--all-platforms]",
     "       lazycodex-ai uninstall [--project <path>]",
     "       lazycodex-ai update [--dry-run] [--repo-root <path>]",
+    "       lazycodex-ai doctor [--source-root <path>] [--model <model>] [--json|--status|--verbose]",
     "       lazycodex-ai version",
     "       lazycodex-ai <command> [args...]",
     "",
@@ -14321,53 +14386,79 @@ async function runDelegatedOmoCommand(parsed, options) {
   if (parsed.command === "doctor" && process.env.LAZYCODEX_DOCTOR_LCX_ACTIVE === "1") {
     throw new Error("Refusing recursive lazycodex doctor invocation from inside $omo:lcx-doctor");
   }
-  const invocation = buildDelegatedOmoInvocation(parsed);
+  const invocations = buildDelegatedOmoInvocations(parsed);
   if (parsed.dryRun) {
-    options.log(formatShellCommand(invocation.command, invocation.args));
+    for (const invocation of invocations) {
+      options.log(formatShellCommand(invocation.command, invocation.args));
+    }
     return;
   }
-  const env3 = invocation.delegatesToOmo ? { ...process.env, OMO_INVOCATION_NAME: "omo", ...invocation.env } : { ...process.env, ...invocation.env };
-  await options.runCommand(invocation.command, invocation.args, { cwd: options.cwd, env: env3 });
+  for (const invocation of invocations) {
+    const env3 = invocation.delegatesToOmo ? { ...process.env, OMO_INVOCATION_NAME: "omo", ...invocation.env } : { ...process.env, ...invocation.env };
+    await options.runCommand(invocation.command, invocation.args, { cwd: options.cwd, env: env3 });
+  }
 }
 function buildDelegatedOmoInvocation(parsed) {
+  const invocation = buildDelegatedOmoInvocations(parsed)[0];
+  if (invocation === undefined) {
+    throw new Error("No delegated omo invocation was built");
+  }
+  return invocation;
+}
+function buildDelegatedOmoInvocations(parsed) {
   if (parsed.command === "doctor")
-    return buildLazyCodexDoctorInvocation(parsed.args);
-  const args = ["--yes", "--package", "oh-my-openagent", "omo", parsed.command];
+    return [buildLazyCodexDoctorInvocation(parsed.args)];
   if (parsed.command === "install") {
-    args.push("--platform=codex");
-    if (parsed.noTui)
-      args.push("--no-tui");
-    if (parsed.skipAuth)
-      args.push("--skip-auth");
-    if (parsed.autonomousPermissions !== false)
-      args.push("--codex-autonomous");
-    if (parsed.autonomousPermissions === false)
-      args.push("--no-codex-autonomous");
-    if (parsed.repoRoot)
-      args.push(`--repo-root=${parsed.repoRoot}`);
-  } else if (parsed.command === "cleanup") {
+    const targets = parsed.targets ?? LAZYCODEX_INSTALL_TARGETS;
+    return targets.map((target) => buildInstallInvocation(parsed, target));
+  }
+  const args = ["--yes", "--package", "oh-my-openagent", "omo", parsed.command];
+  if (parsed.command === "cleanup") {
     args.push("--platform=codex", ...parsed.args);
   } else {
     args.push(...parsed.args);
   }
+  return [{ command: "npx", args, delegatesToOmo: true }];
+}
+function buildInstallInvocation(parsed, target) {
+  const args = ["--yes", "oh-my-openagent@latest", parsed.command, `--platform=${target}`];
+  if (parsed.command === "install") {
+    if (parsed.noTui)
+      args.push("--no-tui");
+    if (parsed.skipAuth)
+      args.push("--skip-auth");
+    if (target === "codex") {
+      if (parsed.autonomousPermissions !== false)
+        args.push("--codex-autonomous");
+      if (parsed.autonomousPermissions === false)
+        args.push("--no-codex-autonomous");
+      if (parsed.repoRoot)
+        args.push(`--repo-root=${parsed.repoRoot}`);
+    }
+  }
   return { command: "npx", args, delegatesToOmo: true };
 }
 function buildLazyCodexDoctorInvocation(doctorArgs) {
+  const doctorOptions = parseLazyCodexDoctorOptions(doctorArgs);
+  const codexArgs = [
+    "exec",
+    "--ephemeral",
+    "--sandbox",
+    "danger-full-access",
+    "--skip-git-repo-check",
+    "--cd",
+    "."
+  ];
+  if (doctorOptions.model !== undefined)
+    codexArgs.push("--model", doctorOptions.model);
+  codexArgs.push(buildLazyCodexDoctorPrompt(doctorOptions.args));
   return {
     command: "codex",
-    args: [
-      "exec",
-      "--ephemeral",
-      "--sandbox",
-      "read-only",
-      "--skip-git-repo-check",
-      "--cd",
-      ".",
-      buildLazyCodexDoctorPrompt(doctorArgs)
-    ],
+    args: codexArgs,
     delegatesToOmo: false,
     env: {
-      LAZYCODEX_DOCTOR_LCX_ACTIVE: "1"
+      LAZYCODEX_DOCTOR_LCX_ACTIVE: "1",
+      ...doctorOptions.sourceRoot === undefined ? {} : { LAZYCODEX_SOURCE_ROOT: doctorOptions.sourceRoot }
     }
   };
 }
@@ -14375,11 +14466,57 @@ function buildLazyCodexDoctorPrompt(doctorArgs) {
   return [
     "Use $omo:lcx-doctor to diagnose this LazyCodex/Codex installation.",
     "This command is already the lazycodex doctor surface; never invoke lazycodex doctor from inside the doctor workflow.",
-    "Sync the latest LazyCodex and OpenAI Codex sources into /tmp, inventory the local installation,",
+    "Use the resolved source root from LAZYCODEX_SOURCE_ROOT when set; otherwise use ${TMPDIR:-/tmp}/lazycodex-sources.",
+    "Validate cached source checkouts before reuse, quarantine corrupt caches, and do not rely on /tmp/lazycodex-source.",
+    "Sync the latest LazyCodex and OpenAI Codex sources there, inventory the local installation,",
     "probe the Codex plugin/cache/hooks/MCP state, and report PASS/WARN/FAIL findings with evidence and remediations.",
     buildDoctorOutputInstruction(doctorArgs),
     doctorArgs.length > 0 ? `Requested doctor arguments: ${doctorArgs.join(" ")}` : "Requested doctor arguments: none"
   ].join(" ");
+}
+function parseLazyCodexDoctorOptions(doctorArgs) {
+  const args = [];
+  let model;
+  let sourceRoot;
+  let index = 0;
+  while (index < doctorArgs.length) {
+    const arg = doctorArgs[index];
+    if (arg === "--model") {
+      const value = doctorArgs[index + 1];
+      if (typeof value !== "string" || value.trim().length === 0)
+        throw new Error("--model requires a value");
+      model = value;
+      index += 2;
+      continue;
+    }
+    if (typeof arg === "string" && arg.startsWith("--model=")) {
+      const value = arg.slice("--model=".length);
+      if (value.trim().length === 0)
+        throw new Error("--model requires a value");
+      model = value;
+      index += 1;
+      continue;
+    }
+    if (arg === "--source-root") {
+      const value = doctorArgs[index + 1];
+      if (typeof value !== "string" || value.trim().length === 0)
+        throw new Error("--source-root requires a path");
+      sourceRoot = value;
+      index += 2;
+      continue;
+    }
+    if (typeof arg === "string" && arg.startsWith("--source-root=")) {
+      const value = arg.slice("--source-root=".length);
+      if (value.trim().length === 0)
+        throw new Error("--source-root requires a path");
+      sourceRoot = value;
+      index += 1;
+      continue;
+    }
+    args.push(arg);
+    index += 1;
+  }
+  return { args, ...model === undefined ? {} : { model }, ...sourceRoot === undefined ? {} : { sourceRoot } };
 }
 function buildDoctorOutputInstruction(doctorArgs) {
   if (doctorArgs.includes("--json")) {
@@ -14715,23 +14852,39 @@ async function runLazyCodexInstallLocalCli(input) {
         input.log(`node ${input.entrypointPath} install --repo-root=${parsed.repoRoot}`);
         return 0;
       }
-      const result2 = await installMarketplaceLocally({
+      const result = await installMarketplaceLocally({
         repoRoot: resolve11(parsed.repoRoot),
         autonomousPermissions: true,
         env: input.env
       });
-      input.log(`Installed ${result2.installed.length} plugin(s) from ${result2.marketplaceName}.`);
+      input.log(`Installed ${result.installed.length} plugin(s) from ${result.marketplaceName}.`);
       return 0;
     }
     return runLazyCodexManualUpdate({ env: input.env, dryRun: parsed.dryRun, log: input.log, invokedPath: input.invokedPath });
   }
   const repoRoot = parsed.repoRoot ? resolve11(parsed.repoRoot) : input.defaultRepoRoot;
-  const result = await installMarketplaceLocally({
-    repoRoot,
-    autonomousPermissions: parsed.autonomousPermissions,
-    env: input.env
-  });
-  input.log(`Installed ${result.installed.length} plugin(s) from ${result.marketplaceName}.`);
+  if (parsed.targets.includes("codex")) {
+    const result = await installMarketplaceLocally({
+      repoRoot,
+      autonomousPermissions: parsed.autonomousPermissions,
+      env: input.env
+    });
+    input.log(`Installed ${result.installed.length} plugin(s) from ${result.marketplaceName}.`);
+  }
+  const delegatedTargets = parsed.targets.filter((target) => target !== "codex");
+  if (delegatedTargets.length > 0) {
+    await runDelegatedOmoCommand({
+      kind: "command",
+      command: "install",
+      dryRun: false,
+      targets: delegatedTargets,
+      noTui: parsed.noTui,
+      skipAuth: parsed.skipAuth,
+      autonomousPermissions: parsed.autonomousPermissions,
+      repoRoot: undefined,
+      args: []
+    }, { cwd: input.cwd, log: input.log, runCommand: defaultRunCommand });
+  }
   return 0;
 }
 export {
@@ -14751,6 +14904,7 @@ export {
   installCachedPlugin,
   formatLazyCodexInstallHelp,
   findMissingHookCommandTargets,
+  buildDelegatedOmoInvocations,
   buildDelegatedOmoInvocation,
   assertHookCommandTargets,
   PASSTHROUGH_COMMANDS
