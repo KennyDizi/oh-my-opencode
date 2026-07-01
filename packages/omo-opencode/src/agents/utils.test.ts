@@ -362,7 +362,7 @@ describe("createBuiltinAgents with model overrides", () => {
     fetchSpy.mockRestore()
   })
 
-  test("Fato registers as an Oracle copy with review-work skill injected", async () => {
+  test("Fato registers as an Oracle copy with review-work and find-skills injected", async () => {
     // #given
     const fetchSpy = spyOn(shared, "fetchAvailableModels").mockResolvedValue(
       new Set([
@@ -384,6 +384,7 @@ describe("createBuiltinAgents with model overrides", () => {
       expect(fato?.mode).toBe("subagent")
       expect(fato?.temperature).toBe(0.1)
       expect(fato?.prompt).toContain("Codex Harness Tool Compatibility")
+      expect(fato?.prompt).toContain("# Find Skills")
       expect(fato?.prompt).toContain("strategic technical advisor")
       expect("skills" in (fato ?? {})).toBe(false)
       expect(permission.write).toBe("deny")

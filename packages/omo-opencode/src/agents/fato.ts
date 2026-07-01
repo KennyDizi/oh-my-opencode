@@ -3,6 +3,7 @@ import { createOracleAgent, ORACLE_PROMPT_METADATA } from "./oracle";
 import type { AgentMode, AgentPromptMetadata } from "./types";
 
 const MODE: AgentMode = "subagent";
+const FATO_SKILLS = ["review-work", "find-skills"] as const;
 
 type SkillBackedAgentConfig = AgentConfig & { skills: string[] };
 
@@ -14,7 +15,7 @@ export const FATO_PROMPT_METADATA: AgentPromptMetadata = {
 export function createFatoAgent(model: string): AgentConfig {
   const config: SkillBackedAgentConfig = {
     ...createOracleAgent(model),
-    skills: ["review-work"],
+    skills: [...FATO_SKILLS],
   };
 
   return config;
