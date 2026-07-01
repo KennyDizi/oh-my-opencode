@@ -76,7 +76,7 @@ When both scopes define the same team name, project scope wins.
 
 - **Eligible:** `sisyphus`, `atlas`, `sisyphus-junior`.
 - **Conditional:** `hephaestus` (needs teammate permission `teammate: "allow"`; otherwise use `subagent_type: "sisyphus"`).
-- **Hard-reject:** `oracle`, `librarian`, `explore`, `multimodal-looker`, `metis`, `momus`, `prometheus`.
+- **Hard-reject:** `oracle`, `fato`, `librarian`, `explore`, `multimodal-looker`, `metis`, `momus`, `prometheus`.
 
 Hard-reject agents fail TeamSpec parsing because they cannot write mailbox state. Use `delegate-task` for those agents.
 

@@ -79,10 +79,10 @@ Model labels above show the current fallback stacks from `packages/omo-opencode/
 
 ### Agent Inventory and Modes (Current)
 
-The system has **11 built-in agents**:
+The system has **12 built-in agents**:
 
 - Primary: `sisyphus`, `hephaestus`, `prometheus`, `atlas`
-- Subagent: `oracle`, `librarian`, `explore`, `multimodal-looker`, `metis`, `momus`, `sisyphus-junior`
+- Subagent: `oracle`, `fato`, `librarian`, `explore`, `multimodal-looker`, `metis`, `momus`, `sisyphus-junior`
 
 Canonical assembly order for primary agents is:
 
