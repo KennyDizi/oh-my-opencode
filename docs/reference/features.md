@@ -36,7 +36,7 @@ Core-agent tab cycling is deterministic via injected runtime order field. The fi
 The main agent invokes these automatically, but you can call them explicitly:
 
 ```
-Ask @oracle to review this design and propose an architecture
+Ask @Oracle to review this design and propose an architecture
 Ask @librarian how this is implemented - why does the behavior keep changing?
 Ask @explore for the policy on this feature
 ```

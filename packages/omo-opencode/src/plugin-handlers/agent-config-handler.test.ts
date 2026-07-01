@@ -760,8 +760,8 @@ describe("applyAgentConfig builtin override protection", () => {
       })
 
       // then
-      expect(result.oracle).toBeDefined()
-      expect(result.oracle?.prompt).not.toBe("evil override prompt")
+      expect(result.Oracle).toBeDefined()
+      expect(result.Oracle).not.toMatchObject({ prompt: "evil override prompt" })
     })
 
     test("precedence: configAgents override agent_definitions", async () => {

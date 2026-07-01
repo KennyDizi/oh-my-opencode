@@ -97,8 +97,8 @@ describe("getAgentDisplayName", () => {
     // when getAgentDisplayName called
     const result = getAgentDisplayName(configKey)
 
-    // then returns "oracle"
-    expect(result).toBe("oracle")
+    // then returns "Oracle"
+    expect(result).toBe("Oracle")
   })
 
   it("returns display name for fato", () => {
@@ -108,8 +108,8 @@ describe("getAgentDisplayName", () => {
     // when getAgentDisplayName called
     const result = getAgentDisplayName(configKey)
 
-    // then returns "fato"
-    expect(result).toBe("fato")
+    // then returns "Fato"
+    expect(result).toBe("Fato")
   })
 
   it("returns display name for librarian", () => {
@@ -200,6 +200,10 @@ describe("getAgentConfigKey", () => {
     expect(getAgentConfigKey("Sisyphus-Junior")).toBe("sisyphus-junior")
   })
 
+  it("resolves Oracle display name to its lowercase config key", () => {
+    expect(getAgentConfigKey("Oracle")).toBe("oracle")
+  })
+
   it("resolves atlas even when the UI ordering prefix is present", () => {
     expect(getAgentConfigKey(getAgentListDisplayName("atlas"))).toBe("atlas")
   })
@@ -219,7 +223,7 @@ describe("getAgentListDisplayName", () => {
   })
 
   it("keeps non-core agents unchanged for list display", () => {
-    expect(getAgentListDisplayName("oracle")).toBe("oracle")
+    expect(getAgentListDisplayName("librarian")).toBe("librarian")
   })
 
   it("is a thin alias for getAgentDisplayName", () => {
@@ -281,8 +285,8 @@ describe("AGENT_DISPLAY_NAMES", () => {
       momus: "Momus - Plan Critic",
       athena: "Athena - Council",
       "athena-junior": "Athena-Junior - Council",
-      oracle: "oracle",
-      fato: "fato",
+      oracle: "Oracle",
+      fato: "Fato",
       librarian: "librarian",
       explore: "explore",
       "multimodal-looker": "multimodal-looker",

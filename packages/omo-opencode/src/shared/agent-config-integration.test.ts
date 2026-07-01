@@ -98,7 +98,7 @@ describe("Agent Config Integration", () => {
       expect(displayNames).toContain("Atlas - Plan Executor")
       expect(displayNames).toContain("Metis - Plan Consultant")
       expect(displayNames).toContain("Momus - Plan Critic")
-      expect(displayNames).toContain("oracle")
+      expect(displayNames).toContain("Oracle")
       expect(displayNames).toContain("librarian")
       expect(displayNames).toContain("explore")
       expect(displayNames).toContain("multimodal-looker")
