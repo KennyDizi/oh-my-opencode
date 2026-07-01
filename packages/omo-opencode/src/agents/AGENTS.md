@@ -1,15 +1,15 @@
 ---
 name: agents-directory
-description: Developer reference for all 11 Oh My OpenAgent agent definitions, factory patterns, tool restrictions, and model routing.
+description: Developer reference for all 12 Oh My OpenAgent agent definitions, factory patterns, tool restrictions, and model routing.
 ---
 
-# src/agents/ — 11 Agent Definitions
+# src/agents/ — 12 Agent Definitions
 
 **Generated:** 2026-05-15
 
 ## OVERVIEW
 
-11 built-in agents. Type enum: [`src/config/schema/agent-names.ts`](../config/schema/agent-names.ts) `BuiltinAgentNameSchema`. 10 of them register via [`builtin-agents.ts`](builtin-agents.ts) `agentSources` record (factory functions). **Prometheus is special-cased** — it has no `createPrometheusAgent` factory; instead [`prometheus-agent-config-builder.ts`](../plugin-handlers/prometheus-agent-config-builder.ts) constructs its config directly during `agent-config-handler` Phase 3.
+12 built-in agents. Type enum: [`src/config/schema/agent-names.ts`](../config/schema/agent-names.ts) `BuiltinAgentNameSchema`. 11 of them register via [`builtin-agents.ts`](builtin-agents.ts) `agentSources` record (factory functions). **Prometheus is special-cased** — it has no `createPrometheusAgent` factory; instead [`prometheus-agent-config-builder.ts`](../plugin-handlers/prometheus-agent-config-builder.ts) constructs its config directly during `agent-config-handler` Phase 3.
 
 All factories follow `createXXXAgent(model) → AgentConfig`. Each carries a static `mode` property (`AgentFactory` type in [`src/agents/types.ts`](types.ts)). Composed via `buildAgent()`.
 
@@ -22,6 +22,7 @@ Modes verified from each agent file's `const MODE: AgentMode = ...` and (for Pro
 | **Sisyphus** | claude-opus-4-7 max | (model default) | primary | kimi-k2.6 → k2p5 → kimi-k2.5 → gpt-5.5 medium → glm-5 → big-pickle | Main orchestrator, plans + delegates; `thinking: { type: "enabled", budgetTokens: 32000 }` |
 | **Hephaestus** | gpt-5.5 medium | (model default) | primary | (single-entry chain — `requiresProvider`: openai \| github-copilot \| opencode \| vercel) | Autonomous deep worker |
 | **Oracle** | gpt-5.5 high | 0.1 | subagent | gemini-3.1-pro high → claude-opus-4-7 max → glm-5.1 | Read-only consultation |
+| **Fato** | claude-fable-5 max | 0.1 | subagent | claude-sonnet-5 max → gpt-5.5 high | Oracle-equivalent read-only review agent with builtin `review-work` skill |
 | **Librarian** | gpt-5.4-mini-fast | 0.1 | subagent | qwen3.5-plus → minimax-m2.7-highspeed → minimax-m3 → minimax-m2.7 → claude-haiku-4-5 → gpt-5.4-nano | External docs/code search |
 | **Explore** | gpt-5.4-mini-fast | 0.1 | subagent | qwen3.5-plus → minimax-m2.7-highspeed → minimax-m3 → minimax-m2.7 → claude-haiku-4-5 → gpt-5.4-nano | Contextual grep |
 | **Multimodal-Looker** | gpt-5.5 medium | 0.1 | subagent | kimi-k2.6 → glm-4.6v → gpt-5-nano | PDF/image analysis |
@@ -38,6 +39,7 @@ Defined in [`src/shared/agent-tool-restrictions.ts`](../shared/agent-tool-restri
 | Agent | Denied Tools |
 |-------|-------------|
 | Oracle | write, edit, task, call_omo_agent |
+| Fato | write, edit, task, call_omo_agent |
 | Librarian | write, edit, task, call_omo_agent |
 | Explore | write, edit, task, call_omo_agent |
 | Multimodal-Looker | ALL except read |
@@ -53,7 +55,7 @@ Authoritative registry: [`AGENT_ELIGIBILITY_REGISTRY`](../features/team-mode/typ
 |---------|--------|
 | `eligible` | sisyphus, atlas, sisyphus-junior |
 | `conditional` | hephaestus (lacks `teammate: "allow"` permission by default — see D-36 / `tool-config-handler.ts`; use `subagent_type: "sisyphus"` instead) |
-| `hard-reject` | oracle, librarian, explore, multimodal-looker, metis, momus, prometheus (each with a specific rejection message) |
+| `hard-reject` | oracle, fato, librarian, explore, multimodal-looker, metis, momus, prometheus (each with a specific rejection message) |
 
 Read-only agents are rejected at TeamSpec parse time. For those, the lead delegates via `task` (delegate-task) instead. See [`team-mode/AGENTS.md`](../features/team-mode/AGENTS.md).
 
@@ -67,6 +69,7 @@ agents/
 ├── hephaestus.ts                              # Routes to model variant
 ├── hephaestus/                                # gpt.ts, gpt-5-5.ts, gpt-5-4.ts, gpt-5-5.ts
 ├── oracle.ts                                  # Read-only consultant
+├── fato.ts                                    # Oracle-equivalent review-work agent
 ├── librarian.ts                               # External search
 ├── explore.ts                                 # Codebase grep
 ├── multimodal-looker.ts                       # Vision/PDF
@@ -75,7 +78,7 @@ agents/
 ├── atlas/agent.ts                             # Todo orchestrator
 ├── prometheus/                                # Strategic planner prompt router; prompt content in packages/prompts-core/prompts/prometheus/
 ├── types.ts                                   # BuiltinAgentName, AgentMode, AgentConfig
-├── builtin-agents.ts                          # agentSources registry (10 → 11 with sisyphus-junior)
+├── builtin-agents.ts                          # agentSources registry (11 factory-backed agents; Prometheus is special-cased)
 ├── builtin-agents/                            # maybeCreateXXXConfig conditional factories + general-agents.ts + available-skills.ts
 ├── agent-builder.ts                           # buildAgent() composition
 ├── utils.ts                                   # agent utilities
@@ -106,7 +109,7 @@ Model resolution: 4-step pipeline → override → category-default → provider
 Definition (from [`src/agents/types.ts`](types.ts)):
 
 - **`primary`** — respects user's UI-selected model. Used by: sisyphus, hephaestus, atlas, prometheus.
-- **`subagent`** — uses own fallback chain, ignores UI selection. Used by: oracle, librarian, explore, multimodal-looker, metis, momus, sisyphus-junior.
+- **`subagent`** — uses own fallback chain, ignores UI selection. Used by: oracle, fato, librarian, explore, multimodal-looker, metis, momus, sisyphus-junior.
 - **`all`** — declared in the type for OpenCode compatibility but no built-in agent currently uses it.
 
 ## CANONICAL ORDER
