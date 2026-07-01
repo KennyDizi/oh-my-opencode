@@ -27,6 +27,18 @@ export function isClaudeFable5Model(model: string): boolean {
   return modelName.includes("claude-fable-5")
 }
 
+const CLAUDE_SONNET_VERSION_RE =
+  /(?:^|-)claude-sonnet-(\d+)(?:[-@]|$)|(?:^|-)sonnet-(\d+)(?:[-@]|$)|(?:^|-)claude-(\d+)-sonnet(?:[-@]|$)/
+
+export function isClaudeSonnet5OrLaterModel(model: string): boolean {
+  const modelName = extractModelName(model).toLowerCase().replaceAll(".", "-")
+  const match = CLAUDE_SONNET_VERSION_RE.exec(modelName)
+  if (!match) return false
+  const version = Number(match[1] ?? match[2] ?? match[3])
+  if (Number.isNaN(version)) return false
+  return version >= 5
+}
+
 const CLAUDE_OPUS_VERSION_RE = /claude-opus-(\d+)-(\d+)/
 
 /**

@@ -6,6 +6,7 @@ import {
   isClaudeOpus47OrLaterModel,
   isClaudeFableOrMythosModel,
   isClaudeOpus48Model,
+  isClaudeSonnet5OrLaterModel,
   isGeminiModel,
   isGlmModel,
   isGptModel,
@@ -81,6 +82,16 @@ describe("model family detectors", () => {
     expect(isClaudeFable5Model("claude-fable-5")).toBe(true)
     expect(isClaudeFable5Model("anthropic/claude-opus-4-8")).toBe(false)
     expect(isClaudeFable5Model("anthropic/claude-sonnet-4-6")).toBe(false)
+  })
+
+  test("#given Claude Sonnet 5 model ids #then detects Sonnet 5 and later only", () => {
+    expect(isClaudeSonnet5OrLaterModel("anthropic/claude-sonnet-5")).toBe(true)
+    expect(isClaudeSonnet5OrLaterModel("anthropic/claude-sonnet-5-20260630")).toBe(true)
+    expect(isClaudeSonnet5OrLaterModel("google-vertex-anthropic/claude-sonnet-5@default")).toBe(true)
+    expect(isClaudeSonnet5OrLaterModel("bedrock/anthropic-claude-sonnet-5")).toBe(true)
+    expect(isClaudeSonnet5OrLaterModel("bedrock/anthropic--claude-5-sonnet")).toBe(true)
+    expect(isClaudeSonnet5OrLaterModel("anthropic/claude-sonnet-4-6")).toBe(false)
+    expect(isClaudeSonnet5OrLaterModel("anthropic/claude-opus-5-0")).toBe(false)
   })
 
   test("#given Claude Opus 4.7+ model ids #then detects 4.7 and later only", () => {
