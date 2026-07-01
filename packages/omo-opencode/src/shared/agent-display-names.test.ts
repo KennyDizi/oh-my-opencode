@@ -101,6 +101,17 @@ describe("getAgentDisplayName", () => {
     expect(result).toBe("oracle")
   })
 
+  it("returns display name for fato", () => {
+    // given config key "fato"
+    const configKey = "fato"
+
+    // when getAgentDisplayName called
+    const result = getAgentDisplayName(configKey)
+
+    // then returns "fato"
+    expect(result).toBe("fato")
+  })
+
   it("returns display name for librarian", () => {
     // given config key "librarian"
     const configKey = "librarian"
@@ -271,6 +282,7 @@ describe("AGENT_DISPLAY_NAMES", () => {
       athena: "Athena - Council",
       "athena-junior": "Athena-Junior - Council",
       oracle: "oracle",
+      fato: "fato",
       librarian: "librarian",
       explore: "explore",
       "multimodal-looker": "multimodal-looker",

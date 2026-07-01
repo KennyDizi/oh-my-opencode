@@ -20,6 +20,7 @@ export const AGENT_DISPLAY_NAMES: Record<string, string> = {
   athena: "Athena - Council",
   "athena-junior": "Athena-Junior - Council",
   oracle: "oracle",
+  fato: "fato",
   librarian: "librarian",
   explore: "explore",
   "multimodal-looker": "multimodal-looker",
