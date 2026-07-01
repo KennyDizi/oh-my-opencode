@@ -8,6 +8,7 @@ const TASK_DENIED_SUBAGENT_KEYS = [
   "librarian",
   "explore",
   "oracle",
+  "fato",
   "multimodal-looker",
   "metis",
   "momus",

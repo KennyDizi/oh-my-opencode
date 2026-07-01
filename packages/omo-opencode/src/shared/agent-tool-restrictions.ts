@@ -40,6 +40,13 @@ const AGENT_RESTRICTIONS: Record<string, Record<string, boolean>> = {
     call_omo_agent: false,
   },
 
+  fato: {
+    write: false,
+    edit: false,
+    task: false,
+    call_omo_agent: false,
+  },
+
   metis: {
     write: false,
     edit: false,

@@ -13,6 +13,7 @@ const TASK_DENIED_SUBAGENTS = [
   "librarian",
   "explore",
   "oracle",
+  "fato",
   "multimodal-looker",
   "metis",
   "momus",

@@ -36,6 +36,7 @@ describe("read-only agent tool restrictions", () => {
       "explore",
       "librarian",
       "oracle",
+      "fato",
       "metis",
       "momus",
       "multimodal-looker",
@@ -92,6 +93,19 @@ describe("read-only agent tool restrictions", () => {
       // then
       expect(permission["task"]).toBe("deny")
       expect(permission["call_omo_agent"]).toBeUndefined()
+    })
+  })
+
+  describe("Fato", () => {
+    test("mirrors Oracle session restrictions", () => {
+      // given / when
+      const restrictions = getAgentToolRestrictions("fato")
+
+      // then
+      expect(restrictions.write).toBe(false)
+      expect(restrictions.edit).toBe(false)
+      expect(restrictions.task).toBe(false)
+      expect(restrictions.call_omo_agent).toBe(false)
     })
   })
 
