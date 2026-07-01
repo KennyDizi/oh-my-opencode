@@ -17,6 +17,33 @@ describe("AGENT_MODEL_REQUIREMENTS", () => {
     expect(primary?.variant).toBe("high")
   })
 
+  test("fato supports only Claude Fable 5, Claude Sonnet 5, and GPT-5.5", () => {
+    // given
+    const fato = AGENT_MODEL_REQUIREMENTS.fato
+
+    // when
+    const fallbackChain = fato?.fallbackChain ?? []
+
+    // then
+    expect(fallbackChain).toEqual([
+      {
+        providers: ["anthropic", "github-copilot", "opencode", "vercel"],
+        model: "claude-fable-5",
+        variant: "max",
+      },
+      {
+        providers: ["anthropic", "github-copilot", "opencode", "vercel"],
+        model: "claude-sonnet-5",
+        variant: "max",
+      },
+      {
+        providers: ["openai", "github-copilot", "opencode", "vercel"],
+        model: "gpt-5.5",
+        variant: "high",
+      },
+    ])
+  })
+
   test("sisyphus keeps opus primary before k2p5, kimi-k2.5, gpt-5.5 medium, and big-pickle", () => {
     // given
     const sisyphus = AGENT_MODEL_REQUIREMENTS["sisyphus"]

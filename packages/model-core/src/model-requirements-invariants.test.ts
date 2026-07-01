@@ -5,6 +5,7 @@ const expectedAgents = [
   "sisyphus",
   "hephaestus",
   "oracle",
+  "fato",
   "librarian",
   "explore",
   "multimodal-looker",
