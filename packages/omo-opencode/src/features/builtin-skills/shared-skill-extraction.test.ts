@@ -7,7 +7,7 @@ declare const Bun: {
   file(path: string): { text(): Promise<string> }
 }
 
-const TARGET_SKILLS = ["remove-ai-slops", "review-work", "frontend", "init-deep", "debugging"] as const
+const TARGET_SKILLS = ["remove-ai-slops", "review-work", "find-skills", "frontend", "init-deep", "debugging"] as const
 
 type TargetSkill = (typeof TARGET_SKILLS)[number]
 
@@ -34,6 +34,9 @@ async function readSkillSource(name: TargetSkill): Promise<SkillSource> {
     case "review-work":
       skill = (await import("./skills/review-work")).reviewWorkSkill
       break
+		case "find-skills":
+			skill = (await import("./skills/find-skills")).findSkillsSkill
+			break
 		case "frontend":
 			skill = (await import("./skills/frontend")).frontendSkill
 			break
