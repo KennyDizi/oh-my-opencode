@@ -7,6 +7,7 @@ import {
   isClaudeOpus47Model,
   isClaudeOpus47OrLaterModel,
   isClaudeOpus48Model,
+  isClaudeSonnet5OrLaterModel,
   isGeminiModel,
   isGlmModel,
   isGptModel,
@@ -22,6 +23,7 @@ export {
   isClaudeOpus47Model,
   isClaudeOpus47OrLaterModel,
   isClaudeOpus48Model,
+  isClaudeSonnet5OrLaterModel,
   isGeminiModel,
   isGlmModel,
   isGptModel,
@@ -33,16 +35,21 @@ export {
 const CLAUDE_THINKING_BUDGET_TOKENS = 32000;
 
 /**
- * Anthropic Opus 4.7+, Fable, and Mythos models reject thinking.type "enabled";
- * they require adaptive thinking plus an effort, which OpenCode core derives from
- * the model variant. For those models emit no thinking config and let core drive
- * it (issue #4614; opencode core #31546). All other Claude models keep the
- * explicit enabled-thinking budget.
+ * Anthropic Opus 4.7+, Sonnet 5+, Fable, and Mythos models reject
+ * thinking.type "enabled"; they require adaptive thinking plus an effort, which
+ * OpenCode core derives from the model variant. For those models emit no
+ * thinking config and let core drive it (issue #4614; opencode core #31546;
+ * anomalyco/opencode 3a669d5). All other Claude models keep the explicit
+ * enabled-thinking budget.
  */
 export function buildClaudeThinkingConfig(
   model: string,
 ): { thinking: { type: "enabled"; budgetTokens: number } } | Record<string, never> {
-  if (isClaudeOpus47OrLaterModel(model) || isClaudeFableOrMythosModel(model)) {
+  if (
+    isClaudeOpus47OrLaterModel(model) ||
+    isClaudeSonnet5OrLaterModel(model) ||
+    isClaudeFableOrMythosModel(model)
+  ) {
     return {};
   }
   return { thinking: { type: "enabled", budgetTokens: CLAUDE_THINKING_BUDGET_TOKENS } };
@@ -138,6 +145,7 @@ export type BuiltinAgentName =
   | "sisyphus"
   | "hephaestus"
   | "oracle"
+  | "fato"
   | "librarian"
   | "explore"
   | "multimodal-looker"

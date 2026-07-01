@@ -362,6 +362,63 @@ describe("createBuiltinAgents with model overrides", () => {
     fetchSpy.mockRestore()
   })
 
+  test("Fato registers as an Oracle copy with review-work skill injected", async () => {
+    // #given
+    const fetchSpy = spyOn(shared, "fetchAvailableModels").mockResolvedValue(
+      new Set([
+        "anthropic/claude-fable-5",
+        "anthropic/claude-sonnet-5",
+        "openai/gpt-5.5",
+      ])
+    )
+
+    try {
+      // #when
+      const agents = await createBuiltinAgents([], {}, undefined, TEST_DEFAULT_MODEL)
+      const fato = agents.fato
+      const permission = (fato?.permission ?? {}) as Record<string, string>
+
+      // #then
+      expect(fato).toBeDefined()
+      expect(fato?.model).toBe("anthropic/claude-fable-5")
+      expect(fato?.mode).toBe("subagent")
+      expect(fato?.temperature).toBe(0.1)
+      expect(fato?.prompt).toContain("Codex Harness Tool Compatibility")
+      expect(fato?.prompt).toContain("strategic technical advisor")
+      expect("skills" in (fato ?? {})).toBe(false)
+      expect(permission.write).toBe("deny")
+      expect(permission.edit).toBe("deny")
+      expect(permission.apply_patch).toBe("deny")
+      expect(permission.task).toBe("deny")
+    } finally {
+      fetchSpy.mockRestore()
+    }
+  })
+
+  test("Fato with Claude Sonnet 5 omits explicit thinking for adaptive variants", async () => {
+    // #given
+    const fetchSpy = spyOn(shared, "fetchAvailableModels").mockResolvedValue(
+      new Set(["anthropic/claude-sonnet-5"])
+    )
+    const overrides = {
+      fato: { model: "anthropic/claude-sonnet-5", variant: "max" },
+    }
+
+    try {
+      // #when
+      const agents = await createBuiltinAgents([], overrides, undefined, TEST_DEFAULT_MODEL)
+
+      // #then
+      expect(agents.fato).toBeDefined()
+      expect(agents.fato.model).toBe("anthropic/claude-sonnet-5")
+      expect(agents.fato.variant).toBe("max")
+      expect(agents.fato.thinking).toBeUndefined()
+      expect(agents.fato.prompt).toContain("Codex Harness Tool Compatibility")
+    } finally {
+      fetchSpy.mockRestore()
+    }
+  })
+
   test("Oracle with Claude model override has thinking, no reasoningEffort", async () => {
     // #given
     const providerModelsSpy = spyOn(connectedProvidersCache, "readProviderModelsCache").mockReturnValue(null)
