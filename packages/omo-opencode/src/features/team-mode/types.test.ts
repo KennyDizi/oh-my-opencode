@@ -262,13 +262,16 @@ describe("team-mode types", () => {
     )
 
     // then
-    expect(entries).toHaveLength(11)
-    expect(verdictCounts).toEqual({ eligible: 3, conditional: 1, "hard-reject": 7 })
+    expect(entries).toHaveLength(12)
+    expect(verdictCounts).toEqual({ eligible: 3, conditional: 1, "hard-reject": 8 })
     expect(AGENT_ELIGIBILITY_REGISTRY.hephaestus.rejectionMessage).toBe(
       "Agent 'hephaestus' lacks teammate permission. Either apply D-36 (add teammate: \"allow\" in tool-config-handler.ts) or use subagent_type: \"sisyphus\" instead.",
     )
     expect(AGENT_ELIGIBILITY_REGISTRY.oracle.rejectionMessage).toBe(
       "Agent 'oracle' is read-only (cannot write files). Team members must write to mailbox inbox files. Use delegate-task with subagent_type: 'oracle' for read-only analysis instead.",
+    )
+    expect(AGENT_ELIGIBILITY_REGISTRY.fato.rejectionMessage).toBe(
+      "Agent 'fato' is read-only (cannot write files). Team members must write to mailbox inbox files. Use delegate-task with subagent_type: 'fato' for read-only analysis instead.",
     )
     expect(AGENT_ELIGIBILITY_REGISTRY.librarian.rejectionMessage).toBe(
       "Agent 'librarian' is read-only (write/edit denied). Cannot write to mailbox as team member. Use delegate-task for research queries instead.",

@@ -201,6 +201,11 @@ export const AGENT_ELIGIBILITY_REGISTRY: Readonly<Record<string, {
     rejectionMessage:
       "Agent 'oracle' is read-only (cannot write files). Team members must write to mailbox inbox files. Use delegate-task with subagent_type: 'oracle' for read-only analysis instead.",
   },
+  fato: {
+    verdict: "hard-reject",
+    rejectionMessage:
+      "Agent 'fato' is read-only (cannot write files). Team members must write to mailbox inbox files. Use delegate-task with subagent_type: 'fato' for read-only analysis instead.",
+  },
   librarian: {
     verdict: "hard-reject",
     rejectionMessage:
@@ -237,7 +242,7 @@ export const AGENT_ELIGIBILITY_REGISTRY: Readonly<Record<string, {
 
 /**
  * §V.3 member validation error messages live in member-parser.ts.
- * Includes: "Unknown subagent_type '<name>'. Available ELIGIBLE agents: sisyphus, atlas, sisyphus-junior, hephaestus (if D-36 applied). Use delegate-task for read-only agents like oracle, librarian, explore, metis, momus, multimodal-looker."
+ * Includes: "Unknown subagent_type '<name>'. Available ELIGIBLE agents: sisyphus, atlas, sisyphus-junior, hephaestus (if D-36 applied). Use delegate-task for read-only agents like oracle, fato, librarian, explore, metis, momus, multimodal-looker."
  */
 
 const parseMemberBase = createParseMember(MemberSchema, AGENT_ELIGIBILITY_REGISTRY)

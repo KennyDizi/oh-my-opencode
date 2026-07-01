@@ -11,6 +11,9 @@ import { TeamModeConfigSchema } from "../config"
 const ORACLE_REJECTION_MESSAGE =
   "Agent 'oracle' is read-only (cannot write files). Team members must write to mailbox inbox files. Use delegate-task with subagent_type: 'oracle' for read-only analysis instead."
 
+const FATO_REJECTION_MESSAGE =
+  "Agent 'fato' is read-only (cannot write files). Team members must write to mailbox inbox files. Use delegate-task with subagent_type: 'fato' for read-only analysis instead."
+
 const { TeamSpecValidationError, loadAllTeamSpecs, loadTeamSpec } = await import("./loader")
 
 function createBaseSpec(teamName: string): {
@@ -216,6 +219,33 @@ describe("team-registry loader", () => {
     expect(thrownError).toMatchObject({
       name: TeamSpecValidationError.name,
       message: ORACLE_REJECTION_MESSAGE,
+      code: "INELIGIBLE_AGENT",
+      field: "subagent_type",
+      memberName: "lead",
+    })
+  })
+
+  test("rejects fato subagent members with the exact plan message", async () => {
+    // given
+    const rootDirectory = await createTemporaryRoot()
+    temporaryDirectories.push(rootDirectory)
+    const fixturePaths = getFixturePaths(rootDirectory, "fato-team")
+    const teamSpec = createBaseSpec("fato-team")
+    teamSpec.members = [{ kind: "subagent_type", name: "lead", subagent_type: "fato" }]
+    await writeJsonFile(fixturePaths.userConfigPath, teamSpec)
+
+    // when
+    let thrownError: unknown
+    try {
+      await loadTeamSpec("fato-team", createConfig(fixturePaths.userBaseDir), fixturePaths.projectRoot)
+    } catch (error) {
+      thrownError = error
+    }
+
+    // then
+    expect(thrownError).toMatchObject({
+      name: TeamSpecValidationError.name,
+      message: FATO_REJECTION_MESSAGE,
       code: "INELIGIBLE_AGENT",
       field: "subagent_type",
       memberName: "lead",
