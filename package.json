@@ -143,11 +143,11 @@
   },
   "homepage": "https://github.com/code-yeongyu/oh-my-openagent#readme",
   "dependencies": {
-    "@ai-sdk/anthropic": "^4.0.5",
-    "@ai-sdk/google": "^4.0.6",
-    "@ai-sdk/openai": "^4.0.5",
-    "@ai-sdk/provider": "^4.0.1",
-    "@ai-sdk/xai": "^4.0.4",
+    "@ai-sdk/anthropic": "^4.0.7",
+    "@ai-sdk/google": "^4.0.8",
+    "@ai-sdk/openai": "^4.0.7",
+    "@ai-sdk/provider": "^4.0.2",
+    "@ai-sdk/xai": "^4.0.6",
     "@clack/prompts": "^1.6.0",
     "@code-yeongyu/comment-checker": "^0.8.0",
     "@modelcontextprotocol/sdk": "^1.29.0",
@@ -162,8 +162,8 @@
     "js-yaml": "^5.2.1",
     "jsonc-parser": "^3.3.1",
     "picocolors": "^1.1.1",
-    "picomatch": "^4.0.4",
-    "posthog-node": "^5.39.2",
+    "picomatch": "^4.0.5",
+    "posthog-node": "^5.39.4",
     "vscode-jsonrpc": "^9.0.1",
     "zod": "^4.4.3"
   },
@@ -212,7 +212,7 @@
   },
   "overrides": {
     "hono": "^4.12.27",
-    "@hono/node-server": "^2.0.6",
+    "@hono/node-server": "^2.0.8",
     "express-rate-limit": "^8.5.2",
     "fast-uri": "^4.1.0",
     "path-to-regexp": "^8.4.2"
