@@ -1,6 +1,6 @@
 ---
 name: sisyphus-variants
-description: Developer reference for Fathos (Sisyphus) orchestrator model-specific prompt variants — selection logic and key exports.
+description: Developer reference for Fathos orchestrator model-specific prompt variants — selection logic and key exports.
 ---
 
 # src/agents/sisyphus/ -- Orchestrator Variants
@@ -9,7 +9,7 @@ description: Developer reference for Fathos (Sisyphus) orchestrator model-specif
 
 ## OVERVIEW
 
-Model-specific prompt variants for the Fathos (Sisyphus) main orchestrator. Parent `sisyphus-agent-factory.ts` routes to the correct variant based on active model.
+Model-specific prompt variants for the `Fathos` main orchestrator. Parent `sisyphus-agent-factory.ts` routes to the correct variant based on active model.
 
 ## FILES
 
