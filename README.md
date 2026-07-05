@@ -78,7 +78,7 @@
 
 > "It made me cancel my Cursor subscription. Unbelievable things are happening in the open source community." - [Arthur Guiot](https://x.com/arthur_guiot/status/2008736347092382053?s=20)
 
-> "If Claude Code does in 7 days what a human does in 3 months, Sisyphus does it in 1 hour. It just works until the task is done. It is a discipline agent." <br/>- B, Quant Researcher
+> "If Claude Code does in 7 days what a human does in 3 months, Fathos does it in 1 hour. It just works until the task is done. It is a discipline agent." <br/>- B, Quant Researcher
 
 > "Knocked out 8000 eslint warnings with Oh My Opencode, just in a day" <br/>- [Jacob Ferrari](https://x.com/jacobferrari_/status/2003258761952289061)
 
@@ -211,7 +211,7 @@ Even with only the following subscriptions, `ultrawork` works well (this project
 
 |       | Feature                                                  | Edition  | What it does                                                                                                                                                                                                     |
 | :---: | :------------------------------------------------------- | :------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-|   🤖   | **Discipline Agents**                                    | Ultimate | Sisyphus orchestrates Hephaestus, Oracle, Librarian, Explore. A full AI dev team in parallel.                                                                                                                    |
+|   🤖   | **Discipline Agents**                                    | Ultimate | Fathos orchestrates Hephaestus, Oracle, Librarian, Explore. A full AI dev team in parallel.                                                                                                                    |
 |   🧩   | **Codex CLI Light Edition**                              | Light    | Portable OMO components (rules, comment-checker, git-bash, LSP, ultrawork, ulw-loop, start-work continuation, telemetry) running inside OpenAI Codex CLI. Install via `npx lazycodex-ai install`.             |
 |   👥   | **Team Mode** (v4.0, opt-in)                             | Ultimate | Lead agent + up to 8 parallel members, real-time tmux visualization, dedicated `team_*` tools. Powers `hyperplan` (5 hostile critics) and `security-research` (3 hunters + 2 PoC engineers). [Docs →](docs/guide/team-mode.md) |
 |   ⚡   | **`ultrawork` / `ulw`**                                  | Both     | One word. Every agent activates. Doesn't stop until done.                                                                                                                                                        |
@@ -241,7 +241,7 @@ Even with only the following subscriptions, `ultrawork` works well (this project
 <td align="center"><img src=".github/assets/hephaestus.png" height="300" /></td>
 </tr></table>
 
-**Sisyphus** (`claude-opus-4-7` / **`kimi-k2.6`** / **`glm-5.1`** ) is your main orchestrator. He plans, delegates to specialists, and drives tasks to completion with aggressive parallel execution. He does not stop halfway.
+**Fathos** (`claude-opus-4-7` / **`kimi-k2.6`** / **`glm-5.1`** ) is your main orchestrator. He plans, delegates to specialists, and drives tasks to completion with aggressive parallel execution. He does not stop halfway.
 
 **Hephaestus** (`gpt-5.5`) is your autonomous deep worker. Give him a goal, not a recipe. He explores the codebase, researches patterns, and executes end-to-end without hand-holding. *The Legitimate Craftsman.*
 
@@ -279,7 +279,7 @@ Restart opencode and the `team_*` tool family unlocks. Two skills already ride o
 
 ### Agent Orchestration
 
-When Sisyphus delegates to a subagent, it doesn't pick a model. It picks a **category**. The category maps automatically to the right model:
+When Fathos delegates to a subagent, it doesn't pick a model. It picks a **category**. The category maps automatically to the right model:
 
 | Category             | What it's for                      |
 | :------------------- | :--------------------------------- |
@@ -425,7 +425,7 @@ Features you'll think should've always existed. Once you use them, you can't go 
 See full [Features Documentation](docs/reference/features.md).
 
 **Quick Overview:**
-- **Agents**: Sisyphus (the main agent), Prometheus (planner), Oracle (architecture/debugging), Librarian (docs/code search), Explore (fast codebase grep), Multimodal Looker
+- **Agents**: Fathos (the main agent), Prometheus (planner), Oracle (architecture/debugging), Librarian (docs/code search), Explore (fast codebase grep), Multimodal Looker
 - **Background Agents**: Run multiple agents in parallel like a real dev team
 - **LSP & AST Tools**: Refactoring, rename, diagnostics, AST-aware code search
 - **Hash-anchored Edit Tool**: `LINE#ID` references validate content before applying every change. Surgical edits, zero stale-line errors
@@ -451,7 +451,7 @@ See [Configuration Documentation](docs/reference/configuration.md).
 - **JSONC Support**: Comments and trailing commas supported
 - **Agents**: Override models, temperatures, prompts, and permissions for any agent
 - **Built-in Skills**: `playwright` (browser automation), `git-master` (atomic commits)
-- **Sisyphus Agent**: Main orchestrator with Prometheus (Planner) and Metis (Plan Consultant)
+- **Fathos Agent**: Main orchestrator with Prometheus (Planner) and Metis (Plan Consultant)
 - **Background Tasks**: Configure concurrency limits per provider/model
 - **Categories**: Domain-specific task delegation (`visual`, `business-logic`, custom)
 - **Hooks**: 54+ lifecycle hooks (61 with Team Mode), all configurable via `disabled_hooks`

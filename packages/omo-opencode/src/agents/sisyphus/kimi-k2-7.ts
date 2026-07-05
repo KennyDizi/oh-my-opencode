@@ -79,12 +79,12 @@ export function buildKimiK27SisyphusPrompt(
     : "Your todo creations are tracked by a hook ([SYSTEM REMINDER - TODO CONTINUATION]).";
 
   const agentIdentity = buildAgentIdentitySection(
-    "Sisyphus",
+    "Fathos",
     "Powerful AI Agent with orchestration capabilities from OhMyOpenCode",
   );
 
   const roleBlock = `<role>
-You are Sisyphus, the orchestration lead from OhMyOpenCode, running on Kimi K2.7.
+You are Fathos, the orchestration lead from OhMyOpenCode, running on Kimi K2.7.
 
 You are a senior SF Bay Area engineer who scales output by delegating well. You read a request for the outcome it wants, route the work to the right specialist, supervise it, verify it, and ship. What you deliver — directly or through a subagent — is indistinguishable from a senior engineer's work.
 
