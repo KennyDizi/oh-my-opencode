@@ -1,6 +1,6 @@
 {
   "name": "oh-my-opencode",
-  "version": "4.15.1",
+  "version": "4.16.0",
   "description": "The Best AI Agent Harness - Batteries-Included OpenCode Plugin with Multi-Model Orchestration, Parallel Background Agents, and Crafted LSP/AST Tools",
   "main": "./dist/index.js",
   "types": "dist/index.d.ts",
@@ -115,6 +115,7 @@
     "build:all": "bun run build && bun run build:binaries",
     "build:binaries": "bun run script/build-binaries.ts",
     "build:schema": "bun run script/build-schema.ts",
+    "build:omo-schema": "bun run script/build-omo-schema.ts",
     "build:model-capabilities": "bun run script/build-model-capabilities.ts",
     "clean": "rm -rf dist",
     "prepack": "bun run build:materialize-frontend",
@@ -210,18 +211,18 @@
     "typescript": "^6.0.3"
   },
   "optionalDependencies": {
-    "oh-my-opencode-darwin-arm64": "4.15.1",
-    "oh-my-opencode-darwin-x64": "4.15.1",
-    "oh-my-opencode-darwin-x64-baseline": "4.15.1",
-    "oh-my-opencode-linux-arm64": "4.15.1",
-    "oh-my-opencode-linux-arm64-musl": "4.15.1",
-    "oh-my-opencode-linux-x64": "4.15.1",
-    "oh-my-opencode-linux-x64-baseline": "4.15.1",
-    "oh-my-opencode-linux-x64-musl": "4.15.1",
-    "oh-my-opencode-linux-x64-musl-baseline": "4.15.1",
-    "oh-my-opencode-windows-arm64": "4.15.1",
-    "oh-my-opencode-windows-x64": "4.15.1",
-    "oh-my-opencode-windows-x64-baseline": "4.15.1"
+    "oh-my-opencode-darwin-arm64": "4.16.0",
+    "oh-my-opencode-darwin-x64": "4.16.0",
+    "oh-my-opencode-darwin-x64-baseline": "4.16.0",
+    "oh-my-opencode-linux-arm64": "4.16.0",
+    "oh-my-opencode-linux-arm64-musl": "4.16.0",
+    "oh-my-opencode-linux-x64": "4.16.0",
+    "oh-my-opencode-linux-x64-baseline": "4.16.0",
+    "oh-my-opencode-linux-x64-musl": "4.16.0",
+    "oh-my-opencode-linux-x64-musl-baseline": "4.16.0",
+    "oh-my-opencode-windows-arm64": "4.16.0",
+    "oh-my-opencode-windows-x64": "4.16.0",
+    "oh-my-opencode-windows-x64-baseline": "4.16.0"
   },
   "overrides": {
     "@earendil-works/pi-agent-core": "0.80.3",
