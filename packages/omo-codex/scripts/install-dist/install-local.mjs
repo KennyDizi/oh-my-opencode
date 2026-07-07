@@ -347,7 +347,7 @@ function getTelemetryDistinctId(machineIdPrefix, osProvider = getDefaultTelemetr
 }
 var init_machine_id = () => {};
 
-// node_modules/.bun/posthog-node@5.39.4/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/module.node.mjs
+// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/module.node.mjs
 import { dirname as dirname9, posix, sep as sep7 } from "node:path";
 function createModulerModifier() {
   const getModuleFromFileName = createGetModuleFromFilename();
@@ -3269,7 +3269,7 @@ var init_dist = __esm(() => {
   init_types();
 });
 
-// node_modules/.bun/posthog-node@5.39.4/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/context-lines.node.mjs
+// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/context-lines.node.mjs
 import { createReadStream } from "node:fs";
 import { createInterface } from "node:readline";
 async function addSourceContext(frames) {
@@ -3488,7 +3488,7 @@ var init_context_lines_node = __esm(() => {
   LRU_FILE_CONTENTS_FS_READ_FAILED = new exports_error_tracking.ReduceableCache(20);
 });
 
-// node_modules/.bun/posthog-node@5.39.4/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/relative-path.node.mjs
+// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/relative-path.node.mjs
 import { isAbsolute as isAbsolute6, relative as relative4, sep as sep8 } from "node:path";
 function createRelativePathModifier(basePath = process.cwd()) {
   const isWindows = sep8 === "\\";
@@ -3505,11 +3505,11 @@ function createRelativePathModifier(basePath = process.cwd()) {
 }
 var init_relative_path_node = () => {};
 
-// node_modules/.bun/posthog-node@5.39.4/node_modules/posthog-node/dist/version.mjs
-var version = "5.39.4";
+// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/version.mjs
+var version = "5.40.0";
 var init_version = () => {};
 
-// node_modules/.bun/posthog-node@5.39.4/node_modules/posthog-node/dist/types.mjs
+// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/types.mjs
 var FeatureFlagError2;
 var init_types3 = __esm(() => {
   FeatureFlagError2 = {
@@ -3520,7 +3520,7 @@ var init_types3 = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.39.4/node_modules/posthog-node/dist/feature-flag-evaluations.mjs
+// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/feature-flag-evaluations.mjs
 class FeatureFlagEvaluations {
   constructor(init) {
     this._host = init.host;
@@ -3654,7 +3654,7 @@ var init_feature_flag_evaluations = __esm(() => {
   init_types3();
 });
 
-// node_modules/.bun/posthog-node@5.39.4/node_modules/posthog-node/dist/extensions/feature-flags/crypto.mjs
+// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/extensions/feature-flags/crypto.mjs
 async function hashSHA1(text) {
   const subtle = globalThis.crypto?.subtle;
   if (!subtle)
@@ -3665,7 +3665,7 @@ async function hashSHA1(text) {
 }
 var init_crypto = () => {};
 
-// node_modules/.bun/posthog-node@5.39.4/node_modules/posthog-node/dist/extensions/feature-flags/feature-flags.mjs
+// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/extensions/feature-flags/feature-flags.mjs
 function setCustomErrorPrototype(error, constructor) {
   error.name = constructor.name;
   Error.captureStackTrace(error, constructor);
@@ -4080,7 +4080,7 @@ class FeatureFlagsPoller {
           return;
         case 401:
           this.beginBackoff();
-          throw new ClientError(`Your project key or personal API key is invalid. Setting next polling interval to ${this.getPollingInterval()}ms. More information: https://posthog.com/docs/api#rate-limiting`);
+          throw new ClientError(`Your project key or secret key is invalid. Setting next polling interval to ${this.getPollingInterval()}ms. More information: https://posthog.com/docs/api#rate-limiting`);
         case 402:
           console.warn("[FEATURE FLAGS] Feature flags quota limit exceeded - unsetting all local flags. Learn more about billing limits at https://posthog.com/docs/billing/limits-alerts");
           this.featureFlags = [];
@@ -4090,7 +4090,7 @@ class FeatureFlagsPoller {
           return;
         case 403:
           this.beginBackoff();
-          throw new ClientError(`Your personal API key does not have permission to fetch feature flag definitions for local evaluation. Setting next polling interval to ${this.getPollingInterval()}ms. Are you sure you're using the correct personal and Project API key pair? More information: https://posthog.com/docs/api/overview`);
+          throw new ClientError(`Your secret key does not have permission to fetch feature flag definitions for local evaluation. Setting next polling interval to ${this.getPollingInterval()}ms. Are you sure you're using the correct secret and Project API key pair? More information: https://posthog.com/docs/api/overview`);
         case 429:
           this.beginBackoff();
           throw new ClientError(`You are being rate limited. Setting next polling interval to ${this.getPollingInterval()}ms. More information: https://posthog.com/docs/api#rate-limiting`);
@@ -4576,7 +4576,7 @@ var init_feature_flags = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.39.4/node_modules/posthog-node/dist/extensions/error-tracking/autocapture.mjs
+// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/extensions/error-tracking/autocapture.mjs
 function makeUncaughtExceptionHandler(captureFn, onFatalFn) {
   let calledFatalError = false;
   return Object.assign((error) => {
@@ -4609,7 +4609,7 @@ function addUnhandledRejectionListener(captureFn) {
 }
 var init_autocapture = () => {};
 
-// node_modules/.bun/posthog-node@5.39.4/node_modules/posthog-node/dist/extensions/error-tracking/index.mjs
+// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/extensions/error-tracking/index.mjs
 class ErrorTracking {
   constructor(client, options, _logger) {
     this.client = client;
@@ -4681,7 +4681,7 @@ var init_error_tracking2 = __esm(() => {
   init_dist();
 });
 
-// node_modules/.bun/posthog-node@5.39.4/node_modules/posthog-node/dist/storage-memory.mjs
+// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/storage-memory.mjs
 class PostHogMemoryStorage {
   getProperty(key) {
     return this._memoryStorage[key];
@@ -4695,7 +4695,7 @@ class PostHogMemoryStorage {
 }
 var init_storage_memory = () => {};
 
-// node_modules/.bun/posthog-node@5.39.4/node_modules/posthog-node/dist/client.mjs
+// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/client.mjs
 function emitDeprecationWarningOnce(id, message) {
   if (_emittedDeprecations.has(id))
     return;
@@ -4746,7 +4746,7 @@ var init_client = __esm(() => {
       const normalizedOptions = {
         ...options,
         host: normalizeHost(options.host),
-        personalApiKey: normalizePersonalApiKey(options.personalApiKey)
+        personalApiKey: normalizePersonalApiKey(options.secretKey ?? options.personalApiKey)
       };
       super(normalizedApiKey, normalizedOptions), this._memoryStorage = new PostHogMemoryStorage;
       this.options = normalizedOptions;
@@ -5799,7 +5799,7 @@ var init_client = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.39.4/node_modules/posthog-node/dist/extensions/context/context.mjs
+// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/extensions/context/context.mjs
 import { AsyncLocalStorage } from "node:async_hooks";
 
 class PostHogContext {
@@ -5831,7 +5831,7 @@ class PostHogContext {
 }
 var init_context = () => {};
 
-// node_modules/.bun/posthog-node@5.39.4/node_modules/posthog-node/dist/extensions/sentry-integration.mjs
+// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/extensions/sentry-integration.mjs
 function createEventProcessor(_posthog, { organization, projectId, prefix, severityAllowList = [
   "error"
 ], sendExceptionsToPostHog = true } = {}) {
@@ -5902,22 +5902,22 @@ var init_sentry_integration = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.39.4/node_modules/posthog-node/dist/extensions/tracing-headers.mjs
+// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/extensions/tracing-headers.mjs
 var init_tracing_headers2 = () => {};
 
-// node_modules/.bun/posthog-node@5.39.4/node_modules/posthog-node/dist/extensions/url-utils.mjs
+// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/extensions/url-utils.mjs
 var init_url_utils = __esm(() => {
   init_dist();
 });
 
-// node_modules/.bun/posthog-node@5.39.4/node_modules/posthog-node/dist/extensions/express.mjs
+// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/extensions/express.mjs
 var init_express = __esm(() => {
   init_error_tracking2();
   init_tracing_headers2();
   init_url_utils();
 });
 
-// node_modules/.bun/posthog-node@5.39.4/node_modules/posthog-node/dist/exports.mjs
+// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/exports.mjs
 var init_exports = __esm(() => {
   init_feature_flag_evaluations();
   init_dist();
@@ -5926,7 +5926,7 @@ var init_exports = __esm(() => {
   init_types3();
 });
 
-// node_modules/.bun/posthog-node@5.39.4/node_modules/posthog-node/dist/entrypoints/index.node.mjs
+// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/entrypoints/index.node.mjs
 var PostHog;
 var init_index_node = __esm(() => {
   init_module_node();
