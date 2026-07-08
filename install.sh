@@ -31,8 +31,19 @@ echo -e "${YELLOW}[4/4]${NC} Verifying build output..."
 
 FAILED=0
 
+print_file_size() {
+    local file_path="$1"
+
+    if command -v du &> /dev/null; then
+        local file_size
+        file_size="$(du -h "$file_path" | cut -f1)"
+        echo -e "    size on disk: ${file_size}"
+    fi
+}
+
 if [ -f "dist/index.js" ]; then
     echo -e "${GREEN}✓${NC} dist/index.js exists"
+    print_file_size "dist/index.js"
 else
     echo -e "${RED}✗${NC} dist/index.js missing"
     FAILED=1
@@ -40,6 +51,7 @@ fi
 
 if [ -f "dist/index.d.ts" ]; then
     echo -e "${GREEN}✓${NC} dist/index.d.ts exists"
+    print_file_size "dist/index.d.ts"
 else
     echo -e "${RED}✗${NC} dist/index.d.ts missing"
     FAILED=1
@@ -47,6 +59,7 @@ fi
 
 if [ -f "dist/cli/index.js" ]; then
     echo -e "${GREEN}✓${NC} dist/cli/index.js exists"
+    print_file_size "dist/cli/index.js"
 else
     echo -e "${RED}✗${NC} dist/cli/index.js missing"
     FAILED=1
@@ -54,6 +67,7 @@ fi
 
 if [ -f "assets/oh-my-opencode.schema.json" ]; then
     echo -e "${GREEN}✓${NC} assets/oh-my-opencode.schema.json exists"
+    print_file_size "assets/oh-my-opencode.schema.json"
     if command -v jq &> /dev/null; then
         if jq empty assets/oh-my-opencode.schema.json 2>/dev/null; then
             echo -e "${GREEN}✓${NC} Schema is valid JSON"
