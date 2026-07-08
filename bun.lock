@@ -57,7 +57,7 @@
         "@oh-my-opencode/tmux-core": "workspace:*",
         "@oh-my-opencode/utils": "workspace:*",
         "@types/js-yaml": "^4.0.9",
-        "@types/node": "^26.1.0",
+        "@types/node": "^26.1.1",
         "@types/picomatch": "^4.0.3",
         "@typescript/native-preview": "7.0.0-dev.20260518.1",
         "@xterm/addon-unicode11": "^0.9.0",
