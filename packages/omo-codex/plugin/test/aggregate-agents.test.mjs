@@ -19,16 +19,16 @@ const lazycodexAgentInvariants = new Map([
 	[
 		"explorer.toml",
 		{
-			model: "gpt-5.6-terra",
-			effort: "medium",
+			model: "gpt-5.6-luna",
+			effort: "low",
 			includes: [/Read-only/, /working tree/, /rg/],
 		},
 	],
 	[
 		"librarian.toml",
 		{
-			model: "gpt-5.6-terra",
-			effort: "medium",
+			model: "gpt-5.6-luna",
+			effort: "low",
 			includes: [/Read-only/, /SHA-pinned GitHub permalink/, /external/],
 		},
 	],
@@ -62,6 +62,30 @@ const lazycodexAgentInvariants = new Map([
 			model: "gpt-5.6-sol",
 			effort: "high",
 			includes: [/EVIDENCE_RECORDED: <path>/, /scenario/i, /artifact/i],
+		},
+	],
+	[
+		"lazycodex-worker-low.toml",
+		{
+			model: "gpt-5.6-luna",
+			effort: "high",
+			includes: [/EVIDENCE_RECORDED: <path>/, /low-difficulty/i, /smallest correct change/i],
+		},
+	],
+	[
+		"lazycodex-worker-medium.toml",
+		{
+			model: "gpt-5.6-sol",
+			effort: "high",
+			includes: [/EVIDENCE_RECORDED: <path>/, /medium-difficulty/i, /smallest correct change/i],
+		},
+	],
+	[
+		"lazycodex-worker-high.toml",
+		{
+			model: "gpt-5.6-sol",
+			effort: "max",
+			includes: [/EVIDENCE_RECORDED: <path>/, /high-difficulty/i, /smallest correct change/i],
 		},
 	],
 	[
@@ -117,6 +141,9 @@ test("#given bundled Codex agents #when components/ultrawork/agents directory is
 		"lazycodex-executor.toml",
 		"lazycodex-gate-reviewer.toml",
 		"lazycodex-qa-executor.toml",
+		"lazycodex-worker-high.toml",
+		"lazycodex-worker-low.toml",
+		"lazycodex-worker-medium.toml",
 		"librarian.toml",
 		"metis.toml",
 		"momus.toml",
@@ -207,3 +234,27 @@ test("#given LazyCodex reviewer prompts #when inspected #then anti-slop review c
 		"gate reviewer must perform the overfit/slop pass directly before checking report coverage",
 	);
 });
+
+test("#given done-gate reviewer prompts #when inspected #then burden of proof is approve-unless-cited and reject priors are gone", async () => {
+	const agentsDir = join(root, "components", "ultrawork", "agents");
+	const gateReviewer = await readFile(join(agentsDir, "lazycodex-gate-reviewer.toml"), "utf8");
+	const qaExecutor = await readFile(join(agentsDir, "lazycodex-qa-executor.toml"), "utf8");
+	const codeReviewer = await readFile(join(agentsDir, "lazycodex-code-reviewer.toml"), "utf8");
+
+	assert.match(gateReviewer, /APPROVE unless you can cite/);
+	assert.match(gateReviewer, /violatedCriterion/);
+	assert.match(gateReviewer, /evidencePointer/);
+	assert.match(gateReviewer, /top blockers inline/);
+	assert.match(gateReviewer, /is a NOTE, not a blocker/);
+	assert.match(gateReviewer, /You do NOT check/);
+	assert.doesNotMatch(gateReviewer, /Assume the work has already failed/);
+	assert.doesNotMatch(gateReviewer, /Return exactly one recommendation: APPROVE\/REJECT\./);
+
+	assert.match(qaExecutor, /one-line reason/);
+	assert.match(qaExecutor, /rejecting a legitimately untriggered class is itself an error/);
+	assert.doesNotMatch(qaExecutor, /Trust nothing\./);
+
+	assert.match(codeReviewer, /MEDIUM by default/);
+	assert.doesNotMatch(codeReviewer, /Treat useless tests or needless production complexity as CRITICAL\/HIGH/);
+});
+
