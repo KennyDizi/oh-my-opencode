@@ -1,7 +1,7 @@
 import type { AgentConfig } from "@opencode-ai/sdk";
-import { createAgentToolRestrictions } from "../shared/permission-compat";
 import type { AgentMode, AgentPromptMetadata } from "./types";
-import { buildClaudeThinkingConfig, isGpt5_5Model, isGptModel } from "./types";
+import { buildClaudeThinkingConfig, isGpt5_5Model, isGpt5_6Model, isGptModel } from "./types";
+import { createAgentToolRestrictions } from "../shared/permission-compat";
 
 const MODE: AgentMode = "subagent";
 
@@ -526,7 +526,7 @@ export function createOracleAgent(model: string): AgentConfig {
     prompt: ORACLE_DEFAULT_PROMPT,
   } as AgentConfig;
 
-  if (isGpt5_5Model(model)) {
+  if (isGpt5_5Model(model) || isGpt5_6Model(model)) {
     return {
       ...base,
       prompt: ORACLE_GPT_5_5_PROMPT,
