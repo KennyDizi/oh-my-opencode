@@ -17,6 +17,7 @@ const TASK_DENIED_SUBAGENTS = [
   "multimodal-looker",
   "metis",
   "momus",
+  "praha",
 ] as const
 
 const TASK_ALLOWED_AGENT_NAMES = [

@@ -17,6 +17,7 @@ export const AGENT_DISPLAY_NAMES: Record<string, string> = {
   "sisyphus-junior": "Sisyphus-Junior",
   metis: "Metis - Plan Consultant",
   momus: "Momus - Plan Critic",
+  praha: "Praha",
   athena: "Athena - Council",
   "athena-junior": "Athena-Junior - Council",
   oracle: "Oracle",
@@ -97,6 +98,7 @@ const REVERSE_DISPLAY_NAMES: Record<string, string> = Object.fromEntries(
 // Old configs/sessions may reference these names; resolve them to config keys.
 const LEGACY_DISPLAY_NAMES: Record<string, string> = {
   "sisyphus (ultraworker)": "sisyphus",
+  "sisyphus - ultraworker": "sisyphus",
   "hephaestus (deep agent)": "hephaestus",
   "prometheus (plan builder)": "prometheus",
   "atlas (plan executor)": "atlas",

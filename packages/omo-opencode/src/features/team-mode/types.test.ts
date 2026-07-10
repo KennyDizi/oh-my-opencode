@@ -262,8 +262,8 @@ describe("team-mode types", () => {
     )
 
     // then
-    expect(entries).toHaveLength(12)
-    expect(verdictCounts).toEqual({ eligible: 3, conditional: 1, "hard-reject": 8 })
+    expect(entries).toHaveLength(13)
+    expect(verdictCounts).toEqual({ eligible: 3, conditional: 1, "hard-reject": 9 })
     expect(AGENT_ELIGIBILITY_REGISTRY.hephaestus.rejectionMessage).toBe(
       "Agent 'hephaestus' lacks teammate permission. Either apply D-36 (add teammate: \"allow\" in tool-config-handler.ts) or use subagent_type: \"sisyphus\" instead.",
     )
@@ -287,6 +287,9 @@ describe("team-mode types", () => {
     )
     expect(AGENT_ELIGIBILITY_REGISTRY.momus.rejectionMessage).toBe(
       "Agent 'momus' is read-only (plan reviewer). Cannot write to mailbox as team member. Use delegate-task for plan review instead.",
+    )
+    expect(AGENT_ELIGIBILITY_REGISTRY.praha.rejectionMessage).toBe(
+      "Agent 'praha' is read-only (technical document reviewer). Cannot write to mailbox as team member. Use delegate-task with subagent_type: 'praha' for document review instead.",
     )
     expect(AGENT_ELIGIBILITY_REGISTRY.prometheus.rejectionMessage).toBe(
       "Agent 'prometheus' is plan-mode-only; can only write to .omo/*.md (enforced by prometheusMdOnly hook). Cannot write to team mailbox. Use delegate-task with subagent_type: 'plan' instead.",

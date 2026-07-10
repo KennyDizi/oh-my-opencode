@@ -12,6 +12,7 @@ const expectedAgents = [
   "prometheus",
   "metis",
   "momus",
+  "praha",
   "atlas",
   "sisyphus-junior",
 ] as const

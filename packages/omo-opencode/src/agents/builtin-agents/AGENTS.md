@@ -1,6 +1,6 @@
 ---
 name: builtin-agents-factory-layer
-description: Conditional factory wrappers that apply overrides, model resolution, skill filtering, and provider gating to the 12 agent definitions.
+description: Conditional factory wrappers that apply overrides, model resolution, skill filtering, and provider gating to the 13 agent definitions.
 ---
 
 # src/agents/builtin-agents/ -- Conditional Factory Layer
@@ -9,7 +9,7 @@ description: Conditional factory wrappers that apply overrides, model resolution
 
 ## OVERVIEW
 
-Conditional factory layer beneath the 12 raw agent definitions in `src/agents/`. Each `maybeCreateXXXConfig` wrapper decides whether an agent registers, resolves its model via the 4-step pipeline, applies user overrides, filters skills, and returns the final `AgentConfig` -- or `undefined` if the agent is disabled or requirements are not met. Outputs feed `createPluginInterface`.
+Conditional factory layer beneath the 13 raw agent definitions in `src/agents/`. Each `maybeCreateXXXConfig` wrapper decides whether an agent registers, resolves its model via the 4-step pipeline, applies user overrides, filters skills, and returns the final `AgentConfig` -- or `undefined` if the agent is disabled or requirements are not met. Outputs feed `createPluginInterface`.
 
 ## FILE CATALOG
 

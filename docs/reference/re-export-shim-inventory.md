@@ -10,7 +10,7 @@ Generated command:
 git ls-files packages/omo-opencode/src packages/omo-codex/src | grep '\.ts$' | sort | xargs awk 'FNR==1 && /^export (\*|\{).*from ["'"'"']@oh-my-opencode\// { print FILENAME }'
 ```
 
-Snapshot date: 2026-06-13. Total shim exports found: 317.
+Snapshot date: 2026-06-13. Total shim exports found: 318.
 
 ## Aggregate By Target Package
 
@@ -27,7 +27,7 @@ Snapshot date: 2026-06-13. Total shim exports found: 317.
 | `@oh-my-opencode/omo-senpi` | 1 |
 | `@oh-my-opencode/openclaw-core` | 30 |
 | `@oh-my-opencode/rules-engine` | 4 |
-| `@oh-my-opencode/skills-loader-core` | 65 |
+| `@oh-my-opencode/skills-loader-core` | 66 |
 | `@oh-my-opencode/team-core` | 45 |
 | `@oh-my-opencode/tmux-core` | 3 |
 | `@oh-my-opencode/utils` | 54 |
@@ -91,6 +91,7 @@ Snapshot date: 2026-06-13. Total shim exports found: 317.
 | `packages/omo-opencode/src/features/builtin-skills/skills/agent-browser-template.ts` | `@oh-my-opencode/skills-loader-core` |
 | `packages/omo-opencode/src/features/builtin-skills/skills/debugging.ts` | `@oh-my-opencode/skills-loader-core` |
 | `packages/omo-opencode/src/features/builtin-skills/skills/dev-browser.ts` | `@oh-my-opencode/skills-loader-core` |
+| `packages/omo-opencode/src/features/builtin-skills/skills/find-skills.ts` | `@oh-my-opencode/skills-loader-core` |
 | `packages/omo-opencode/src/features/builtin-skills/skills/frontend.ts` | `@oh-my-opencode/skills-loader-core` |
 | `packages/omo-opencode/src/features/builtin-skills/skills/git-master-sections/commit-atomic-planning.ts` | `@oh-my-opencode/skills-loader-core` |
 | `packages/omo-opencode/src/features/builtin-skills/skills/git-master-sections/commit-context-analysis.ts` | `@oh-my-opencode/skills-loader-core` |

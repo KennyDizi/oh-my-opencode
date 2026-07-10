@@ -28,6 +28,40 @@ const EXPLORATION_AGENT_DENYLIST: Record<string, boolean> = {
   call_omo_agent: false,
 }
 
+const PRAHA_SESSION_TOOL_RESTRICTIONS: Record<string, boolean> = {
+  read: true,
+  grep: false,
+  glob: false,
+  bash: false,
+  interactive_bash: false,
+  skill: false,
+  skill_mcp: false,
+  webfetch: false,
+  external_directory: false,
+  look_at: false,
+  write: false,
+  edit: false,
+  apply_patch: false,
+  task: false,
+  call_omo_agent: false,
+  background_output: false,
+  background_cancel: false,
+  session_list: false,
+  session_read: false,
+  session_search: false,
+  session_info: false,
+  task_create: false,
+  task_get: false,
+  task_list: false,
+  task_update: false,
+  lsp_diagnostics: false,
+  lsp_goto_definition: false,
+  lsp_find_references: false,
+  lsp_symbols: false,
+  lsp_prepare_rename: false,
+  lsp_rename: false,
+}
+
 const AGENT_RESTRICTIONS: Record<string, Record<string, boolean>> = {
   explore: EXPLORATION_AGENT_DENYLIST,
 
@@ -56,6 +90,8 @@ const AGENT_RESTRICTIONS: Record<string, Record<string, boolean>> = {
     write: false,
     edit: false,
   },
+
+  praha: PRAHA_SESSION_TOOL_RESTRICTIONS,
 
   "multimodal-looker": {
     read: true,

@@ -57,7 +57,7 @@ Registered via [`src/plugin/tool-registry.ts`](../../plugin/tool-registry.ts) `t
 |---------|--------|-------|
 | `eligible` | sisyphus, atlas, sisyphus-junior | Three only |
 | `conditional` | hephaestus | Lacks `teammate: "allow"` permission by default. Either apply D-36 patch (add `teammate: "allow"` in `tool-config-handler.ts`) or use `subagent_type: "sisyphus"` instead |
-| `hard-reject` | oracle, librarian, explore, multimodal-looker, metis, momus, prometheus | Read-only or plan-mode-only — cannot write to mailbox; use `task` (delegate-task) instead |
+| `hard-reject` | oracle, librarian, explore, multimodal-looker, metis, momus, praha, prometheus | Read-only or plan-mode-only — cannot write to mailbox; use `task` (delegate-task) instead |
 
 Hard-reject agents throw at TeamSpec parse with a specific message ("Agent 'X' is read-only…"). The error message points members at delegate-task as the right escape hatch.
 

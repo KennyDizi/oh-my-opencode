@@ -206,6 +206,33 @@ describe("AGENT_MODEL_REQUIREMENTS", () => {
     expect(primary?.providers[0]).toBe("openai")
   })
 
+  test("praha has high-reasoning document review fallbacks", () => {
+    // given
+    const praha = AGENT_MODEL_REQUIREMENTS.praha
+
+    // when
+    const [primary, opusFallback, geminiFallback, glmFallback] = praha.fallbackChain
+
+    // then
+    expect(praha.fallbackChain).toHaveLength(4)
+    expect(primary).toEqual({
+      providers: ["openai", "github-copilot", "opencode", "vercel"],
+      model: "gpt-5.5",
+      variant: "high",
+    })
+    expect(opusFallback).toEqual({
+      providers: ["anthropic", "github-copilot", "opencode", "vercel"],
+      model: "claude-opus-4-7",
+      variant: "max",
+    })
+    expect(geminiFallback).toEqual({
+      providers: ["google", "github-copilot", "opencode", "vercel"],
+      model: "gemini-3.1-pro",
+      variant: "high",
+    })
+    expect(glmFallback).toEqual({ providers: ["opencode-go", "vercel"], model: "glm-5.1" })
+  })
+
   test("atlas keeps sonnet, kimi, gpt-5.5, and minimax fallback order", () => {
     // given
     const atlas = AGENT_MODEL_REQUIREMENTS["atlas"]

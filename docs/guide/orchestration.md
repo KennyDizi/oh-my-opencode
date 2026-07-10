@@ -47,6 +47,8 @@ flowchart TB
     subgraph Workers["Worker Layer (Specialized Agents)"]
         Junior[" Sisyphus-Junior<br/>(Task Executor)<br/>claude-sonnet-4-6 / kimi-k2.6 / gpt-5.5 / minimax-m3 / minimax-m2.7"]
         Oracle[" Oracle<br/>(Architecture)<br/>gpt-5.5 / gemini-3.1-pro / claude-opus-4-7 / glm-5"]
+        Fato[" Fato<br/>(Review)<br/>claude-fable-5 / claude-sonnet-5 / gpt-5.5"]
+        Praha[" Praha<br/>(Document Review)<br/>gpt-5.5 / claude-opus-4-7 / gemini-3.1-pro / glm-5.1"]
         Explore[" Explore<br/>(Codebase Grep)<br/>gpt-5.4-mini-fast / minimax-m2.7-highspeed / minimax-m3 / claude-haiku-4-5"]
         Librarian[" Librarian<br/>(Docs/OSS)<br/>gpt-5.4-mini-fast / minimax-m2.7-highspeed / minimax-m3 / claude-haiku-4-5"]
         Frontend[" visual-engineering<br/>(category + frontend)<br/>gemini-3.1-pro / glm-5 / claude-opus-4-7"]
@@ -64,12 +66,16 @@ flowchart TB
 
     Orchestrator -->|"task(category=deep/quick/unspecified-*)"| Junior
     Orchestrator -->|"task(subagent_type=oracle)"| Oracle
+    Orchestrator -->|"task(subagent_type=fato)"| Fato
+    Orchestrator -->|"task(subagent_type=praha)"| Praha
     Orchestrator -->|"call_omo_agent(subagent_type=explore)"| Explore
     Orchestrator -->|"call_omo_agent(subagent_type=librarian)"| Librarian
     Orchestrator -->|"task(category=visual-engineering, load_skills=[frontend])"| Frontend
 
     Junior -->|"Results + Learnings"| Orchestrator
     Oracle -->|"Advice"| Orchestrator
+    Fato -->|"Review"| Orchestrator
+    Praha -->|"Document clarity"| Orchestrator
     Explore -->|"Code patterns"| Orchestrator
     Librarian -->|"Documentation"| Orchestrator
     Frontend -->|"UI code"| Orchestrator
@@ -79,10 +85,10 @@ Model labels above show the current fallback stacks from `packages/omo-opencode/
 
 ### Agent Inventory and Modes (Current)
 
-The system has **12 built-in agents**:
+The system has **13 built-in agents**:
 
 - Primary: `sisyphus`, `hephaestus`, `prometheus`, `atlas`
-- Subagent: `oracle`, `fato`, `librarian`, `explore`, `multimodal-looker`, `metis`, `momus`, `sisyphus-junior`
+- Subagent: `oracle`, `fato`, `librarian`, `explore`, `multimodal-looker`, `metis`, `momus`, `praha`, `sisyphus-junior`
 
 Canonical assembly order for primary agents is:
 

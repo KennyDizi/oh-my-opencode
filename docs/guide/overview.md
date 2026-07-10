@@ -61,6 +61,8 @@ User Request
     ├─→ [Prometheus] — Strategic planning (interview mode)
     ├─→ [Atlas] — Todo orchestration and execution
     ├─→ [Oracle] — Architecture consultation
+    ├─→ [Fato] — Implementation review
+    ├─→ [Praha] — Technical document clarity review
     ├─→ [Librarian] — Documentation/code search
     ├─→ [Explore] — Fast codebase grep
     └─→ [Category-based agents] — Specialized by task type
@@ -123,6 +125,8 @@ Read-only high-IQ consultant for architecture decisions and complex debugging. C
 
 - **Metis** — Gap analyzer. Catches what Prometheus missed before plans are finalized.
 - **Momus** — Ruthless reviewer. Validates plans against clarity, verification, and context criteria.
+- **Fato** — Implementation review consultant for post-work verification.
+- **Praha** — Technical document clarity reviewer that checks referenced local files safely.
 - **Explore** — Fast codebase grep. Uses speed-focused models for pattern discovery.
 - **Librarian** — Documentation and OSS code search. Stays current on library APIs and best practices.
 - **Multimodal Looker** — Vision and screenshot analysis.
@@ -225,7 +229,7 @@ You can override specific agents or categories in your config:
 
 **GPT models** (explicit reasoning, principle-driven):
 
-- GPT-5.5 — deep coding powerhouse, required for Hephaestus and default for Oracle
+- GPT-5.5 — deep coding powerhouse, required for Hephaestus and default for Oracle, Momus, and Praha
 - GPT-5.4 Mini — fast and cheap utility tasks
 
 **Different-behavior models**:

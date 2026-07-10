@@ -2,7 +2,7 @@
 
 ## Agents
 
-Oh-My-OpenAgent provides 11 specialized AI agents. Each has distinct expertise, optimized models, and tool permissions.
+Oh-My-OpenAgent provides 13 specialized AI agents. Each has distinct expertise, optimized models, and tool permissions.
 
 ### Core Agents
 
@@ -13,6 +13,7 @@ Core-agent tab cycling is deterministic via injected runtime order field. The fi
 | **Sisyphus**          | `claude-opus-4-7`  | The default orchestrator. Plans, delegates, and executes complex tasks using specialized subagents with aggressive parallel execution. Todo-driven workflow with extended thinking (32k budget). Fallback: `opencode-go/kimi-k2.6` → `kimi-for-coding/k2p5` → `opencode\|moonshotai\|moonshotai-cn\|firmware\|ollama-cloud\|aihubmix/kimi-k2.5` → `openai\|github-copilot\|opencode/gpt-5.5 (medium)` → `zai-coding-plan\|opencode/glm-5` → `opencode/big-pickle`. |
 | **Hephaestus**        | `gpt-5.5`          | The Legitimate Craftsman. Autonomous deep worker inspired by AmpCode's deep mode. Goal-oriented execution with thorough research before action. Explores codebase patterns, completes tasks end-to-end without premature stopping. Named after the Greek god of forge and craftsmanship. Requires a GPT-capable provider. |
 | **Oracle**            | `gpt-5.5`          | Architecture decisions, code review, debugging. Read-only consultation with stellar logical reasoning and deep analysis. Inspired by AmpCode. Fallback: `google\|github-copilot\|opencode/gemini-3.1-pro (high)` → `anthropic\|github-copilot\|opencode/claude-opus-4-7 (max)` → `opencode-go/glm-5.1`.                                                                                                                                 |
+| **Fato**              | `claude-fable-5`   | Implementation review consultant. Oracle-equivalent read-only review agent with the built-in review-work skill. Fallback: `anthropic\|github-copilot\|opencode\|vercel/claude-sonnet-5 (max)` → `openai\|github-copilot\|opencode\|vercel/gpt-5.5 (high)`. |
 | **Librarian**         | `gpt-5.4-mini-fast` | Multi-repo analysis, documentation lookup, OSS implementation examples. Deep codebase understanding with evidence-based answers. Fallback: `opencode-go/qwen3.5-plus` → `opencode-go/minimax-m3` → `opencode-go/minimax-m2.7` → `anthropic\|vercel/claude-haiku-4-5` → `openai\|vercel/gpt-5.4-nano`. |
 | **Explore**           | `gpt-5.4-mini-fast` | Fast codebase exploration and contextual grep. Fallback: `opencode-go/qwen3.5-plus` → `opencode-go/minimax-m3` → `opencode-go/minimax-m2.7` → `anthropic\|vercel/claude-haiku-4-5` → `openai\|vercel/gpt-5.4-nano`. |
 | **Multimodal-Looker** | `gpt-5.5`          | Visual content specialist. Analyzes PDFs, images, diagrams to extract information. Fallback: `opencode-go/kimi-k2.6` → `zai-coding-plan/glm-4.6v` → `openai\|github-copilot\|opencode/gpt-5-nano`.                                                                                                                                                                                                   |
@@ -23,6 +24,7 @@ Core-agent tab cycling is deterministic via injected runtime order field. The fi
 | **Prometheus** | `claude-opus-4-7` | Strategic planner with interview mode. Creates detailed work plans through iterative questioning. Fallback: `openai\|github-copilot\|opencode/gpt-5.5 (high)` → `opencode-go/glm-5.1` → `google\|github-copilot\|opencode/gemini-3.1-pro`. |
 | **Metis**      | `claude-sonnet-4-6` | Plan consultant — pre-planning analysis. Identifies hidden intentions, ambiguities, and AI failure points. Fallback: `anthropic\|github-copilot\|opencode/claude-opus-4-7 (max)` → `openai\|github-copilot\|opencode/gpt-5.5 (high)` → `opencode-go/glm-5.1` → `kimi-for-coding/k2p5`. |
 | **Momus**      | `gpt-5.5`         | Plan reviewer — validates plans against clarity, verifiability, and completeness standards. Fallback: `anthropic\|github-copilot\|opencode/claude-opus-4-7 (max)` → `google\|github-copilot\|opencode/gemini-3.1-pro (high)` → `opencode-go/glm-5.1`. |
+| **Praha**      | `gpt-5.5`         | Technical document clarity reviewer. Reads safe referenced local files and reports hard-to-understand passages, ambiguities, and hard-to-verify claims. Fallback: `anthropic\|github-copilot\|opencode\|vercel/claude-opus-4-7 (max)` → `google\|github-copilot\|opencode\|vercel/gemini-3.1-pro (high)` → `opencode-go\|vercel/glm-5.1`. |
 
 ### Orchestration Agents
 
@@ -46,11 +48,13 @@ Ask @explore for the policy on this feature
 | Agent             | Restrictions                                                                            |
 | ----------------- | --------------------------------------------------------------------------------------- |
 | oracle            | Read-only: cannot write, edit, or delegate (blocked: write, edit, task, call_omo_agent) |
+| fato              | Read-only: cannot write, edit, or delegate (blocked: write, edit, task, call_omo_agent) |
 | librarian         | Cannot write, edit, or delegate (blocked: write, edit, task, call_omo_agent)            |
 | explore           | Cannot write, edit, or delegate (blocked: write, edit, task, call_omo_agent)            |
 | multimodal-looker | Allowlist: `read` only                                                                  |
 | atlas             | Cannot delegate (blocked: task, call_omo_agent)                                         |
 | momus             | Cannot write, edit, or delegate (blocked: write, edit, task)                            |
+| praha             | Allowlist: `read` only; external and secret-looking references are unverified            |
 
 ### Background Agents
 

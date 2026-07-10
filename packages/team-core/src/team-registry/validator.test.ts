@@ -14,6 +14,8 @@ import {
 
 const PROMETHEUS_REJECTION_MESSAGE =
   "Agent 'prometheus' is plan-mode-only; can only write to .omo/*.md (enforced by prometheusMdOnly hook). Cannot write to team mailbox. Use delegate-task with subagent_type: 'plan' instead."
+const PRAHA_REJECTION_MESSAGE =
+  "Agent 'praha' is read-only (technical document reviewer). Cannot write to mailbox as team member. Use delegate-task with subagent_type: 'praha' for document review instead."
 
 function createCategoryMember(name: string): Member {
   return {
@@ -99,6 +101,24 @@ describe("team-registry validator", () => {
 
     // then
     expect(act).toThrow(PROMETHEUS_REJECTION_MESSAGE)
+    expect(act).toThrow(TeamSpecValidationError)
+  })
+
+  test("rejects praha subagent members with the exact document-review message", () => {
+    // given
+    const member: Member = {
+      kind: "subagent_type",
+      name: "document-reviewer",
+      subagent_type: "praha",
+      backendType: "in-process",
+      isActive: true,
+    }
+
+    // when
+    const act = () => validateMemberEligibility(member)
+
+    // then
+    expect(act).toThrow(PRAHA_REJECTION_MESSAGE)
     expect(act).toThrow(TeamSpecValidationError)
   })
 

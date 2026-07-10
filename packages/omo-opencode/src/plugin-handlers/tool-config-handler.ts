@@ -12,6 +12,7 @@ const TASK_DENIED_SUBAGENT_KEYS = [
   "multimodal-looker",
   "metis",
   "momus",
+  "praha",
 ] as const;
 
 function getConfigQuestionPermission(): string | null {

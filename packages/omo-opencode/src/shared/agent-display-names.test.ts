@@ -9,8 +9,8 @@ describe("getAgentDisplayName", () => {
     // when getAgentDisplayName called
     const result = getAgentDisplayName(configKey)
 
-    // then returns "Sisyphus - ultraworker"
-    expect(result).toBe("Sisyphus - ultraworker")
+    // then returns "Fathos"
+    expect(result).toBe("Fathos")
   })
 
   it("returns display name for uppercase config key (old format - case-insensitive)", () => {
@@ -20,8 +20,8 @@ describe("getAgentDisplayName", () => {
     // when getAgentDisplayName called
     const result = getAgentDisplayName(configKey)
 
-    // then returns "Sisyphus - ultraworker" (case-insensitive lookup)
-    expect(result).toBe("Sisyphus - ultraworker")
+    // then returns "Fathos" (case-insensitive lookup)
+    expect(result).toBe("Fathos")
   })
 
   it("returns original key for unknown agents (fallback)", () => {
@@ -145,6 +145,17 @@ describe("getAgentDisplayName", () => {
     expect(result).toBe("multimodal-looker")
   })
 
+  it("returns display name for praha", () => {
+    // given config key "praha"
+    const configKey = "praha"
+
+    // when getAgentDisplayName called
+    const result = getAgentDisplayName(configKey)
+
+    // then returns "Praha"
+    expect(result).toBe("Praha")
+  })
+
   it("preserves CJK display-name overrides verbatim", () => {
     expect(getAgentDisplayName("sisyphus", { sisyphus: { displayName: "Sisyphus - 主脑" } })).toBe("Sisyphus - 主脑")
     expect(getAgentDisplayName("hephaestus", { hephaestus: { displayName: "헤파이스토스" } })).toBe("헤파이스토스")
@@ -212,11 +223,15 @@ describe("getAgentConfigKey", () => {
     expect(getAgentConfigKey("Sisyphus\u200B - Ultraworker")).toBe("sisyphus")
     expect(getAgentConfigKey("\uFEFFAtlas - Plan Executor")).toBe("atlas")
   })
+
+  it("resolves Praha display name to its lowercase config key", () => {
+    expect(getAgentConfigKey("Praha")).toBe("praha")
+  })
 })
 
 describe("getAgentListDisplayName", () => {
   it("returns the canonical display name for the core agent list", () => {
-    expect(getAgentListDisplayName("sisyphus")).toBe("Sisyphus - ultraworker")
+    expect(getAgentListDisplayName("sisyphus")).toBe("Fathos")
     expect(getAgentListDisplayName("hephaestus")).toBe("Hephaestus - Deep Agent")
     expect(getAgentListDisplayName("prometheus")).toBe("Prometheus - Plan Builder")
     expect(getAgentListDisplayName("atlas")).toBe("Atlas - Plan Executor")
@@ -243,14 +258,14 @@ describe("stripAgentListSortPrefix", () => {
 
 describe("normalizeAgentForPrompt", () => {
   it("strips core UI ordering prefixes back to canonical display names", () => {
-    expect(normalizeAgentForPrompt(getAgentListDisplayName("sisyphus"))).toBe("Sisyphus - ultraworker")
+    expect(normalizeAgentForPrompt(getAgentListDisplayName("sisyphus"))).toBe("Fathos")
     expect(normalizeAgentForPrompt(getAgentListDisplayName("hephaestus"))).toBe("Hephaestus - Deep Agent")
     expect(normalizeAgentForPrompt(getAgentListDisplayName("prometheus"))).toBe("Prometheus - Plan Builder")
     expect(normalizeAgentForPrompt(getAgentListDisplayName("atlas"))).toBe("Atlas - Plan Executor")
   })
 
   it("removes zero-width characters before returning canonical names", () => {
-    expect(normalizeAgentForPrompt("Sisyphus\u200B - Ultraworker")).toBe("Sisyphus - ultraworker")
+    expect(normalizeAgentForPrompt("Sisyphus\u200B - Ultraworker")).toBe("Fathos")
   })
 
   it("converts legacy parenthesized names to canonical display names", () => {
@@ -276,13 +291,14 @@ describe("AGENT_DISPLAY_NAMES", () => {
   it("contains all expected agent mappings", () => {
     // given expected mappings
     const expectedMappings = {
-      sisyphus: "Sisyphus - ultraworker",
+      sisyphus: "Fathos",
       hephaestus: "Hephaestus - Deep Agent",
       prometheus: "Prometheus - Plan Builder",
       atlas: "Atlas - Plan Executor",
       "sisyphus-junior": "Sisyphus-Junior",
       metis: "Metis - Plan Consultant",
       momus: "Momus - Plan Critic",
+      praha: "Praha",
       athena: "Athena - Council",
       "athena-junior": "Athena-Junior - Council",
       oracle: "Oracle",

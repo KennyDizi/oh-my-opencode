@@ -35,4 +35,24 @@ describe("AgentOverridesSchema", () => {
 
     expect(result.success).toBe(false)
   })
+
+  test("accepts praha override config", () => {
+    // given
+    const input = {
+      praha: {
+        model: "openai/gpt-5.5",
+        temperature: 0.1,
+        prompt_append: "Focus on unclear claims.",
+      },
+    }
+
+    // when
+    const result = AgentOverridesSchema.safeParse(input)
+
+    // then
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data.praha?.model).toBe("openai/gpt-5.5")
+    }
+  })
 })

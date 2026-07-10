@@ -2,7 +2,7 @@
 
 oh-my-openagent ships in **two editions** of the same product:
 
-- **Ultimate Edition (omo for [OpenCode](https://opencode.ai))** — the full omo experience. 12 discipline agents, 54+ lifecycle hooks, all built-in MCPs, every slash command, Team Mode, ulw-loop, hashline edits, the works.
+- **Ultimate Edition (omo for [OpenCode](https://opencode.ai))** — the full omo experience. 13 discipline agents, 54+ lifecycle hooks, all built-in MCPs, every slash command, Team Mode, ulw-loop, hashline edits, the works.
 - **Light Edition (omo for [OpenAI Codex CLI](https://github.com/openai/codex))** — the portable components that fit Codex's plugin system: `rules`, `comment-checker`, `git-bash`, `lsp`, `ultrawork`, `ulw-loop`, `start-work-continuation`, and `telemetry`, plus plugin-scoped MCPs for `grep_app`, `context7`, `codegraph`, `git_bash`, and `lsp`, and the shared `ast-grep` skill. No agent orchestration and no `team_*` tools — Codex CLI's native surface does that work.
 
 Most users want **Ultimate**. Pick **Light** if you are already invested in Codex CLI. Pick **both** if you want OMO available wherever you happen to be working that day.
@@ -17,7 +17,7 @@ Most users want **Ultimate**. Pick **Light** if you are already invested in Code
 
 ## For Humans
 
-**Strongly recommended: let an LLM agent install Ultimate for you.** Ultimate setup involves subscription detection, model selection across 12 agents, provider authentication, and config migration — humans fat-finger these. An LLM agent reads the full guide and walks every step correctly.
+**Strongly recommended: let an LLM agent install Ultimate for you.** Ultimate setup involves subscription detection, model selection across 13 agents, provider authentication, and config migration — humans fat-finger these. An LLM agent reads the full guide and walks every step correctly.
 
 ### Ultimate (OpenCode) — let an agent do it
 
@@ -198,7 +198,7 @@ Map their answer to:
    - **no** → `--claude=no`
 
 2. **Do you have an OpenAI/ChatGPT Plus Subscription?**
-   - **yes** → `--openai=yes` (enables GPT-5.5 for Oracle and Hephaestus)
+   - **yes** → `--openai=yes` (enables GPT-5.5 for Hephaestus, Oracle, Momus, Praha, and Fato fallback)
    - **no** → `--openai=no` (default)
 
 3. **Will you integrate Gemini models?**
@@ -229,7 +229,7 @@ Map their answer to:
    - **yes** → `--vercel-ai-gateway=yes`
    - **no** → `--vercel-ai-gateway=no` (default)
 
-**Provider selection is agent-specific.** There is no single global provider priority — each of the 12 agents has its own fallback chain.
+**Provider selection is agent-specific.** There is no single global provider priority — each of the 13 agents has its own fallback chain.
 
 **MUST STRONGLY WARN, WHEN USER SAID THEY DON'T HAVE CLAUDE SUBSCRIPTION, SISYPHUS AGENT MIGHT NOT WORK IDEALLY.**
 
@@ -486,6 +486,7 @@ GitHub Copilot is supported as a **fallback provider** when native providers are
 | ------------- | ---------------------------------- |
 | **Sisyphus**  | `github-copilot/claude-opus-4.7`   |
 | **Oracle**    | `github-copilot/gpt-5.5`           |
+| **Praha**     | `github-copilot/gpt-5.5`           |
 | **Explore**   | `github-copilot/grok-code-fast-1`  |
 | **Atlas**     | `github-copilot/claude-sonnet-4.6` |
 
@@ -514,6 +515,7 @@ When OpenCode Zen is the best available provider, common examples:
 | ------------- | ---------------------------------------------------- |
 | **Sisyphus**  | `opencode/claude-opus-4-7`                           |
 | **Oracle**    | `opencode/gpt-5.5`                                   |
+| **Praha**     | `opencode/gpt-5.5`                                   |
 | **Explore**   | `opencode/minimax-m2.7`                              |
 
 Run the installer with `--opencode-zen=yes` and select "Yes" for OpenCode Zen at the prompt. If your OpenCode environment prompts for provider authentication, follow the OpenCode provider flow for `opencode/` models.
@@ -591,7 +593,9 @@ Priority: **Claude > GPT > Claude-like models**
 | -------------- | ---------------------- | -------------------------------------- | ------------------------------------------------------ |
 | **Hephaestus** | Deep autonomous worker | GPT-5.5 (medium) only                  | "Codex on steroids." No fallback. Requires GPT access. |
 | **Oracle**     | Architecture/debugging | openai\|github-copilot\|opencode/gpt-5.5 (high) → google\|github-copilot\|opencode/gemini-3.1-pro (high) → anthropic\|github-copilot\|opencode/claude-opus-4-7 (max) → opencode-go/glm-5.1 | High-IQ strategic backup. GPT preferred. |
+| **Fato**       | Implementation review  | anthropic\|github-copilot\|opencode/claude-fable-5 (max) → anthropic\|github-copilot\|opencode/claude-sonnet-5 (max) → openai\|github-copilot\|opencode/gpt-5.5 (high) | Review-work specialist. Claude preferred. |
 | **Momus**      | High-accuracy reviewer | openai\|github-copilot\|opencode/gpt-5.5 (xhigh) → anthropic\|github-copilot\|opencode/claude-opus-4-7 (max) → google\|github-copilot\|opencode/gemini-3.1-pro (high) → opencode-go/glm-5.1 | Verification agent. GPT preferred. |
+| **Praha**      | Technical document reviewer | openai\|github-copilot\|opencode/gpt-5.5 (high) → anthropic\|github-copilot\|opencode/claude-opus-4-7 (max) → google\|github-copilot\|opencode/gemini-3.1-pro (high) → opencode-go/glm-5.1 | Clarity and referenced-file verification. GPT preferred. |
 
 **Utility Agents** (speed over intelligence — do not "upgrade" them):
 
@@ -665,20 +669,22 @@ All built-in slash commands are **Ultimate-only** — Codex CLI does not have a 
 | `/remove-ai-slops` | Ultimate | Strip AI-generated code smells from recent changes |
 | `/hyperplan` | Ultimate | Direct invocation of hyperplan skill |
 
-#### Agents (11) — Ultimate only
+#### Agents (13) — Ultimate only
 
-All 11 discipline agents are part of the Ultimate edition. The Light edition does not ship agent orchestration — Codex CLI's own model selection takes that role. Sisyphus delegates to these; you don't usually call them directly, but knowing the cast helps:
+All 13 discipline agents are part of the Ultimate edition. The Light edition does not ship agent orchestration — Codex CLI's own model selection takes that role. Sisyphus delegates to these; you don't usually call them directly, but knowing the cast helps:
 
 - **Sisyphus** — main orchestrator. Plans, delegates, drives to completion.
 - **Hephaestus** — "Codex on steroids." Deep autonomous worker, GPT-native.
 - **Prometheus** — strategic planner, interviews you before code is written.
 - **Atlas** — todo-list orchestrator.
 - **Oracle** — architecture/debugging consultant.
+- **Fato** — implementation review consultant.
 - **Librarian** — external docs/code search.
 - **Explore** — fast codebase grep.
 - **Multimodal-Looker** — vision/PDF analysis.
 - **Metis** — pre-planning consultant, reviews Prometheus plans for gaps.
 - **Momus** — high-accuracy plan reviewer.
+- **Praha** — technical document clarity reviewer.
 - **Sisyphus-Junior** — category-spawned executor for delegated tasks.
 
 #### Skills

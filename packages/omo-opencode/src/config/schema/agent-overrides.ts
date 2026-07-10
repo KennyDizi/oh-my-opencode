@@ -69,6 +69,7 @@ export const AgentOverridesSchema = z.object({
   prometheus: AgentOverrideConfigSchema.optional(),
   metis: AgentOverrideConfigSchema.optional(),
   momus: AgentOverrideConfigSchema.optional(),
+  praha: AgentOverrideConfigSchema.optional(),
   oracle: AgentOverrideConfigSchema.optional(),
   fato: AgentOverrideConfigSchema.optional(),
   librarian: AgentOverrideConfigSchema.optional(),

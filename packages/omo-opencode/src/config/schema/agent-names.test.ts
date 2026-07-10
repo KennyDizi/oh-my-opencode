@@ -14,6 +14,16 @@ describe("agent name schemas", () => {
     expect(builtinResult.success).toBe(true)
     expect(overridableResult.success).toBe(true)
   })
+
+  test("accepts praha as a builtin and overridable agent", () => {
+    // given / when
+    const builtinResult = BuiltinAgentNameSchema.safeParse("praha")
+    const overridableResult = OverridableAgentNameSchema.safeParse("praha")
+
+    // then
+    expect(builtinResult.success).toBe(true)
+    expect(overridableResult.success).toBe(true)
+  })
 })
 
 describe("OhMyOpenCodeConfigSchema disabled_skills", () => {

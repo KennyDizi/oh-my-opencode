@@ -6,6 +6,7 @@ import { createLibrarianAgent } from "./librarian"
 import { createExploreAgent } from "./explore"
 import { createMomusAgent } from "./momus"
 import { createMetisAgent } from "./metis"
+import { createPrahaAgent } from "./praha"
 import { createAtlasAgent } from "./atlas"
 import { createSisyphusAgent } from "./sisyphus"
 import { createHephaestusAgent } from "./hephaestus"
@@ -39,6 +40,7 @@ describe("read-only agent tool restrictions", () => {
       "fato",
       "metis",
       "momus",
+      "praha",
       "multimodal-looker",
       "sisyphus-junior",
       "custom-worker",
@@ -164,6 +166,45 @@ describe("read-only agent tool restrictions", () => {
       // then
       expect(permission["task"]).toBeUndefined()
       expect(sessionRestrictions["task"]).toBeUndefined()
+    })
+  })
+
+  describe("Praha", () => {
+    test("denies file-writing and delegation tools", () => {
+      // given
+      const agent = createPrahaAgent(TEST_MODEL)
+
+      // when
+      const permission = agent.permission as Record<string, string>
+      const sessionRestrictions = getAgentToolRestrictions("praha")
+
+      // then
+      for (const tool of FILE_WRITE_TOOLS) {
+        expect(permission[tool]).toBe("deny")
+        expect(sessionRestrictions[tool]).toBe(false)
+      }
+      expect(permission.task).toBe("deny")
+      expect(permission.call_omo_agent).toBe("deny")
+      expect(sessionRestrictions.task).toBe(false)
+      expect(sessionRestrictions.call_omo_agent).toBe(false)
+    })
+
+    test("denies exfiltration-capable delegated-session tools", () => {
+      // given / when
+      const sessionRestrictions = getAgentToolRestrictions("praha")
+
+      // then
+      expect(sessionRestrictions.read).toBe(true)
+      expect(sessionRestrictions.grep).toBe(false)
+      expect(sessionRestrictions.glob).toBe(false)
+      expect(sessionRestrictions.bash).toBe(false)
+      expect(sessionRestrictions.interactive_bash).toBe(false)
+      expect(sessionRestrictions.skill).toBe(false)
+      expect(sessionRestrictions.skill_mcp).toBe(false)
+      expect(sessionRestrictions.webfetch).toBe(false)
+      expect(sessionRestrictions.look_at).toBe(false)
+      expect(sessionRestrictions.session_read).toBe(false)
+      expect(sessionRestrictions.background_output).toBe(false)
     })
   })
 

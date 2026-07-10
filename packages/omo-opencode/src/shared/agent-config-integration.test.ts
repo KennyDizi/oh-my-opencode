@@ -86,18 +86,19 @@ describe("Agent Config Integration", () => {
   describe("Display name resolution", () => {
     test("returns correct display names for all builtin agents", () => {
       // given - lowercase config keys
-      const agents = ["sisyphus", "hephaestus", "prometheus", "atlas", "metis", "momus", "oracle", "librarian", "explore", "multimodal-looker"]
+      const agents = ["sisyphus", "hephaestus", "prometheus", "atlas", "metis", "momus", "praha", "oracle", "librarian", "explore", "multimodal-looker"]
 
       // when - display names are requested
       const displayNames = agents.map((agent) => getAgentDisplayName(agent))
 
       // then - display names are correct
-      expect(displayNames).toContain("Sisyphus - ultraworker")
+      expect(displayNames).toContain("Fathos")
       expect(displayNames).toContain("Hephaestus - Deep Agent")
       expect(displayNames).toContain("Prometheus - Plan Builder")
       expect(displayNames).toContain("Atlas - Plan Executor")
       expect(displayNames).toContain("Metis - Plan Consultant")
       expect(displayNames).toContain("Momus - Plan Critic")
+      expect(displayNames).toContain("Praha")
       expect(displayNames).toContain("Oracle")
       expect(displayNames).toContain("librarian")
       expect(displayNames).toContain("explore")
@@ -112,9 +113,9 @@ describe("Agent Config Integration", () => {
       const displayNames = keys.map((key) => getAgentDisplayName(key))
 
       // then - correct display names are returned
-      expect(displayNames[0]).toBe("Sisyphus - ultraworker")
+      expect(displayNames[0]).toBe("Fathos")
       expect(displayNames[1]).toBe("Atlas - Plan Executor")
-      expect(displayNames[2]).toBe("Sisyphus - ultraworker")
+      expect(displayNames[2]).toBe("Fathos")
       expect(displayNames[3]).toBe("Atlas - Plan Executor")
       expect(displayNames[4]).toBe("Prometheus - Plan Builder")
       expect(displayNames[5]).toBe("Prometheus - Plan Builder")
@@ -146,7 +147,7 @@ describe("Agent Config Integration", () => {
 
     test("model requirements include all builtin agents", () => {
       // given - expected builtin agents
-      const expectedAgents = ["sisyphus", "hephaestus", "prometheus", "atlas", "metis", "momus", "oracle", "librarian", "explore", "multimodal-looker"]
+      const expectedAgents = ["sisyphus", "hephaestus", "prometheus", "atlas", "metis", "momus", "praha", "oracle", "librarian", "explore", "multimodal-looker"]
 
       // when - checking AGENT_MODEL_REQUIREMENTS
       const agentKeys = Object.keys(AGENT_MODEL_REQUIREMENTS)
@@ -189,7 +190,7 @@ describe("Agent Config Integration", () => {
       const prometheusDisplay = getAgentDisplayName("prometheus")
 
       // then - display names are correct
-      expect(sisyphusDisplay).toBe("Sisyphus - ultraworker")
+      expect(sisyphusDisplay).toBe("Fathos")
       expect(prometheusDisplay).toBe("Prometheus - Plan Builder")
 
       // then - config values are preserved
@@ -218,7 +219,7 @@ describe("Agent Config Integration", () => {
       const atlasDisplay = getAgentDisplayName("atlas")
 
       // then - display names are correct
-      expect(sisyphusDisplay).toBe("Sisyphus - ultraworker")
+      expect(sisyphusDisplay).toBe("Fathos")
       expect(atlasDisplay).toBe("Atlas - Plan Executor")
     })
   })

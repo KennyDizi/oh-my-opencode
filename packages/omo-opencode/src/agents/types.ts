@@ -151,6 +151,7 @@ export type BuiltinAgentName =
   | "multimodal-looker"
   | "metis"
   | "momus"
+  | "praha"
   | "atlas"
   | "sisyphus-junior";
 
