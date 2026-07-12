@@ -347,7 +347,7 @@ function getTelemetryDistinctId(machineIdPrefix, osProvider = getDefaultTelemetr
 }
 var init_machine_id = () => {};
 
-// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/module.node.mjs
+// node_modules/.bun/posthog-node@5.41.0/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/module.node.mjs
 import { dirname as dirname10, posix, sep as sep7 } from "node:path";
 function createModulerModifier() {
   const getModuleFromFileName = createGetModuleFromFilename();
@@ -384,7 +384,7 @@ function normalizeWindowsPath(path2) {
 }
 var init_module_node = () => {};
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/featureFlagUtils.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/featureFlagUtils.mjs
 function getFlagDetailFromFlagAndPayload(key, value, payload) {
   return {
     key,
@@ -452,7 +452,7 @@ var normalizeFlagsResponse = (flagsResponse) => {
 };
 var init_featureFlagUtils = () => {};
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/types.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/types.mjs
 var types_PostHogPersistedProperty;
 var init_types = __esm(() => {
   types_PostHogPersistedProperty = /* @__PURE__ */ function(PostHogPersistedProperty) {
@@ -469,6 +469,7 @@ var init_types = __esm(() => {
     PostHogPersistedProperty["BootstrapFeatureFlagPayloads"] = "bootstrap_feature_flag_payloads";
     PostHogPersistedProperty["OverrideFeatureFlags"] = "override_feature_flags";
     PostHogPersistedProperty["Queue"] = "queue";
+    PostHogPersistedProperty["AiQueue"] = "ai_queue";
     PostHogPersistedProperty["LogsQueue"] = "logs_queue";
     PostHogPersistedProperty["OptedOut"] = "opted_out";
     PostHogPersistedProperty["SessionId"] = "session_id";
@@ -490,7 +491,7 @@ var init_types = __esm(() => {
   }({});
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/gzip.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/gzip.mjs
 function isGzipSupported() {
   return "CompressionStream" in globalThis && "TextEncoder" in globalThis && "Response" in globalThis && typeof Response.prototype.blob == "function";
 }
@@ -558,7 +559,7 @@ var init_gzip = __esm(() => {
   init_types();
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/utils/bot-detection.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/utils/bot-detection.mjs
 var DEFAULT_BLOCKED_UA_STRS, isBlockedUA = function(ua, customBlockedUserAgents = []) {
   if (!ua)
     return false;
@@ -650,7 +651,7 @@ var init_bot_detection = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/utils/string-utils.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/utils/string-utils.mjs
 function safeJsonStringify(value) {
   const ancestors = [];
   return JSON.stringify(value, function(_key, replacementValue) {
@@ -676,7 +677,7 @@ function safeJsonStringify(value) {
 }
 var init_string_utils = () => {};
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/utils/type-utils.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/utils/type-utils.mjs
 function isPrimitive(value) {
   return value === null || typeof value != "object";
 }
@@ -712,7 +713,7 @@ var init_type_utils = __esm(() => {
   };
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/utils/number-utils.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/utils/number-utils.mjs
 function clampToRange(value, min, max, logger, fallbackValue) {
   if (min > max) {
     logger.warn("min cannot be greater than max.");
@@ -735,7 +736,7 @@ var init_number_utils = __esm(() => {
   init_type_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/utils/bucketed-rate-limiter.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/utils/bucketed-rate-limiter.mjs
 class BucketedRateLimiter {
   constructor(options) {
     this._buckets = {};
@@ -782,7 +783,7 @@ var init_bucketed_rate_limiter = __esm(() => {
   init_number_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/vendor/uuidv7.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/vendor/uuidv7.mjs
 class UUID {
   constructor(bytes) {
     this.bytes = bytes;
@@ -957,7 +958,7 @@ var init_uuidv7 = __esm(() => {
   /*! For license information please see uuidv7.mjs.LICENSE.txt */
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/utils/promise-queue.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/utils/promise-queue.mjs
 class PromiseQueue {
   add(promise) {
     const promiseUUID = uuidv7();
@@ -999,7 +1000,7 @@ var init_promise_queue = __esm(() => {
   init_uuidv7();
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/utils/logger.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/utils/logger.mjs
 function createConsole(consoleLike = console) {
   const lockedMethods = {
     log: consoleLike.log.bind(consoleLike),
@@ -1041,7 +1042,7 @@ var _createLogger = (prefix, maybeCall, consoleLike) => {
 }, passThrough = (fn) => fn();
 var init_logger = () => {};
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/utils/user-agent-utils.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/utils/user-agent-utils.mjs
 var MOBILE = "Mobile", IOS = "iOS", ANDROID = "Android", TABLET = "Tablet", ANDROID_TABLET, APPLE = "Apple", APPLE_WATCH, SAFARI = "Safari", BLACKBERRY = "BlackBerry", SAMSUNG = "Samsung", SAMSUNG_BROWSER, SAMSUNG_INTERNET, CHROME = "Chrome", CHROME_OS, CHROME_IOS, INTERNET_EXPLORER = "Internet Explorer", INTERNET_EXPLORER_MOBILE, OPERA = "Opera", OPERA_MINI, EDGE = "Edge", MICROSOFT_EDGE, FIREFOX = "Firefox", FIREFOX_IOS, NINTENDO = "Nintendo", PLAYSTATION = "PlayStation", XBOX = "Xbox", ANDROID_MOBILE, MOBILE_SAFARI, WINDOWS = "Windows", WINDOWS_PHONE, GENERIC = "Generic", GENERIC_MOBILE, GENERIC_TABLET, KONQUEROR = "Konqueror", OCULUS_BROWSER = "Oculus Browser", VIVALDI = "Vivaldi", YANDEX = "Yandex", WHALE = "Whale", DUCKDUCKGO = "DuckDuckGo", PALE_MOON = "Pale Moon", WATERFOX = "Waterfox", BRAVE = "Brave", GOOGLE_SEARCH_APP = "Google Search App", BROWSER_VERSION_REGEX_SUFFIX = "(\\d+(\\.\\d+)?)", DEFAULT_BROWSER_VERSION_REGEX, XBOX_REGEX, PLAYSTATION_REGEX, NINTENDO_REGEX, BLACKBERRY_REGEX, windowsVersionMap, versionRegexes, osMatchers;
 var init_user_agent_utils = __esm(() => {
   init_string_utils();
@@ -1310,7 +1311,7 @@ var init_user_agent_utils = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/utils/index.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/utils/index.mjs
 function isValidUUID(value) {
   return typeof value == "string" && UUID_REGEX.test(value);
 }
@@ -1366,7 +1367,7 @@ var init_utils = __esm(() => {
   UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/logs/logs-utils.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/logs/logs-utils.mjs
 var OTLP_SEVERITY_MAP, DEFAULT_OTLP_SEVERITY;
 var init_logs_utils = __esm(() => {
   init_utils();
@@ -1399,25 +1400,37 @@ var init_logs_utils = __esm(() => {
   DEFAULT_OTLP_SEVERITY = OTLP_SEVERITY_MAP.info;
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/logs/index.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/logs/index.mjs
 var init_logs = __esm(() => {
   init_logs_utils();
   init_types();
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/surveys/validation.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/metrics/metrics-utils.mjs
+var init_metrics_utils = __esm(() => {
+  init_logs_utils();
+});
+
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/metrics/index.mjs
+var init_metrics = __esm(() => {
+  init_utils();
+  init_logs_utils();
+  init_metrics_utils();
+});
+
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/surveys/validation.mjs
 var init_validation = __esm(() => {
   init_types();
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/cookie.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/cookie.mjs
 var init_cookie = __esm(() => {
   init_utils();
   init_uuidv7();
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/eventemitter.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/eventemitter.mjs
 class SimpleEventEmitter {
   constructor() {
     this.events = {};
@@ -1440,7 +1453,7 @@ class SimpleEventEmitter {
 }
 var init_eventemitter = () => {};
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/error-tracking/chunk-ids.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/error-tracking/chunk-ids.mjs
 function getFilenameToChunkIdMap(stackParser) {
   const chunkIdMap = globalThis._posthogChunkIds;
   if (!chunkIdMap)
@@ -1478,7 +1491,7 @@ function getFilenameToChunkIdMap(stackParser) {
 var parsedStackResults, lastKeysCount, cachedFilenameChunkIds;
 var init_chunk_ids = () => {};
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/error-tracking/error-properties-builder.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/error-tracking/error-properties-builder.mjs
 class ErrorPropertiesBuilder {
   constructor(coercers, stackParser, modifiers = []) {
     this.coercers = coercers;
@@ -1604,7 +1617,7 @@ var init_error_properties_builder = __esm(() => {
   init_chunk_ids();
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/error-tracking/parsers/base.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/error-tracking/parsers/base.mjs
 function createFrame(platform, filename, func, lineno, colno) {
   const frame = {
     platform,
@@ -1623,7 +1636,7 @@ var init_base = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/error-tracking/parsers/safari.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/error-tracking/parsers/safari.mjs
 var extractSafariExtensionDetails = (func, filename) => {
   const isSafariExtension = func.indexOf("safari-extension") !== -1;
   const isSafariWebExtension = func.indexOf("safari-web-extension") !== -1;
@@ -1639,7 +1652,7 @@ var init_safari = __esm(() => {
   init_base();
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/error-tracking/parsers/chrome.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/error-tracking/parsers/chrome.mjs
 var chromeRegexNoFnName, chromeRegex, chromeEvalRegex, chromeStackLineParser = (line, platform) => {
   const noFnParts = chromeRegexNoFnName.exec(line);
   if (noFnParts) {
@@ -1669,7 +1682,7 @@ var init_chrome = __esm(() => {
   chromeEvalRegex = /\((\S*)(?::(\d+))(?::(\d+))\)/;
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/error-tracking/parsers/gecko.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/error-tracking/parsers/gecko.mjs
 var geckoREgex, geckoEvalRegex, geckoStackLineParser = (line, platform) => {
   const parts = geckoREgex.exec(line);
   if (parts) {
@@ -1696,7 +1709,7 @@ var init_gecko = __esm(() => {
   geckoEvalRegex = /(\S+) line (\d+)(?: > eval line \d+)* > eval/i;
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/error-tracking/parsers/winjs.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/error-tracking/parsers/winjs.mjs
 var winjsRegex, winjsStackLineParser = (line, platform) => {
   const parts = winjsRegex.exec(line);
   return parts ? createFrame(platform, parts[2], parts[1] || UNKNOWN_FUNCTION, +parts[3], parts[4] ? +parts[4] : undefined) : undefined;
@@ -1706,7 +1719,7 @@ var init_winjs = __esm(() => {
   winjsRegex = /^\s*at (?:((?:\[object object\])?.+) )?\(?((?:[-a-z]+):.*?):(\d+)(?::(\d+))?\)?\s*$/i;
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/error-tracking/parsers/opera.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/error-tracking/parsers/opera.mjs
 var opera10Regex, opera10StackLineParser = (line, platform) => {
   const parts = opera10Regex.exec(line);
   return parts ? createFrame(platform, parts[2], parts[3] || UNKNOWN_FUNCTION, +parts[1]) : undefined;
@@ -1720,7 +1733,7 @@ var init_opera = __esm(() => {
   opera11Regex = / line (\d+), column (\d+)\s*(?:in (?:<anonymous function: ([^>]+)>|([^)]+))\(.*\))? in (.*):\s*$/i;
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/error-tracking/parsers/node.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/error-tracking/parsers/node.mjs
 function filenameIsInApp(filename, isNative = false) {
   const isInternal = isNative || filename && !filename.startsWith("/") && !filename.match(/^[A-Z]:/) && !filename.startsWith(".") && !filename.match(/^[a-zA-Z]([a-zA-Z0-9.\-+])*:\/\//);
   return !isInternal && filename !== undefined && !filename.includes("node_modules/");
@@ -1792,7 +1805,7 @@ var init_node = __esm(() => {
   FULL_MATCH = /at (?:async )?(?:(.+?)\s+\()?(?:(.+):(\d+):(\d+)?|([^)]+))\)?/;
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/error-tracking/parsers/index.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/error-tracking/parsers/index.mjs
 function reverseAndStripFrames(stack) {
   if (!stack.length)
     return [];
@@ -1846,7 +1859,7 @@ var init_parsers = __esm(() => {
   WEBPACK_ERROR_REGEXP = /\(error: (.*)\)/;
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/error-tracking/coercers/dom-exception-coercer.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/error-tracking/coercers/dom-exception-coercer.mjs
 class DOMExceptionCoercer {
   match(err) {
     return this.isDOMException(err) || this.isDOMError(err);
@@ -1880,7 +1893,7 @@ var init_dom_exception_coercer = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/error-tracking/coercers/error-coercer.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/error-tracking/coercers/error-coercer.mjs
 class ErrorCoercer {
   match(err) {
     return isPlainError(err);
@@ -1911,7 +1924,7 @@ var init_error_coercer = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/error-tracking/coercers/error-event-coercer.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/error-tracking/coercers/error-event-coercer.mjs
 class ErrorEventCoercer {
   constructor() {}
   match(err) {
@@ -1933,7 +1946,7 @@ var init_error_event_coercer = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/error-tracking/coercers/string-coercer.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/error-tracking/coercers/string-coercer.mjs
 class StringCoercer {
   match(input) {
     return typeof input == "string";
@@ -1966,7 +1979,7 @@ var init_string_coercer = __esm(() => {
   ERROR_TYPES_PATTERN = /^(?:[Uu]ncaught (?:exception: )?)?(?:((?:Eval|Internal|Range|Reference|Syntax|Type|URI|)Error): )?(.*)$/i;
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/error-tracking/types.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/error-tracking/types.mjs
 var severityLevels;
 var init_types2 = __esm(() => {
   severityLevels = [
@@ -1979,7 +1992,7 @@ var init_types2 = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/error-tracking/coercers/utils.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/error-tracking/coercers/utils.mjs
 function extractExceptionKeysForMessage(err, maxLength = 40) {
   const keys = Object.keys(err);
   keys.sort();
@@ -1997,7 +2010,7 @@ function extractExceptionKeysForMessage(err, maxLength = 40) {
 }
 var init_utils2 = () => {};
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/error-tracking/coercers/object-coercer.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/error-tracking/coercers/object-coercer.mjs
 class ObjectCoercer {
   match(candidate) {
     return typeof candidate == "object" && candidate !== null;
@@ -2056,7 +2069,7 @@ var init_object_coercer = __esm(() => {
   init_utils2();
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/error-tracking/coercers/event-coercer.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/error-tracking/coercers/event-coercer.mjs
 class EventCoercer {
   match(err) {
     return isEvent(err);
@@ -2076,7 +2089,7 @@ var init_event_coercer = __esm(() => {
   init_utils2();
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/error-tracking/coercers/primitive-coercer.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/error-tracking/coercers/primitive-coercer.mjs
 class PrimitiveCoercer {
   match(candidate) {
     return isPrimitive(candidate);
@@ -2094,7 +2107,7 @@ var init_primitive_coercer = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/error-tracking/coercers/promise-rejection-event.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/error-tracking/coercers/promise-rejection-event.mjs
 class PromiseRejectionEventCoercer {
   match(err) {
     return isBuiltin(err, "PromiseRejectionEvent") || this.isCustomEventWrappingRejection(err);
@@ -2134,7 +2147,7 @@ var init_promise_rejection_event = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/error-tracking/coercers/index.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/error-tracking/coercers/index.mjs
 var init_coercers = __esm(() => {
   init_dom_exception_coercer();
   init_error_coercer();
@@ -2146,7 +2159,7 @@ var init_coercers = __esm(() => {
   init_promise_rejection_event();
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/error-tracking/utils.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/error-tracking/utils.mjs
 class ReduceableCache {
   constructor(_maxSize) {
     this._maxSize = _maxSize;
@@ -2173,7 +2186,7 @@ class ReduceableCache {
 }
 var init_utils3 = () => {};
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/error-tracking/exception-steps.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/error-tracking/exception-steps.mjs
 function resolveExceptionStepsConfig(config) {
   if (!config)
     return {
@@ -2311,7 +2324,7 @@ var init_exception_steps = __esm(() => {
   };
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/error-tracking/index.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/error-tracking/index.mjs
 var exports_error_tracking = {};
 __export(exports_error_tracking, {
   winjsStackLineParser: () => winjsStackLineParser,
@@ -2348,7 +2361,7 @@ var init_error_tracking = __esm(() => {
   init_exception_steps();
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/posthog-core-stateless.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/posthog-core-stateless.mjs
 async function logFlushError(err) {
   if (err instanceof PostHogFetchHttpError) {
     let text = "";
@@ -2403,7 +2416,9 @@ class PostHogCoreStateless {
   }
   constructor(apiKey, options = {}) {
     this.flushPromise = null;
+    this.pendingFlushPromise = null;
     this.flushPromises = new Set;
+    this._dequeuedMessagesCount = 0;
     this.shutdownPromise = null;
     this.promiseQueue = new PromiseQueue;
     this._events = new SimpleEventEmitter;
@@ -2835,6 +2850,20 @@ class PostHogCoreStateless {
     return message;
   }
   async flushStorage() {}
+  getQueueRouteKey(_message) {
+    return DEFAULT_QUEUE_ROUTE;
+  }
+  persistedQueueKeyForRoute(_route) {
+    return types_PostHogPersistedProperty.Queue;
+  }
+  getActiveQueueRoutes() {
+    return [
+      DEFAULT_QUEUE_ROUTE
+    ];
+  }
+  getRouteQueue(route) {
+    return this.getPersistedProperty(this.persistedQueueKeyForRoute(route)) || [];
+  }
   enqueue(type, _message, options) {
     this.wrap(() => {
       if (this.optedOut)
@@ -2844,7 +2873,8 @@ class PostHogCoreStateless {
       if (message === null)
         return;
       message = this.normalizeMessage(message);
-      const queue = this.getPersistedProperty(types_PostHogPersistedProperty.Queue) || [];
+      const queueKey = this.persistedQueueKeyForRoute(this.getQueueRouteKey(message));
+      const queue = this.getPersistedProperty(queueKey) || [];
       if (queue.length >= this.maxQueueSize) {
         queue.shift();
         this._logger.info("Queue is full, the oldest event is dropped.");
@@ -2852,7 +2882,7 @@ class PostHogCoreStateless {
       queue.push({
         message
       });
-      this.setPersistedProperty(types_PostHogPersistedProperty.Queue, queue);
+      this.setPersistedProperty(queueKey, queue);
       this._events.emit(type, message);
       if (queue.length >= this.flushAt)
         this.flushBackground();
@@ -2872,32 +2902,10 @@ class PostHogCoreStateless {
     if (message === null)
       return;
     message = this.normalizeMessage(message);
-    const data = {
-      api_key: this.apiKey,
-      batch: [
-        message
-      ],
-      sent_at: currentISOTime()
-    };
-    if (this.historicalMigration)
-      data.historical_migration = true;
-    const payload = safeJsonStringify(data);
-    const url = `${this.host}/batch/`;
-    const gzippedPayload = this.disableCompression ? null : await gzipCompress(payload, this.isDebug);
-    const fetchOptions = {
-      method: "POST",
-      headers: {
-        ...this.getCustomHeaders(),
-        "Content-Type": "application/json",
-        ...gzippedPayload !== null && {
-          "Content-Encoding": "gzip"
-        }
-      },
-      body: gzippedPayload || payload
-    };
     try {
-      const response = await this.fetchWithRetry(url, fetchOptions);
-      await response.body?.cancel()?.catch(() => {});
+      await this.sendBatch([
+        message
+      ], undefined, this.getQueueRouteKey(message));
     } catch (err) {
       this._events.emit("error", err);
     }
@@ -2945,6 +2953,8 @@ class PostHogCoreStateless {
     }
   }
   flushBackground() {
+    if (this.pendingFlushPromise)
+      return;
     this.flush().catch(async (err) => {
       await logFlushError(err);
     });
@@ -2974,6 +2984,8 @@ class PostHogCoreStateless {
   flushInternal(waitForPendingPromises) {
     if (this.disabled)
       return Promise.resolve();
+    if (!waitForPendingPromises && this.pendingFlushPromise)
+      return this.pendingFlushPromise;
     const previousFlushPromise = this.flushPromise;
     const maxPromiseId = this.promiseQueue.maxId;
     const nextFlushPromise = Promise.resolve().then(() => {
@@ -2984,7 +2996,12 @@ class PostHogCoreStateless {
         ]);
     }).then(() => allSettled([
       previousFlushPromise
-    ])).then(() => this._flush());
+    ])).then(() => {
+      if (this.pendingFlushPromise === nextFlushPromise)
+        this.pendingFlushPromise = null;
+      return this._flush();
+    });
+    this.pendingFlushPromise = nextFlushPromise;
     this.flushPromise = nextFlushPromise;
     this.flushPromises.add(nextFlushPromise);
     this.addPendingPromise(nextFlushPromise);
@@ -2992,6 +3009,8 @@ class PostHogCoreStateless {
       nextFlushPromise
     ]).then(() => {
       this.flushPromises.delete(nextFlushPromise);
+      if (this.pendingFlushPromise === nextFlushPromise)
+        this.pendingFlushPromise = null;
       if (this.flushPromise === nextFlushPromise)
         this.flushPromise = null;
     });
@@ -3004,44 +3023,67 @@ class PostHogCoreStateless {
       headers["User-Agent"] = customUserAgent;
     return headers;
   }
+  async sendBatch(batchMessages, retryOptions, _route = DEFAULT_QUEUE_ROUTE) {
+    const data = {
+      api_key: this.apiKey,
+      batch: batchMessages,
+      sent_at: currentISOTime()
+    };
+    if (this.historicalMigration)
+      data.historical_migration = true;
+    const payload = safeJsonStringify(data);
+    const url = `${this.host}/batch/`;
+    const gzippedPayload = this.disableCompression ? null : await gzipCompress(payload, this.isDebug);
+    const fetchOptions = {
+      method: "POST",
+      headers: {
+        ...this.getCustomHeaders(),
+        "Content-Type": "application/json",
+        ...gzippedPayload !== null && {
+          "Content-Encoding": "gzip"
+        }
+      },
+      body: gzippedPayload || payload
+    };
+    const response = await this.fetchWithRetry(url, fetchOptions, retryOptions);
+    await response.body?.cancel()?.catch(() => {});
+  }
   async _flush() {
     this.clearFlushTimer();
     await this._initPromise;
-    let queue = this.getPersistedProperty(types_PostHogPersistedProperty.Queue) || [];
-    if (!queue.length)
+    const routes = this.getActiveQueueRoutes();
+    if (!routes.some((route) => this.getRouteQueue(route).length > 0))
       return;
     const sentMessages = [];
+    let firstError;
+    for (const route of routes)
+      try {
+        await this._flushRoute(route, sentMessages);
+      } catch (err) {
+        if (firstError === undefined)
+          firstError = err;
+      }
+    if (firstError !== undefined)
+      throw firstError;
+    this._events.emit("flush", sentMessages);
+  }
+  async _flushRoute(route, sentMessages) {
+    const queueKey = this.persistedQueueKeyForRoute(route);
+    let queue = this.getPersistedProperty(queueKey) || [];
+    if (!queue.length)
+      return;
     const originalQueueLength = queue.length;
-    while (queue.length > 0 && sentMessages.length < originalQueueLength) {
+    let sentFromRoute = 0;
+    while (queue.length > 0 && sentFromRoute < originalQueueLength) {
       const batchItems = queue.slice(0, this.maxBatchSize);
       const batchMessages = batchItems.map((item) => item.message === undefined ? item.message : this.normalizeMessage(item.message));
       const persistQueueChange = async () => {
-        const refreshedQueue = this.getPersistedProperty(types_PostHogPersistedProperty.Queue) || [];
+        const refreshedQueue = this.getPersistedProperty(queueKey) || [];
         const newQueue = refreshedQueue.slice(batchItems.length);
-        this.setPersistedProperty(types_PostHogPersistedProperty.Queue, newQueue);
+        this.setPersistedProperty(queueKey, newQueue);
         queue = newQueue;
+        this._dequeuedMessagesCount += batchItems.length;
         await this.flushStorage();
-      };
-      const data = {
-        api_key: this.apiKey,
-        batch: batchMessages,
-        sent_at: currentISOTime()
-      };
-      if (this.historicalMigration)
-        data.historical_migration = true;
-      const payload = safeJsonStringify(data);
-      const url = `${this.host}/batch/`;
-      const gzippedPayload = this.disableCompression ? null : await gzipCompress(payload, this.isDebug);
-      const fetchOptions = {
-        method: "POST",
-        headers: {
-          ...this.getCustomHeaders(),
-          "Content-Type": "application/json",
-          ...gzippedPayload !== null && {
-            "Content-Encoding": "gzip"
-          }
-        },
-        body: gzippedPayload || payload
       };
       const retryOptions = {
         retryCheck: (err) => {
@@ -3051,8 +3093,7 @@ class PostHogCoreStateless {
         }
       };
       try {
-        const response = await this.fetchWithRetry(url, fetchOptions, retryOptions);
-        await response.body?.cancel()?.catch(() => {});
+        await this.sendBatch(batchMessages, retryOptions, route);
       } catch (err) {
         if (isPostHogFetchContentTooLargeError(err) && batchMessages.length > 1) {
           this.maxBatchSize = Math.max(1, Math.floor(batchMessages.length / 2));
@@ -3066,8 +3107,8 @@ class PostHogCoreStateless {
       }
       await persistQueueChange();
       sentMessages.push(...batchMessages);
+      sentFromRoute += batchMessages.length;
     }
-    this._events.emit("flush", sentMessages);
   }
   async _sendLogsBatch(payload) {
     if (this.disabled)
@@ -3163,12 +3204,17 @@ class PostHogCoreStateless {
       try {
         await this.promiseQueue.join();
         while (true) {
-          const queue = this.getPersistedProperty(types_PostHogPersistedProperty.Queue) || [];
-          if (queue.length === 0)
+          const hasQueuedEvents = this.getActiveQueueRoutes().some((route) => this.getRouteQueue(route).length > 0);
+          if (!hasQueuedEvents)
             break;
+          const dequeuedBeforeFlush = this._dequeuedMessagesCount;
           await this.flush();
           if (hasTimedOut)
             break;
+          if (this._dequeuedMessagesCount === dequeuedBeforeFlush) {
+            this._logger.warn("Shutdown flush completed but did not send any queued events. Stopping drain to avoid a loop.");
+            break;
+          }
         }
       } catch (e) {
         if (!isPostHogFetchError(e))
@@ -3206,7 +3252,7 @@ var PostHogFetchHttpError, PostHogFetchNetworkError, applyCallerFeatureFlagOverr
   for (const key of Object.keys(callerProperties))
     if (key.startsWith("$feature/") || key === "$active_feature_flags")
       target[key] = callerProperties[key];
-};
+}, DEFAULT_QUEUE_ROUTE = "default";
 var init_posthog_core_stateless = __esm(() => {
   init_eventemitter();
   init_featureFlagUtils();
@@ -3238,7 +3284,7 @@ var init_posthog_core_stateless = __esm(() => {
   };
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/posthog-core.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/posthog-core.mjs
 var init_posthog_core = __esm(() => {
   init_featureFlagUtils();
   init_types();
@@ -3247,17 +3293,18 @@ var init_posthog_core = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/tracing-headers.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/tracing-headers.mjs
 var init_tracing_headers = __esm(() => {
   init_type_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.39.6/node_modules/@posthog/core/dist/index.mjs
+// node_modules/.bun/@posthog+core@1.40.2/node_modules/@posthog/core/dist/index.mjs
 var init_dist = __esm(() => {
   init_featureFlagUtils();
   init_gzip();
   init_logs_utils();
   init_logs();
+  init_metrics();
   init_uuidv7();
   init_validation();
   init_error_tracking();
@@ -3269,7 +3316,7 @@ var init_dist = __esm(() => {
   init_types();
 });
 
-// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/context-lines.node.mjs
+// node_modules/.bun/posthog-node@5.41.0/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/context-lines.node.mjs
 import { createReadStream } from "node:fs";
 import { createInterface } from "node:readline";
 async function addSourceContext(frames) {
@@ -3488,7 +3535,7 @@ var init_context_lines_node = __esm(() => {
   LRU_FILE_CONTENTS_FS_READ_FAILED = new exports_error_tracking.ReduceableCache(20);
 });
 
-// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/relative-path.node.mjs
+// node_modules/.bun/posthog-node@5.41.0/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/relative-path.node.mjs
 import { isAbsolute as isAbsolute7, relative as relative4, sep as sep8 } from "node:path";
 function createRelativePathModifier(basePath = process.cwd()) {
   const isWindows = sep8 === "\\";
@@ -3505,11 +3552,11 @@ function createRelativePathModifier(basePath = process.cwd()) {
 }
 var init_relative_path_node = () => {};
 
-// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/version.mjs
-var version = "5.40.0";
+// node_modules/.bun/posthog-node@5.41.0/node_modules/posthog-node/dist/version.mjs
+var version = "5.41.0";
 var init_version = () => {};
 
-// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/types.mjs
+// node_modules/.bun/posthog-node@5.41.0/node_modules/posthog-node/dist/types.mjs
 var FeatureFlagError2;
 var init_types3 = __esm(() => {
   FeatureFlagError2 = {
@@ -3520,7 +3567,7 @@ var init_types3 = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/feature-flag-evaluations.mjs
+// node_modules/.bun/posthog-node@5.41.0/node_modules/posthog-node/dist/feature-flag-evaluations.mjs
 class FeatureFlagEvaluations {
   constructor(init) {
     this._host = init.host;
@@ -3654,7 +3701,7 @@ var init_feature_flag_evaluations = __esm(() => {
   init_types3();
 });
 
-// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/extensions/feature-flags/crypto.mjs
+// node_modules/.bun/posthog-node@5.41.0/node_modules/posthog-node/dist/extensions/feature-flags/crypto.mjs
 async function hashSHA1(text) {
   const subtle = globalThis.crypto?.subtle;
   if (!subtle)
@@ -3665,7 +3712,7 @@ async function hashSHA1(text) {
 }
 var init_crypto = () => {};
 
-// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/extensions/feature-flags/feature-flags.mjs
+// node_modules/.bun/posthog-node@5.41.0/node_modules/posthog-node/dist/extensions/feature-flags/feature-flags.mjs
 function setCustomErrorPrototype(error, constructor) {
   error.name = constructor.name;
   Error.captureStackTrace(error, constructor);
@@ -4576,7 +4623,7 @@ var init_feature_flags = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/extensions/error-tracking/autocapture.mjs
+// node_modules/.bun/posthog-node@5.41.0/node_modules/posthog-node/dist/extensions/error-tracking/autocapture.mjs
 function makeUncaughtExceptionHandler(captureFn, onFatalFn) {
   let calledFatalError = false;
   return Object.assign((error) => {
@@ -4609,7 +4656,7 @@ function addUnhandledRejectionListener(captureFn) {
 }
 var init_autocapture = () => {};
 
-// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/extensions/error-tracking/index.mjs
+// node_modules/.bun/posthog-node@5.41.0/node_modules/posthog-node/dist/extensions/error-tracking/index.mjs
 class ErrorTracking {
   constructor(client, options, _logger) {
     this.client = client;
@@ -4681,7 +4728,7 @@ var init_error_tracking2 = __esm(() => {
   init_dist();
 });
 
-// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/storage-memory.mjs
+// node_modules/.bun/posthog-node@5.41.0/node_modules/posthog-node/dist/storage-memory.mjs
 class PostHogMemoryStorage {
   getProperty(key) {
     return this._memoryStorage[key];
@@ -4695,7 +4742,361 @@ class PostHogMemoryStorage {
 }
 var init_storage_memory = () => {};
 
-// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/client.mjs
+// node_modules/.bun/posthog-node@5.41.0/node_modules/posthog-node/dist/capture-v1/config.mjs
+function isCaptureMode(value) {
+  return value === "v0" || value === "v1";
+}
+function resolveCaptureMode() {
+  const envMode = typeof process != "undefined" ? process.env?.POSTHOG_CAPTURE_MODE : undefined;
+  return isCaptureMode(envMode) ? envMode : "v0";
+}
+var init_config = () => {};
+
+// node_modules/.bun/posthog-node@5.41.0/node_modules/posthog-node/dist/capture-v1/routing.mjs
+function isLegacyOnlyEvent(message) {
+  return typeof message.event == "string" && message.event.startsWith(AI_EVENT_PREFIX);
+}
+var AI_EVENT_PREFIX = "$ai_", ANALYTICS_ROUTE = "analytics", AI_ROUTE = "ai";
+var init_routing = () => {};
+
+// node_modules/.bun/posthog-node@5.41.0/node_modules/posthog-node/dist/capture-v1/errors.mjs
+var CaptureV1Error;
+var init_errors = __esm(() => {
+  CaptureV1Error = class CaptureV1Error extends Error {
+    constructor({ requestId, drops, retryExhausted, cause }) {
+      super(CaptureV1Error.buildMessage(requestId, drops, retryExhausted, cause)), this.name = "CaptureV1Error";
+      this.requestId = requestId;
+      this.drops = drops;
+      this.retryExhausted = retryExhausted;
+      this.cause = cause;
+    }
+    static buildMessage(requestId, drops, retryExhausted, cause) {
+      let message = `Capture V1 batch ${requestId} did not fully deliver: ${drops.length} dropped, ${retryExhausted.length} undelivered`;
+      if (cause instanceof Error)
+        message += ` (${cause.message})`;
+      return message;
+    }
+  };
+});
+
+// node_modules/.bun/posthog-node@5.41.0/node_modules/posthog-node/dist/capture-v1/transform.mjs
+function coerceBool(value) {
+  if (typeof value == "boolean")
+    return value;
+  if (typeof value == "number")
+    return value !== 0;
+  if (typeof value == "string") {
+    const normalized = value.trim().toLowerCase();
+    if (normalized === "true" || normalized === "1")
+      return true;
+    if (normalized === "false" || normalized === "0")
+      return false;
+  }
+}
+function coerceString(value) {
+  return typeof value == "string" ? value : undefined;
+}
+function isRecord3(value) {
+  return typeof value == "object" && value !== null && !Array.isArray(value);
+}
+function toRfc3339(timestamp) {
+  if (typeof timestamp == "string") {
+    const asDate2 = new Date(timestamp);
+    return Number.isNaN(asDate2.getTime()) ? new Date().toISOString() : timestamp;
+  }
+  if (timestamp instanceof Date)
+    return Number.isNaN(timestamp.getTime()) ? new Date().toISOString() : timestamp.toISOString();
+  const asDate = timestamp == null ? new Date : new Date(timestamp);
+  return Number.isNaN(asDate.getTime()) ? new Date().toISOString() : asDate.toISOString();
+}
+function relocateInto(properties, key, value) {
+  if (value !== undefined && !(key in properties))
+    properties[key] = value;
+}
+function buildV1Event(message) {
+  const sourceProperties = isRecord3(message.properties) ? message.properties : {};
+  const properties = {
+    ...sourceProperties
+  };
+  const options = {};
+  for (const { property, optionKey, coerce } of OPTION_SENTINELS)
+    if (property in properties) {
+      const coerced = coerce(properties[property]);
+      if (coerced !== undefined)
+        options[optionKey] = coerced;
+      delete properties[property];
+    }
+  const topLevel = {};
+  for (const { property, field } of TOPLEVEL_SENTINELS)
+    if (property in properties) {
+      const value = properties[property];
+      if (typeof value == "string")
+        topLevel[field] = value;
+      delete properties[property];
+    }
+  delete properties.$lib;
+  delete properties.$lib_version;
+  relocateInto(properties, "$set", message.$set);
+  relocateInto(properties, "$set_once", message.$set_once);
+  return {
+    event: String(message.event ?? ""),
+    uuid: String(message.uuid ?? ""),
+    distinct_id: String(message.distinct_id ?? ""),
+    timestamp: toRfc3339(message.timestamp),
+    ...topLevel,
+    options,
+    properties
+  };
+}
+function buildV1Batch(messages, { createdAt, historicalMigration }) {
+  const batch = {
+    created_at: createdAt,
+    batch: messages.map(buildV1Event)
+  };
+  if (historicalMigration)
+    batch.historical_migration = true;
+  return batch;
+}
+var OPTION_SENTINELS, TOPLEVEL_SENTINELS;
+var init_transform = __esm(() => {
+  OPTION_SENTINELS = [
+    {
+      property: "$cookieless_mode",
+      optionKey: "cookieless_mode",
+      coerce: coerceBool
+    },
+    {
+      property: "$ignore_sent_at",
+      optionKey: "disable_skew_correction",
+      coerce: coerceBool
+    },
+    {
+      property: "$process_person_profile",
+      optionKey: "process_person_profile",
+      coerce: coerceBool
+    },
+    {
+      property: "$product_tour_id",
+      optionKey: "product_tour_id",
+      coerce: coerceString
+    }
+  ];
+  TOPLEVEL_SENTINELS = [
+    {
+      property: "$session_id",
+      field: "session_id"
+    },
+    {
+      property: "$window_id",
+      field: "window_id"
+    }
+  ];
+});
+
+// node_modules/.bun/posthog-node@5.41.0/node_modules/posthog-node/dist/capture-v1/sender.mjs
+class V1CaptureSender {
+  constructor(config, hooks) {
+    this.config = config;
+    this.maxBackoffMs = config.maxBackoffMs ?? DEFAULT_MAX_BACKOFF_MS;
+    this.fetchFn = hooks.fetch;
+    this.onError = hooks.onError;
+    this.now = hooks.now ?? Date.now;
+    this.sleep = hooks.sleep ?? ((ms) => new Promise((resolve9) => safeSetTimeout(resolve9, ms)));
+    this.generateRequestId = hooks.generateRequestId ?? uuidv7;
+    this.compress = hooks.compress ?? gzipCompress;
+  }
+  async sendV1Batch(messages) {
+    if (messages.length === 0)
+      return;
+    const requestId = this.generateRequestId();
+    const createdAt = new Date(this.now()).toISOString();
+    const { batch } = buildV1Batch(messages, {
+      createdAt,
+      historicalMigration: this.config.historicalMigration
+    });
+    const url = `${this.config.host}${V1_ANALYTICS_PATH}`;
+    const drops = [];
+    let pending = batch;
+    const maxAttempts = Math.max(1, this.config.maxAttempts);
+    for (let attempt = 1;attempt <= maxAttempts; attempt++) {
+      const isLastAttempt = attempt === maxAttempts;
+      const payload = safeJsonStringify({
+        created_at: createdAt,
+        ...this.config.historicalMigration ? {
+          historical_migration: true
+        } : {},
+        batch: pending
+      });
+      let response;
+      try {
+        response = await this.sendOnce(url, payload, attempt, requestId);
+      } catch (transportError) {
+        if (isLastAttempt)
+          return this.surfaceBatchFailure(requestId, drops, pending, transportError);
+        await this.sleep(this.backoffDelay(attempt));
+        continue;
+      }
+      const { status } = response;
+      if (status < 200 || status >= 300) {
+        if (!isLastAttempt && RETRYABLE_STATUSES.has(status)) {
+          const retryAfterMs2 = this.parseRetryAfter(response);
+          await this.cancelBody(response);
+          await this.sleep(this.backoffDelay(attempt, retryAfterMs2));
+          continue;
+        }
+        const httpError = await this.buildHttpError(response, status);
+        return this.surfaceBatchFailure(requestId, drops, pending, httpError);
+      }
+      let parsed;
+      try {
+        parsed = await this.parseResponse(response);
+      } catch {
+        return this.surfaceBatchFailure(requestId, drops, pending, new Error(`Capture V1 returned an unparseable ${status} response body`));
+      }
+      const retryable = this.classify(pending, parsed, drops);
+      if (retryable.length === 0)
+        return this.surfacePartialDrops(requestId, drops);
+      if (isLastAttempt)
+        return void this.onError(new CaptureV1Error({
+          requestId,
+          drops,
+          retryExhausted: retryable.map((event) => event.uuid)
+        }));
+      pending = retryable;
+      const retryAfterMs = this.parseRetryAfter(response);
+      await this.sleep(this.backoffDelay(attempt, retryAfterMs));
+    }
+  }
+  async sendOnce(url, payload, attempt, requestId) {
+    const headers = this.buildHeaders(attempt, requestId);
+    let body = payload;
+    if (this.config.compressionEnabled) {
+      const compressed = await this.compress(payload, this.config.isDebug);
+      if (compressed !== null) {
+        body = compressed;
+        headers["Content-Encoding"] = "gzip";
+      }
+    }
+    const controller = new AbortController;
+    const timer = safeSetTimeout(() => controller.abort(), this.config.requestTimeoutMs);
+    try {
+      return await this.fetchFn(url, {
+        method: "POST",
+        headers,
+        body,
+        signal: controller.signal
+      });
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+  buildHeaders(attempt, requestId) {
+    const sdkInfo = `${this.config.libraryId}/${this.config.libraryVersion}`;
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${this.config.apiKey}`,
+      "PostHog-Sdk-Info": sdkInfo,
+      "PostHog-Attempt": String(attempt),
+      "PostHog-Request-Id": requestId,
+      "PostHog-Request-Timestamp": new Date(this.now()).toISOString()
+    };
+    if (this.config.userAgent)
+      headers["User-Agent"] = this.config.userAgent;
+    return headers;
+  }
+  classify(pending, parsed, drops) {
+    const results = parsed.results ?? {};
+    const retryable = [];
+    for (const event of pending) {
+      const result = results[event.uuid];
+      if (result) {
+        if (result.result === "drop")
+          drops.push({
+            uuid: event.uuid,
+            details: result.details ?? undefined
+          });
+        else if (result.result === "retry")
+          retryable.push(event);
+      }
+    }
+    return retryable;
+  }
+  backoffDelay(attempt, retryAfterMs) {
+    const exponential = Math.min(this.config.initialRetryDelayMs * 2 ** (attempt - 1), this.maxBackoffMs);
+    if (retryAfterMs === undefined)
+      return exponential;
+    return Math.max(exponential, Math.min(retryAfterMs, this.maxBackoffMs));
+  }
+  parseRetryAfter(response) {
+    const raw = response.headers?.get("Retry-After");
+    if (!raw)
+      return;
+    const trimmed = raw.trim();
+    if (/^\d+$/.test(trimmed)) {
+      const seconds = parseInt(trimmed, 10);
+      return Number.isFinite(seconds) && seconds > 0 ? 1000 * seconds : undefined;
+    }
+    const dateMs = Date.parse(trimmed);
+    if (Number.isNaN(dateMs))
+      return;
+    const delta = dateMs - this.now();
+    return delta > 0 ? delta : undefined;
+  }
+  async parseResponse(response) {
+    const text = await response.text();
+    const parsed = JSON.parse(text);
+    if (typeof parsed != "object" || parsed === null || Array.isArray(parsed))
+      throw new Error("unexpected response shape");
+    const results = parsed.results;
+    if (results !== undefined && (typeof results != "object" || results === null || Array.isArray(results)))
+      throw new Error("unexpected results shape");
+    return {
+      results: results ?? {}
+    };
+  }
+  async buildHttpError(response, status) {
+    let bodyText = "";
+    try {
+      bodyText = (await response.text()).slice(0, 512);
+    } catch {}
+    const suffix = bodyText ? `: ${bodyText}` : "";
+    return new Error(`Capture V1 request failed with HTTP ${status}${suffix}`);
+  }
+  surfaceBatchFailure(requestId, drops, pending, cause) {
+    this.onError(new CaptureV1Error({
+      requestId,
+      drops,
+      retryExhausted: pending.map((event) => event.uuid),
+      cause
+    }));
+  }
+  surfacePartialDrops(requestId, drops) {
+    if (drops.length > 0)
+      this.onError(new CaptureV1Error({
+        requestId,
+        drops,
+        retryExhausted: []
+      }));
+  }
+  async cancelBody(response) {
+    await response.body?.cancel()?.catch(() => {});
+  }
+}
+var V1_ANALYTICS_PATH = "/i/v1/analytics/events", DEFAULT_MAX_BACKOFF_MS = 30000, RETRYABLE_STATUSES;
+var init_sender = __esm(() => {
+  init_dist();
+  init_errors();
+  init_transform();
+  RETRYABLE_STATUSES = new Set([
+    408,
+    500,
+    502,
+    503,
+    504
+  ]);
+});
+
+// node_modules/.bun/posthog-node@5.41.0/node_modules/posthog-node/dist/client.mjs
 function emitDeprecationWarningOnce(id, message) {
   if (_emittedDeprecations.has(id))
     return;
@@ -4739,6 +5140,9 @@ var init_client = __esm(() => {
   init_feature_flags();
   init_error_tracking2();
   init_storage_memory();
+  init_config();
+  init_routing();
+  init_sender();
   _emittedDeprecations = new Set;
   PostHogBackendClient = class PostHogBackendClient extends PostHogCoreStateless {
     constructor(apiKey, options = {}) {
@@ -4750,6 +5154,7 @@ var init_client = __esm(() => {
       };
       super(normalizedApiKey, normalizedOptions), this._memoryStorage = new PostHogMemoryStorage;
       this.options = normalizedOptions;
+      this.captureMode = resolveCaptureMode();
       this.context = this.initializeContext();
       this.options.featureFlagsPollingInterval = typeof normalizedOptions.featureFlagsPollingInterval == "number" ? Math.max(normalizedOptions.featureFlagsPollingInterval, MINIMUM_POLLING_INTERVAL) : THIRTY_SECONDS;
       if (typeof normalizedOptions.waitUntilDebounceMs == "number")
@@ -4854,6 +5259,46 @@ var init_client = __esm(() => {
     }
     fetch(url, options) {
       return this.options.fetch ? this.options.fetch(url, options) : fetch(url, options);
+    }
+    getQueueRouteKey(message) {
+      return this.captureMode === "v1" && isLegacyOnlyEvent(message) ? AI_ROUTE : ANALYTICS_ROUTE;
+    }
+    persistedQueueKeyForRoute(route) {
+      return route === AI_ROUTE ? types_PostHogPersistedProperty.AiQueue : types_PostHogPersistedProperty.Queue;
+    }
+    getActiveQueueRoutes() {
+      return this.captureMode === "v1" ? [
+        ANALYTICS_ROUTE,
+        AI_ROUTE
+      ] : [
+        ANALYTICS_ROUTE
+      ];
+    }
+    async sendBatch(batchMessages, retryOptions, route = ANALYTICS_ROUTE) {
+      if (this.captureMode !== "v1" || route === AI_ROUTE)
+        return super.sendBatch(batchMessages, retryOptions, route);
+      const v1Events = batchMessages.filter((message) => message !== undefined);
+      await this.getV1Sender().sendV1Batch(v1Events);
+    }
+    getV1Sender() {
+      if (!this._v1Sender)
+        this._v1Sender = new V1CaptureSender({
+          host: this.host,
+          apiKey: this.apiKey,
+          libraryId: this.getLibraryId(),
+          libraryVersion: this.getLibraryVersion(),
+          userAgent: this.getCustomUserAgent() || undefined,
+          historicalMigration: this.historicalMigration,
+          compressionEnabled: !this.disableCompression,
+          requestTimeoutMs: this.requestTimeout,
+          maxAttempts: (this.options.fetchRetryCount ?? 3) + 1,
+          initialRetryDelayMs: this.options.fetchRetryDelay ?? 3000,
+          isDebug: this.isDebug
+        }, {
+          fetch: (url, fetchOptions) => this.fetch(url, fetchOptions),
+          onError: (error) => this._events.emit("error", error)
+        });
+      return this._v1Sender;
     }
     getLibraryVersion() {
       return version;
@@ -5799,7 +6244,7 @@ var init_client = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/extensions/context/context.mjs
+// node_modules/.bun/posthog-node@5.41.0/node_modules/posthog-node/dist/extensions/context/context.mjs
 import { AsyncLocalStorage } from "node:async_hooks";
 
 class PostHogContext {
@@ -5831,7 +6276,7 @@ class PostHogContext {
 }
 var init_context = () => {};
 
-// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/extensions/sentry-integration.mjs
+// node_modules/.bun/posthog-node@5.41.0/node_modules/posthog-node/dist/extensions/sentry-integration.mjs
 function createEventProcessor(_posthog, { organization, projectId, prefix, severityAllowList = [
   "error"
 ], sendExceptionsToPostHog = true } = {}) {
@@ -5902,22 +6347,22 @@ var init_sentry_integration = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/extensions/tracing-headers.mjs
+// node_modules/.bun/posthog-node@5.41.0/node_modules/posthog-node/dist/extensions/tracing-headers.mjs
 var init_tracing_headers2 = () => {};
 
-// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/extensions/url-utils.mjs
+// node_modules/.bun/posthog-node@5.41.0/node_modules/posthog-node/dist/extensions/url-utils.mjs
 var init_url_utils = __esm(() => {
   init_dist();
 });
 
-// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/extensions/express.mjs
+// node_modules/.bun/posthog-node@5.41.0/node_modules/posthog-node/dist/extensions/express.mjs
 var init_express = __esm(() => {
   init_error_tracking2();
   init_tracing_headers2();
   init_url_utils();
 });
 
-// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/exports.mjs
+// node_modules/.bun/posthog-node@5.41.0/node_modules/posthog-node/dist/exports.mjs
 var init_exports = __esm(() => {
   init_feature_flag_evaluations();
   init_dist();
@@ -5926,7 +6371,7 @@ var init_exports = __esm(() => {
   init_types3();
 });
 
-// node_modules/.bun/posthog-node@5.40.0/node_modules/posthog-node/dist/entrypoints/index.node.mjs
+// node_modules/.bun/posthog-node@5.41.0/node_modules/posthog-node/dist/entrypoints/index.node.mjs
 var PostHog;
 var init_index_node = __esm(() => {
   init_module_node();
@@ -6141,7 +6586,7 @@ var package_default;
 var init_package = __esm(() => {
   package_default = {
     name: "@oh-my-opencode/omo-codex",
-    version: "4.16.3",
+    version: "4.17.0",
     type: "module",
     private: true,
     description: "Codex harness adapter for oh-my-openagent. Vendored Codex plugin namespace (omo) + TypeScript installer + telemetry.",
