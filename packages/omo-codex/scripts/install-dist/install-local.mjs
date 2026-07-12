@@ -7850,7 +7850,12 @@ function shouldCopyPluginPath(path, root) {
   if (relative4 === "")
     return true;
   const parts = relative4.split(sep5);
-  return !parts.some((part) => part === ".git" || part === "node_modules");
+  if (parts.some((part) => part === ".git" || part === "node_modules"))
+    return false;
+  return !isNestedComponentMcpManifest(parts);
+}
+function isNestedComponentMcpManifest(parts) {
+  return parts.length > 1 && parts.at(-1) === ".mcp.json";
 }
 var removedSparkshellReferencePattern = /\b(?:sparkshell|spark[-_\s]+shell)\b/i;
 var removedSparkshellPromptSurfaceDirs = new Set([".codex-plugin", "agents", "bundled-rules", "hooks", "skills"]);
@@ -8797,12 +8802,18 @@ import { readFile as readFile10 } from "node:fs/promises";
 import { join as join17 } from "node:path";
 var FALLBACK_CODEX_MODEL_CATALOG = {
   current: {
-    model: "gpt-5.5",
-    modelContextWindow: 400000,
+    model: "gpt-5.6-sol",
+    modelContextWindow: 372000,
     modelReasoningEffort: "high",
     planModeReasoningEffort: "xhigh"
   },
   managedProfiles: [
+    {
+      model: "gpt-5.5",
+      modelContextWindow: 400000,
+      modelReasoningEffort: "high",
+      planModeReasoningEffort: "xhigh"
+    },
     {
       model: "gpt-5.5",
       modelContextWindow: 1e6,
@@ -9275,6 +9286,42 @@ var MANAGED_REASONING_DEFAULT_UPGRADES = new Map([
       {
         previous: { model: "gpt-5.5", effort: "xhigh" },
         current: { model: "gpt-5.6-sol", effort: "ultra" }
+      }
+    ]
+  ],
+  [
+    "plan",
+    [
+      {
+        previous: { model: "gpt-5.6-sol", effort: "xhigh" },
+        current: { model: "gpt-5.6-sol", effort: "max" }
+      }
+    ]
+  ],
+  [
+    "lazycodex-worker-medium",
+    [
+      {
+        previous: { model: "gpt-5.6-sol", effort: "high" },
+        current: { model: "gpt-5.6-luna", effort: "max" }
+      }
+    ]
+  ],
+  [
+    "lazycodex-qa-executor",
+    [
+      {
+        previous: { model: "gpt-5.6-terra", effort: "medium" },
+        current: { model: "gpt-5.6-luna", effort: "high" }
+      }
+    ]
+  ],
+  [
+    "lazycodex-gate-reviewer",
+    [
+      {
+        previous: { model: "gpt-5.6-sol", effort: "xhigh" },
+        current: { model: "gpt-5.6-sol", effort: "high" }
       }
     ]
   ]
