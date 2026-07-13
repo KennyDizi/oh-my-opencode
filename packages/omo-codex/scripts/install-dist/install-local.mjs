@@ -8202,9 +8202,11 @@ function collectCommands(value, commands) {
 
 // packages/omo-codex/src/install/codex-cache-install.ts
 async function installCachedPlugin(input) {
+  const env = input.env ?? process.env;
+  const npmInstallEnv = sanitizeNpmInstallEnv(env);
   if (input.buildSource !== false) {
-    await maybeRunNpmInstall(input.sourcePath, input.runCommand);
-    await maybeRunNpmBuild(input.sourcePath, input.runCommand);
+    await maybeRunNpmInstall(input.sourcePath, input.runCommand, npmInstallEnv);
+    await maybeRunNpmBuild(input.sourcePath, input.runCommand, env);
   }
   const targetPath = join12(input.codexHome, "plugins", "cache", input.marketplaceName, input.name, input.version);
   const tempPath = createTempSiblingPath(targetPath);
@@ -8214,10 +8216,10 @@ async function installCachedPlugin(input) {
     await rewriteCachedPackageLocalFileDependencies(tempPath, input.sourcePath);
     await copyBundledMcpRuntimeDists({ pluginRoot: tempPath, sourceRoot: input.sourcePath });
     await copyRootRuntimeDists({ pluginRoot: tempPath, sourcePath: input.sourcePath });
-    await maybeRunNpmInstall(tempPath, input.runCommand, ["ci", "--omit=dev"]);
+    await maybeRunNpmInstall(tempPath, input.runCommand, npmInstallEnv, ["ci", "--omit=dev"]);
     await removeCachedManagedNpmBinShims(tempPath);
     if (input.buildSource === false)
-      await maybeRunNpmSyncSkills(tempPath, input.runCommand);
+      await maybeRunNpmSyncSkills(tempPath, input.runCommand, env);
     await assertNoRemovedSparkshellPromptReferences(tempPath);
     await rewriteCachedMcpManifest(tempPath, input.sourcePath);
     await rewriteCachedManifestRoot(tempPath, tempPath, targetPath);
@@ -8229,12 +8231,12 @@ async function installCachedPlugin(input) {
   }
   return { name: input.name, version: input.version, path: targetPath };
 }
-async function maybeRunNpmInstall(cwd, runCommand, args = ["install"]) {
+async function maybeRunNpmInstall(cwd, runCommand, env, args = ["install"]) {
   if (!await fileExistsStrict(join12(cwd, "package.json")))
     return;
-  await runCommand("npm", args, { cwd });
+  await runCommand("npm", args, { cwd, env });
 }
-async function maybeRunNpmBuild(cwd, runCommand) {
+async function maybeRunNpmBuild(cwd, runCommand, env) {
   if (!await fileExistsStrict(join12(cwd, "package.json")))
     return;
   const packageJson = JSON.parse(await readFile8(join12(cwd, "package.json"), "utf8"));
@@ -8243,9 +8245,9 @@ async function maybeRunNpmBuild(cwd, runCommand) {
   const scripts = packageJson.scripts;
   if (!isPlainRecord(scripts) || typeof scripts.build !== "string")
     return;
-  await runCommand("npm", ["run", "build"], { cwd });
+  await runCommand("npm", ["run", "build"], { cwd, env });
 }
-async function maybeRunNpmSyncSkills(cwd, runCommand) {
+async function maybeRunNpmSyncSkills(cwd, runCommand, env) {
   if (!await fileExistsStrict(join12(cwd, "package.json")))
     return;
   const packageJson = JSON.parse(await readFile8(join12(cwd, "package.json"), "utf8"));
@@ -8254,7 +8256,10 @@ async function maybeRunNpmSyncSkills(cwd, runCommand) {
   const scripts = packageJson.scripts;
   if (!isPlainRecord(scripts) || typeof scripts["sync:skills"] !== "string")
     return;
-  await runCommand("npm", ["run", "sync:skills"], { cwd });
+  await runCommand("npm", ["run", "sync:skills"], { cwd, env });
+}
+function sanitizeNpmInstallEnv(env) {
+  return Object.fromEntries(Object.entries(env).filter(([key]) => key.toLowerCase() !== "npm_config_allow_scripts"));
 }
 function createTempSiblingPath(targetPath) {
   return join12(dirname5(targetPath), `.tmp-${basename3(targetPath)}-${process.pid}-${Date.now()}`);
@@ -10956,6 +10961,7 @@ async function runCodexInstaller(options = {}) {
     const plugin = await installCachedPlugin({
       buildSource,
       codexHome,
+      env: env2,
       marketplaceName: marketplace.name,
       name: entry.name,
       runCommand,
