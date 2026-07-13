@@ -235,7 +235,7 @@
     "@earendil-works/pi-ai": "0.80.6",
     "@earendil-works/pi-coding-agent": "0.80.6",
     "@earendil-works/pi-tui": "0.80.6",
-    "hono": "^4.12.29",
+    "hono": "^4.12.30",
     "@hono/node-server": "^2.0.8",
     "express-rate-limit": "^8.5.2",
     "fast-uri": "^4.1.0",
