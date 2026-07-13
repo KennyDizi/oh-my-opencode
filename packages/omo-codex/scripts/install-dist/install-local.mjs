@@ -6586,7 +6586,7 @@ var package_default;
 var init_package = __esm(() => {
   package_default = {
     name: "@oh-my-opencode/omo-codex",
-    version: "4.17.0",
+    version: "4.17.1",
     type: "module",
     private: true,
     description: "Codex harness adapter for oh-my-openagent. Vendored Codex plugin namespace (omo) + TypeScript installer + telemetry.",
@@ -8778,6 +8778,14 @@ function parseAgentHeaderName(header) {
   const path = parseTomlDottedKey(header);
   return path?.[0] === "agents" ? path[1] ?? null : null;
 }
+function parseJsonString(value) {
+  try {
+    const parsed = JSON.parse(value);
+    return typeof parsed === "string" ? parsed : null;
+  } catch {
+    return null;
+  }
+}
 function parseHookStateHeaderKey(header) {
   const path = parseTomlDottedKey(header);
   if (path?.[0] !== "hooks" || path[1] !== "state")
@@ -9932,16 +9940,6 @@ function isSectionHeader3(line) {
 }
 function agentNameFromToml(fileName) {
   return fileName.endsWith(".toml") ? fileName.slice(0, -".toml".length) : fileName;
-}
-function parseJsonString(value) {
-  try {
-    const parsed = JSON.parse(value);
-    return typeof parsed === "string" ? parsed : null;
-  } catch (error) {
-    if (error instanceof Error)
-      return null;
-    return null;
-  }
 }
 async function exists2(path) {
   try {
