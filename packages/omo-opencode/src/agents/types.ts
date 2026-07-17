@@ -13,6 +13,7 @@ import {
   isGptModel,
   isKimiK2Model,
   isKimiK27Model,
+  isKimiK3Model,
   isMiniMaxModel,
 } from "@oh-my-opencode/model-core";
 
@@ -29,6 +30,7 @@ export {
   isGptModel,
   isKimiK2Model,
   isKimiK27Model,
+  isKimiK3Model,
   isMiniMaxModel,
 };
 
