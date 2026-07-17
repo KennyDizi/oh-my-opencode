@@ -2,6 +2,41 @@
 
 Tracks bugs that are present in the current release but have been intentionally deferred. Each entry should explain the symptom, the history, any workaround, and the planned resolution.
 
+## #5850 - `ulw` planner can fall into native OpenCode plan mode
+
+- **Affects**: Complex `ulw` runs where planning is delegated through a subagent named `plan` while OpenCode's experimental plan mode is enabled.
+- **Symptom**: The delegated planner can use OpenCode's native plan workflow, write under `.opencode/plans/` (or OpenCode's data-directory `opencode/plans/` fallback), and show the native `plan_exit` approval prompt instead of returning an OMO plan under `.omo/plans/` to the parent. The nested approval can offer to switch that child to build mode, while leaving it unresolved keeps the synchronous parent task waiting.
+- **Workaround**: If a native `plan_exit` prompt appears inside a delegated `ulw` planner, do not switch that nested child to build mode. Interrupt back to the parent, then ask the parent to recover the plan output or rerun planning through Prometheus/OMO planning explicitly.
+- **Status**: Open. Tracked at https://github.com/code-yeongyu/oh-my-openagent/issues/5850.
+
+## #5839 - Ultrawork verification can miss prose-only Oracle approvals
+
+- **Affects**: Ultrawork/Ralph-loop verification flows that rely on Oracle returning the exact `<promise>VERIFIED</promise>` token.
+- **Symptom**: Oracle can approve the work in normal prose, but the detector treats the verification as failed because the success token was never requested or emitted. The loop may then spend extra iterations re-fixing already-correct work.
+- **Workaround**: When manually asking Oracle to verify completion, explicitly instruct it to end with `<promise>VERIFIED</promise>` only if the work is genuinely complete and correct. If a verification failure follows a clear prose approval, inspect the Oracle transcript before assuming the implementation regressed.
+- **Status**: Open. Tracked at https://github.com/code-yeongyu/oh-my-openagent/issues/5839.
+
+## #5746 - tmux subagent panes attach only after focus by default
+
+- **Affects**: `tmux.enabled` sessions that expect every subagent pane to show a live attached session immediately.
+- **Symptom**: New panes can show only the placeholder text `Focus this pane to attach` until the user focuses each pane. With high background concurrency, the tmux layout can look blank or inactive even though subagents are running.
+- **Workaround**: Focus a pane to activate its `opencode attach` session, or inspect subagent status through normal task/background outputs when live pane rendering is not necessary. Treat the placeholder as current behavior unless an eager-attach option is added.
+- **Status**: Open enhancement. Tracked at https://github.com/code-yeongyu/oh-my-openagent/issues/5746.
+
+## #5809 - cmux tmux panes can stay on the focus-to-attach placeholder
+
+- **Affects**: Users running OMO inside cmux's tmux-compat native split layer.
+- **Symptom**: Subagent panes can be created with the "Focus this pane to attach" placeholder but never transition into `opencode attach`, because the activation path relies on `tmux respawn-pane -k`, which cmux may treat as a no-op.
+- **Workaround**: Use a real tmux server for subagent pane visualization when interactive attach matters, or avoid relying on focus-to-attach behavior inside cmux until an eager attach path is available. The underlying subagent work can still be inspected through non-pane outputs/logs.
+- **Status**: Open. Tracked at https://github.com/code-yeongyu/oh-my-openagent/issues/5809.
+
+## #5806 - `ulw` mode does not persist across follow-up messages
+
+- **Affects**: Multi-turn Sisyphus sessions that rely on `ulw` or `ultrawork` keyword injection.
+- **Symptom**: The keyword detector is edge-triggered per message. A first prompt that includes `ulw` gets the ultrawork prompt, but a follow-up that omits the keyword can fall back to default Sisyphus behavior and lose the expected delegation pattern.
+- **Workaround**: Repeat `ulw` or `ultrawork` in every follow-up message that should stay in ultrawork mode. For long tasks, prefer starting a fresh prompt that includes the keyword instead of assuming the mode remains active.
+- **Status**: Open. Tracked at https://github.com/code-yeongyu/oh-my-openagent/issues/5806.
+
 ## #5838 - LazyCodex frontend runs can skip the visual QA gate
 
 - **Affects**: Codex Light / LazyCodex sessions where the frontend skill is used for UI work.
