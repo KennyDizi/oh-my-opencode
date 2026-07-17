@@ -27,7 +27,7 @@ describe("agent name schemas", () => {
 })
 
 describe("OhMyOpenCodeConfigSchema disabled_skills", () => {
-  test("accepts review-work, shared aliases, and runtime security skills", () => {
+  test("accepts review-work, runtime security skills", () => {
     // given
     const config = {
       disabled_skills: [
@@ -38,7 +38,6 @@ describe("OhMyOpenCodeConfigSchema disabled_skills", () => {
         "security-review",
         "debugging",
         "visual-qa",
-        "shared/ulw-plan",
       ],
     }
 
@@ -56,7 +55,6 @@ describe("OhMyOpenCodeConfigSchema disabled_skills", () => {
         "security-review",
         "debugging",
         "visual-qa",
-        "shared/ulw-plan",
       ])
     }
   })
