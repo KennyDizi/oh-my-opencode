@@ -55,6 +55,22 @@ Ask @explore for the policy on this feature
 | momus             | Cannot write, edit, or delegate (blocked: write, edit, task)                            |
 | praha             | Allowlist: `read` only; external and secret-looking references are unverified            |
 
+### Instruction Files vs Enforcement
+
+`AGENTS.md` files are instruction context. They tell agents how to work in a
+project, and OMO can inject that context into prompts, but they are not a
+deterministic permission boundary.
+
+Deterministic enforcement today comes from OMO config (`agents.*.permission`,
+agent `tools`, disabled tools/agents), built-in agent restrictions, OpenCode's
+own permission gate when it is available, and guard hooks such as
+`team-tool-gating`, `write-existing-file-guard`, and `prometheus-md-only`.
+
+OMO does not currently read an `AGENTOWNERS.yml` file or run a generic
+AGENTOWNERS policy-enforcer hook. If a project needs hard agent boundaries,
+encode them in config permissions, tool allowlists, repository protections, or
+review gates rather than relying on prose-only instructions.
+
 ### Background Agents
 
 Run agents in the background and continue working:
