@@ -3412,16 +3412,39 @@ function bufferFromChunk(chunk) {
 
 // ../../mcp-stdio-core/src/server.ts
 var DEFAULT_IDLE_TIMEOUT_MS = 10 * 60000;
+var DEFAULT_PARENT_POLL_INTERVAL_MS = 30000;
 var noopLog = () => {};
+function isProcessAlive(pid) {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (error) {
+    if (hasErrorCode(error, "ESRCH"))
+      return false;
+    if (hasErrorCode(error, "EPERM"))
+      return true;
+    throw error;
+  }
+}
 async function runJsonRpcStdioServer(config) {
   const log = config.log ?? noopLog;
   const idleTimeoutMs = config.idleTimeoutMs ?? DEFAULT_IDLE_TIMEOUT_MS;
-  const idleTimer = createIdleTimer(idleTimeoutMs, log, config.onIdleTimeout);
+  let isClosed = false;
+  const idleTimer = createIdleTimer(idleTimeoutMs, log, () => {
+    isClosed = true;
+    config.onIdleTimeout?.();
+  });
+  const watchdog = createParentWatchdog(config.parentWatchdog, (parentPid, pollIntervalMs) => {
+    isClosed = true;
+    log("parent_exit", { parent_pid: parentPid, poll_interval_ms: pollIntervalMs });
+    config.onParentExit?.();
+    config.input.destroy();
+  });
   log("stdio_started", { cwd: process.cwd(), idle_timeout_ms: idleTimeoutMs });
   idleTimer.arm();
   try {
     for await (const message of readStdioJsonRpcMessages(config.input)) {
-      if (idleTimer.closed())
+      if (isClosed)
         break;
       idleTimer.arm();
       if (message.kind === "parse_error") {
@@ -3432,8 +3455,12 @@ async function runJsonRpcStdioServer(config) {
       if (!await handleRequest(message, config, log))
         break;
     }
+  } catch (error) {
+    if (!(isClosed && hasErrorCode(error, "ERR_STREAM_PREMATURE_CLOSE")))
+      throw error;
   } finally {
     idleTimer.clear();
+    watchdog.clear();
     log("stdio_stopped");
   }
 }
@@ -3489,9 +3516,33 @@ function isTerminalOutputError(error) {
     return false;
   return error.code === "EPIPE" || error.code === "ERR_STREAM_DESTROYED" || error.code === "ERR_STREAM_WRITE_AFTER_END";
 }
-function createIdleTimer(idleTimeoutMs, log, onIdleTimeout) {
+function hasErrorCode(error, code) {
+  return error instanceof Error && "code" in error && error.code === code;
+}
+function createParentWatchdog(config, onDeadParent) {
+  if (config === undefined)
+    return { clear: () => {} };
+  const pollIntervalMs = config.pollIntervalMs ?? DEFAULT_PARENT_POLL_INTERVAL_MS;
+  if (pollIntervalMs <= 0)
+    return { clear: () => {} };
+  const parentPid = config.parentPid ?? process.ppid;
+  const probeAlive = config.probeAlive ?? isProcessAlive;
+  let fired = false;
+  const timer = setInterval(() => {
+    if (fired || probeAlive(parentPid))
+      return;
+    fired = true;
+    onDeadParent(parentPid, pollIntervalMs);
+  }, pollIntervalMs);
+  timer.unref();
+  return {
+    clear: () => {
+      clearInterval(timer);
+    }
+  };
+}
+function createIdleTimer(idleTimeoutMs, log, onTimeout) {
   let timer = null;
-  let isClosed = false;
   return {
     arm: () => {
       if (timer !== null)
@@ -3499,9 +3550,8 @@ function createIdleTimer(idleTimeoutMs, log, onIdleTimeout) {
       if (idleTimeoutMs <= 0)
         return;
       timer = setTimeout(() => {
-        isClosed = true;
         log("idle_timeout", { idle_timeout_ms: idleTimeoutMs });
-        onIdleTimeout?.();
+        onTimeout();
       }, idleTimeoutMs);
       timer.unref();
     },
@@ -3510,8 +3560,7 @@ function createIdleTimer(idleTimeoutMs, log, onIdleTimeout) {
         return;
       clearTimeout(timer);
       timer = null;
-    },
-    closed: () => isClosed
+    }
   };
 }
 // components/codegraph/src/serve-invocation.ts
@@ -3544,6 +3593,7 @@ class CodegraphBridgeStdioError extends Error {
 var CODEGRAPH_NODE_DESCRIPTION = "Inspect one named symbol or file. In symbol mode, includeCode=true includes leaf-symbol source when available. Container symbols such as classes, interfaces, structs, enums, modules, and namespaces return structural outlines with member lists by design. For container source, request a specific member symbol or use file mode with symbolsOnly=false plus offset/limit.";
 var CODEGRAPH_NODE_INCLUDE_CODE_DESCRIPTION = "Symbol mode: include leaf-symbol source when available. Container symbols such as classes, interfaces, structs, enums, modules, and namespaces intentionally return structural outlines with members; request a specific member symbol or use file mode with symbolsOnly=false plus offset/limit for source.";
 var CODEGRAPH_CONTAINER_OUTLINE_GUIDANCE = "Container symbols intentionally return structural outlines with members. For source, request a specific member symbol or call codegraph_node in file mode with symbolsOnly=false plus offset/limit around the symbol location.";
+var SIGKILL_ESCALATION_MS = 2000;
 async function runBridgedCodegraphProcess(command, args, options) {
   const invocation = resolveServeProcessInvocation(command, args);
   const child = spawn2(invocation.command, invocation.args, {
@@ -3569,17 +3619,24 @@ async function runBridgedCodegraphProcess(command, args, options) {
       resolveExit(signal === null ? 0 : 1);
     });
   });
-  const clientForwardingDone = forwardClientToCodegraph(options.input, childInput, pendingResponses, (mode) => {
-    defaultResponseMode = mode;
-  });
-  const responseForwardingDone = forwardCodegraphToClient(childOutput, options.output, pendingResponses, () => defaultResponseMode);
-  const bridgeDone = Promise.all([clientForwardingDone, responseForwardingDone]);
-  const childAndResponsesDone = Promise.all([childExit, responseForwardingDone]).then(([exitCode]) => exitCode);
   const destroyChildPipes = () => {
     childInput.destroy();
     childOutput.destroy();
   };
   childExit.then(destroyChildPipes, destroyChildPipes);
+  let parentWatchdogFired = false;
+  const parentWatchdog = createParentWatchdog(options.parentWatchdog, () => {
+    parentWatchdogFired = true;
+    options.input.destroy();
+    destroyChildPipes();
+    terminateCodegraphChild(child);
+  });
+  const clientForwardingDone = forwardClientToCodegraph(options.input, childInput, pendingResponses, (mode) => {
+    defaultResponseMode = mode;
+  }, () => parentWatchdogFired);
+  const responseForwardingDone = forwardCodegraphToClient(childOutput, options.output, pendingResponses, () => defaultResponseMode, () => parentWatchdogFired);
+  const bridgeDone = Promise.all([clientForwardingDone, responseForwardingDone]);
+  const childAndResponsesDone = Promise.all([childExit, responseForwardingDone]).then(([exitCode]) => exitCode);
   try {
     return await Promise.race([childAndResponsesDone, bridgeDone.then(() => childExit)]);
   } catch (error) {
@@ -3590,39 +3647,66 @@ async function runBridgedCodegraphProcess(command, args, options) {
       return;
     });
     throw error;
+  } finally {
+    parentWatchdog.clear();
   }
 }
-async function forwardClientToCodegraph(input, childInput, pendingResponses, setDefaultResponseMode) {
-  for await (const message of readStdioJsonRpcMessages(input)) {
-    if (message.kind === "parse_error") {
-      continue;
-    }
-    const responseMode = message.responseMode;
-    setDefaultResponseMode(responseMode);
-    const key = responseModeKey(message.payload);
-    if (key !== null) {
-      pendingResponses.set(key, {
-        method: jsonRpcMethod(message.payload),
-        responseMode,
-        toolName: jsonRpcToolName(message.payload)
-      });
-    }
-    await writeLine(childInput, JSON.stringify(message.payload));
-  }
-  childInput.end();
+function terminateCodegraphChild(child) {
+  if (child.exitCode !== null || child.signalCode !== null)
+    return;
+  child.kill("SIGTERM");
+  const escalation = setTimeout(() => {
+    if (child.exitCode === null && child.signalCode === null)
+      child.kill("SIGKILL");
+  }, SIGKILL_ESCALATION_MS);
+  escalation.unref();
 }
-async function forwardCodegraphToClient(childOutput, output, pendingResponses, defaultResponseMode) {
-  for await (const message of readStdioJsonRpcMessages(childOutput)) {
-    if (message.kind === "parse_error") {
-      await writeStdioJsonRpcResponse(output, errorResponse(null, -32700, "Parse error", message.message), defaultResponseMode());
-      continue;
+function isWatchdogTeardownError(error) {
+  if (!(error instanceof Error) || !("code" in error))
+    return false;
+  return error.code === "ERR_STREAM_PREMATURE_CLOSE" || error.code === "ERR_STREAM_DESTROYED" || error.code === "ERR_STREAM_WRITE_AFTER_END" || error.code === "EPIPE";
+}
+async function forwardClientToCodegraph(input, childInput, pendingResponses, setDefaultResponseMode, tolerateWatchdogClose) {
+  try {
+    for await (const message of readStdioJsonRpcMessages(input)) {
+      if (message.kind === "parse_error") {
+        continue;
+      }
+      const responseMode = message.responseMode;
+      setDefaultResponseMode(responseMode);
+      const key = responseModeKey(message.payload);
+      if (key !== null) {
+        pendingResponses.set(key, {
+          method: jsonRpcMethod(message.payload),
+          responseMode,
+          toolName: jsonRpcToolName(message.payload)
+        });
+      }
+      await writeLine(childInput, JSON.stringify(message.payload));
     }
-    const key = responseModeKey(message.payload);
-    const pendingResponse = key === null ? undefined : pendingResponses.get(key);
-    const responseMode = pendingResponse?.responseMode ?? defaultResponseMode();
-    if (key !== null)
-      pendingResponses.delete(key);
-    await writeStdioJsonRpcResponse(output, clarifyCodegraphResponse(message.payload, pendingResponse), responseMode);
+    childInput.end();
+  } catch (error) {
+    if (!(tolerateWatchdogClose() && isWatchdogTeardownError(error)))
+      throw error;
+  }
+}
+async function forwardCodegraphToClient(childOutput, output, pendingResponses, defaultResponseMode, tolerateWatchdogClose) {
+  try {
+    for await (const message of readStdioJsonRpcMessages(childOutput)) {
+      if (message.kind === "parse_error") {
+        await writeStdioJsonRpcResponse(output, errorResponse(null, -32700, "Parse error", message.message), defaultResponseMode());
+        continue;
+      }
+      const key = responseModeKey(message.payload);
+      const pendingResponse = key === null ? undefined : pendingResponses.get(key);
+      const responseMode = pendingResponse?.responseMode ?? defaultResponseMode();
+      if (key !== null)
+        pendingResponses.delete(key);
+      await writeStdioJsonRpcResponse(output, clarifyCodegraphResponse(message.payload, pendingResponse), responseMode);
+    }
+  } catch (error) {
+    if (!(tolerateWatchdogClose() && isWatchdogTeardownError(error)))
+      throw error;
   }
 }
 function responseModeKey(payload) {
@@ -3754,7 +3838,8 @@ async function runUnavailableCodegraphMcpServer(options) {
       serverVersion: options.serverVersion
     },
     input: options.input,
-    output: options.output
+    output: options.output,
+    parentWatchdog: options.parentWatchdog ?? {}
   });
 }
 async function handleUnavailableCodegraphMcpRequest(input, options) {
@@ -3854,7 +3939,8 @@ async function runCodegraphServe(options = {}) {
     input: options.stdin ?? processStdin2,
     output: options.stdout ?? processStdout2,
     stderr: options.stderr ?? processStderr3,
-    stdio: "pipe"
+    stdio: "pipe",
+    parentWatchdog: options.parentWatchdog ?? {}
   });
 }
 async function runUnavailableMcp(reason, options) {
@@ -3863,7 +3949,8 @@ async function runUnavailableMcp(reason, options) {
     input: options.stdin ?? processStdin2,
     output: options.stdout ?? processStdout2,
     reason,
-    serverVersion: CODEGRAPH_VERSION2
+    serverVersion: CODEGRAPH_VERSION2,
+    parentWatchdog: options.parentWatchdog ?? {}
   });
   return 0;
 }
