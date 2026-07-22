@@ -8334,6 +8334,7 @@ async function rewriteCachedPackageLocalFileDependencies(pluginRoot, sourceRoot)
   const packageJsonPaths = [];
   await collectPackageJsonPaths(pluginRoot, pluginRoot, packageJsonPaths);
   const packageLock = await readPackageLock(pluginRoot);
+  let rewroteAnyPackageJson = false;
   for (const packageJsonPath of packageJsonPaths) {
     const raw = await readFile5(packageJsonPath, "utf8");
     const parsed = JSON.parse(raw);
@@ -8369,13 +8370,16 @@ async function rewriteCachedPackageLocalFileDependencies(pluginRoot, sourceRoot)
         changed = true;
       }
     }
-    if (changed)
+    if (changed) {
       await writeFile2(packageJsonPath, `${JSON.stringify(parsed, null, "\t")}
 `);
+      rewroteAnyPackageJson = true;
+    }
   }
   if (packageLock.changed)
     await writeFile2(packageLock.path, `${JSON.stringify(packageLock.value, null, "\t")}
 `);
+  return rewroteAnyPackageJson;
 }
 async function readPackageLock(pluginRoot) {
   const path = join8(pluginRoot, "package-lock.json");
@@ -8796,10 +8800,11 @@ async function installCachedPlugin(input) {
   await rm4(tempPath, { recursive: true, force: true });
   try {
     await copyDirectory(input.sourcePath, tempPath);
-    await rewriteCachedPackageLocalFileDependencies(tempPath, input.sourcePath);
+    const rewroteLocalFileDependencies = await rewriteCachedPackageLocalFileDependencies(tempPath, input.sourcePath);
     await copyBundledMcpRuntimeDists({ pluginRoot: tempPath, sourceRoot: input.sourcePath });
     await copyRootRuntimeDists({ pluginRoot: tempPath, sourcePath: input.sourcePath });
-    await maybeRunNpmInstall(tempPath, input.runCommand, npmInstallEnv, ["ci", "--omit=dev"]);
+    const installArgs = rewroteLocalFileDependencies ? ["install", "--omit=dev", "--no-audit", "--no-fund"] : ["ci", "--omit=dev"];
+    await maybeRunNpmInstall(tempPath, input.runCommand, npmInstallEnv, installArgs);
     await removeCachedManagedNpmBinShims(tempPath);
     if (input.buildSource === false)
       await maybeRunNpmSyncSkills(tempPath, input.runCommand, env);
