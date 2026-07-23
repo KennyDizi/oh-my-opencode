@@ -8,13 +8,13 @@ import {
   isAgentRegistered,
   resolveRegisteredAgentName,
   updateSessionAgent,
-} from "../../features/claude-code-session-state";
-import { log } from "../../shared/logger";
-import { buildStartWorkContextInfo } from "./context-info-builder";
-import { parseUserRequest } from "./parse-user-request";
-import { findRecentSessionPlanPath } from "./session-plan-affinity";
-import { createWorktreeActiveBlock } from "./worktree-block";
-import { detectWorktreePath } from "./worktree-detector";
+} from "../../features/claude-code-session-state"
+import { detectWorktreePath } from "./worktree-detector"
+import { parseUserRequest } from "./parse-user-request"
+import { buildStartWorkContextInfo } from "./context-info-builder"
+import { createPrDeliveryBlock, createWorktreeActiveBlock } from "./worktree-block"
+import { findRecentSessionPlanPath } from "./session-plan-affinity"
+import { log } from "@oh-my-opencode/utils";
 
 export const HOOK_NAME = "start-work" as const
 const START_WORK_TEMPLATE_MARKER = "You are starting an Atlas work session."
@@ -191,8 +191,9 @@ export function createStartWorkHook(ctx: PluginInput) {
     const sessionId = normalizeSessionId(input.sessionID, "opencode")
     const timestamp = new Date().toISOString()
 
-    const { planName: explicitPlanName, explicitWorktreePath } = parseUserRequest(promptText)
-    const { worktreePath, block: worktreeBlock } = resolveWorktreeContext(explicitWorktreePath)
+    const { planName: explicitPlanName, explicitWorktreePath, makePr, ship } = parseUserRequest(promptText)
+    const { worktreePath, block } = resolveWorktreeContext(explicitWorktreePath)
+    const worktreeBlock = block + createPrDeliveryBlock({ makePr, ship }, worktreePath)
     const preferredPlanPath = explicitPlanName
       ? null
       : await findRecentSessionPlanPath({
