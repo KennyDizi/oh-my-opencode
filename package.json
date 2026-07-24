@@ -157,8 +157,8 @@
   "homepage": "https://github.com/code-yeongyu/oh-my-openagent#readme",
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.18",
-    "@ai-sdk/google": "^4.0.21",
-    "@ai-sdk/openai": "^4.0.17",
+    "@ai-sdk/google": "^4.0.22",
+    "@ai-sdk/openai": "^4.0.18",
     "@ai-sdk/provider": "^4.0.3",
     "@ai-sdk/xai": "^4.0.18",
     "@clack/prompts": "^1.7.0",
