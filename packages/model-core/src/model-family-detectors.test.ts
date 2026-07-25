@@ -6,7 +6,7 @@ import {
   isClaudeOpus47OrLaterModel,
   isClaudeFableOrMythosModel,
   isClaudeOpus48Model,
-  isClaudeSonnet5OrLaterModel,
+  isClaudeOpus5Model,
   isGeminiModel,
   isGlmModel,
   isGptModel,
@@ -14,6 +14,7 @@ import {
   isKimiK27Model,
   isKimiK3Model,
   isMiniMaxModel,
+  isClaudeSonnet5OrLaterModel,
 } from "./model-family-detectors"
 
 describe("model family detectors", () => {
@@ -88,6 +89,17 @@ describe("model family detectors", () => {
     expect(isClaudeOpus48Model("anthropic/claude-fable-5")).toBe(false)
   })
 
+  test("#given Claude Opus 5 model ids #then detects Opus 5 only", () => {
+    expect(isClaudeOpus5Model("anthropic/claude-opus-5")).toBe(true)
+    expect(isClaudeOpus5Model("anthropic/claude-opus-5-0")).toBe(true)
+    expect(isClaudeOpus5Model("anthropic/claude-opus-5.0")).toBe(true)
+    expect(isClaudeOpus5Model("anthropic/claude-opus-5[1m]")).toBe(true)
+    expect(isClaudeOpus5Model("claude-opus-5")).toBe(true)
+    expect(isClaudeOpus5Model("anthropic/claude-opus-4-8")).toBe(false)
+    expect(isClaudeOpus5Model("anthropic/claude-fable-5")).toBe(false)
+    expect(isClaudeOpus5Model("anthropic/claude-sonnet-4-6")).toBe(false)
+  })
+
   test("#given Claude Fable 5 model ids #then detects Fable 5 only", () => {
     expect(isClaudeFable5Model("anthropic/claude-fable-5")).toBe(true)
     expect(isClaudeFable5Model("anthropic/claude-fable-5[1m]")).toBe(true)
@@ -111,6 +123,8 @@ describe("model family detectors", () => {
     expect(isClaudeOpus47OrLaterModel("anthropic/claude-opus-4-8")).toBe(true)
     expect(isClaudeOpus47OrLaterModel("anthropic/claude-opus-4.8")).toBe(true)
     expect(isClaudeOpus47OrLaterModel("anthropic/claude-opus-5-0")).toBe(true)
+    expect(isClaudeOpus47OrLaterModel("anthropic/claude-opus-5")).toBe(true)
+    expect(isClaudeOpus47OrLaterModel("anthropic/claude-opus-4")).toBe(false)
     expect(isClaudeOpus47OrLaterModel("claude-opus-4-7")).toBe(true)
     expect(isClaudeOpus47OrLaterModel("anthropic/claude-fable-5")).toBe(true)
     expect(isClaudeOpus47OrLaterModel("anthropic/claude-fable-5[1m]")).toBe(true)
