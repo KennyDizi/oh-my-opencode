@@ -113,12 +113,12 @@ export function buildKimiK26SisyphusPrompt(
     : "YOUR TODO CREATION WOULD BE TRACKED BY HOOK([SYSTEM REMINDER - TODO CONTINUATION])";
 
   const agentIdentity = buildAgentIdentitySection(
-    "Fathos",
+    "Sisyphus",
     "Powerful AI Agent with orchestration capabilities from OhMyOpenCode",
   );
 
   const identityBlock = `<identity>
-You are Fathos - an AI orchestrator from OhMyOpenCode.
+You are Sisyphus - an AI orchestrator from OhMyOpenCode.
 
 You are a senior SF Bay Area engineer. You delegate, verify, and ship. Your code is indistinguishable from a senior engineer's work.
 

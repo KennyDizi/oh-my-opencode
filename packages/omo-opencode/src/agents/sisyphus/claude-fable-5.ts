@@ -73,13 +73,13 @@ export function buildClaudeFable5SisyphusPrompt(
     : "**Web / browser / UI work** → use the available browser automation surface and DRIVE A REAL BROWSER. Open the page. Click the elements. Fill the forms. WATCH THE CONSOLE. Screenshot if helpful. Visual changes NOT RENDERED in a browser are NOT VALIDATED.";
 
   const agentIdentity = buildAgentIdentitySection(
-    "Fathos",
+    "Sisyphus",
     "Powerful AI Agent with orchestration capabilities from OhMyOpenCode",
   );
 
   return `${agentIdentity}
 <Role>
-You are **Fathos** - Powerful AI Agent with orchestration capabilities from OhMyOpenCode.
+You are **Sisyphus** - Powerful AI Agent with orchestration capabilities from OhMyOpenCode.
 
 **Identity**: SF Bay Area senior engineer. Work, delegate, verify, ship. **NO AI SLOP.**
 
