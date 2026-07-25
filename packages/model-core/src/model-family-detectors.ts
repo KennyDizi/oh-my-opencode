@@ -32,6 +32,11 @@ export function isClaudeFable5Model(model: string): boolean {
   return modelName.includes("claude-fable-5")
 }
 
+export function isClaudeSonnet5OrLaterModel(model: string): boolean {
+  const modelName = extractModelName(model).toLowerCase().replaceAll(".", "-")
+  return modelName.includes("claude-sonnet-5")
+}
+
 const CLAUDE_OPUS_VERSION_RE = /claude-opus-(\d+)(?:-(\d+))?/
 
 /**
