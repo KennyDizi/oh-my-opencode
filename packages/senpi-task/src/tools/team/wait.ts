@@ -53,8 +53,10 @@ export async function runTeamWait(
 
   const timeoutMs = clampWaitTimeout(input.timeout_ms, deps.waitBounds)
   const from = normalizeWaitFrom(input.from)
+  // The activity lives ONLY in details.progress: senpi core's tool-progress line paints it, so
+  // echoing it as partial content renders the same wait twice.
   const activity = `waiting for team message${from === undefined ? "" : ` from ${from}`}`
-  onUpdate?.(toolResult(activity, { kind: "waiting", progress: { activity, startedAt: Date.now(), maxWaitMs: timeoutMs } }))
+  onUpdate?.(toolResult("", { kind: "waiting", progress: { activity, startedAt: Date.now(), maxWaitMs: timeoutMs } }))
   const filter = from === undefined ? {} : { from }
   const registration = deps.registry.register(resolved.teamRunId, filter)
   try {
@@ -75,11 +77,26 @@ export async function runTeamWait(
     await poller.pollOnce(filter)
     const outcome = await waitForMessage(registration, timeoutMs, signal)
     switch (outcome.kind) {
-      case "timeout":
+      case "timeout": {
+        // A timeout writes no team_message_waited event (that ledger only records committed
+        // deliveries), so the text must not send the model hunting for one. Naming live member
+        // states is the actionable part: waiting on a crashed member is a dead wait.
+        const memberSegment = await deps.service.status(resolved.teamRunId).then(
+          (state) => state.members.length > 0
+            ? ` Members: ${state.members.map((member) => `${member.name} [${member.status}]`).join(", ")}.`
+            : "",
+          (error: unknown) => {
+            // A status failure must stay visible: masking it would misreport a broken run as a
+            // plain quiet timeout.
+            const message = error instanceof Error ? error.message : String(error)
+            return ` (member status unavailable: ${message})`
+          },
+        )
         return toolResult(
-          `No team message arrived within ${timeoutMs}ms. Check task_output for a committed team_message_waited recovery event.`,
+          `No team message arrived within ${timeoutMs}ms.${memberSegment} Either team_wait again to keep listening, or check member progress with task_output.`,
           { kind: "timeout", timeout_ms: timeoutMs },
         )
+      }
       case "message":
         return toolResult(formatMessageText(outcome.message), {
           kind: "message",
@@ -101,7 +118,7 @@ export function createTeamWaitTool(
   return {
     name: "team_wait",
     label: "Team Wait",
-    description: "Wait for the next durable message to the current team lead, optionally filtered by sender.",
+    description: "Lead-only. Wait for the next durable message to this team lead, optionally filtered by sender; drains any unreported delivered message first. timeout_ms is clamped to the configured bounds; on timeout the result names current member states. Members reply only after being sent work, so the normal loop is task_send(member) -> team_wait.",
     parameters: TeamWaitParams,
     execute: (_toolCallId: string, params: TeamWaitInput, signal: AbortSignal | undefined, onUpdate: AgentToolUpdateCallback<TeamWaitDetails> | undefined) => runTeamWait(deps, params, signal, onUpdate),
     renderResult: (result, options, theme) => renderTeamWaitResult(result, options, theme),
@@ -121,9 +138,9 @@ function renderTeamWaitResult(
   theme: TeamWaitRenderTheme,
 ): WaitRenderComponent {
   const text = options.isPartial && isWaitingDetails(result.details)
-    ? result.details.progress.activity
+    ? result.content.find((part) => part.type === "text")?.text ?? ""
     : result.content[0]?.type === "text" ? result.content[0].text : "team_wait"
-  return linesComponent([theme.fg("toolTitle", text)])
+  return text.length === 0 ? linesComponent([]) : linesComponent([theme.fg("toolTitle", text)])
 }
 
 function isWaitingDetails(details: unknown): details is Extract<TeamWaitDetails, { readonly kind: "waiting" }> {
