@@ -62,7 +62,7 @@ function buildCodegraphEnv(options = {}) {
   const homeDir = options.homeDir ?? homedir();
   return {
     [CODEGRAPH_INSTALL_DIR_ENV]: join(homeDir, ".omo", "codegraph"),
-    ...options.daemon === true ? {} : { [CODEGRAPH_NO_DAEMON_ENV]: "1" },
+    ...options.daemon === false ? { [CODEGRAPH_NO_DAEMON_ENV]: "1" } : {},
     [CODEGRAPH_NO_DOWNLOAD_ENV]: "1",
     [CODEGRAPH_TELEMETRY_ENV]: "0",
     [DO_NOT_TRACK_ENV]: "1"
@@ -1544,6 +1544,7 @@ var SETTING_HARNESS_SUPPORT = {
 var BUILT_IN_DEFAULTS = {
   codegraph: {
     auto_provision: true,
+    daemon: true,
     enabled: true,
     telemetry: false
   }
@@ -2611,7 +2612,7 @@ async function runCodegraphServe(options = {}) {
     return runUnavailableMcp(buildCodegraphNodeSkipHint(nodeSupport), options);
   }
   const runProcess = options.runProcess ?? runBridgedCodegraphProcess;
-  const codegraphEnv = codegraphEnvForConfig(trustedInstallDir, homeDir, codegraphConfig.daemon === true, options.buildEnv);
+  const codegraphEnv = codegraphEnvForConfig(trustedInstallDir, homeDir, codegraphConfig.daemon !== false, options.buildEnv);
   const mergedEnv = buildCodegraphChildEnv({ ambientEnv: env, codegraphEnv, runtimeEnv: env });
   return runProcess(resolution.command, [...resolution.argsPrefix, "serve", "--mcp"], {
     cwd: projectCwd,

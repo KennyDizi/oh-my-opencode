@@ -7283,7 +7283,7 @@
           "type": "boolean"
         },
         "daemon": {
-          "default": false,
+          "default": true,
           "type": "boolean"
         },
         "enabled": {
