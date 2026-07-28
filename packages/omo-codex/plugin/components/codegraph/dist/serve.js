@@ -8281,6 +8281,14 @@ function ensureBackupDirectories(moves, fileSystem) {
   for (const move of moves)
     fileSystem.mkdirSync(directoryPath2(move.to), { recursive: true });
 }
+function transformResult(value) {
+  if (isPlainObject3(value) && isPlainObject3(value.document) && Array.isArray(value.diagnostics) && value.diagnostics.every((diagnostic) => typeof diagnostic === "string")) {
+    return { diagnostics: value.diagnostics, document: value.document };
+  }
+  if (!isPlainObject3(value))
+    throw new MigrationTransactionError("Migration transform must return a plain object");
+  return { diagnostics: [], document: value };
+}
 function executePlan(input) {
   const { env, fileSystem, journalResumed, plan } = input;
   const protectedPaths = new Set([plan.targetPath, migrationJournalPath(env), migrationLockPath(env)]);
@@ -8290,21 +8298,20 @@ function executePlan(input) {
   if (!shouldRunMigration({ legacySourcesExist: existingSources.length > 0, migrationId: plan.id, target })) {
     return { diagnostics: [], journalResumed, status: "skipped" };
   }
-  const transformed = plan.transform(loadSources(existingSources, fileSystem));
-  if (!isPlainObject3(transformed))
-    throw new MigrationTransactionError("Migration transform must return a plain object");
-  const prepared = prepareTargetWrite({ additions: transformed, migrationId: plan.id, target, targetPath: plan.targetPath });
+  const transformed = transformResult(plan.transform(loadSources(existingSources, fileSystem)));
+  const prepared = prepareTargetWrite({ additions: transformed.document, migrationId: plan.id, target, targetPath: plan.targetPath });
+  const diagnostics = [...transformed.diagnostics, ...prepared.diagnostics];
   const moves = backupMoves(existingSources, plan.id, fileSystem, protectedPaths);
-  const preview = { backupMoves: moves, targetPath: plan.targetPath, transform: transformed };
+  const preview = { backupMoves: moves, targetPath: plan.targetPath, transform: transformed.document };
   if (input.dryRun)
-    return { diagnostics: prepared.diagnostics, journalResumed, preview, status: "planned" };
+    return { diagnostics, journalResumed, preview, status: "planned" };
   ensureBackupDirectories(moves, fileSystem);
   const journal = {
     backupMoves: moves,
     completedMoves: [],
     migrationId: plan.id,
     targetPath: plan.targetPath,
-    targetWrite: { additions: transformed },
+    targetWrite: { additions: transformed.document },
     targetWritten: false,
     version: 1
   };
@@ -8327,7 +8334,7 @@ function executePlan(input) {
     input.onBoundary?.("source-recorded");
   }
   removeMigrationJournal(fileSystem, env);
-  return { diagnostics: prepared.diagnostics, journalResumed, preview, status: "migrated" };
+  return { diagnostics, journalResumed, preview, status: "migrated" };
 }
 function runMigrations(options) {
   const clock = options.clock ?? DEFAULT_MIGRATION_CLOCK;
@@ -8399,12 +8406,15 @@ function transformConfigJsonc(configPath, sources) {
   const senpi = recordAt(legacy, "[senpi]");
   const history = migrationHistory(sources, configPath);
   return {
-    $schema: OMO_SCHEMA_URL,
-    ...recordAt(legacy, "codegraph") === undefined ? {} : { codegraph: recordAt(legacy, "codegraph") },
-    ...recordAt(legacy, "[opencode]") === undefined ? {} : { "[opencode]": recordAt(legacy, "[opencode]") },
-    ...recordAt(legacy, "[codex]") === undefined ? {} : { "[codex]": recordAt(legacy, "[codex]") },
-    ...senpi === undefined && omo === undefined ? {} : { "[senpi]": senpi ?? omo },
-    ...Object.keys(history).length === 0 ? {} : { legacy_migrations: history }
+    diagnostics: omo !== undefined && senpi !== undefined ? ["conflict: [senpi] legacy [omo] kept [senpi]"] : [],
+    document: {
+      $schema: OMO_SCHEMA_URL,
+      ...recordAt(legacy, "codegraph") === undefined ? {} : { codegraph: recordAt(legacy, "codegraph") },
+      ...recordAt(legacy, "[opencode]") === undefined ? {} : { "[opencode]": recordAt(legacy, "[opencode]") },
+      ...recordAt(legacy, "[codex]") === undefined ? {} : { "[codex]": recordAt(legacy, "[codex]") },
+      ...senpi === undefined && omo === undefined ? {} : { "[senpi]": senpi ?? omo },
+      ...Object.keys(history).length === 0 ? {} : { legacy_migrations: history }
+    }
   };
 }
 function timestamp(value) {
