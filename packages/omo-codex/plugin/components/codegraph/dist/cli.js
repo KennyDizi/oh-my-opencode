@@ -7794,6 +7794,9 @@ function removeMigrationJournal(fileSystem, env) {
 import { join as join10 } from "node:path";
 var DEFAULT_LEASE_DURATION_MS = 30000;
 var GUARD_LEASE_DURATION_MS = 1000;
+var LIVE_OWNER_STALE_LEASE_MULTIPLIER = 2;
+var MUTATION_GUARD_RETRY_DELAYS_MS = [2, 4, 8, 16, 32];
+var MUTATION_GUARD_SLEEP_VIEW = new Int32Array(new SharedArrayBuffer(4));
 function migrationLockPath(env) {
   return toPosixPath(join10(resolveHomeDir(env), ".omo", ".migration.lock"));
 }
@@ -7828,12 +7831,20 @@ function leaseContent(process3, clock, duration3) {
   return `${JSON.stringify({ leaseExpiresAt: clock.now() + duration3, pid: process3.pid })}
 `;
 }
-function isExpiredDead(record2, clock, process3) {
-  return record2.leaseExpiresAt <= clock.now() && !process3.isAlive(record2.pid);
+function isReclaimable(record2, clock, process3, leaseDurationMs) {
+  const now = clock.now();
+  if (record2.leaseExpiresAt > now)
+    return false;
+  if (!process3.isAlive(record2.pid))
+    return true;
+  return record2.leaseExpiresAt + leaseDurationMs * LIVE_OWNER_STALE_LEASE_MULTIPLIER <= now;
+}
+function sleepSync(milliseconds) {
+  Atomics.wait(MUTATION_GUARD_SLEEP_VIEW, 0, 0, milliseconds);
 }
 function acquireMutationGuard(input) {
   const path = mutationGuardPath(input.env);
-  for (let attempt = 0;attempt < 3; attempt += 1) {
+  for (let attempt = 0;attempt <= MUTATION_GUARD_RETRY_DELAYS_MS.length; attempt += 1) {
     const content = leaseContent(input.process, input.clock, GUARD_LEASE_DURATION_MS);
     try {
       input.fileSystem.writeFileExclusiveSync(path, content);
@@ -7842,11 +7853,19 @@ function acquireMutationGuard(input) {
       if (!isFileExistsError3(error))
         throw error;
     }
-    const observedContent = input.fileSystem.readFileSync(path, "utf-8");
-    const observed = parseLockRecord(observedContent);
-    if (observed === null || !isExpiredDead(observed, input.clock, input.process))
-      return null;
-    input.fileSystem.removeIfContentsMatchSync(path, observedContent);
+    try {
+      const observedContent = input.fileSystem.readFileSync(path, "utf-8");
+      const observed = parseLockRecord(observedContent);
+      if (observed === null || isReclaimable(observed, input.clock, input.process, GUARD_LEASE_DURATION_MS)) {
+        input.fileSystem.removeIfContentsMatchSync(path, observedContent);
+      }
+    } catch (error) {
+      if (!isFileMissingError(error))
+        throw error;
+    }
+    const retryDelayMs = MUTATION_GUARD_RETRY_DELAYS_MS[attempt];
+    if (retryDelayMs !== undefined)
+      sleepSync(retryDelayMs);
   }
   return null;
 }
@@ -7878,8 +7897,10 @@ function acquireMigrationLock(input) {
       return {
         release: () => {
           const guardContent2 = acquireMutationGuard(input);
-          if (guardContent2 === null)
+          if (guardContent2 === null) {
+            input.fileSystem.removeIfContentsMatchSync(path, ownedContent);
             return;
+          }
           try {
             input.fileSystem.removeIfContentsMatchSync(path, ownedContent);
           } finally {
@@ -7907,7 +7928,7 @@ function acquireMigrationLock(input) {
         throw error;
       }
       const observed = parseLockRecord(observedContent);
-      if (observed === null || !isExpiredDead(observed, input.clock, input.process))
+      if (observed !== null && !isReclaimable(observed, input.clock, input.process, leaseDurationMs))
         return null;
       input.fileSystem.removeIfContentsMatchSync(path, observedContent);
     } finally {
