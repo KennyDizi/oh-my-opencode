@@ -6990,6 +6990,7 @@ var DEFAULT_READ_FILE_SYSTEM = {
 };
 
 // ../../omo-config-core/src/loader/paths.ts
+var MAX_PROJECT_CONFIG_DIRECTORY_DEPTH = 256;
 function containsPath(parent, child) {
   const pathToChild = relative(parent, child);
   return pathToChild === "" || !pathToChild.startsWith("..") && !isAbsolute2(pathToChild);
@@ -7048,14 +7049,16 @@ function realpathOrSelf(path, fileSystem) {
 function findProjectConfigPathsFarthestFirst(cwd, homeDir, fileSystem) {
   const startDir = resolve4(cwd);
   const resolvedHomeDir = resolve4(homeDir);
-  const stopDir = containsPath(realpathOrSelf(resolvedHomeDir, fileSystem), realpathOrSelf(startDir, fileSystem)) ? resolvedHomeDir : null;
+  const realHomeDir = realpathOrSelf(resolvedHomeDir, fileSystem);
+  const stopDir = containsPath(realHomeDir, realpathOrSelf(startDir, fileSystem)) ? realHomeDir : null;
   const nearestFirst = [];
   let currentDir = startDir;
-  while (true) {
-    const configPath = currentDir === resolvedHomeDir ? null : detectOmoJsonPath(currentDir, fileSystem);
+  for (let depth = 0;depth < MAX_PROJECT_CONFIG_DIRECTORY_DEPTH; depth += 1) {
+    const isHomeDir = currentDir === resolvedHomeDir || stopDir !== null && realpathOrSelf(currentDir, fileSystem) === stopDir;
+    const configPath = isHomeDir ? null : detectOmoJsonPath(currentDir, fileSystem);
     if (configPath !== null)
       nearestFirst.push(configPath);
-    if (stopDir === null || currentDir === stopDir)
+    if (isHomeDir)
       break;
     const parentDir = dirname2(currentDir);
     if (parentDir === currentDir)
