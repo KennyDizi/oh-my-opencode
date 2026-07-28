@@ -103,7 +103,7 @@ degrades color and wide-glyph width. In this repo:
 stream). Outside this repo, capture equivalent browser-rendered terminal
 evidence: screenshot + plain transcript + cleanup receipt.
 
-# Bootstrap (DO ALL FOUR ONCE PER RUN, BEFORE ANY OTHER WORK — later ulw messages steer this run, never restart it)
+# Bootstrap (DO ALL FOUR BEFORE ANY OTHER WORK — NO SKIPPING)
 
 ## 0. Survey the skills, gather context, then size the work
 First, survey the loaded skill list and read the description of each
@@ -135,11 +135,8 @@ Never spawn the planner before the discovery wave has returned.
 ## 1. Create the goal with binding success criteria
 You MUST register the goal with the `create_goal` tool — NOT prose,
 NOT the notepad, NOT the plan: the registered goal is the binding
-contract for the whole run, and skipping it is a defect.
-Later user messages amend it only where they conflict; every
-non-conflicting criterion stays binding until its evidence is captured.
-Call it with exactly `objective`; do not include `status`. Only when no
-goal tool
+contract for the whole run, and skipping it is a defect. Call it with
+exactly `objective`; do not include `status`. Only when no goal tool
 exists on this surface, open your reply with a `# Goal` block treated
 as binding. Goals are unlimited; never invent a numeric budget or
 limit.
@@ -250,25 +247,31 @@ library/API/docs/web — delegate to the `librarian` subagent. Spawn them
 in background (`run_in_background: true`) and keep doing root work
 while they run.
 
-# Parallel execution (eval-first — batch as hell)
-The `eval` tool is your DEFAULT execution surface — drive work as
-programs, not one-off tool calls. For ANY bounded wave of two or more
-independent operations — file reads, `rg`/glob searches, git queries,
-LSP requests, web fetches, package metadata lookups — write ONE eval
-program that runs them ALL concurrently (`Promise.all` in JavaScript,
+# Parallel execution (EVAL TOOL MAXXING — batch as hell)
+The `eval` tool is your DEFAULT execution surface — think about how
+each step parallelises as code, then drive it as a PROGRAM, not
+one-off tool calls: the moment a step needs more than one call, write
+one LONG cell with real control flow — `if` branches, `for` loops
+over targets, `try`/`except` per item so one failure degrades only
+that item. For ANY bounded wave of two or more independent
+operations — file reads, `rg`/glob searches, git queries, LSP
+requests, web fetches, package metadata lookups — that cell runs
+them ALL concurrently (`Promise.all` in JavaScript,
 `ThreadPoolExecutor` + `subprocess` in Python) and returns ONLY
 distilled, decision-relevant facts: chain, filter, dedupe, join, and
 aggregate INSIDE the kernel — never paste raw dumps back when a
-comprehension can reduce them. Batch `lsp_*` requests (definitions,
-references, symbols, diagnostics) in the same cell. DEFAULT to fan-out:
+comprehension can reduce them. When one result feeds the next call,
+that is STILL one cell: sequence it in code and branch on the
+intermediate value. Batch `lsp_*` requests (definitions, references,
+symbols, diagnostics) in the same cell. DEFAULT to fan-out:
 spawn independent `task(...)` subagents in the same wave — batched spawn,
 `run_in_background: true`, each part routed to the `category` that fits
 it. Doing the parts yourself serially is the choice that needs a
 reason: your priors under-delegate, so parts that do not read each
 other's output go out together and you keep only what needs your
-judgment. Keep direct sequential calls only when one result chooses
-the next call, the output is already tiny, semantic judgment sits
-between the calls, or approvals / side effects are involved.
+judgment. Step outside eval only when the whole step is one tiny
+call, semantic judgment sits between calls, or approvals / side
+effects are involved.
 
 # Execution loop (PIN → RED → GREEN → SURFACE → CLEAN)
 Until every success criterion PASSES with its evidence captured:
@@ -342,16 +345,17 @@ Until every success criterion PASSES with its evidence captured:
 Within a step, follow Finding things; NEVER parallelise RED and GREEN of
 the same criterion.
 
-# Waiting discipline (notifications, not polls)
+# Waiting discipline (MONITOR MAXXING — subscribe, never sleep)
 Blocking waits are gone from this harness. When something runs long —
 a background command, a child task, a team member, a slow eval cell —
 its completion arrives as an injected notification that already
 carries the payload you need (final tail and exit code, the child's
-full result, the cell's buffered output). Keep doing independent root
+full result, the cell's buffered output). Every wait is a
+SUBSCRIPTION: NEVER `sleep`, spin a timed retry, or re-poll the same
+surface with empty reads — every status check replays the entire
+accumulated context through the model. Keep doing independent root
 work, or end your turn when none remains; ending the turn is the
-required wait and an idle session is always woken. Never re-poll the
-same surface with empty reads — every status check replays the entire
-accumulated context through the model.
+required wait and an idle session is always woken.
 - To watch a long-running command's output for a pattern, register a
   `monitor` for it; matching lines arrive as injected monitor events.
 - Only when a midpoint decision requires it, peek once with
@@ -503,8 +507,7 @@ commits this session — then stage + draft the message instead.
   list (`<sha> <subject>`). No file-by-file changelog unless asked.
 
 # Stop rules
-- After each result, ask whether the user's full request — the
-  registered goal plus every later steering message — can now be
+- After each result, ask whether the user's core request can now be
   answered with useful evidence in hand. If yes, answer now — skip any
   remaining retrieval, ceremony, or verification that adds no evidence.
 - The STOP GOAL: every scenario PASSES with captured evidence, every
