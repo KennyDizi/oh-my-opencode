@@ -585,7 +585,7 @@ Use Hephaestus when you deliberately want autonomous deep implementation or arch
 
 ## Configuration
 
-You can control related features in `oh-my-openagent.json`:
+You can control related features in the `[opencode]` block of `~/.omo/omo.jsonc`:
 
 ```jsonc
 {
