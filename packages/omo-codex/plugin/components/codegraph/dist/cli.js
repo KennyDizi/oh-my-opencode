@@ -5387,7 +5387,8 @@ var OmoCategoryConfigSchema = object({
   prompt_append: string2().optional(),
   max_prompt_tokens: number2().int().positive().optional(),
   is_unstable_agent: boolean2().optional(),
-  disable: boolean2().optional()
+  disable: boolean2().optional(),
+  warn_unavailable: boolean2().optional()
 }).strict();
 var OmoCategoriesConfigSchema = record(string2(), OmoCategoryConfigSchema);
 
@@ -5436,6 +5437,9 @@ var OmoTaskTeamSettingsSchema = object({
   max_parallel_members: number2().int().min(1).max(8).default(4),
   max_wall_clock_minutes: number2().int().positive().default(120)
 }).strict();
+var OmoTaskWarningsSchema = object({
+  unavailable_categories: boolean2().default(true)
+}).strict();
 var OmoTaskSettingsSchema = object({
   default_execution_mode: _enum(["in-process", "process"]).default("in-process"),
   default_concurrency: number2().int().positive().default(5),
@@ -5446,6 +5450,7 @@ var OmoTaskSettingsSchema = object({
   ttl_ms: number2().int().positive().default(86400000),
   state_dir: string2().optional(),
   reattach_on_reconcile: boolean2().optional(),
+  warnings: OmoTaskWarningsSchema.default({ unavailable_categories: true }),
   wait: OmoTaskWaitSchema.default({ min_ms: 5000, default_ms: 60000, max_ms: 600000 }),
   team: OmoTaskTeamSettingsSchema.default({
     max_members: 8,
@@ -5463,6 +5468,9 @@ var OmoTaskTeamSettingsLayerSchema = object({
   max_parallel_members: number2().int().min(1).max(8).optional(),
   max_wall_clock_minutes: number2().int().positive().optional()
 }).strict();
+var OmoTaskWarningsLayerSchema = object({
+  unavailable_categories: boolean2().optional()
+}).strict();
 var OmoTaskSettingsLayerSchema = object({
   default_execution_mode: _enum(["in-process", "process"]).optional(),
   default_concurrency: number2().int().positive().optional(),
@@ -5473,6 +5481,7 @@ var OmoTaskSettingsLayerSchema = object({
   ttl_ms: number2().int().positive().optional(),
   state_dir: string2().optional(),
   reattach_on_reconcile: boolean2().optional(),
+  warnings: OmoTaskWarningsLayerSchema.optional(),
   wait: OmoTaskWaitLayerSchema.optional(),
   team: OmoTaskTeamSettingsLayerSchema.optional()
 }).strict();
