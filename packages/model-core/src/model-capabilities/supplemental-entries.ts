@@ -95,23 +95,8 @@ export const SUPPLEMENTAL_MODEL_CAPABILITIES: Record<string, ModelCapabilitiesSn
 			output: 128000,
 		},
 	},
-	"claude-sonnet-5": {
-		id: "claude-sonnet-5",
-		family: "claude-sonnet",
-		reasoning: true,
-		temperature: false,
-		toolCall: true,
-		modalities: {
-			input: ["text", "image", "pdf"],
-			output: ["text"],
-		},
-		limit: {
-			context: 1000000,
-			output: 128000,
-		},
-	},
-	"gpt-5.4-mini-fast": {
-		id: "gpt-5.4-mini-fast",
+	"gpt-5.6-luna-fast": {
+		id: "gpt-5.6-luna-fast",
 		family: "gpt-mini",
 		reasoning: true,
 		temperature: false,
