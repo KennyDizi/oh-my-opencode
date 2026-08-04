@@ -5589,6 +5589,7 @@ var OmoTaskSettingsSchema = object({
   ttl_ms: number2().int().positive().default(86400000),
   state_dir: string2().optional(),
   reattach_on_reconcile: boolean2().optional(),
+  resume_children: boolean2().default(true),
   warnings: OmoTaskWarningsSchema.default({ unavailable_categories: true }),
   wait: OmoTaskWaitSchema.default({ min_ms: 5000, default_ms: 60000, max_ms: 600000 }),
   team: OmoTaskTeamSettingsSchema.default({
@@ -5620,6 +5621,7 @@ var OmoTaskSettingsLayerSchema = object({
   ttl_ms: number2().int().positive().optional(),
   state_dir: string2().optional(),
   reattach_on_reconcile: boolean2().optional(),
+  resume_children: boolean2().optional(),
   warnings: OmoTaskWarningsLayerSchema.optional(),
   wait: OmoTaskWaitLayerSchema.optional(),
   team: OmoTaskTeamSettingsLayerSchema.optional()
