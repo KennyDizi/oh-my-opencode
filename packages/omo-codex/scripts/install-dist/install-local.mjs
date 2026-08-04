@@ -12124,6 +12124,11 @@ async function seedAndMigrateOmoSot(input) {
 // packages/omo-codex/src/install/install-ast-grep-sg.ts
 import { join as join32 } from "node:path";
 
+// packages/utils/src/ast-grep/install-script.ts
+import { spawn as spawn2 } from "node:child_process";
+import { existsSync as existsSync4 } from "node:fs";
+import { join as join31 } from "node:path";
+
 // packages/utils/src/ast-grep/sg-manifest.ts
 function normalizeRuntimePlatform(platform = process.platform) {
   if (platform === "darwin" || platform === "linux" || platform === "win32")
@@ -12140,9 +12145,6 @@ function runtimeSlug(platform = process.platform, arch = process.arch) {
 }
 
 // packages/utils/src/ast-grep/install-script.ts
-import { spawn as spawn2 } from "node:child_process";
-import { existsSync as existsSync4 } from "node:fs";
-import { join as join31 } from "node:path";
 var AST_GREP_BIN_DIR_ENV_KEY = "OMO_AST_GREP_BIN_DIR";
 var AST_GREP_INSTALL_TIMEOUT_MS = 30000;
 function astGrepRuntimeDir(baseDir, platform = process.platform, arch = process.arch) {
