@@ -166,8 +166,8 @@
     "@clack/prompts": "^1.7.0",
     "@code-yeongyu/comment-checker": "^0.8.0",
     "@modelcontextprotocol/sdk": "^1.30.0",
-    "@opencode-ai/plugin": "1.18.13",
-    "@opencode-ai/sdk": "1.18.13",
+    "@opencode-ai/plugin": "1.18.14",
+    "@opencode-ai/sdk": "1.18.14",
     "@opentui/core": "^0.5.1",
     "@opentui/keymap": "^0.5.1",
     "@opentui/solid": "^0.5.1",
@@ -178,7 +178,7 @@
     "jsonc-parser": "^3.3.1",
     "picocolors": "^1.1.1",
     "picomatch": "^4.0.5",
-    "posthog-node": "^5.47.10",
+    "posthog-node": "^5.48.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
