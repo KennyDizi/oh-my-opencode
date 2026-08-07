@@ -5566,6 +5566,8 @@ var OmoModelCatalogEntryLayerSchema = preprocess((value) => isRecord4(value) ? n
 var OmoModelCatalogLayerSchema = record(string2(), OmoModelCatalogEntryLayerSchema);
 
 // ../../omo-config-core/src/schema/task.ts
+import { availableParallelism } from "node:os";
+var ResidencyMaxChildrenInputSchema = union([number2().int().positive(), literal("unlimited")]);
 var OmoTaskWaitSchema = object({
   min_ms: number2().int().positive().default(5000),
   default_ms: number2().int().positive().default(60000),
@@ -5585,7 +5587,7 @@ var OmoTaskSettingsSchema = object({
   provider_concurrency: record(string2(), number2().int().positive()).optional(),
   model_concurrency: record(string2(), number2().int().positive()).optional(),
   max_depth: number2().int().nonnegative().default(1),
-  residency_max_children: number2().int().positive().default(8),
+  residency_max_children: ResidencyMaxChildrenInputSchema.default(8),
   ttl_ms: number2().int().positive().default(86400000),
   state_dir: string2().optional(),
   reattach_on_reconcile: boolean2().optional(),
@@ -5617,7 +5619,7 @@ var OmoTaskSettingsLayerSchema = object({
   provider_concurrency: record(string2(), number2().int().positive()).optional(),
   model_concurrency: record(string2(), number2().int().positive()).optional(),
   max_depth: number2().int().nonnegative().optional(),
-  residency_max_children: number2().int().positive().optional(),
+  residency_max_children: ResidencyMaxChildrenInputSchema.optional(),
   ttl_ms: number2().int().positive().optional(),
   state_dir: string2().optional(),
   reattach_on_reconcile: boolean2().optional(),
@@ -5626,6 +5628,13 @@ var OmoTaskSettingsLayerSchema = object({
   wait: OmoTaskWaitLayerSchema.optional(),
   team: OmoTaskTeamSettingsLayerSchema.optional()
 }).strict();
+function resolveOmoTaskSettings(input, resolveParallelism = availableParallelism) {
+  const record2 = record(string2(), unknown()).parse(input);
+  return OmoTaskSettingsSchema.parse({
+    ...record2,
+    residency_max_children: record2["residency_max_children"] ?? Math.max(8, resolveParallelism() * 3)
+  });
+}
 
 // ../../omo-config-core/src/schema/team.ts
 var OmoTeamMemberBaseSchema = object({
@@ -7301,7 +7310,7 @@ var DEFAULT_RAW_CONFIG = {
   agents: {},
   categories: {},
   codegraph: OmoCodegraphSettingsSchema.parse({}),
-  task: OmoTaskSettingsSchema.parse({}),
+  task: resolveOmoTaskSettings({}),
   teams: {}
 };
 function stripResolutionControlKeys(config2) {
