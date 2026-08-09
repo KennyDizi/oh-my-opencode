@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// omo-codex-install:837f31a80cb49a0be547308babfd7266571dd1c53846dc2a2225006cc2da8bfa:83f9d480fb43d459a810fad644ffc2c888abc7eebbd104e8a96c30a411666453
+// omo-codex-install:7bc4b0f020f0a1b4448cc75385a7e3c60042e3b270e304d4c1a43a859e81a4c2:0f943b32288adb624e5616e99fbe624241789d937665b3ad755b009405542d9b
 var __defProp = Object.defineProperty;
 var __returnValue = (v) => v;
 function __exportSetter(name, newValue) {
@@ -7660,7 +7660,7 @@ var package_default;
 var init_package = __esm(() => {
   package_default = {
     name: "@oh-my-opencode/omo-codex",
-    version: "4.19.4",
+    version: "5.0.0-beta.2",
     type: "module",
     private: true,
     description: "Codex harness adapter for oh-my-openagent. Vendored Codex plugin namespace (omo) + TypeScript installer + telemetry.",
@@ -8440,7 +8440,7 @@ function isNodeErrorWithCode2(error) {
 // packages/omo-codex/src/install/codex-cache-runtime-wrapper.ts
 import { join as join4 } from "node:path";
 var RUNTIME_WRAPPER_MARKER = "OMO_GENERATED_RUNTIME_WRAPPER";
-function posixRuntimeWrapper(cliPath, codexHome, binDir, nodeCliPath) {
+function posixRuntimeWrapper(binName, cliPath, codexHome, binDir, nodeCliPath) {
   const ulwLoopBin = toPosixPath(join4(binDir, "omo-ulw-loop"));
   const nodeCli = escapePosixDoubleQuoted(toPosixPath(nodeCliPath));
   const escapedCliPath = escapePosixDoubleQuoted(toPosixPath(cliPath));
@@ -8450,6 +8450,8 @@ function posixRuntimeWrapper(cliPath, codexHome, binDir, nodeCliPath) {
     "#!/bin/sh",
     `# ${RUNTIME_WRAPPER_MARKER}`,
     `export CODEX_HOME="\${CODEX_HOME:-${escapedCodexHome}}"`,
+    `export OMO_INVOCATION_NAME=${binName}`,
+    "export OMO_EDITION=codex",
     'if [ "$1" = "ulw-loop" ] && [ -x "' + escapedUlwLoopBin + '" ]; then',
     "  shift",
     '  exec "' + escapedUlwLoopBin + '" ulw-loop "$@"',
@@ -8473,11 +8475,11 @@ function posixRuntimeWrapper(cliPath, codexHome, binDir, nodeCliPath) {
     `  if [ -f "${nodeCli}" ] && command -v node >/dev/null 2>&1; then`,
     `    exec node "${nodeCli}" "$@"`,
     "  fi",
-    `  echo "omo: bun runtime not found (checked PATH, ~/.bun/bin, /opt/homebrew/bin, /usr/local/bin) and the node fallback CLI is missing at ${nodeCli}; install bun from https://bun.sh, or reinstall omo and force the fallback with OMO_RUNTIME=node" >&2`,
+    `  echo "${binName}: bun runtime not found (checked PATH, ~/.bun/bin, /opt/homebrew/bin, /usr/local/bin) and the node fallback CLI is missing at ${nodeCli}; install bun from https://bun.sh, or reinstall ${binName} and force the fallback with OMO_RUNTIME=node" >&2`,
     "  exit 127",
     "fi",
     `if [ ! -f "${escapedCliPath}" ]; then`,
-    `  echo "omo: runtime target missing at ${escapedCliPath}; reinstall with: npx --yes lazycodex-ai@latest install --no-tui" >&2`,
+    `  echo "${binName}: runtime target missing at ${escapedCliPath}; reinstall with: npx --yes lazycodex-ai@latest install --no-tui" >&2`,
     "  exit 1",
     "fi",
     `exec "$BUN_BINARY" "${escapedCliPath}" "$@"`,
@@ -8485,12 +8487,14 @@ function posixRuntimeWrapper(cliPath, codexHome, binDir, nodeCliPath) {
   ].join(`
 `);
 }
-function windowsRuntimeWrapper(cliPath, codexHome, binDir, nodeCliPath) {
+function windowsRuntimeWrapper(binName, cliPath, codexHome, binDir, nodeCliPath) {
   const ulwLoopBin = join4(binDir, "omo-ulw-loop.cmd");
   return [
     "@echo off",
     `rem ${RUNTIME_WRAPPER_MARKER}`,
     `if not defined CODEX_HOME set "CODEX_HOME=${codexHome}"`,
+    `set "OMO_INVOCATION_NAME=${binName}"`,
+    'set "OMO_EDITION=codex"',
     ...windowsNodeDiscoveryLines(),
     `if "%~1"=="ulw-loop" if exist "${ulwLoopBin}" (`,
     "  shift /1",
@@ -8508,11 +8512,11 @@ function windowsRuntimeWrapper(cliPath, codexHome, binDir, nodeCliPath) {
     `    "%OMO_NODE_BINARY%" "${nodeCliPath}" %*`,
     "    exit /b %ERRORLEVEL%",
     "  )",
-    `  echo omo: bun runtime not found, no Node runtime was discovered from NODE_REPL_NODE_PATH or PATH, or the node fallback CLI is missing at ${nodeCliPath}; install bun from https://bun.sh or rerun LazyCodex install from Codex Desktop 1>&2`,
+    `  echo ${binName}: bun runtime not found, no Node runtime was discovered from NODE_REPL_NODE_PATH or PATH, or the node fallback CLI is missing at ${nodeCliPath}; install bun from https://bun.sh or rerun LazyCodex install from Codex Desktop 1>&2`,
     "  exit /b 127",
     ")",
     `if not exist "${cliPath}" (`,
-    `  echo omo: runtime target missing at ${cliPath}; reinstall with: npx --yes lazycodex-ai@latest install --no-tui 1>&2`,
+    `  echo ${binName}: runtime target missing at ${cliPath}; reinstall with: npx --yes lazycodex-ai@latest install --no-tui 1>&2`,
     "  exit /b 1",
     ")",
     `"%BUN_BINARY%" "${cliPath}" %*`,
@@ -8528,7 +8532,14 @@ function escapePosixDoubleQuoted(value) {
 }
 
 // packages/omo-codex/src/install/codex-cache-bins.ts
-var RESERVED_NESTED_BIN_NAMES = new Set(["omo", "lazycodex", "lazycodex-ai", "oh-my-opencode", "oh-my-openagent"]);
+var RESERVED_NESTED_BIN_NAMES = new Set([
+  "omo",
+  "omo-agent-toolkit",
+  "lazycodex",
+  "lazycodex-ai",
+  "oh-my-opencode",
+  "oh-my-openagent"
+]);
 async function linkCachedPluginBins(input) {
   const binLinks = await discoverPackageBins(input.pluginRoot);
   const platform = input.platform ?? process.platform;
@@ -8558,20 +8569,26 @@ async function removeCachedManagedNpmBinShims(pluginRoot) {
 }
 async function linkRootRuntimeBin(input) {
   const cliPath = join5(input.repoRoot, "dist", "cli", "index.js");
-  if (!await isFile(cliPath))
-    return null;
-  const nodeCliPath = join5(input.repoRoot, "dist", "cli-node", "index.js");
   const platform = input.platform ?? process.platform;
+  const legacyPath = join5(input.binDir, platform === "win32" ? "omo.cmd" : "omo");
+  if (!await isFile(cliPath)) {
+    await removeGeneratedRuntimeWrapper(legacyPath);
+    return null;
+  }
+  const binName = "omo-agent-toolkit";
+  const nodeCliPath = join5(input.repoRoot, "dist", "cli-node", "index.js");
   await mkdir(input.binDir, { recursive: true });
   if (platform === "win32") {
-    const linkPath2 = join5(input.binDir, "omo.cmd");
-    await replaceRuntimeWrapper(linkPath2, windowsRuntimeWrapper(cliPath, input.codexHome, input.binDir, nodeCliPath));
-    return { name: "omo", path: linkPath2, target: cliPath };
+    const linkPath2 = join5(input.binDir, `${binName}.cmd`);
+    await replaceRuntimeWrapper(linkPath2, windowsRuntimeWrapper(binName, cliPath, input.codexHome, input.binDir, nodeCliPath));
+    await removeGeneratedRuntimeWrapper(legacyPath);
+    return { name: binName, path: linkPath2, target: cliPath };
   }
-  const linkPath = join5(input.binDir, "omo");
-  await replaceRuntimeWrapper(linkPath, posixRuntimeWrapper(cliPath, input.codexHome, input.binDir, nodeCliPath));
+  const linkPath = join5(input.binDir, binName);
+  await replaceRuntimeWrapper(linkPath, posixRuntimeWrapper(binName, cliPath, input.codexHome, input.binDir, nodeCliPath));
   await chmod(linkPath, 493);
-  return { name: "omo", path: linkPath, target: cliPath };
+  await removeGeneratedRuntimeWrapper(legacyPath);
+  return { name: binName, path: linkPath, target: cliPath };
 }
 async function linkCachedPluginBin(binDir, link, platform) {
   if (platform === "win32") {
@@ -8683,6 +8700,29 @@ async function replaceRuntimeWrapper(linkPath, content) {
     throw new Error(`${linkPath} already exists and is not a generated OMO runtime wrapper`);
   await rm3(linkPath, { force: true });
   await writeFile(linkPath, content);
+}
+async function removeGeneratedRuntimeWrapper(path) {
+  try {
+    const entry = await lstat4(path);
+    if (!entry.isFile() && !entry.isSymbolicLink())
+      return;
+    const content = await readGeneratedWrapperContent(path);
+    if (content.includes(RUNTIME_WRAPPER_MARKER))
+      await rm3(path, { force: true });
+  } catch (error) {
+    if (isNodeErrorWithCode(error) && error.code === "ENOENT")
+      return;
+    throw error;
+  }
+}
+async function readGeneratedWrapperContent(path) {
+  try {
+    return await readFile3(path, "utf8");
+  } catch (error) {
+    if (isNodeErrorWithCode(error) && (error.code === "ENOENT" || error.code === "EISDIR"))
+      return "";
+    throw error;
+  }
 }
 async function existingNonRuntimeWrapper(path) {
   try {
@@ -12722,7 +12762,7 @@ async function runCodexInstaller(options = {}) {
       if (runtimeLink !== null)
         log(`Linked ${runtimeLink.name} -> ${runtimeLink.target}`);
       else
-        log(`Warning: skipped the omo runtime wrapper because ${join36(repoRoot, "dist", "cli", "index.js")} is missing; omo ulw-loop commands will be unavailable until a package shipping dist/cli is installed`);
+        log(`Warning: skipped the omo-agent-toolkit runtime wrapper because ${join36(repoRoot, "dist", "cli", "index.js")} is missing; omo-agent-toolkit ulw-loop commands will be unavailable until a package shipping dist/cli is installed`);
     }
     pluginSources.push({ name: entry.name, sourcePath });
     installed.push(plugin);
@@ -13057,7 +13097,7 @@ async function runDelegatedOmoCommand(parsed, options) {
     options.log(formatShellCommand(invocation.command, invocation.args));
     return;
   }
-  const env2 = invocation.delegatesToOmo ? { ...process.env, OMO_INVOCATION_NAME: "omo", ...invocation.env } : { ...process.env, ...invocation.env };
+  const env2 = invocation.delegatesToOmo ? { ...process.env, OMO_INVOCATION_NAME: "omo-agent-toolkit", ...invocation.env } : { ...process.env, ...invocation.env };
   await options.runCommand(invocation.command, invocation.args, { cwd: options.cwd, env: env2 });
 }
 function buildDelegatedOmoInvocation(parsed) {
@@ -13077,7 +13117,7 @@ function buildDelegatedOmoInvocation(parsed) {
       args2.push(`--repo-root=${parsed.repoRoot}`);
     return { command: "npx", args: args2, delegatesToOmo: true };
   }
-  const args = ["--yes", "--package", "oh-my-openagent", "omo", parsed.command];
+  const args = ["--yes", "--package", "oh-my-openagent", "omo-agent-toolkit", parsed.command];
   if (parsed.command === "cleanup") {
     args.push("--platform=codex", ...parsed.args);
   } else {
