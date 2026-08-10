@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// omo-codex-install:7bc4b0f020f0a1b4448cc75385a7e3c60042e3b270e304d4c1a43a859e81a4c2:0f943b32288adb624e5616e99fbe624241789d937665b3ad755b009405542d9b
+// omo-codex-install:7bc4b0f020f0a1b4448cc75385a7e3c60042e3b270e304d4c1a43a859e81a4c2:b70d25a8992c98fa7a198abc89aaf94de44af106e44465b72cfb758245e12c24
 var __defProp = Object.defineProperty;
 var __returnValue = (v) => v;
 function __exportSetter(name, newValue) {
@@ -315,6 +315,9 @@ function shouldDisableTelemetry(input) {
   const env = input.env ?? process.env;
   const globalPrefix = input.globalEnvPrefix ?? "OMO";
   const prefixes = Array.from(new Set([globalPrefix, input.productEnvPrefix]));
+  if (isDisableFlag(env["DO_NOT_TRACK"])) {
+    return true;
+  }
   for (const prefix of prefixes) {
     if (isDisableFlag(env[`${prefix}_DISABLE_POSTHOG`])) {
       return true;
@@ -336,17 +339,6 @@ var init_env = __esm(() => {
   TRUTHY_DISABLE_VALUES = ["1", "true", "yes"];
   SEND_OPT_OUT_VALUES = ["0", "false", "no", "yes"];
 });
-
-// packages/telemetry-core/src/machine-id.ts
-import { createHash as createHash3 } from "node:crypto";
-import os2 from "node:os";
-function getDefaultTelemetryOsProvider() {
-  return os2;
-}
-function getTelemetryDistinctId(machineIdPrefix, osProvider = getDefaultTelemetryOsProvider()) {
-  return createHash3("sha256").update(`${machineIdPrefix}${osProvider.hostname()}`).digest("hex");
-}
-var init_machine_id = () => {};
 
 // node_modules/.bun/posthog-node@5.48.1/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/module.node.mjs
 import { dirname as dirname10, posix as posix2, sep as sep7 } from "node:path";
@@ -7478,6 +7470,17 @@ var init_index_node = __esm(() => {
   };
 });
 
+// packages/telemetry-core/src/machine-id.ts
+import { createHash as createHash3 } from "node:crypto";
+import os2 from "node:os";
+function getDefaultTelemetryOsProvider() {
+  return os2;
+}
+function getTelemetryDistinctId(machineIdPrefix, osProvider = getDefaultTelemetryOsProvider()) {
+  return createHash3("sha256").update(`${machineIdPrefix}${osProvider.hostname()}`).digest("hex");
+}
+var init_machine_id = () => {};
+
 // packages/telemetry-core/src/posthog-client.ts
 class PostHogTelemetryTransport {
   #client;
@@ -7565,7 +7568,8 @@ function createTransport(input) {
       flushAt: 1,
       flushInterval: 0,
       host: getTelemetryHost(env, input.product.defaultHost),
-      disableGeoip: false
+      disableGeoip: input.product.disableGeoip ?? false,
+      ...input.product.transportOptions
     });
   } catch (error) {
     input.diagnostics?.({
@@ -7642,6 +7646,17 @@ var init_posthog_client = __esm(() => {
   };
 });
 
+// packages/telemetry-core/src/events.ts
+var ALLOWED_DOLLAR_KEYS;
+var init_events = __esm(() => {
+  ALLOWED_DOLLAR_KEYS = new Set([
+    "$os",
+    "$os_version",
+    "$process_person_profile",
+    "$session_id"
+  ]);
+});
+
 // packages/telemetry-core/src/record-daily-active.ts
 var init_record_daily_active = () => {};
 
@@ -7650,6 +7665,7 @@ var init_src = __esm(() => {
   init_activity_state();
   init_diagnostics();
   init_env();
+  init_events();
   init_machine_id();
   init_posthog_client();
   init_record_daily_active();
@@ -7660,7 +7676,7 @@ var package_default;
 var init_package = __esm(() => {
   package_default = {
     name: "@oh-my-opencode/omo-codex",
-    version: "5.0.0-beta.2",
+    version: "5.0.0-beta.5",
     type: "module",
     private: true,
     description: "Codex harness adapter for oh-my-openagent. Vendored Codex plugin namespace (omo) + TypeScript installer + telemetry.",

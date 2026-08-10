@@ -1222,6 +1222,14 @@
           "type": "string",
           "minLength": 1
         },
+        "tool_exposure": {
+          "default": "direct",
+          "type": "string",
+          "enum": [
+            "direct",
+            "search"
+          ]
+        },
         "reflection": {
           "default": {
             "trigger": {
@@ -1434,11 +1442,25 @@
       "required": [
         "enabled",
         "agent",
+        "tool_exposure",
         "reflection",
         "sync",
         "search",
         "compile_warn_tokens",
         "agents"
+      ],
+      "additionalProperties": false
+    },
+    "telemetry": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "default": true,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "enabled"
       ],
       "additionalProperties": false
     },
@@ -13629,6 +13651,13 @@
               "type": "string",
               "minLength": 1
             },
+            "tool_exposure": {
+              "type": "string",
+              "enum": [
+                "direct",
+                "search"
+              ]
+            },
             "reflection": {
               "type": "object",
               "properties": {
@@ -13789,6 +13818,15 @@
                 },
                 "additionalProperties": false
               }
+            }
+          },
+          "additionalProperties": false
+        },
+        "telemetry": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
             }
           },
           "additionalProperties": false
@@ -14944,6 +14982,13 @@
               "type": "string",
               "minLength": 1
             },
+            "tool_exposure": {
+              "type": "string",
+              "enum": [
+                "direct",
+                "search"
+              ]
+            },
             "reflection": {
               "type": "object",
               "properties": {
@@ -15104,6 +15149,15 @@
                 },
                 "additionalProperties": false
               }
+            }
+          },
+          "additionalProperties": false
+        },
+        "telemetry": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
             }
           },
           "additionalProperties": false
@@ -16265,6 +16319,13 @@
                 "type": "string",
                 "minLength": 1
               },
+              "tool_exposure": {
+                "type": "string",
+                "enum": [
+                  "direct",
+                  "search"
+                ]
+              },
               "reflection": {
                 "type": "object",
                 "properties": {
@@ -16425,6 +16486,15 @@
                   },
                   "additionalProperties": false
                 }
+              }
+            },
+            "additionalProperties": false
+          },
+          "telemetry": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean"
               }
             },
             "additionalProperties": false
@@ -28616,6 +28686,13 @@
                     "type": "string",
                     "minLength": 1
                   },
+                  "tool_exposure": {
+                    "type": "string",
+                    "enum": [
+                      "direct",
+                      "search"
+                    ]
+                  },
                   "reflection": {
                     "type": "object",
                     "properties": {
@@ -28776,6 +28853,15 @@
                       },
                       "additionalProperties": false
                     }
+                  }
+                },
+                "additionalProperties": false
+              },
+              "telemetry": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
                   }
                 },
                 "additionalProperties": false
@@ -29931,6 +30017,13 @@
                     "type": "string",
                     "minLength": 1
                   },
+                  "tool_exposure": {
+                    "type": "string",
+                    "enum": [
+                      "direct",
+                      "search"
+                    ]
+                  },
                   "reflection": {
                     "type": "object",
                     "properties": {
@@ -30091,6 +30184,15 @@
                       },
                       "additionalProperties": false
                     }
+                  }
+                },
+                "additionalProperties": false
+              },
+              "telemetry": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
                   }
                 },
                 "additionalProperties": false

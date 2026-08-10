@@ -86,7 +86,10 @@ describe("createMemoryComponent", () => {
       "senpi-memory.reflection-completion",
       MEMORY_BINDING_CUSTOM_TYPE,
     ])
+    // Direct registration is the default surface so memory always works; the exposure-search MCP
+    // variant is an explicit opt-in asserted in tool-surface.test.ts.
     expect(pi.tools.map((tool) => tool.name)).toEqual(["memory", "memory_apply_patch"])
+    expect(pi.mcpServers.map((server) => server.name)).toEqual([])
     expect(pi.entries).toEqual([{
       customType: MEMORY_BINDING_CUSTOM_TYPE,
       data: expect.objectContaining({ identity: expect.stringMatching(/^project-[a-f0-9]{8}$/), boundAt: 123 }),
@@ -167,5 +170,41 @@ describe("createMemoryComponent", () => {
     await pi.dispatch("session_shutdown", {}, live)
 
     expect(memoryModuleSupervisor.refCount).toBe(before)
+  })
+
+  test("#given a stale footer #when session start exits disabled or conflicted #then the status is cleared first", async () => {
+    for (const scenario of ["disabled", "conflicted"] as const) {
+      const { cwd, memoryHome } = fixture()
+      const pi = new MemoryFakeExtensionAPI()
+      const statusCalls: Array<{ key: string; text: string | undefined }> = []
+      let reads = 0
+      createMemoryComponent({
+        env: { OMO_MEMORY_HOME: memoryHome },
+        loadConfig: () => loadedMemoryConfig(memorySettings({
+          enabled: scenario === "disabled" ? reads++ === 0 : true,
+          ...(scenario === "conflicted" ? { agent: "fresh" } : {}),
+        })),
+        resolveCwd: () => cwd,
+      }).register(pi, componentContext())
+
+      await pi.dispatch("session_start", {}, {
+        sessionManager: {
+          getEntries: () => scenario === "conflicted"
+            ? [{
+                type: "custom",
+                customType: MEMORY_BINDING_CUSTOM_TYPE,
+                data: { identity: "different-identity", repoPathHash: "hash", boundAt: 1 },
+              }]
+            : [],
+          getSessionId: () => `session-${scenario}`,
+        },
+        ui: {
+          notify: () => {},
+          setStatus: (key: string, text: string | undefined) => statusCalls.push({ key, text }),
+        },
+      })
+
+      expect(statusCalls).toEqual([{ key: "memory", text: undefined }])
+    }
   })
 })
