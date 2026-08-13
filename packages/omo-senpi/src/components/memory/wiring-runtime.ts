@@ -1,6 +1,6 @@
 import { join } from "node:path"
 
-import { TranscriptJournal, sanitizeToSlug } from "@oh-my-opencode/memory-core"
+import { TranscriptJournal, sanitizeToSlug, type ReservedRun } from "@oh-my-opencode/memory-core"
 
 import type { MemoryIdentityContext } from "./context"
 import type { DreamTriggerSession } from "./dream-trigger"
@@ -17,6 +17,7 @@ import { resolveMemoryModelRegistry } from "./model-registry-resolver"
 import { resolveReflectionTriggerConfig, type ReflectionTriggerSession } from "./trigger-wiring"
 import { isRecord, sessionIdFrom } from "./wiring-context"
 import type { MemoryWiringOptions } from "./wiring-types"
+import type { ReflectionLiveSession } from "./worker"
 import { buildFactsSandboxTransform, type SandboxPolicy } from "./sandbox"
 
 export interface MemoryRuntimeWiring {
@@ -30,9 +31,18 @@ export interface MemoryRuntimeWiring {
   dreamSessionFor(eventCtx: unknown): DreamTriggerSession | undefined
 }
 
+export interface MemoryRuntimeWiringHooks {
+  /** Fires at the real launch site so the footer can animate while the run is in flight. */
+  readonly onLaunch?: (identity: string, run: ReservedRun) => void | Promise<void>
+  /** Fires after a completion was delivered directly to the currently bound session. */
+  readonly onLiveCompletion?: (identity: string, runId: string) => void | Promise<void>
+}
+
 export function createMemoryRuntimeWiring(
   options: MemoryWiringOptions,
   lastEventCtx: { current?: unknown },
+  liveSession?: () => ReflectionLiveSession | undefined,
+  hooks: MemoryRuntimeWiringHooks = {},
 ): MemoryRuntimeWiring {
   const runtimes = new Map<string, MemoryIdentityRuntime>()
   const journals = new Map<string, MemoryJournalWiring>()
@@ -105,6 +115,18 @@ export function createMemoryRuntimeWiring(
       cwd: options.cwd,
       resolveModelRegistry,
       ...(options.logger === undefined ? {} : { logger: options.logger }),
+      ...(liveSession === undefined
+        ? {}
+        : {
+            liveSession: () => {
+              const live = liveSession()
+              if (live === undefined || hooks.onLiveCompletion === undefined) return live
+              return {
+                ...live,
+                onCompletion: (runId: string) => hooks.onLiveCompletion?.(identity.identity, runId),
+              }
+            },
+          }),
     })
     runtimes.set(identity.identity, runtime)
     return runtime
@@ -125,7 +147,10 @@ export function createMemoryRuntimeWiring(
         evaluate: async (conversationId, event) => {
           lastEventCtx.current = eventCtx
           const result = await runtime.store.evaluate(conversationId, event)
-          if (result?.status === "active") runtime.launch(result.run)
+          if (result?.status === "active") {
+            runtime.launch(result.run)
+            await hooks.onLaunch?.(identity.identity, result.run)
+          }
           return result
         },
       },

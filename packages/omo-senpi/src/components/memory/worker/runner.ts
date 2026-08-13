@@ -15,24 +15,30 @@ import { loadSenpiOmoConfig, type SenpiOmoConfigResult } from "../../config-reso
 import { resolveAgentReflectionSettings } from "../reflection-settings"
 import { createOncePerSessionGuard } from "../../task/usage-guidance"
 import {
+  REFLECTION_LAUNCHED_ENTRY_TYPE,
   recordReflectionCompletion,
   registerReflectionCompletionRenderer,
+  safeNotify,
   type ReflectionCompletionRecord,
   type ReflectionLiveSession,
 } from "./completion"
+import { emitReflectionHealthAlert, readReflectionHealth } from "./health"
 import {
   resolveReflectionModel,
   shouldWarnCategoryUnavailable,
   type ReflectionModelResolution,
 } from "./resolve-model"
 import {
+  MemoryModelExhaustedError,
   runMemoryModelAttempts,
   type MemoryModelChain,
 } from "./memory-model-attempts"
+import { preflightMemoryModels } from "./model-preflight"
+import { resolveSenpiLaunch } from "./senpi-command"
 import { createRunWorktree } from "./create-run-worktree"
 import { prepareReflectionCandidateSpawn } from "./reflection-spawn-input"
 import { readRunJson } from "./run-artifacts"
-import { failReservationRun, finalizeRecordedOutcome } from "./run-finalization"
+import { failReservationRun, finalizeRecordedOutcome, overrideFailedReservationRun } from "./run-finalization"
 import type { RunFinalizationContext } from "./run-finalization-types"
 import { parseReservationRunLedger } from "./reservation-run-ledger"
 import { requireFinalizedResult } from "./runner-finalization-result"
@@ -52,6 +58,7 @@ export class SenpiSubprocessRunner implements ReflectionRunner {
   private readonly loadConfig: (options?: { readonly cwd?: string }) => SenpiOmoConfigResult
   private readonly now: () => Date
   private readonly warnedCategory = createOncePerSessionGuard()
+  private readonly warnedHealth = createOncePerSessionGuard()
   private readonly registeredApis = new WeakSet<object>()
 
   constructor(private readonly options: SenpiSubprocessRunnerOptions) {
@@ -77,7 +84,7 @@ export class SenpiSubprocessRunner implements ReflectionRunner {
       }, startedAt, resolution, true)
     }
 
-    const execution = await this.execute(run, resolution, loaded)
+    const execution = await this.execute(run, resolution, loaded, startedAt)
     if ("runId" in execution) return this.deliverFinalized(execution)
     const settled = await this.settle(run, execution, startedAt, resolution, false)
     return settled
@@ -87,6 +94,7 @@ export class SenpiSubprocessRunner implements ReflectionRunner {
     run: ReservedRun,
     resolution: Extract<ReflectionModelResolution, { readonly kind: "resolved" }>,
     loaded: SenpiOmoConfigResult,
+    startedAt: string,
   ): Promise<ExecutionResult | ReflectionRunResult> {
     const repo = new GitMemoryRepo({ dir: this.options.identity.paths.repo, agentId: this.options.identity.id })
     if (!existsSync(join(this.options.identity.paths.repo, ".git"))) {
@@ -106,7 +114,22 @@ export class SenpiSubprocessRunner implements ReflectionRunner {
         },
         ...resolution.fallbacks,
       ]
-      await runMemoryModelAttempts(candidates, async (candidate, attemptNumber, nextAttempt) => {
+      const env = this.options.env ?? process.env
+      const launch = this.options.senpiCommand === undefined
+        ? resolveSenpiLaunch(env)
+        : { command: this.options.senpiCommand, prefixArgs: this.options.senpiPrefixArgs ?? [] }
+      const preflight = await preflightMemoryModels({
+        candidates,
+        launch,
+        env: { ...env, SENPI_MEMORY_REFLECTION: "1", SENPI_PTY_FORCE_PIPE: "1" },
+        configSources: loaded.sources,
+        warn: (message, details) => this.options.logger?.warn(message, details),
+      })
+      if (preflight.kind === "none_visible") {
+        throw new Error(`No reflection model candidate is visible to the discovery-disabled child: ${preflight.rejected.map((item) => `${item.model} (${item.cause})`).join(", ")}`)
+      }
+      let launched = false
+      await runMemoryModelAttempts(preflight.candidates, async (candidate, attemptNumber, nextAttempt) => {
         const spawnArgs = await prepareReflectionCandidateSpawn({
           run,
           worktree: activeWorktree,
@@ -118,9 +141,13 @@ export class SenpiSubprocessRunner implements ReflectionRunner {
           nextAttempt,
           config: loaded.config,
           identity: this.options.identity,
-          env: this.options.env ?? process.env,
+          env,
           senpiCommand: this.options.senpiCommand,
         })
+        if (!launched) {
+          await this.appendLaunched(run, resolution, startedAt)
+          launched = true
+        }
         return runReflectionChild(spawnArgs, {
           terminationGraceMs: this.options.terminationGraceMs,
           maxOutputBytes: this.options.maxOutputBytes,
@@ -132,13 +159,15 @@ export class SenpiSubprocessRunner implements ReflectionRunner {
       const runDir = join(this.options.identity.paths.reflection, "runs", run.runId)
       if (existsSync(join(runDir, "ledger.json"))) {
         const ledger = parseReservationRunLedger(await readRunJson<unknown>(join(runDir, "ledger.json")))
-        const finalized = await failReservationRun(
-          this.finalizationContext(),
-          runDir,
-          ledger,
-          "failed",
-          errorMessage(error),
-        )
+        const finalized = error instanceof MemoryModelExhaustedError
+          ? await overrideFailedReservationRun(this.finalizationContext(), runDir, ledger, error.message)
+          : await failReservationRun(
+              this.finalizationContext(),
+              runDir,
+              ledger,
+              "failed",
+              errorMessage(error),
+            )
         return requireFinalizedResult(finalized)
       }
       const discarded = worktree === undefined ? undefined : await this.discard(worktree)
@@ -164,6 +193,8 @@ export class SenpiSubprocessRunner implements ReflectionRunner {
     const transition = await this.options.reservation.complete(run.runId, result.outcome)
     const live = this.options.liveSession?.()
     this.ensureRenderer(live)
+    const finishedAt = this.now().toISOString()
+    const healthBefore = await readReflectionHealth(join(this.options.identity.paths.reflection, "completions"))
     const record: ReflectionCompletionRecord = {
       schemaVersion: 1,
       runId: run.runId,
@@ -184,14 +215,20 @@ export class SenpiSubprocessRunner implements ReflectionRunner {
       ...(result.reason === undefined ? {} : { reason: result.reason }),
       ...(result.detail === undefined ? {} : { detail: result.detail }),
       startedAt,
-      finishedAt: this.now().toISOString(),
+      finishedAt,
+      durationMs: Math.max(0, Date.parse(finishedAt) - Date.parse(startedAt)),
+      consecutiveFailures: result.outcome === "failed" ? healthBefore.streak + 1 : 0,
       delivery: { status: "pending" },
     }
+    const completionsDir = join(this.options.identity.paths.reflection, "completions")
     const completion = await recordReflectionCompletion(
-      join(this.options.identity.paths.reflection, "completions"),
+      completionsDir,
       record,
-      suppressCompletionNotification && live ? { sessionId: live.sessionId, api: live.api } : live,
+      suppressCompletionNotification && live
+        ? { sessionId: live.sessionId, api: live.api, logger: live.logger }
+        : live,
     )
+    await emitReflectionHealthAlert(completionsDir, this.options.identity.id, live, this.warnedHealth)
     return {
       runId: run.runId,
       outcome: result.outcome,
@@ -205,12 +242,65 @@ export class SenpiSubprocessRunner implements ReflectionRunner {
   private async deliverFinalized(result: ReflectionRunResult): Promise<ReflectionRunResult> {
     const live = this.options.liveSession?.()
     this.ensureRenderer(live)
+    const finishedAt = result.completion.finishedAt
+    const health = await readReflectionHealth(join(this.options.identity.paths.reflection, "completions"))
+    const completionsDir = join(this.options.identity.paths.reflection, "completions")
     const completion = await recordReflectionCompletion(
-      join(this.options.identity.paths.reflection, "completions"),
-      result.completion,
+      completionsDir,
+      {
+        ...result.completion,
+        durationMs: Math.max(0, Date.parse(finishedAt) - Date.parse(result.completion.startedAt)),
+        ...(result.completion.outcome === "merged"
+          ? await this.mergedMetadata(result.completion.runId)
+          : {}),
+        consecutiveFailures: result.completion.outcome === "failed" ? health.streak : 0,
+      },
       live,
     )
+    await emitReflectionHealthAlert(completionsDir, this.options.identity.id, live, this.warnedHealth)
     return { ...result, completion }
+  }
+
+  private async appendLaunched(
+    run: ReservedRun,
+    resolution: Extract<ReflectionModelResolution, { readonly kind: "resolved" }>,
+    startedAt: string,
+  ): Promise<void> {
+    const live = this.options.liveSession?.()
+    if (!live) return
+    const states = this.options.getTranscriptState === undefined
+      ? []
+      : await Promise.all(run.request.conversationIds.map((id) => this.options.getTranscriptState?.(id)))
+    const backlogSteps = states.reduce(
+      (sum, state) => sum + (state?.steps_since_last_successful_reflection ?? 0),
+      0,
+    )
+    live.api.appendEntry(REFLECTION_LAUNCHED_ENTRY_TYPE, {
+      schemaVersion: 1,
+      runId: run.runId,
+      identity: this.options.identity.id,
+      trigger: run.request.trigger,
+      category: resolution.category,
+      model: resolution.model,
+      ...(resolution.thinking === undefined ? {} : { thinking: resolution.thinking }),
+      conversationIds: run.request.conversationIds,
+      backlogSteps,
+      startedAt,
+    })
+  }
+
+  private async mergedMetadata(runId: string): Promise<{ mergedCommitSha?: string; filesChanged?: number }> {
+    try {
+      const ledger = parseReservationRunLedger(await readRunJson<unknown>(
+        join(this.options.identity.paths.reflection, "runs", runId, "ledger.json"),
+      ))
+      return {
+        ...(ledger.integrationSha === undefined ? {} : { mergedCommitSha: ledger.integrationSha }),
+        filesChanged: ledger.validatedChangedPaths?.length ?? 0,
+      }
+    } catch {
+      return {}
+    }
   }
 
   private notifyCategoryUnavailable(config: OmoConfig, resolution: Extract<ReflectionModelResolution, { readonly kind: "category_unavailable" }>): void {
@@ -218,7 +308,8 @@ export class SenpiSubprocessRunner implements ReflectionRunner {
     if (!live?.ui || !shouldWarnCategoryUnavailable(config, resolution.category)) return
     if (!this.warnedCategory(`${live.sessionId}:${resolution.category}`)) return
     const providers = resolution.missingProviders?.join(", ")
-    live.ui.notify(
+    safeNotify(
+      live,
       providers
         ? `Category "${resolution.category}" has no usable model: none of its fallback-chain providers are connected (${providers}).`
         : `Category "${resolution.category}" has no usable model for memory reflection.`,

@@ -91,10 +91,13 @@ export function createIdentityRuntime(
   const runner = new SenpiSubprocessRunner({
     identity: asMemoryIdentity(identity),
     reservation: store,
+    logger: deps.logger,
     resolveModelRegistry: deps.resolveModelRegistry,
     loadConfig: (options) => deps.loadConfig(options ?? {}),
     cwd: deps.cwd(),
     sandbox: lazySandbox,
+    getTranscriptState: async (conversationId) =>
+      new TranscriptJournal({ journalDir: join(identity.identityPaths.transcripts, conversationId) }).getState(),
     ...(deps.liveSession === undefined ? {} : { liveSession: deps.liveSession }),
   })
   const launch = (run: ReservedRun): void => {

@@ -1,7 +1,8 @@
-import type { MemoryIdentity, ReflectionOutcome, ReservedRun } from "@oh-my-opencode/memory-core"
+import type { MemoryIdentity, ReflectionOutcome, ReflectionTranscriptState, ReservedRun } from "@oh-my-opencode/memory-core"
 import type { SenpiModelPort, SenpiModelRegistryPort } from "@oh-my-opencode/senpi-task"
 
 import type { SenpiOmoConfigResult } from "../../config-resolution"
+import type { ComponentLogger } from "../../../extension/types"
 import type { ReflectionCompletionRecord, ReflectionLiveSession } from "./completion"
 import type { ReflectionThinkingLevel } from "./resolve-model"
 import type { ReflectionSandbox } from "./spawn"
@@ -30,6 +31,7 @@ export interface ReflectionRunner {
 export interface SenpiSubprocessRunnerOptions {
   readonly identity: MemoryIdentity
   readonly reservation: ReflectionReservationPort
+  readonly logger?: ComponentLogger
   readonly resolveModelRegistry: () => SenpiModelRegistryPort<SenpiModelPort> | undefined
   readonly loadConfig?: (options?: { readonly cwd?: string }) => SenpiOmoConfigResult
   readonly cwd?: string
@@ -39,8 +41,10 @@ export interface SenpiSubprocessRunnerOptions {
   readonly maxOutputBytes?: number
   readonly sandbox?: ReflectionSandbox
   readonly liveSession?: () => ReflectionLiveSession | undefined
+  readonly getTranscriptState?: (conversationId: string) => Promise<ReflectionTranscriptState>
   readonly now?: () => Date
   readonly senpiCommand?: string
+  readonly senpiPrefixArgs?: readonly string[]
   readonly supervisorPath?: string
   readonly withWriterLock?: <T>(operation: () => Promise<T>) => Promise<T>
 }
