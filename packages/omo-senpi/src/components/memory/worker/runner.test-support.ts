@@ -15,6 +15,7 @@ import { OmoMemorySettingsSchema, type OmoConfig } from "@oh-my-opencode/omo-con
 import type { SenpiModelPort } from "@oh-my-opencode/senpi-task"
 
 import type { SenpiOmoConfigResult } from "../../config-resolution"
+import type { ResolveAndPreflightMemoryLaunch } from "./memory-launch-preflight"
 import type {
   ReflectionCompletionApi,
 } from "./completion"
@@ -40,6 +41,10 @@ export class CapturedCompletionApi implements ReflectionCompletionApi {
   }
 }
 
+export type HarnessModel = SenpiModelPort & {
+  readonly cost?: { readonly input: number; readonly cacheRead?: number; readonly output?: number }
+}
+
 export interface RunnerHarness {
   readonly root: string
   readonly identity: MemoryIdentity
@@ -61,10 +66,16 @@ export async function createRunnerHarness(options: {
   readonly childMode: "commit" | "timeout" | "admin" | "model-fallback" | "model-exhausted"
   readonly categoryAvailable?: boolean
   readonly config?: OmoConfig
-  readonly models?: readonly SenpiModelPort[]
-  readonly preflightModels?: readonly SenpiModelPort[]
+  readonly models?: readonly HarnessModel[]
+  readonly preflightModels?: readonly HarnessModel[]
   readonly deadlineMs?: number
   readonly terminationGraceMs?: number
+  readonly now?: () => Date
+  readonly resolveAndPreflightLaunch?: ResolveAndPreflightMemoryLaunch
+  readonly resolveSessionModel?: () => { readonly provider: string; readonly id: string; readonly thinking?: string } | undefined
+  readonly resolveParentContextTokens?: () => number | undefined
+  readonly resolveParentSessionFile?: () => string | undefined
+  readonly resolveParentCacheReusable?: () => boolean
 }): Promise<RunnerHarness> {
   const root = await mkdtemp(join(tmpdir(), "memory-reflection-worker-"))
   const identity: MemoryIdentity = {
@@ -150,9 +161,15 @@ export async function createRunnerHarness(options: {
     cwd: root,
     deadlineMs: options.deadlineMs,
     terminationGraceMs: options.terminationGraceMs,
+    now: options.now,
     supervisorPath: supervisorFixture,
     senpiCommand: process.execPath,
     senpiPrefixArgs: [senpiLauncher],
+    resolveAndPreflightLaunch: options.resolveAndPreflightLaunch,
+    ...(options.resolveSessionModel === undefined ? {} : { resolveSessionModel: options.resolveSessionModel }),
+    ...(options.resolveParentContextTokens === undefined ? {} : { resolveParentContextTokens: options.resolveParentContextTokens }),
+    ...(options.resolveParentSessionFile === undefined ? {} : { resolveParentSessionFile: options.resolveParentSessionFile }),
+    ...(options.resolveParentCacheReusable === undefined ? {} : { resolveParentCacheReusable: options.resolveParentCacheReusable }),
     getTranscriptState: (conversationId) => {
       if (conversationId !== "conversation-a") throw new Error(`unknown conversation: ${conversationId}`)
       return journal.getState()

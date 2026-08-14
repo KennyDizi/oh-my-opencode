@@ -14,10 +14,16 @@ import {
 } from "./identity-runtime"
 import { createMemoryJournalWiring, type MemoryJournalWiring } from "./journal-wiring"
 import { resolveMemoryModelRegistry } from "./model-registry-resolver"
+import { resolveMemorySessionModel } from "./session-model-resolver"
+import {
+  resolveParentCacheReusable as resolveParentCacheReusableFromCtx,
+  resolveParentContextTokens as resolveParentContextTokensFromCtx,
+  resolveParentSessionFile as resolveParentSessionFileFromCtx,
+} from "./session-context-resolver"
 import { resolveReflectionTriggerConfig, type ReflectionTriggerSession } from "./trigger-wiring"
 import { isRecord, sessionIdFrom } from "./wiring-context"
 import type { MemoryWiringOptions } from "./wiring-types"
-import type { ReflectionLiveSession } from "./worker"
+import type { ReflectionLiveSession, ReflectionSessionModel } from "./worker"
 import { buildFactsSandboxTransform, type SandboxPolicy } from "./sandbox"
 
 export interface MemoryRuntimeWiring {
@@ -55,6 +61,22 @@ export function createMemoryRuntimeWiring(
     return resolveMemoryModelRegistry(lastEventCtx.current)
   }
 
+  function resolveSessionModel(): ReflectionSessionModel | undefined {
+    return resolveMemorySessionModel(lastEventCtx.current)
+  }
+
+  function resolveParentContextTokens(): number | undefined {
+    return resolveParentContextTokensFromCtx(lastEventCtx.current)
+  }
+
+  function resolveParentSessionFile(): string | undefined {
+    return resolveParentSessionFileFromCtx(lastEventCtx.current)
+  }
+
+  function resolveParentCacheReusable(): boolean {
+    return resolveParentCacheReusableFromCtx(lastEventCtx.current)
+  }
+
   function journalWiringFor(identity: MemoryIdentityContext): MemoryJournalWiring {
     const cached = journals.get(identity.identity)
     if (cached !== undefined) return cached
@@ -83,6 +105,11 @@ export function createMemoryRuntimeWiring(
       env: options.env,
       sandbox: buildFactsSandboxTransform({
         policy: sandboxPolicy as SandboxPolicy,
+        onWarning: (warning, spawnArgs) => options.logger?.warn("memory facts sandbox degraded", {
+          identity: identity.identity,
+          runId: spawnArgs.runId,
+          warning,
+        }),
       }),
       ...(options.logger === undefined ? {} : { logger: options.logger }),
     })
@@ -114,6 +141,10 @@ export function createMemoryRuntimeWiring(
       loadConfig: options.loadConfig,
       cwd: options.cwd,
       resolveModelRegistry,
+      resolveSessionModel,
+      resolveParentContextTokens,
+      resolveParentSessionFile,
+      resolveParentCacheReusable,
       ...(options.logger === undefined ? {} : { logger: options.logger }),
       ...(liveSession === undefined
         ? {}

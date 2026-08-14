@@ -24,6 +24,7 @@ import {
   reconcileReflectionRuns,
   type ReflectionLiveSession,
   type ReflectionReservationPort,
+  type ReflectionSessionModel,
 } from "./worker"
 import type { ReflectionSpawnArgs } from "./worker"
 export { resolveMemorySettings } from "./reflection-settings"
@@ -32,6 +33,10 @@ export interface MemoryIdentityRuntimeDeps {
   readonly loadConfig: (options: { readonly cwd?: string }) => SenpiOmoConfigResult
   readonly cwd: () => string
   readonly resolveModelRegistry: () => SenpiModelRegistryPort<SenpiModelPort> | undefined
+  readonly resolveSessionModel?: () => ReflectionSessionModel | undefined
+  readonly resolveParentContextTokens?: () => number | undefined
+  readonly resolveParentSessionFile?: () => string | undefined
+  readonly resolveParentCacheReusable?: () => boolean
   readonly liveSession?: () => ReflectionLiveSession | undefined
   readonly logger?: ComponentLogger
 }
@@ -83,7 +88,16 @@ export function createIdentityRuntime(
           process.env.SENPI_CODING_AGENT_DIR ?? join(homedir(), ".senpi", "agent"),
           ...(process.env.XDG_CONFIG_HOME === undefined ? [] : [process.env.XDG_CONFIG_HOME]),
         ],
+        command: spawnArgs.command,
+        env: spawnArgs.env,
       })
+      if (builtSandbox.warning !== undefined) {
+        deps.logger?.warn("memory reflection sandbox degraded", {
+          identity: identity.identity,
+          runId: spawnArgs.runId,
+          warning: builtSandbox.warning,
+        })
+      }
     }
     return builtSandbox(spawnArgs)
   }
@@ -93,6 +107,10 @@ export function createIdentityRuntime(
     reservation: store,
     logger: deps.logger,
     resolveModelRegistry: deps.resolveModelRegistry,
+    ...(deps.resolveSessionModel === undefined ? {} : { resolveSessionModel: deps.resolveSessionModel }),
+    ...(deps.resolveParentContextTokens === undefined ? {} : { resolveParentContextTokens: deps.resolveParentContextTokens }),
+    ...(deps.resolveParentSessionFile === undefined ? {} : { resolveParentSessionFile: deps.resolveParentSessionFile }),
+    ...(deps.resolveParentCacheReusable === undefined ? {} : { resolveParentCacheReusable: deps.resolveParentCacheReusable }),
     loadConfig: (options) => deps.loadConfig(options ?? {}),
     cwd: deps.cwd(),
     sandbox: lazySandbox,
