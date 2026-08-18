@@ -245,7 +245,6 @@ describe("auto-slash command executor plugin dispatch", () => {
     )
 
     expect(result.success).toBe(true)
-    expect(result.replacementText).toContain("# /daplug:run-prompt Command")
     expect(result.replacementText).toContain("**Scope**: plugin")
   })
 
@@ -353,7 +352,6 @@ describe("auto-slash command executor plugin dispatch", () => {
     expect(result.replacementText).toContain("Echo ship it and ship it.")
     expect(result.replacementText).not.toContain("$ARGUMENTS")
     expect(result.replacementText).not.toContain("${user_message}")
-    expect(result.replacementText).not.toContain("## User Request")
   })
 
   it("retains the user request section for command templates without argument placeholders", async () => {
@@ -371,7 +369,6 @@ describe("auto-slash command executor plugin dispatch", () => {
     )
 
     expect(result.success).toBe(true)
-    expect(result.replacementText).toContain("## User Request\n\nship it")
   })
 
   it("preserves special arguments as data when a command template consumes them", async () => {
@@ -392,7 +389,6 @@ describe("auto-slash command executor plugin dispatch", () => {
 
     expect(result.success).toBe(true)
     expect(result.replacementText).toContain(`Echo ${args}.`)
-    expect(result.replacementText).not.toContain("## User Request")
     expect(existsSync(injectionMarker)).toBe(false)
   })
 

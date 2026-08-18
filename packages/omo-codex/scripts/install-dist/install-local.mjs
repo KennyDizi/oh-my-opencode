@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// omo-codex-install:7bc4b0f020f0a1b4448cc75385a7e3c60042e3b270e304d4c1a43a859e81a4c2:943a210415660c38a5e2f4f15eef45f428945e727cc060b155c09c5798e2dfdb
+// omo-codex-install:1d8359e77ebe41655f091cd2e455f320cde2f9c681f0651797c47d8fdfa2dd76:6255553f18765cfd4dc92af08ef9bbd942032671ec0e140415e2551269c83e5c
 var __defProp = Object.defineProperty;
 var __returnValue = (v) => v;
 function __exportSetter(name, newValue) {
@@ -7822,7 +7822,7 @@ var package_default;
 var init_package = __esm(() => {
   package_default = {
     name: "@oh-my-opencode/omo-codex",
-    version: "5.0.0-beta.7",
+    version: "5.0.0-beta.9",
     type: "module",
     private: true,
     description: "Codex harness adapter for oh-my-openagent. Vendored Codex plugin namespace (omo) + TypeScript installer + telemetry.",
@@ -12714,6 +12714,7 @@ function runtimeSlug(platform = process.platform, arch = process.arch) {
 
 // packages/utils/src/ast-grep/install-script.ts
 var AST_GREP_BIN_DIR_ENV_KEY = "OMO_AST_GREP_BIN_DIR";
+var KILL_GRACE_MS = 1000;
 var AST_GREP_INSTALL_TIMEOUT_MS = 30000;
 function astGrepRuntimeDir(baseDir, platform = process.platform, arch = process.arch) {
   return join32(baseDir, "runtime", "ast-grep", runtimeSlug(platform, arch));
@@ -12765,16 +12766,30 @@ function invocationsForPlatform(scriptPath, platform) {
 async function runInvocation(input) {
   const child = input.spawnProcess(input.invocation.command, input.invocation.args, { cwd: input.skillDir, env: input.env });
   let timedOut = false;
+  let terminateDeadline;
+  let terminateDeadlineGrace;
+  const killIgnored = new Promise((_, reject) => {
+    terminateDeadline = () => reject(new Error("ast-grep install child ignored termination"));
+  });
   const timeout = setTimeout(() => {
     timedOut = true;
     child.kill();
+    terminateDeadlineGrace = setTimeout(() => terminateDeadline?.(), KILL_GRACE_MS);
   }, input.timeoutMs);
-  timeout.unref?.();
   try {
-    const outcome = await child.outcome;
-    return timedOut ? { kind: "timed-out" } : outcome;
+    const outcome = await Promise.race([child.outcome, killIgnored]);
+    if (timedOut)
+      return { kind: "timed-out" };
+    return outcome;
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("ignored termination")) {
+      return { kind: "spawn-error", error, missingExecutable: false };
+    }
+    throw error;
   } finally {
     clearTimeout(timeout);
+    if (terminateDeadlineGrace !== undefined)
+      clearTimeout(terminateDeadlineGrace);
   }
 }
 function failedReason(outcome) {
