@@ -1,3 +1,47 @@
+## 2026-08-18 — Rebuild the Sisyphus runtime prompt on same-family model switches
+
+The Sisyphus runtime prompt reconciler skipped every rebuild whose runtime
+model shared the configured model's broad prompt family. The `fallback`
+family is not prompt-uniform: `buildFallbackSisyphusPrompt` applies
+Gemini-specific override blocks, and other families bake model-dependent
+sections (GPT identity text, claude/non-claude planner sections). Switching
+between same-family models in the TUI (e.g. Gemini -> MiniMax-M3 or
+DeepSeek -> MiniMax-M3) therefore kept the previous model's baked prompt in
+place, and the active model reported a stale identity (issue #6966).
+
+The reconciler now skips only when the runtime model is exactly the model the
+baked prompt was built for, and the existing rebuilt-versus-baked equality
+check suppresses genuine no-op switches (DeepSeek and MiniMax bake
+byte-identical fallback bodies, verified against the real prompt builder).
+The system-transform handler canonicalizes the opencode hook model record to
+`<providerID>/<id>` so bare builtin-provider ids compare exactly. Rebuild work
+per request is unchanged for cross-family switches; same-family switches now
+rebuild like cross-family ones already did.
+
+## 2026-08-18 — Respect user permission.task on OMO main agents
+
+`applyToolConfig` built the permission object for sisyphus, atlas, hephaestus,
+and prometheus by spreading the agent's existing permission first and then
+hardcoding `task: "allow"` on top, so any user-configured `permission.task`
+was silently discarded while the config looked applied. The default is now
+injected before the spread, which keeps `task: "allow"` when the user
+configured nothing and lets an explicit user value win otherwise.
+
+The plugin-injected rules that fence delegation (`call_omo_agent: "deny"`,
+`task_*`, `teammate`, todo denials, prometheus bash denials) still apply after
+the user permission, so only the `task` default changed precedence. Verified
+against a real isolated `opencode serve` boot with a user-layer
+`[opencode].agents.<agent>.permission.task` override for all four agents, plus
+a negative-control boot without user config. Object mappings for
+`permission.task` and a configurable deny list remain follow-ups tracked in
+the issue.
+
+## 2026-08-18 — Resolve configured category model chains against availability
+
+OpenCode category `models` chains now skip entries that are absent from the connected provider catalog before creating the delegated session. The configured order and per-entry settings remain intact, and fuzzy-normalized model IDs resolve to the provider's available spelling instead of being discarded.
+
+When no configured entry is available, delegation still fails rather than selecting an unrelated default, but the error now names the complete configured chain. Cold-cache behavior remains unchanged until an availability catalog exists.
+
 ## 2026-08-17 — Track Senpi 2026.8.17 for the omo-ai beta line
 
 All active native Senpi pins now use `2026.8.17` across the root workspace,
