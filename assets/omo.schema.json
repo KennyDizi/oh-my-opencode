@@ -1525,6 +1525,22 @@
           ],
           "additionalProperties": false
         },
+        "write_notice": {
+          "default": {
+            "enabled": true
+          },
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": true,
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "enabled"
+          ],
+          "additionalProperties": false
+        },
         "sync": {
           "default": {
             "enabled": true
@@ -1718,6 +1734,15 @@
                 },
                 "additionalProperties": false
               },
+              "write_notice": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              },
               "sync": {
                 "type": "object",
                 "properties": {
@@ -1760,6 +1785,7 @@
         "dream",
         "people",
         "soul",
+        "write_notice",
         "sync",
         "search",
         "compile_warn_tokens",
@@ -14155,6 +14181,15 @@
               },
               "additionalProperties": false
             },
+            "write_notice": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            },
             "sync": {
               "type": "object",
               "properties": {
@@ -14327,6 +14362,15 @@
                     "type": "object",
                     "properties": {
                       "edit_notice": {
+                        "type": "boolean"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "write_notice": {
+                    "type": "object",
+                    "properties": {
+                      "enabled": {
                         "type": "boolean"
                       }
                     },
@@ -15714,6 +15758,15 @@
               },
               "additionalProperties": false
             },
+            "write_notice": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            },
             "sync": {
               "type": "object",
               "properties": {
@@ -15886,6 +15939,15 @@
                     "type": "object",
                     "properties": {
                       "edit_notice": {
+                        "type": "boolean"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "write_notice": {
+                    "type": "object",
+                    "properties": {
+                      "enabled": {
                         "type": "boolean"
                       }
                     },
@@ -17279,6 +17341,15 @@
                 },
                 "additionalProperties": false
               },
+              "write_notice": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              },
               "sync": {
                 "type": "object",
                 "properties": {
@@ -17451,6 +17522,15 @@
                       "type": "object",
                       "properties": {
                         "edit_notice": {
+                          "type": "boolean"
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "write_notice": {
+                      "type": "object",
+                      "properties": {
+                        "enabled": {
                           "type": "boolean"
                         }
                       },
@@ -29874,6 +29954,15 @@
                     },
                     "additionalProperties": false
                   },
+                  "write_notice": {
+                    "type": "object",
+                    "properties": {
+                      "enabled": {
+                        "type": "boolean"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
                   "sync": {
                     "type": "object",
                     "properties": {
@@ -30046,6 +30135,15 @@
                           "type": "object",
                           "properties": {
                             "edit_notice": {
+                              "type": "boolean"
+                            }
+                          },
+                          "additionalProperties": false
+                        },
+                        "write_notice": {
+                          "type": "object",
+                          "properties": {
+                            "enabled": {
                               "type": "boolean"
                             }
                           },
@@ -31433,6 +31531,15 @@
                     },
                     "additionalProperties": false
                   },
+                  "write_notice": {
+                    "type": "object",
+                    "properties": {
+                      "enabled": {
+                        "type": "boolean"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
                   "sync": {
                     "type": "object",
                     "properties": {
@@ -31605,6 +31712,15 @@
                           "type": "object",
                           "properties": {
                             "edit_notice": {
+                              "type": "boolean"
+                            }
+                          },
+                          "additionalProperties": false
+                        },
+                        "write_notice": {
+                          "type": "object",
+                          "properties": {
+                            "enabled": {
                               "type": "boolean"
                             }
                           },
