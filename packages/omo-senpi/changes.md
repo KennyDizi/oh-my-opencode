@@ -1,3 +1,32 @@
+## 2026-08-18 — Follow the Senpi 2026.8.18-3 host contract
+
+The adapter peer and development dependency now require Senpi `2026.8.18-3`,
+and the task engine's peer and development pins move with it. The 2026.8.18-3
+host repairs the release changelog itself: a merge resolution had left a stray
+conflict marker and duplicated empty headings inside the `[Unreleased]`
+section, which the release stamper would have frozen into an immutable
+released section.
+
+The host release also carries the accumulated post-2026.8.18-2 runtime work:
+active goals resume after a continuation-flooded session load suppressed
+auto-continuation, transient provider stream-start timeouts spend their full
+configured retry budget, Cursor exec-bridge dispatches bind to the run that
+opened their stream, leaked-invoke recovery resolves wire-aliased tool names,
+Cursor context windows track the models.dev first-party catalog, Cursor
+reasoning levels drive both Cursor surfaces, advertised Cursor tool schemas
+are sanitized of JSON-Schema composition keywords, input typed during
+auto-compaction is queued instead of dropped, eval cells with no tool calls
+omit the throughput badge, the packaged codemode sidecar retains its Babel
+dependency closure, and Claude SDK OAuth selects the libc-appropriate binary.
+
+This bump does not add or alter adapter behavior beyond the inherited host
+fixes. The provider registry contract was re-verified: `builtinProviders()` in
+`packages/ai/src/providers/all.ts` is byte-identical to 2026.8.18-2, so the
+42 builtin provider IDs are unchanged and only the provider-map provenance
+stamp moves. Conflict zones are the adapter and task manifests, the workspace
+lockfile, package-shape and senpi-pin expectations, and the provider-map
+provenance comment.
+
 ## 2026-08-18 — Follow the Senpi 2026.8.18-2 host contract
 
 The adapter peer and development dependency now require Senpi `2026.8.18-2`,
@@ -26,6 +55,12 @@ the compatibility banner no longer advertises the nonexistent `git` category.
 The generated skill guard derives valid named agents and categories from the
 runtime registries, so future shared-skill or native-skill drift fails before
 shipping. Shared OpenCode skill sources remain unchanged.
+
+## 2026-08-18 — Keep completed resident team members visible
+
+The below-editor task widget now keeps completed canonical team members while their process-local handles remain resident, so users can still see members that `task_send` can revive. Active rows remain first, the five-row cap still applies afterward, and retained completed rows render as settled compact rows without a live spinner.
+
+Ordinary completed background tasks and stale or non-resident team records remain hidden. This is a presentation-only change; task lifecycle, residency, and messaging behavior are unchanged.
 
 ## 2026-08-18 — Follow the Senpi 2026.8.18 host contract
 
