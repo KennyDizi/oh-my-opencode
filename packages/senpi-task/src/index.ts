@@ -238,11 +238,14 @@ export type {
   ResolvedAgentResult,
   SkillInvocationState,
 } from "./agents"
+export { buildNoticeBox, noticeTone } from "./notice-box"
+export type { NoticeLine, NoticeSpec, NoticeTheme, NoticeTone } from "./notice-box"
 export {
   buildCompletionDetails,
   buildCompletionMessage,
   completionMessageLines,
   createCompletionNotifier,
+  DAG_VERIFICATION_DIRECTIVE,
   routeCompletion,
   shouldNotifyStatus,
 } from "./completion"
