@@ -9333,7 +9333,11 @@ function createParentWatchdog(config2, onDeadParent) {
   const probeAlive = config2.probeAlive ?? isProcessAlive;
   let fired = false;
   const timer = setInterval(() => {
-    if (fired || probeAlive(parentPid))
+    if (fired)
+      return;
+    const alive = probeAlive(parentPid);
+    config2.onPoll?.(alive);
+    if (alive)
       return;
     fired = true;
     onDeadParent(parentPid, pollIntervalMs);
