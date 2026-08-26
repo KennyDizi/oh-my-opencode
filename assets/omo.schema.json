@@ -807,6 +807,31 @@
       ],
       "additionalProperties": false
     },
+    "git_master": {
+      "type": "object",
+      "properties": {
+        "commit_footer": {
+          "default": true,
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "include_co_authored_by": {
+          "default": true,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "commit_footer",
+        "include_co_authored_by"
+      ],
+      "additionalProperties": false
+    },
     "task": {
       "type": "object",
       "properties": {
@@ -13637,6 +13662,25 @@
           },
           "additionalProperties": false
         },
+        "git_master": {
+          "type": "object",
+          "properties": {
+            "commit_footer": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "include_co_authored_by": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
         "task": {
           "type": "object",
           "properties": {
@@ -15210,6 +15254,25 @@
             "session_start_cooldown_ms": {
               "type": "number",
               "minimum": 60000
+            }
+          },
+          "additionalProperties": false
+        },
+        "git_master": {
+          "type": "object",
+          "properties": {
+            "commit_footer": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "include_co_authored_by": {
+              "type": "boolean"
             }
           },
           "additionalProperties": false
@@ -16793,6 +16856,25 @@
               "session_start_cooldown_ms": {
                 "type": "number",
                 "minimum": 60000
+              }
+            },
+            "additionalProperties": false
+          },
+          "git_master": {
+            "type": "object",
+            "properties": {
+              "commit_footer": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              },
+              "include_co_authored_by": {
+                "type": "boolean"
               }
             },
             "additionalProperties": false
@@ -29410,6 +29492,25 @@
                 },
                 "additionalProperties": false
               },
+              "git_master": {
+                "type": "object",
+                "properties": {
+                  "commit_footer": {
+                    "anyOf": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  "include_co_authored_by": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              },
               "task": {
                 "type": "object",
                 "properties": {
@@ -30983,6 +31084,25 @@
                   "session_start_cooldown_ms": {
                     "type": "number",
                     "minimum": 60000
+                  }
+                },
+                "additionalProperties": false
+              },
+              "git_master": {
+                "type": "object",
+                "properties": {
+                  "commit_footer": {
+                    "anyOf": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  "include_co_authored_by": {
+                    "type": "boolean"
                   }
                 },
                 "additionalProperties": false
