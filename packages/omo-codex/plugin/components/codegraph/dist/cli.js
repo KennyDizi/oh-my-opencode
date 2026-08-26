@@ -5732,7 +5732,7 @@ var OmoModelCatalogLayerSchema = record(string2(), OmoModelCatalogEntryLayerSche
 
 // ../../omo-config-core/src/schema/task.ts
 import { availableParallelism } from "node:os";
-var ResidencyMaxChildrenInputSchema = union([number2().int().positive(), literal("unlimited")]);
+var ResidencyMaxChildrenInputSchema = union([number2().int().nonnegative(), literal("unlimited")]);
 var OmoTaskWaitSchema = object({
   min_ms: number2().int().positive().default(5000),
   default_ms: number2().int().positive().default(60000),
@@ -5758,9 +5758,10 @@ var OmoTaskDagSettingsSchema = object({
 }).strict();
 var OmoTaskSettingsSchema = object({
   default_execution_mode: _enum(["in-process", "process"]).default("in-process"),
-  default_concurrency: number2().int().positive().default(5),
-  provider_concurrency: record(string2(), number2().int().positive()).optional(),
-  model_concurrency: record(string2(), number2().int().positive()).optional(),
+  default_concurrency: number2().int().nonnegative().default(5),
+  global_concurrency: number2().int().nonnegative().default(8),
+  provider_concurrency: record(string2(), number2().int().nonnegative()).optional(),
+  model_concurrency: record(string2(), number2().int().nonnegative()).optional(),
   max_depth: number2().int().nonnegative().default(1),
   residency_max_children: ResidencyMaxChildrenInputSchema.default(8),
   ttl_ms: number2().int().positive().default(86400000),
@@ -5801,9 +5802,10 @@ var OmoTaskWarningsLayerSchema = object({
 }).strict();
 var OmoTaskSettingsLayerSchema = object({
   default_execution_mode: _enum(["in-process", "process"]).optional(),
-  default_concurrency: number2().int().positive().optional(),
-  provider_concurrency: record(string2(), number2().int().positive()).optional(),
-  model_concurrency: record(string2(), number2().int().positive()).optional(),
+  default_concurrency: number2().int().nonnegative().optional(),
+  global_concurrency: number2().int().nonnegative().optional(),
+  provider_concurrency: record(string2(), number2().int().nonnegative()).optional(),
+  model_concurrency: record(string2(), number2().int().nonnegative()).optional(),
   max_depth: number2().int().nonnegative().optional(),
   residency_max_children: ResidencyMaxChildrenInputSchema.optional(),
   ttl_ms: number2().int().positive().optional(),
@@ -5819,7 +5821,8 @@ function resolveOmoTaskSettings(input, resolveParallelism = availableParallelism
   const record2 = record(string2(), unknown()).parse(input);
   return OmoTaskSettingsSchema.parse({
     ...record2,
-    residency_max_children: record2["residency_max_children"] ?? Math.max(8, resolveParallelism() * 3)
+    residency_max_children: record2["residency_max_children"] ?? Math.max(8, resolveParallelism() * 3),
+    global_concurrency: record2["global_concurrency"] ?? Math.max(8, resolveParallelism() * 2)
   });
 }
 

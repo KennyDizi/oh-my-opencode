@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/dev/assets/omo.schema.json",
-  "title": "Omo Configuration",
+  "title": "OmO Configuration",
   "description": "Configuration schema for the omo.json / omo.jsonc harness-neutral config surface",
   "type": "object",
   "properties": {
@@ -846,7 +846,13 @@
         "default_concurrency": {
           "default": 5,
           "type": "integer",
-          "exclusiveMinimum": 0,
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "global_concurrency": {
+          "default": 8,
+          "type": "integer",
+          "minimum": 0,
           "maximum": 9007199254740991
         },
         "provider_concurrency": {
@@ -856,7 +862,7 @@
           },
           "additionalProperties": {
             "type": "integer",
-            "exclusiveMinimum": 0,
+            "minimum": 0,
             "maximum": 9007199254740991
           }
         },
@@ -867,7 +873,7 @@
           },
           "additionalProperties": {
             "type": "integer",
-            "exclusiveMinimum": 0,
+            "minimum": 0,
             "maximum": 9007199254740991
           }
         },
@@ -882,7 +888,7 @@
           "anyOf": [
             {
               "type": "integer",
-              "exclusiveMinimum": 0,
+              "minimum": 0,
               "maximum": 9007199254740991
             },
             {
@@ -1059,6 +1065,7 @@
       "required": [
         "default_execution_mode",
         "default_concurrency",
+        "global_concurrency",
         "max_depth",
         "residency_max_children",
         "ttl_ms",
@@ -1894,7 +1901,7 @@
             "enum": [
               "goal",
               "refactor",
-              "start-work",
+              "ulw-execute",
               "stop-continuation",
               "remove-ai-slops",
               "hyperplan"
@@ -12143,7 +12150,7 @@
           "properties": {
             "defaultConcurrency": {
               "type": "number",
-              "minimum": 1
+              "minimum": 0
             },
             "providerConcurrency": {
               "type": "object",
@@ -12825,6 +12832,19 @@
               "additionalProperties": false
             }
           },
+          "additionalProperties": false
+        },
+        "ulw_execute": {
+          "type": "object",
+          "properties": {
+            "auto_commit": {
+              "default": true,
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "auto_commit"
+          ],
           "additionalProperties": false
         },
         "start_work": {
@@ -13693,7 +13713,12 @@
             },
             "default_concurrency": {
               "type": "integer",
-              "exclusiveMinimum": 0,
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "global_concurrency": {
+              "type": "integer",
+              "minimum": 0,
               "maximum": 9007199254740991
             },
             "provider_concurrency": {
@@ -13703,7 +13728,7 @@
               },
               "additionalProperties": {
                 "type": "integer",
-                "exclusiveMinimum": 0,
+                "minimum": 0,
                 "maximum": 9007199254740991
               }
             },
@@ -13714,7 +13739,7 @@
               },
               "additionalProperties": {
                 "type": "integer",
-                "exclusiveMinimum": 0,
+                "minimum": 0,
                 "maximum": 9007199254740991
               }
             },
@@ -13727,7 +13752,7 @@
               "anyOf": [
                 {
                   "type": "integer",
-                  "exclusiveMinimum": 0,
+                  "minimum": 0,
                   "maximum": 9007199254740991
                 },
                 {
@@ -15289,7 +15314,12 @@
             },
             "default_concurrency": {
               "type": "integer",
-              "exclusiveMinimum": 0,
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "global_concurrency": {
+              "type": "integer",
+              "minimum": 0,
               "maximum": 9007199254740991
             },
             "provider_concurrency": {
@@ -15299,7 +15329,7 @@
               },
               "additionalProperties": {
                 "type": "integer",
-                "exclusiveMinimum": 0,
+                "minimum": 0,
                 "maximum": 9007199254740991
               }
             },
@@ -15310,7 +15340,7 @@
               },
               "additionalProperties": {
                 "type": "integer",
-                "exclusiveMinimum": 0,
+                "minimum": 0,
                 "maximum": 9007199254740991
               }
             },
@@ -15323,7 +15353,7 @@
               "anyOf": [
                 {
                   "type": "integer",
-                  "exclusiveMinimum": 0,
+                  "minimum": 0,
                   "maximum": 9007199254740991
                 },
                 {
@@ -16891,7 +16921,12 @@
               },
               "default_concurrency": {
                 "type": "integer",
-                "exclusiveMinimum": 0,
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "global_concurrency": {
+                "type": "integer",
+                "minimum": 0,
                 "maximum": 9007199254740991
               },
               "provider_concurrency": {
@@ -16901,7 +16936,7 @@
                 },
                 "additionalProperties": {
                   "type": "integer",
-                  "exclusiveMinimum": 0,
+                  "minimum": 0,
                   "maximum": 9007199254740991
                 }
               },
@@ -16912,7 +16947,7 @@
                 },
                 "additionalProperties": {
                   "type": "integer",
-                  "exclusiveMinimum": 0,
+                  "minimum": 0,
                   "maximum": 9007199254740991
                 }
               },
@@ -16925,7 +16960,7 @@
                 "anyOf": [
                   {
                     "type": "integer",
-                    "exclusiveMinimum": 0,
+                    "minimum": 0,
                     "maximum": 9007199254740991
                   },
                   {
@@ -17724,7 +17759,7 @@
                   "enum": [
                     "goal",
                     "refactor",
-                    "start-work",
+                    "ulw-execute",
                     "stop-continuation",
                     "remove-ai-slops",
                     "hyperplan"
@@ -27973,7 +28008,7 @@
                 "properties": {
                   "defaultConcurrency": {
                     "type": "number",
-                    "minimum": 1
+                    "minimum": 0
                   },
                   "providerConcurrency": {
                     "type": "object",
@@ -28655,6 +28690,19 @@
                     "additionalProperties": false
                   }
                 },
+                "additionalProperties": false
+              },
+              "ulw_execute": {
+                "type": "object",
+                "properties": {
+                  "auto_commit": {
+                    "default": true,
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "auto_commit"
+                ],
                 "additionalProperties": false
               },
               "start_work": {
@@ -29523,7 +29571,12 @@
                   },
                   "default_concurrency": {
                     "type": "integer",
-                    "exclusiveMinimum": 0,
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "global_concurrency": {
+                    "type": "integer",
+                    "minimum": 0,
                     "maximum": 9007199254740991
                   },
                   "provider_concurrency": {
@@ -29533,7 +29586,7 @@
                     },
                     "additionalProperties": {
                       "type": "integer",
-                      "exclusiveMinimum": 0,
+                      "minimum": 0,
                       "maximum": 9007199254740991
                     }
                   },
@@ -29544,7 +29597,7 @@
                     },
                     "additionalProperties": {
                       "type": "integer",
-                      "exclusiveMinimum": 0,
+                      "minimum": 0,
                       "maximum": 9007199254740991
                     }
                   },
@@ -29557,7 +29610,7 @@
                     "anyOf": [
                       {
                         "type": "integer",
-                        "exclusiveMinimum": 0,
+                        "minimum": 0,
                         "maximum": 9007199254740991
                       },
                       {
@@ -31119,7 +31172,12 @@
                   },
                   "default_concurrency": {
                     "type": "integer",
-                    "exclusiveMinimum": 0,
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "global_concurrency": {
+                    "type": "integer",
+                    "minimum": 0,
                     "maximum": 9007199254740991
                   },
                   "provider_concurrency": {
@@ -31129,7 +31187,7 @@
                     },
                     "additionalProperties": {
                       "type": "integer",
-                      "exclusiveMinimum": 0,
+                      "minimum": 0,
                       "maximum": 9007199254740991
                     }
                   },
@@ -31140,7 +31198,7 @@
                     },
                     "additionalProperties": {
                       "type": "integer",
-                      "exclusiveMinimum": 0,
+                      "minimum": 0,
                       "maximum": 9007199254740991
                     }
                   },
@@ -31153,7 +31211,7 @@
                     "anyOf": [
                       {
                         "type": "integer",
-                        "exclusiveMinimum": 0,
+                        "minimum": 0,
                         "maximum": 9007199254740991
                       },
                       {

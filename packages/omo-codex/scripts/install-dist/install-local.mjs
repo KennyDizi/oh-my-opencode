@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// omo-codex-install:1d8359e77ebe41655f091cd2e455f320cde2f9c681f0651797c47d8fdfa2dd76:139fb6a69db218df1b415accbb2ff498434e6849818d355f17c2a1dcbd1f9a1b
+// omo-codex-install:475155d5e39ca774e5cf86194fee97439fd9c4f3624a85e946a994d5493e4629:9ec012e78c27273d1e7d25471d759ff7d6d2af310d360c8ac871fb205808633c
 var __defProp = Object.defineProperty;
 var __returnValue = (v) => v;
 function __exportSetter(name, newValue) {
@@ -347,7 +347,7 @@ var init_env = __esm(() => {
   SEND_OPT_OUT_VALUES = ["0", "false", "no", "yes"];
 });
 
-// node_modules/.bun/posthog-node@5.49.4/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/module.node.mjs
+// node_modules/.bun/posthog-node@5.51.2/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/module.node.mjs
 import { dirname as dirname10, posix as posix2, sep as sep7 } from "node:path";
 function createModulerModifier() {
   const getModuleFromFileName = createGetModuleFromFilename();
@@ -384,7 +384,7 @@ function normalizeWindowsPath(path2) {
 }
 var init_module_node = () => {};
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/featureFlagUtils.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/featureFlagUtils.mjs
 function getFlagDetailFromFlagAndPayload(key, value, payload) {
   return {
     key,
@@ -513,7 +513,329 @@ var init_featureFlagUtils = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/types.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/featureFlagLocalEvaluation.mjs
+function isValidRegex(regex) {
+  try {
+    new RegExp(regex);
+    return true;
+  } catch {
+    return false;
+  }
+}
+function parseSemverNumericIdentifier(part, raw, parsingPolicy) {
+  if (!/^\d+$/.test(part) || parsingPolicy === "strict" && part.length > 1 && part[0] === "0")
+    throw new InconclusiveMatchError(`Invalid semver: ${raw}`);
+  return parseInt(part, 10);
+}
+function parseFeatureFlagSemver(value, parsingPolicy = "strict") {
+  const text = String(value).trim().replace(/^[vV]/, "");
+  const baseVersion = text.split("-")[0].split("+")[0];
+  if (!baseVersion || baseVersion.startsWith("."))
+    throw new InconclusiveMatchError(`Invalid semver: ${value}`);
+  const parts = baseVersion.split(".");
+  const parsePart = (part) => {
+    if (part === undefined || part === "")
+      return 0;
+    return parseSemverNumericIdentifier(part, value, parsingPolicy);
+  };
+  return [
+    parsePart(parts[0]),
+    parsePart(parts[1]),
+    parsePart(parts[2])
+  ];
+}
+function compareSemverTuples(a, b) {
+  for (let i = 0;i < 3; i++) {
+    if (a[i] < b[i])
+      return -1;
+    if (a[i] > b[i])
+      return 1;
+  }
+  return 0;
+}
+function computeTildeBounds(value, parsingPolicy) {
+  const parsed = parseFeatureFlagSemver(value, parsingPolicy);
+  return {
+    lower: [
+      parsed[0],
+      parsed[1],
+      parsed[2]
+    ],
+    upper: [
+      parsed[0],
+      parsed[1] + 1,
+      0
+    ]
+  };
+}
+function computeCaretBounds(value, parsingPolicy) {
+  const [major, minor, patch] = parseFeatureFlagSemver(value, parsingPolicy);
+  const lower = [
+    major,
+    minor,
+    patch
+  ];
+  let upper;
+  upper = major > 0 ? [
+    major + 1,
+    0,
+    0
+  ] : minor > 0 ? [
+    0,
+    minor + 1,
+    0
+  ] : [
+    0,
+    0,
+    patch + 1
+  ];
+  return {
+    lower,
+    upper
+  };
+}
+function computeWildcardBounds(value, parsingPolicy) {
+  const text = String(value).trim().replace(/^[vV]/, "");
+  const cleanedText = text.replace(/\.\*$/, "").replace(/\*$/, "");
+  if (!cleanedText)
+    throw new InconclusiveMatchError(`Invalid wildcard semver: ${value}`);
+  const parts = cleanedText.split(".");
+  const parseWildcardPart = (part) => {
+    if (parsingPolicy === "legacy-permissive") {
+      const parsed = parseInt(part, 10);
+      if (!isNaN(parsed))
+        return parsed;
+    } else
+      try {
+        return parseSemverNumericIdentifier(part, value, parsingPolicy);
+      } catch {}
+    throw new InconclusiveMatchError(`Invalid wildcard semver: ${value}`);
+  };
+  const major = parseWildcardPart(parts[0]);
+  if (parts.length === 1)
+    return {
+      lower: [
+        major,
+        0,
+        0
+      ],
+      upper: [
+        major + 1,
+        0,
+        0
+      ]
+    };
+  const minor = parseWildcardPart(parts[1]);
+  return {
+    lower: [
+      major,
+      minor,
+      0
+    ],
+    upper: [
+      major,
+      minor + 1,
+      0
+    ]
+  };
+}
+function convertToDateTime(value) {
+  if (value instanceof Date)
+    return value;
+  if (typeof value == "string" || typeof value == "number") {
+    const date = new Date(value);
+    if (!isNaN(date.valueOf()))
+      return date;
+    throw new InconclusiveMatchError(`${value} is in an invalid date format`);
+  }
+  throw new InconclusiveMatchError(`The date provided ${value} must be a string, number, or date object`);
+}
+function relativeDateParseForFeatureFlagMatching(value) {
+  const regex = /^-?(?<number>[0-9]+)(?<interval>[a-z])$/;
+  const match = value.match(regex);
+  const parsedDt = new Date(new Date().toISOString());
+  if (!match || !match.groups)
+    return null;
+  const number = parseInt(match.groups["number"]);
+  if (number >= 1e4)
+    return null;
+  const interval = match.groups["interval"];
+  if (interval === "h")
+    parsedDt.setUTCHours(parsedDt.getUTCHours() - number);
+  else if (interval === "d")
+    parsedDt.setUTCDate(parsedDt.getUTCDate() - number);
+  else if (interval === "w")
+    parsedDt.setUTCDate(parsedDt.getUTCDate() - 7 * number);
+  else if (interval === "m")
+    parsedDt.setUTCMonth(parsedDt.getUTCMonth() - number);
+  else {
+    if (interval !== "y")
+      return null;
+    parsedDt.setUTCFullYear(parsedDt.getUTCFullYear() - number);
+  }
+  return parsedDt;
+}
+function matchFeatureFlagProperty(property, propertyValues, options = {}) {
+  const key = property.key;
+  const value = property.value;
+  const operator = property.operator || "exact";
+  const parsingPolicy = options.semverParsingPolicy ?? "strict";
+  if (key in propertyValues) {
+    if (operator === "is_not_set")
+      return false;
+  } else {
+    if (operator === "is_not_set")
+      return true;
+    throw new InconclusiveMatchError(`Property ${key} not found in propertyValues`);
+  }
+  const overrideValue = propertyValues[key];
+  if (overrideValue == null && !NULL_VALUES_ALLOWED_OPERATORS.includes(operator)) {
+    options.warnFunction?.(`Property ${key} cannot have a value of null/undefined with the ${operator} operator`);
+    return false;
+  }
+  const computeExactMatch = (target, actual) => {
+    if (Array.isArray(target))
+      return target.map((item) => String(item).toLowerCase()).includes(String(actual).toLowerCase());
+    return String(target).toLowerCase() === String(actual).toLowerCase();
+  };
+  const compare = (lhs, rhs, comparisonOperator) => {
+    if (comparisonOperator === "gt")
+      return lhs > rhs;
+    if (comparisonOperator === "gte")
+      return lhs >= rhs;
+    if (comparisonOperator === "lt")
+      return lhs < rhs;
+    if (comparisonOperator === "lte")
+      return lhs <= rhs;
+    throw new Error(`Invalid operator: ${comparisonOperator}`);
+  };
+  switch (operator) {
+    case "exact":
+      return computeExactMatch(value, overrideValue);
+    case "is_not":
+      return !computeExactMatch(value, overrideValue);
+    case "is_set":
+      return key in propertyValues;
+    case "icontains":
+      return String(overrideValue).toLowerCase().includes(String(value).toLowerCase());
+    case "not_icontains":
+      return !String(overrideValue).toLowerCase().includes(String(value).toLowerCase());
+    case "starts_with":
+      return String(overrideValue).toLowerCase().startsWith(String(value).toLowerCase());
+    case "not_starts_with":
+      return !String(overrideValue).toLowerCase().startsWith(String(value).toLowerCase());
+    case "ends_with":
+      return String(overrideValue).toLowerCase().endsWith(String(value).toLowerCase());
+    case "not_ends_with":
+      return !String(overrideValue).toLowerCase().endsWith(String(value).toLowerCase());
+    case "regex":
+      return isValidRegex(String(value)) && String(overrideValue).match(String(value)) !== null;
+    case "not_regex":
+      return isValidRegex(String(value)) && String(overrideValue).match(String(value)) === null;
+    case "gt":
+    case "gte":
+    case "lt":
+    case "lte": {
+      const parsedValue = typeof value == "number" ? value : parseFloat(String(value));
+      const parsedOverride = typeof overrideValue == "number" ? overrideValue : overrideValue != null ? parseFloat(String(overrideValue)) : NaN;
+      if (Number.isFinite(parsedValue) && Number.isFinite(parsedOverride))
+        return compare(parsedOverride, parsedValue, operator);
+      return compare(String(overrideValue), String(value), operator);
+    }
+    case "is_date_after":
+    case "is_date_before": {
+      if (typeof value == "boolean")
+        throw new InconclusiveMatchError("Date operations cannot be performed on boolean values");
+      let parsedDate = relativeDateParseForFeatureFlagMatching(String(value));
+      if (parsedDate == null)
+        parsedDate = convertToDateTime(value);
+      const overrideDate = convertToDateTime(overrideValue);
+      return operator === "is_date_before" ? overrideDate < parsedDate : overrideDate > parsedDate;
+    }
+    case "semver_eq":
+      return compareSemverTuples(parseFeatureFlagSemver(String(overrideValue), parsingPolicy), parseFeatureFlagSemver(String(value), parsingPolicy)) === 0;
+    case "semver_neq":
+      return compareSemverTuples(parseFeatureFlagSemver(String(overrideValue), parsingPolicy), parseFeatureFlagSemver(String(value), parsingPolicy)) !== 0;
+    case "semver_gt":
+      return compareSemverTuples(parseFeatureFlagSemver(String(overrideValue), parsingPolicy), parseFeatureFlagSemver(String(value), parsingPolicy)) > 0;
+    case "semver_gte":
+      return compareSemverTuples(parseFeatureFlagSemver(String(overrideValue), parsingPolicy), parseFeatureFlagSemver(String(value), parsingPolicy)) >= 0;
+    case "semver_lt":
+      return compareSemverTuples(parseFeatureFlagSemver(String(overrideValue), parsingPolicy), parseFeatureFlagSemver(String(value), parsingPolicy)) < 0;
+    case "semver_lte":
+      return compareSemverTuples(parseFeatureFlagSemver(String(overrideValue), parsingPolicy), parseFeatureFlagSemver(String(value), parsingPolicy)) <= 0;
+    case "semver_tilde": {
+      const overrideParsed = parseFeatureFlagSemver(String(overrideValue), parsingPolicy);
+      const { lower, upper } = computeTildeBounds(String(value), parsingPolicy);
+      return compareSemverTuples(overrideParsed, lower) >= 0 && compareSemverTuples(overrideParsed, upper) < 0;
+    }
+    case "semver_caret": {
+      const overrideParsed = parseFeatureFlagSemver(String(overrideValue), parsingPolicy);
+      const { lower, upper } = computeCaretBounds(String(value), parsingPolicy);
+      return compareSemverTuples(overrideParsed, lower) >= 0 && compareSemverTuples(overrideParsed, upper) < 0;
+    }
+    case "semver_wildcard": {
+      const overrideParsed = parseFeatureFlagSemver(String(overrideValue), parsingPolicy);
+      const { lower, upper } = computeWildcardBounds(String(value), parsingPolicy);
+      return compareSemverTuples(overrideParsed, lower) >= 0 && compareSemverTuples(overrideParsed, upper) < 0;
+    }
+    default:
+      throw new InconclusiveMatchError(`Unknown operator: ${operator}`);
+  }
+}
+async function hashSHA1(text) {
+  const subtle = globalThis.crypto?.subtle;
+  if (!subtle)
+    throw new Error("SubtleCrypto API not available");
+  const hashBuffer = await subtle.digest("SHA-1", new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(hashBuffer)).map((byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+async function getFeatureFlagHash(key, bucketingValue, salt = "") {
+  const hashString = await hashSHA1(`${key}.${bucketingValue}${salt}`);
+  return parseInt(hashString.slice(0, 15), 16) / LONG_SCALE;
+}
+function getFeatureFlagVariantLookupTable(variants) {
+  const table = [];
+  let valueMin = 0;
+  for (const variant of variants) {
+    const valueMax = valueMin + variant.rollout_percentage / 100;
+    table.push({
+      valueMin,
+      valueMax,
+      key: variant.key
+    });
+    valueMin = valueMax;
+  }
+  return table;
+}
+async function getFeatureFlagVariant(key, bucketingValue, variants) {
+  const hashValue = await getFeatureFlagHash(key, bucketingValue, "variant");
+  return getFeatureFlagVariantLookupTable(variants).find((variant) => hashValue >= variant.valueMin && hashValue < variant.valueMax)?.key;
+}
+function resolveFeatureFlagPayload(payloads, flagValue) {
+  if (flagValue === false || flagValue == null || !payloads)
+    return null;
+  const payloadKey = typeof flagValue == "boolean" ? flagValue.toString() : flagValue;
+  const payload = payloads[payloadKey] || null;
+  return payload == null ? null : parsePayload(payload);
+}
+var NULL_VALUES_ALLOWED_OPERATORS, LONG_SCALE = 1152921504606847000, InconclusiveMatchError;
+var init_featureFlagLocalEvaluation = __esm(() => {
+  init_featureFlagUtils();
+  NULL_VALUES_ALLOWED_OPERATORS = [
+    "is_not",
+    "is_set"
+  ];
+  InconclusiveMatchError = class InconclusiveMatchError extends Error {
+    constructor(message) {
+      super(message);
+      this.name = this.constructor.name;
+      Object.setPrototypeOf(this, InconclusiveMatchError.prototype);
+    }
+  };
+});
+
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/types.mjs
 var types_PostHogPersistedProperty;
 var init_types = __esm(() => {
   types_PostHogPersistedProperty = /* @__PURE__ */ function(PostHogPersistedProperty) {
@@ -554,7 +876,7 @@ var init_types = __esm(() => {
   }({});
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/gzip.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/gzip.mjs
 function isGzipSupported() {
   return "CompressionStream" in globalThis && "TextEncoder" in globalThis && "Response" in globalThis && typeof Response.prototype.blob == "function";
 }
@@ -622,7 +944,7 @@ var init_gzip = __esm(() => {
   init_types();
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/utils/json-utils.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/utils/json-utils.mjs
 function sanitizeString(value) {
   let output = "";
   for (let index = 0;index < value.length; index++) {
@@ -645,7 +967,7 @@ var init_json_utils = __esm(() => {
   dateToISOString = Date.prototype.toISOString;
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/utils/bot-detection.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/utils/bot-detection.mjs
 var DEFAULT_BLOCKED_UA_STRS, isBlockedUA = function(ua, customBlockedUserAgents = []) {
   if (!ua)
     return false;
@@ -737,7 +1059,7 @@ var init_bot_detection = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/utils/string-utils.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/utils/string-utils.mjs
 function safeJsonStringify(value) {
   const ancestors = [];
   return JSON.stringify(value, function(_key, replacementValue) {
@@ -763,12 +1085,12 @@ function safeJsonStringify(value) {
 }
 var init_string_utils = () => {};
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/utils/browser-utils.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/utils/browser-utils.mjs
 var init_browser_utils = __esm(() => {
   init_string_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/utils/type-utils.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/utils/type-utils.mjs
 function isPrimitive(value) {
   return value === null || typeof value != "object";
 }
@@ -816,7 +1138,7 @@ var init_type_utils = __esm(() => {
   };
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/utils/number-utils.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/utils/number-utils.mjs
 function clampToRange(value, min, max, logger, fallbackValue) {
   if (min > max) {
     logger.warn("min cannot be greater than max.");
@@ -839,7 +1161,7 @@ var init_number_utils = __esm(() => {
   init_type_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/utils/bucketed-rate-limiter.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/utils/bucketed-rate-limiter.mjs
 function resolveExceptionRateLimiterConfig(config = {}) {
   return {
     refillRate: config.exceptionRateLimiterRefillRate ?? config.__exceptionRateLimiterRefillRate ?? DEFAULT_EXCEPTION_RATE_LIMITER_REFILL_RATE,
@@ -893,7 +1215,7 @@ var init_bucketed_rate_limiter = __esm(() => {
   init_number_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/vendor/uuidv7.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/vendor/uuidv7.mjs
 class UUID {
   constructor(bytes) {
     this.bytes = bytes;
@@ -1068,7 +1390,7 @@ var init_uuidv7 = __esm(() => {
   /*! For license information please see uuidv7.mjs.LICENSE.txt */
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/utils/promise-queue.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/utils/promise-queue.mjs
 class PromiseQueue {
   add(promise) {
     const promiseUUID = uuidv7();
@@ -1110,7 +1432,7 @@ var init_promise_queue = __esm(() => {
   init_uuidv7();
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/utils/logger.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/utils/logger.mjs
 function createConsole(consoleLike = console) {
   const lockedMethods = {
     log: consoleLike.log.bind(consoleLike),
@@ -1152,7 +1474,7 @@ var _createLogger = (prefix, maybeCall, consoleLike) => {
 }, passThrough = (fn) => fn();
 var init_logger = () => {};
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/utils/user-agent-utils.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/utils/user-agent-utils.mjs
 var MOBILE = "Mobile", IOS = "iOS", ANDROID = "Android", TABLET = "Tablet", ANDROID_TABLET, APPLE = "Apple", APPLE_WATCH, SAFARI = "Safari", BLACKBERRY = "BlackBerry", SAMSUNG = "Samsung", SAMSUNG_BROWSER, SAMSUNG_INTERNET, CHROME = "Chrome", CHROME_OS, CHROME_IOS, INTERNET_EXPLORER = "Internet Explorer", INTERNET_EXPLORER_MOBILE, OPERA = "Opera", OPERA_MINI, EDGE = "Edge", MICROSOFT_EDGE, FIREFOX = "Firefox", FIREFOX_IOS, NINTENDO = "Nintendo", PLAYSTATION = "PlayStation", XBOX = "Xbox", ANDROID_MOBILE, MOBILE_SAFARI, WINDOWS = "Windows", WINDOWS_PHONE, GENERIC = "Generic", GENERIC_MOBILE, GENERIC_TABLET, KONQUEROR = "Konqueror", OCULUS_BROWSER = "Oculus Browser", VIVALDI = "Vivaldi", YANDEX = "Yandex", WHALE = "Whale", DUCKDUCKGO = "DuckDuckGo", PALE_MOON = "Pale Moon", WATERFOX = "Waterfox", BRAVE = "Brave", GOOGLE_SEARCH_APP = "Google Search App", BROWSER_VERSION_REGEX_SUFFIX = "(\\d+(\\.\\d+)?)", DEFAULT_BROWSER_VERSION_REGEX, XBOX_REGEX, PLAYSTATION_REGEX, NINTENDO_REGEX, BLACKBERRY_REGEX, windowsVersionMap, versionRegexes, osMatchers;
 var init_user_agent_utils = __esm(() => {
   init_string_utils();
@@ -1421,7 +1743,7 @@ var init_user_agent_utils = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/utils/index.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/utils/index.mjs
 function isValidUUID(value) {
   return typeof value == "string" && UUID_REGEX.test(value);
 }
@@ -1499,7 +1821,7 @@ var init_utils = __esm(() => {
   UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/logs/logs-utils.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/logs/logs-utils.mjs
 function newState() {
   return {
     ancestors: new WeakSet,
@@ -1688,14 +2010,14 @@ var init_logs_utils = __esm(() => {
   propertyIsEnumerable = Object.prototype.propertyIsEnumerable;
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/logs/index.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/logs/index.mjs
 var init_logs = __esm(() => {
   init_logs_utils();
   init_types();
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/metrics/metrics-utils.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/metrics/metrics-utils.mjs
 function msToUnixNano(ms) {
   return String(ms) + "000000";
 }
@@ -1769,7 +2091,7 @@ var init_metrics_utils = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/metrics/config.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/metrics/config.mjs
 function resolveMetricsConfig(config) {
   const resourceAttributes = config?.resourceAttributes;
   return {
@@ -1785,7 +2107,7 @@ function resolveMetricsConfig(config) {
 var DEFAULT_FLUSH_INTERVAL_MS = 1e4, DEFAULT_MAX_SERIES_PER_FLUSH = 1000;
 var init_config = () => {};
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/metrics/index.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/metrics/index.mjs
 class PostHogMetrics {
   constructor(_instance, _config, _logger) {
     this._instance = _instance;
@@ -2111,18 +2433,18 @@ var init_metrics = __esm(() => {
   init_config();
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/surveys/validation.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/surveys/validation.mjs
 var init_validation = __esm(() => {
   init_types();
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/cookie.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/cookie.mjs
 var init_cookie = __esm(() => {
   init_utils();
   init_uuidv7();
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/eventemitter.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/eventemitter.mjs
 class SimpleEventEmitter {
   constructor() {
     this.events = {};
@@ -2145,7 +2467,7 @@ class SimpleEventEmitter {
 }
 var init_eventemitter = () => {};
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/error-tracking/chunk-ids.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/error-tracking/chunk-ids.mjs
 function getFilenameToChunkIdMap(stackParser) {
   const chunkIdMap = globalThis._posthogChunkIds;
   if (!chunkIdMap)
@@ -2183,7 +2505,7 @@ function getFilenameToChunkIdMap(stackParser) {
 var parsedStackResults, lastKeysCount, cachedFilenameChunkIds;
 var init_chunk_ids = () => {};
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/error-tracking/error-properties-builder.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/error-tracking/error-properties-builder.mjs
 class ErrorPropertiesBuilder {
   constructor(coercers, stackParser, modifiers = []) {
     this.coercers = coercers;
@@ -2309,7 +2631,7 @@ var init_error_properties_builder = __esm(() => {
   init_chunk_ids();
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/error-tracking/parsers/base.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/error-tracking/parsers/base.mjs
 function createFrame(platform, filename, func, lineno, colno) {
   const frame = {
     platform,
@@ -2328,7 +2650,7 @@ var init_base = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/error-tracking/parsers/safari.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/error-tracking/parsers/safari.mjs
 var extractSafariExtensionDetails = (func, filename) => {
   const isSafariExtension = func.indexOf("safari-extension") !== -1;
   const isSafariWebExtension = func.indexOf("safari-web-extension") !== -1;
@@ -2344,7 +2666,7 @@ var init_safari = __esm(() => {
   init_base();
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/error-tracking/parsers/chrome.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/error-tracking/parsers/chrome.mjs
 var chromeRegexNoFnName, chromeRegex, chromeEvalRegex, chromeStackLineParser = (line, platform) => {
   const noFnParts = chromeRegexNoFnName.exec(line);
   if (noFnParts) {
@@ -2374,7 +2696,7 @@ var init_chrome = __esm(() => {
   chromeEvalRegex = /\((\S*)(?::(\d+))(?::(\d+))\)/;
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/error-tracking/parsers/gecko.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/error-tracking/parsers/gecko.mjs
 var geckoREgex, geckoEvalRegex, geckoStackLineParser = (line, platform) => {
   const parts = geckoREgex.exec(line);
   if (parts) {
@@ -2401,7 +2723,7 @@ var init_gecko = __esm(() => {
   geckoEvalRegex = /(\S+) line (\d+)(?: > eval line \d+)* > eval/i;
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/error-tracking/parsers/winjs.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/error-tracking/parsers/winjs.mjs
 var winjsRegex, winjsStackLineParser = (line, platform) => {
   const parts = winjsRegex.exec(line);
   return parts ? createFrame(platform, parts[2], parts[1] || UNKNOWN_FUNCTION, +parts[3], parts[4] ? +parts[4] : undefined) : undefined;
@@ -2411,7 +2733,7 @@ var init_winjs = __esm(() => {
   winjsRegex = /^\s*at (?:((?:\[object object\])?.+) )?\(?((?:[-a-z]+):.*?):(\d+)(?::(\d+))?\)?\s*$/i;
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/error-tracking/parsers/opera.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/error-tracking/parsers/opera.mjs
 var opera10Regex, opera10StackLineParser = (line, platform) => {
   const parts = opera10Regex.exec(line);
   return parts ? createFrame(platform, parts[2], parts[3] || UNKNOWN_FUNCTION, +parts[1]) : undefined;
@@ -2425,7 +2747,7 @@ var init_opera = __esm(() => {
   opera11Regex = / line (\d+), column (\d+)\s*(?:in (?:<anonymous function: ([^>]+)>|([^)]+))\(.*\))? in (.*):\s*$/i;
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/error-tracking/parsers/node.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/error-tracking/parsers/node.mjs
 function filenameIsInApp(filename, isNative = false) {
   const isInternal = isNative || filename && !filename.startsWith("/") && !filename.match(/^[A-Z]:/) && !filename.startsWith(".") && !filename.match(/^[a-zA-Z]([a-zA-Z0-9.\-+])*:\/\//);
   return !isInternal && filename !== undefined && !filename.includes("node_modules/");
@@ -2501,7 +2823,7 @@ var init_node = __esm(() => {
   PROMISE_INDEX = /^index \d+$/;
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/error-tracking/parsers/index.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/error-tracking/parsers/index.mjs
 function reverseAndStripFrames(stack) {
   if (!stack.length)
     return [];
@@ -2555,7 +2877,7 @@ var init_parsers = __esm(() => {
   WEBPACK_ERROR_REGEXP = /\(error: (.*)\)/;
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/error-tracking/coercers/dom-exception-coercer.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/error-tracking/coercers/dom-exception-coercer.mjs
 class DOMExceptionCoercer {
   match(err) {
     return this.isDOMException(err) || this.isDOMError(err);
@@ -2589,7 +2911,7 @@ var init_dom_exception_coercer = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/error-tracking/coercers/error-coercer.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/error-tracking/coercers/error-coercer.mjs
 class ErrorCoercer {
   match(err) {
     return isError(err);
@@ -2622,7 +2944,7 @@ var init_error_coercer = __esm(() => {
   init_type_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/error-tracking/coercers/error-event-coercer.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/error-tracking/coercers/error-event-coercer.mjs
 class ErrorEventCoercer {
   constructor() {}
   match(err) {
@@ -2660,7 +2982,7 @@ var init_error_event_coercer = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/error-tracking/coercers/string-coercer.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/error-tracking/coercers/string-coercer.mjs
 class StringCoercer {
   match(input) {
     return typeof input == "string";
@@ -2693,7 +3015,7 @@ var init_string_coercer = __esm(() => {
   ERROR_TYPES_PATTERN = /^(?:[Uu]ncaught (?:exception: )?)?(?:((?:Eval|Internal|Range|Reference|Syntax|Type|URI|)Error): )?(.*)$/i;
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/error-tracking/types.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/error-tracking/types.mjs
 var severityLevels;
 var init_types2 = __esm(() => {
   severityLevels = [
@@ -2706,7 +3028,7 @@ var init_types2 = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/error-tracking/coercers/utils.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/error-tracking/coercers/utils.mjs
 function extractExceptionKeysForMessage(err, maxLength = 40) {
   const keys = Object.keys(err);
   keys.sort();
@@ -2724,7 +3046,7 @@ function extractExceptionKeysForMessage(err, maxLength = 40) {
 }
 var init_utils2 = () => {};
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/error-tracking/coercers/object-coercer.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/error-tracking/coercers/object-coercer.mjs
 class ObjectCoercer {
   match(candidate) {
     return typeof candidate == "object" && candidate !== null;
@@ -2795,7 +3117,7 @@ var init_object_coercer = __esm(() => {
   init_utils2();
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/error-tracking/coercers/event-coercer.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/error-tracking/coercers/event-coercer.mjs
 class EventCoercer {
   match(err) {
     return isEvent(err);
@@ -2815,7 +3137,7 @@ var init_event_coercer = __esm(() => {
   init_utils2();
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/error-tracking/coercers/primitive-coercer.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/error-tracking/coercers/primitive-coercer.mjs
 class PrimitiveCoercer {
   match(candidate) {
     return isPrimitive(candidate);
@@ -2833,7 +3155,7 @@ var init_primitive_coercer = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/error-tracking/coercers/promise-rejection-event.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/error-tracking/coercers/promise-rejection-event.mjs
 class PromiseRejectionEventCoercer {
   match(err) {
     return isBuiltin(err, "PromiseRejectionEvent") || this.isCustomEventWrappingRejection(err);
@@ -2873,7 +3195,7 @@ var init_promise_rejection_event = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/error-tracking/coercers/index.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/error-tracking/coercers/index.mjs
 var init_coercers = __esm(() => {
   init_dom_exception_coercer();
   init_error_coercer();
@@ -2885,7 +3207,7 @@ var init_coercers = __esm(() => {
   init_promise_rejection_event();
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/error-tracking/utils.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/error-tracking/utils.mjs
 class ReduceableCache {
   constructor(_maxSize) {
     this._maxSize = _maxSize;
@@ -2912,7 +3234,7 @@ class ReduceableCache {
 }
 var init_utils3 = () => {};
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/error-tracking/exception-steps.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/error-tracking/exception-steps.mjs
 function resolveExceptionStepsConfig(config) {
   if (!config)
     return {
@@ -3050,42 +3372,42 @@ var init_exception_steps = __esm(() => {
   };
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/error-tracking/release.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/error-tracking/release.mjs
 function getInjectedReleaseId() {
   const injected = globalThis._posthogReleaseId;
   return typeof injected == "string" && injected.length > 0 ? injected : undefined;
 }
 var init_release = () => {};
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/error-tracking/index.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/error-tracking/index.mjs
 var exports_error_tracking = {};
 __export(exports_error_tracking, {
-  winjsStackLineParser: () => winjsStackLineParser,
-  stripReservedExceptionStepFields: () => stripReservedExceptionStepFields,
-  reverseAndStripFrames: () => reverseAndStripFrames,
-  resolveExceptionStepsConfig: () => resolveExceptionStepsConfig,
-  opera11StackLineParser: () => opera11StackLineParser,
-  opera10StackLineParser: () => opera10StackLineParser,
-  nodeStackLineParser: () => nodeStackLineParser,
-  getUtf8ByteLength: () => getUtf8ByteLength,
-  getInjectedReleaseId: () => getInjectedReleaseId,
-  geckoStackLineParser: () => geckoStackLineParser,
-  createStackParser: () => createStackParser,
-  createDefaultStackParser: () => createDefaultStackParser,
-  chromeStackLineParser: () => chromeStackLineParser,
-  StringCoercer: () => StringCoercer,
-  ReduceableCache: () => ReduceableCache,
-  PromiseRejectionEventCoercer: () => PromiseRejectionEventCoercer,
-  PrimitiveCoercer: () => PrimitiveCoercer,
-  ObjectCoercer: () => ObjectCoercer,
-  ExceptionStepsBuffer: () => ExceptionStepsBuffer,
-  EventCoercer: () => EventCoercer,
-  ErrorPropertiesBuilder: () => ErrorPropertiesBuilder,
-  ErrorEventCoercer: () => ErrorEventCoercer,
-  ErrorCoercer: () => ErrorCoercer,
-  EXCEPTION_STEP_INTERNAL_FIELDS: () => EXCEPTION_STEP_INTERNAL_FIELDS,
+  DEFAULT_EXCEPTION_STEPS_CONFIG: () => DEFAULT_EXCEPTION_STEPS_CONFIG,
   DOMExceptionCoercer: () => DOMExceptionCoercer,
-  DEFAULT_EXCEPTION_STEPS_CONFIG: () => DEFAULT_EXCEPTION_STEPS_CONFIG
+  EXCEPTION_STEP_INTERNAL_FIELDS: () => EXCEPTION_STEP_INTERNAL_FIELDS,
+  ErrorCoercer: () => ErrorCoercer,
+  ErrorEventCoercer: () => ErrorEventCoercer,
+  ErrorPropertiesBuilder: () => ErrorPropertiesBuilder,
+  EventCoercer: () => EventCoercer,
+  ExceptionStepsBuffer: () => ExceptionStepsBuffer,
+  ObjectCoercer: () => ObjectCoercer,
+  PrimitiveCoercer: () => PrimitiveCoercer,
+  PromiseRejectionEventCoercer: () => PromiseRejectionEventCoercer,
+  ReduceableCache: () => ReduceableCache,
+  StringCoercer: () => StringCoercer,
+  chromeStackLineParser: () => chromeStackLineParser,
+  createDefaultStackParser: () => createDefaultStackParser,
+  createStackParser: () => createStackParser,
+  geckoStackLineParser: () => geckoStackLineParser,
+  getInjectedReleaseId: () => getInjectedReleaseId,
+  getUtf8ByteLength: () => getUtf8ByteLength,
+  nodeStackLineParser: () => nodeStackLineParser,
+  opera10StackLineParser: () => opera10StackLineParser,
+  opera11StackLineParser: () => opera11StackLineParser,
+  resolveExceptionStepsConfig: () => resolveExceptionStepsConfig,
+  reverseAndStripFrames: () => reverseAndStripFrames,
+  stripReservedExceptionStepFields: () => stripReservedExceptionStepFields,
+  winjsStackLineParser: () => winjsStackLineParser
 });
 var init_error_tracking = __esm(() => {
   init_error_properties_builder();
@@ -3096,7 +3418,7 @@ var init_error_tracking = __esm(() => {
   init_release();
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/posthog-core-stateless.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/posthog-core-stateless.mjs
 async function logFlushError(err) {
   if (err instanceof PostHogFetchHttpError) {
     let text = "";
@@ -3895,63 +4217,14 @@ class PostHogCoreStateless {
       sentFromRoute += batchMessages.length;
     }
   }
-  async _sendLogsBatch(payload) {
+  async _sendOtlpBatch({ path: path2, payload }) {
     if (this.disabled)
       return {
         kind: "fatal",
         error: new Error("The client is disabled")
       };
     const serialized = JSON.stringify(payload);
-    const url = `${this.host}/i/v1/logs?token=${encodeURIComponent(this.apiKey)}`;
-    const gzippedPayload = this.disableCompression ? null : await this.compressPayload(serialized);
-    const fetchOptions = {
-      method: "POST",
-      headers: {
-        ...this.getCustomHeaders(),
-        "Content-Type": "application/json",
-        ...gzippedPayload !== null && {
-          "Content-Encoding": "gzip"
-        }
-      },
-      body: gzippedPayload || serialized
-    };
-    try {
-      await this.fetchWithRetry(url, fetchOptions, {
-        type: "successful-write"
-      }, {
-        retryCheck: (err) => {
-          if (isPostHogFetchContentTooLargeError(err))
-            return false;
-          return isPostHogFetchRetryableError(err);
-        }
-      });
-      return {
-        kind: "ok"
-      };
-    } catch (err) {
-      if (isPostHogFetchContentTooLargeError(err))
-        return {
-          kind: "too-large"
-        };
-      if (err instanceof PostHogFetchNetworkError)
-        return {
-          kind: "retry-later",
-          error: err
-        };
-      return {
-        kind: "fatal",
-        error: err
-      };
-    }
-  }
-  async _sendMetricsBatch(payload) {
-    if (this.disabled)
-      return {
-        kind: "fatal",
-        error: new Error("The client is disabled")
-      };
-    const serialized = JSON.stringify(payload);
-    const url = `${this.host}/i/v1/metrics?token=${encodeURIComponent(this.apiKey)}`;
+    const url = `${this.host}/i/v1/${path2}?token=${encodeURIComponent(this.apiKey)}`;
     const gzippedPayload = this.disableCompression ? null : await this.compressPayload(serialized);
     const fetchOptions = {
       method: "POST",
@@ -3993,14 +4266,28 @@ class PostHogCoreStateless {
       };
     }
   }
+  async _sendLogsBatch(payload) {
+    return this._sendOtlpBatch({
+      path: "logs",
+      payload
+    });
+  }
+  async _sendMetricsBatch(payload) {
+    return this._sendOtlpBatch({
+      path: "metrics",
+      payload
+    });
+  }
   async fetchWithRetry(url, options, responseHandling, retryOptions, requestTimeout) {
     const body = options.body ? options.body : "";
     let reqByteLength = -1;
     try {
-      reqByteLength = body instanceof Blob ? body.size : Buffer.byteLength(body, STRING_FORMAT);
+      reqByteLength = body instanceof Blob ? body.size : body instanceof Uint8Array ? body.byteLength : Buffer.byteLength(body, STRING_FORMAT);
     } catch {
       if (body instanceof Blob)
         reqByteLength = body.size;
+      else if (body instanceof Uint8Array)
+        reqByteLength = body.byteLength;
       else {
         const encoded = new TextEncoder().encode(body);
         reqByteLength = encoded.length;
@@ -4215,7 +4502,7 @@ var init_posthog_core_stateless = __esm(() => {
   };
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/posthog-core.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/posthog-core.mjs
 var init_posthog_core = __esm(() => {
   init_featureFlagUtils();
   init_types();
@@ -4224,14 +4511,15 @@ var init_posthog_core = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/tracing-headers.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/tracing-headers.mjs
 var init_tracing_headers = __esm(() => {
   init_type_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.48.8/node_modules/@posthog/core/dist/index.mjs
+// node_modules/.bun/@posthog+core@1.48.11/node_modules/@posthog/core/dist/index.mjs
 var init_dist = __esm(() => {
   init_featureFlagUtils();
+  init_featureFlagLocalEvaluation();
   init_gzip();
   init_logs_utils();
   init_logs();
@@ -4247,7 +4535,7 @@ var init_dist = __esm(() => {
   init_types();
 });
 
-// node_modules/.bun/posthog-node@5.49.4/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/context-lines.node.mjs
+// node_modules/.bun/posthog-node@5.51.2/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/context-lines.node.mjs
 import { constants as constants3 } from "node:fs";
 import { open as promises_open } from "node:fs/promises";
 import { isAbsolute as isAbsolute7 } from "node:path";
@@ -4534,7 +4822,7 @@ var init_context_lines_node = __esm(() => {
   LRU_FILE_CONTENTS_FS_READ_FAILED = new exports_error_tracking.ReduceableCache(20);
 });
 
-// node_modules/.bun/posthog-node@5.49.4/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/relative-path.node.mjs
+// node_modules/.bun/posthog-node@5.51.2/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/relative-path.node.mjs
 import { isAbsolute as isAbsolute8, relative as relative4, sep as sep8 } from "node:path";
 function createRelativePathModifier(basePath = process.cwd()) {
   const isWindows = sep8 === "\\";
@@ -4551,11 +4839,11 @@ function createRelativePathModifier(basePath = process.cwd()) {
 }
 var init_relative_path_node = () => {};
 
-// node_modules/.bun/posthog-node@5.49.4/node_modules/posthog-node/dist/version.mjs
-var version = "5.49.4";
+// node_modules/.bun/posthog-node@5.51.2/node_modules/posthog-node/dist/version.mjs
+var version = "5.51.2";
 var init_version = () => {};
 
-// node_modules/.bun/posthog-node@5.49.4/node_modules/posthog-node/dist/types.mjs
+// node_modules/.bun/posthog-node@5.51.2/node_modules/posthog-node/dist/types.mjs
 var FeatureFlagError2;
 var init_types3 = __esm(() => {
   FeatureFlagError2 = {
@@ -4566,7 +4854,7 @@ var init_types3 = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.49.4/node_modules/posthog-node/dist/feature-flag-evaluations.mjs
+// node_modules/.bun/posthog-node@5.51.2/node_modules/posthog-node/dist/feature-flag-evaluations.mjs
 class FeatureFlagEvaluations {
   constructor(init) {
     this._host = init.host;
@@ -4582,10 +4870,10 @@ class FeatureFlagEvaluations {
     this._accessed = init.accessed ?? new Set;
     this._isSlice = init.isSlice ?? false;
   }
-  isEnabled(key) {
+  isEnabled(key, options = {}) {
     const flag = this._flags[key];
     this._recordAccess(key);
-    return flag?.enabled ?? false;
+    return flag?.enabled ?? options.defaultValue ?? false;
   }
   getFlag(key) {
     const flag = this._flags[key];
@@ -4702,18 +4990,7 @@ var init_feature_flag_evaluations = __esm(() => {
   init_types3();
 });
 
-// node_modules/.bun/posthog-node@5.49.4/node_modules/posthog-node/dist/extensions/feature-flags/crypto.mjs
-async function hashSHA1(text) {
-  const subtle = globalThis.crypto?.subtle;
-  if (!subtle)
-    throw new Error("SubtleCrypto API not available");
-  const hashBuffer = await subtle.digest("SHA-1", new TextEncoder().encode(text));
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map((byte) => byte.toString(16).padStart(2, "0")).join("");
-}
-var init_crypto = () => {};
-
-// node_modules/.bun/posthog-node@5.49.4/node_modules/posthog-node/dist/extensions/feature-flags/feature-flags.mjs
+// node_modules/.bun/posthog-node@5.51.2/node_modules/posthog-node/dist/extensions/feature-flags/feature-flags.mjs
 function setCustomErrorPrototype(error, constructor) {
   error.name = constructor.name;
   Error.captureStackTrace(error, constructor);
@@ -4875,23 +5152,7 @@ class FeatureFlagsPoller {
     return distinctId;
   }
   getFeatureFlagPayload(key, flagValue) {
-    let payload = null;
-    if (flagValue !== false && flagValue != null) {
-      if (typeof flagValue == "boolean")
-        payload = this.featureFlagsByKey?.[key]?.filters?.payloads?.[flagValue.toString()] || null;
-      else if (typeof flagValue == "string")
-        payload = this.featureFlagsByKey?.[key]?.filters?.payloads?.[flagValue] || null;
-      if (payload != null) {
-        if (typeof payload == "object")
-          return payload;
-        if (typeof payload == "string")
-          try {
-            return JSON.parse(payload);
-          } catch {}
-        return payload;
-      }
-    }
-    return null;
+    return resolveFeatureFlagPayload(this.featureFlagsByKey?.[key]?.filters?.payloads, flagValue);
   }
   async evaluateFlagDependency(property, properties, evaluationContext) {
     const { evaluationCache } = evaluationContext;
@@ -5006,32 +5267,15 @@ class FeatureFlagsPoller {
       if (rolloutPercentage == undefined)
         return "match";
     }
-    if (rolloutPercentage != null && await _hash(flag.key, bucketingValue) > rolloutPercentage / 100)
+    if (rolloutPercentage != null && await getFeatureFlagHash(flag.key, bucketingValue) > rolloutPercentage / 100)
       return "out_of_rollout_bound";
     return "match";
   }
   async getMatchingVariant(flag, bucketingValue) {
-    const hashValue = await _hash(flag.key, bucketingValue, "variant");
-    const matchingVariant = this.variantLookupTable(flag).find((variant) => hashValue >= variant.valueMin && hashValue < variant.valueMax);
-    if (matchingVariant)
-      return matchingVariant.key;
+    return getFeatureFlagVariant(flag.key, bucketingValue, flag.filters?.multivariate?.variants || []);
   }
   variantLookupTable(flag) {
-    const lookupTable = [];
-    let valueMin = 0;
-    let valueMax = 0;
-    const flagFilters = flag.filters || {};
-    const multivariates = flagFilters.multivariate?.variants || [];
-    multivariates.forEach((variant) => {
-      valueMax = valueMin + variant.rollout_percentage / 100;
-      lookupTable.push({
-        valueMin,
-        valueMax,
-        key: variant.key
-      });
-      valueMin = valueMax;
-    });
-    return lookupTable;
+    return getFeatureFlagVariantLookupTable(flag.filters?.multivariate?.variants || []);
   }
   updateFlagState(flagData) {
     this.featureFlags = flagData.flags;
@@ -5252,136 +5496,10 @@ class FeatureFlagsPoller {
       }
   }
 }
-async function _hash(key, bucketingValue, salt = "") {
-  const hashString = await hashSHA1(`${key}.${bucketingValue}${salt}`);
-  return parseInt(hashString.slice(0, 15), 16) / LONG_SCALE;
-}
 function matchProperty(property, propertyValues, warnFunction) {
-  const key = property.key;
-  const value = property.value;
-  const operator = property.operator || "exact";
-  if (key in propertyValues) {
-    if (operator === "is_not_set")
-      return false;
-  } else {
-    if (operator === "is_not_set")
-      return true;
-    throw new InconclusiveMatchError(`Property ${key} not found in propertyValues`);
-  }
-  const overrideValue = propertyValues[key];
-  if (overrideValue == null && !NULL_VALUES_ALLOWED_OPERATORS.includes(operator)) {
-    if (warnFunction)
-      warnFunction(`Property ${key} cannot have a value of null/undefined with the ${operator} operator`);
-    return false;
-  }
-  function computeExactMatch(value2, overrideValue2) {
-    if (Array.isArray(value2))
-      return value2.map((val) => String(val).toLowerCase()).includes(String(overrideValue2).toLowerCase());
-    return String(value2).toLowerCase() === String(overrideValue2).toLowerCase();
-  }
-  function compare(lhs, rhs, operator2) {
-    if (operator2 === "gt")
-      return lhs > rhs;
-    if (operator2 === "gte")
-      return lhs >= rhs;
-    if (operator2 === "lt")
-      return lhs < rhs;
-    if (operator2 === "lte")
-      return lhs <= rhs;
-    throw new Error(`Invalid operator: ${operator2}`);
-  }
-  switch (operator) {
-    case "exact":
-      return computeExactMatch(value, overrideValue);
-    case "is_not":
-      return !computeExactMatch(value, overrideValue);
-    case "is_set":
-      return key in propertyValues;
-    case "icontains":
-      return String(overrideValue).toLowerCase().includes(String(value).toLowerCase());
-    case "not_icontains":
-      return !String(overrideValue).toLowerCase().includes(String(value).toLowerCase());
-    case "starts_with":
-      return String(overrideValue).toLowerCase().startsWith(String(value).toLowerCase());
-    case "not_starts_with":
-      return !String(overrideValue).toLowerCase().startsWith(String(value).toLowerCase());
-    case "ends_with":
-      return String(overrideValue).toLowerCase().endsWith(String(value).toLowerCase());
-    case "not_ends_with":
-      return !String(overrideValue).toLowerCase().endsWith(String(value).toLowerCase());
-    case "regex":
-      return isValidRegex(String(value)) && String(overrideValue).match(String(value)) !== null;
-    case "not_regex":
-      return isValidRegex(String(value)) && String(overrideValue).match(String(value)) === null;
-    case "gt":
-    case "gte":
-    case "lt":
-    case "lte": {
-      const parsedValue = typeof value == "number" ? value : parseFloat(String(value));
-      let parsedOverride;
-      parsedOverride = typeof overrideValue == "number" ? overrideValue : overrideValue != null ? parseFloat(String(overrideValue)) : NaN;
-      if (Number.isFinite(parsedValue) && Number.isFinite(parsedOverride))
-        return compare(parsedOverride, parsedValue, operator);
-      return compare(String(overrideValue), String(value), operator);
-    }
-    case "is_date_after":
-    case "is_date_before": {
-      if (typeof value == "boolean")
-        throw new InconclusiveMatchError("Date operations cannot be performed on boolean values");
-      let parsedDate = relativeDateParseForFeatureFlagMatching(String(value));
-      if (parsedDate == null)
-        parsedDate = convertToDateTime(value);
-      if (parsedDate == null)
-        throw new InconclusiveMatchError(`Invalid date: ${value}`);
-      const overrideDate = convertToDateTime(overrideValue);
-      if ([
-        "is_date_before"
-      ].includes(operator))
-        return overrideDate < parsedDate;
-      return overrideDate > parsedDate;
-    }
-    case "semver_eq": {
-      const cmp = compareSemverTuples(parseSemver(String(overrideValue)), parseSemver(String(value)));
-      return cmp === 0;
-    }
-    case "semver_neq": {
-      const cmp = compareSemverTuples(parseSemver(String(overrideValue)), parseSemver(String(value)));
-      return cmp !== 0;
-    }
-    case "semver_gt": {
-      const cmp = compareSemverTuples(parseSemver(String(overrideValue)), parseSemver(String(value)));
-      return cmp > 0;
-    }
-    case "semver_gte": {
-      const cmp = compareSemverTuples(parseSemver(String(overrideValue)), parseSemver(String(value)));
-      return cmp >= 0;
-    }
-    case "semver_lt": {
-      const cmp = compareSemverTuples(parseSemver(String(overrideValue)), parseSemver(String(value)));
-      return cmp < 0;
-    }
-    case "semver_lte": {
-      const cmp = compareSemverTuples(parseSemver(String(overrideValue)), parseSemver(String(value)));
-      return cmp <= 0;
-    }
-    case "semver_tilde": {
-      const overrideParsed = parseSemver(String(overrideValue));
-      const { lower, upper } = computeTildeBounds(String(value));
-      return compareSemverTuples(overrideParsed, lower) >= 0 && compareSemverTuples(overrideParsed, upper) < 0;
-    }
-    case "semver_caret": {
-      const overrideParsed = parseSemver(String(overrideValue));
-      const { lower, upper } = computeCaretBounds(String(value));
-      return compareSemverTuples(overrideParsed, lower) >= 0 && compareSemverTuples(overrideParsed, upper) < 0;
-    }
-    case "semver_wildcard": {
-      const overrideParsed = parseSemver(String(overrideValue));
-      const { lower, upper } = computeWildcardBounds(String(value));
-      return compareSemverTuples(overrideParsed, lower) >= 0 && compareSemverTuples(overrideParsed, upper) < 0;
-    }
-    default:
-      throw new InconclusiveMatchError(`Unknown operator: ${operator}`);
-  }
+  return matchFeatureFlagProperty(property, propertyValues, {
+    warnFunction
+  });
 }
 function checkCohortExists(cohortId, cohortProperties) {
   if (!(cohortId in cohortProperties))
@@ -5461,187 +5579,9 @@ async function matchPropertyGroup(propertyGroup, propertyValues, cohortPropertie
     throw new InconclusiveMatchError("can't match cohort without a given cohort property value");
   return propertyGroupType === "AND";
 }
-function isValidRegex(regex) {
-  try {
-    new RegExp(regex);
-    return true;
-  } catch (err) {
-    return false;
-  }
-}
-function parseSemverNumericIdentifier(part, raw) {
-  if (!/^\d+$/.test(part))
-    throw new InconclusiveMatchError(`Invalid semver: ${raw}`);
-  if (part.length > 1 && part[0] === "0")
-    throw new InconclusiveMatchError(`Invalid semver: ${raw}`);
-  return parseInt(part, 10);
-}
-function parseSemver(value) {
-  const text = String(value).trim().replace(/^[vV]/, "");
-  const baseVersion = text.split("-")[0].split("+")[0];
-  if (!baseVersion || baseVersion.startsWith("."))
-    throw new InconclusiveMatchError(`Invalid semver: ${value}`);
-  const parts = baseVersion.split(".");
-  const parsePart = (part) => {
-    if (part === undefined || part === "")
-      return 0;
-    return parseSemverNumericIdentifier(part, value);
-  };
-  const major = parsePart(parts[0]);
-  const minor = parsePart(parts[1]);
-  const patch = parsePart(parts[2]);
-  return [
-    major,
-    minor,
-    patch
-  ];
-}
-function compareSemverTuples(a, b) {
-  for (let i = 0;i < 3; i++) {
-    if (a[i] < b[i])
-      return -1;
-    if (a[i] > b[i])
-      return 1;
-  }
-  return 0;
-}
-function computeTildeBounds(value) {
-  const parsed = parseSemver(value);
-  const lower = [
-    parsed[0],
-    parsed[1],
-    parsed[2]
-  ];
-  const upper = [
-    parsed[0],
-    parsed[1] + 1,
-    0
-  ];
-  return {
-    lower,
-    upper
-  };
-}
-function computeCaretBounds(value) {
-  const parsed = parseSemver(value);
-  const [major, minor, patch] = parsed;
-  const lower = [
-    major,
-    minor,
-    patch
-  ];
-  let upper;
-  upper = major > 0 ? [
-    major + 1,
-    0,
-    0
-  ] : minor > 0 ? [
-    0,
-    minor + 1,
-    0
-  ] : [
-    0,
-    0,
-    patch + 1
-  ];
-  return {
-    lower,
-    upper
-  };
-}
-function computeWildcardBounds(value) {
-  const text = String(value).trim().replace(/^[vV]/, "");
-  const cleanedText = text.replace(/\.\*$/, "").replace(/\*$/, "");
-  if (!cleanedText)
-    throw new InconclusiveMatchError(`Invalid wildcard semver: ${value}`);
-  const parts = cleanedText.split(".");
-  const parseWildcardPart = (part) => {
-    try {
-      return parseSemverNumericIdentifier(part, value);
-    } catch {
-      throw new InconclusiveMatchError(`Invalid wildcard semver: ${value}`);
-    }
-  };
-  const major = parseWildcardPart(parts[0]);
-  let lower;
-  let upper;
-  if (parts.length === 1) {
-    lower = [
-      major,
-      0,
-      0
-    ];
-    upper = [
-      major + 1,
-      0,
-      0
-    ];
-  } else {
-    const minor = parseWildcardPart(parts[1]);
-    lower = [
-      major,
-      minor,
-      0
-    ];
-    upper = [
-      major,
-      minor + 1,
-      0
-    ];
-  }
-  return {
-    lower,
-    upper
-  };
-}
-function convertToDateTime(value) {
-  if (value instanceof Date)
-    return value;
-  if (typeof value == "string" || typeof value == "number") {
-    const date = new Date(value);
-    if (!isNaN(date.valueOf()))
-      return date;
-    throw new InconclusiveMatchError(`${value} is in an invalid date format`);
-  }
-  throw new InconclusiveMatchError(`The date provided ${value} must be a string, number, or date object`);
-}
-function relativeDateParseForFeatureFlagMatching(value) {
-  const regex = /^-?(?<number>[0-9]+)(?<interval>[a-z])$/;
-  const match = value.match(regex);
-  const parsedDt = new Date(new Date().toISOString());
-  if (!match)
-    return null;
-  {
-    if (!match.groups)
-      return null;
-    const number = parseInt(match.groups["number"]);
-    if (number >= 1e4)
-      return null;
-    const interval = match.groups["interval"];
-    if (interval == "h")
-      parsedDt.setUTCHours(parsedDt.getUTCHours() - number);
-    else if (interval == "d")
-      parsedDt.setUTCDate(parsedDt.getUTCDate() - number);
-    else if (interval == "w")
-      parsedDt.setUTCDate(parsedDt.getUTCDate() - 7 * number);
-    else if (interval == "m")
-      parsedDt.setUTCMonth(parsedDt.getUTCMonth() - number);
-    else {
-      if (interval != "y")
-        return null;
-      parsedDt.setUTCFullYear(parsedDt.getUTCFullYear() - number);
-    }
-    return parsedDt;
-  }
-}
-var SIXTY_SECONDS = 60000, LONG_SCALE = 1152921504606847000, NULL_VALUES_ALLOWED_OPERATORS, ClientError, InconclusiveMatchError, RequiresServerEvaluation;
+var SIXTY_SECONDS = 60000, ClientError, RequiresServerEvaluation;
 var init_feature_flags = __esm(() => {
   init_dist();
-  init_crypto();
-  NULL_VALUES_ALLOWED_OPERATORS = [
-    "is_not",
-    "is_set"
-  ];
   ClientError = class ClientError extends Error {
     constructor(message) {
       super();
@@ -5649,12 +5589,6 @@ var init_feature_flags = __esm(() => {
       this.name = "ClientError";
       this.message = message;
       Object.setPrototypeOf(this, ClientError.prototype);
-    }
-  };
-  InconclusiveMatchError = class InconclusiveMatchError extends Error {
-    constructor(message) {
-      super(message);
-      setCustomErrorPrototype(this, InconclusiveMatchError);
     }
   };
   RequiresServerEvaluation = class RequiresServerEvaluation extends Error {
@@ -5665,7 +5599,7 @@ var init_feature_flags = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.49.4/node_modules/posthog-node/dist/extensions/error-tracking/autocapture.mjs
+// node_modules/.bun/posthog-node@5.51.2/node_modules/posthog-node/dist/extensions/error-tracking/autocapture.mjs
 function splitNodeOptions(nodeOptions) {
   const args = [];
   let current = "";
@@ -5766,7 +5700,7 @@ var init_autocapture = __esm(() => {
   STARTUP_UNHANDLED_REJECTION_MODE = getUnhandledRejectionMode();
 });
 
-// node_modules/.bun/posthog-node@5.49.4/node_modules/posthog-node/dist/extensions/error-tracking/index.mjs
+// node_modules/.bun/posthog-node@5.51.2/node_modules/posthog-node/dist/extensions/error-tracking/index.mjs
 class error_tracking_ErrorTracking {
   constructor(client, options, _logger) {
     this.client = client;
@@ -5840,7 +5774,7 @@ var init_error_tracking2 = __esm(() => {
   init_dist();
 });
 
-// node_modules/.bun/posthog-node@5.49.4/node_modules/posthog-node/dist/storage-memory.mjs
+// node_modules/.bun/posthog-node@5.51.2/node_modules/posthog-node/dist/storage-memory.mjs
 class PostHogMemoryStorage {
   getProperty(key) {
     return this._memoryStorage[key];
@@ -5854,7 +5788,7 @@ class PostHogMemoryStorage {
 }
 var init_storage_memory = () => {};
 
-// node_modules/.bun/posthog-node@5.49.4/node_modules/posthog-node/dist/capture-v1/config.mjs
+// node_modules/.bun/posthog-node@5.51.2/node_modules/posthog-node/dist/capture-v1/config.mjs
 function isCaptureMode(value) {
   return value === "v0" || value === "v1";
 }
@@ -5864,14 +5798,14 @@ function resolveCaptureMode() {
 }
 var init_config2 = () => {};
 
-// node_modules/.bun/posthog-node@5.49.4/node_modules/posthog-node/dist/capture-v1/routing.mjs
+// node_modules/.bun/posthog-node@5.51.2/node_modules/posthog-node/dist/capture-v1/routing.mjs
 function isLegacyOnlyEvent(message) {
   return typeof message.event == "string" && message.event.startsWith(AI_EVENT_PREFIX);
 }
 var AI_EVENT_PREFIX = "$ai_", ANALYTICS_ROUTE = "analytics", AI_ROUTE = "ai";
 var init_routing = () => {};
 
-// node_modules/.bun/posthog-node@5.49.4/node_modules/posthog-node/dist/capture-v1/errors.mjs
+// node_modules/.bun/posthog-node@5.51.2/node_modules/posthog-node/dist/capture-v1/errors.mjs
 var CaptureV1Error;
 var init_errors = __esm(() => {
   CaptureV1Error = class CaptureV1Error extends Error {
@@ -5891,7 +5825,7 @@ var init_errors = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.49.4/node_modules/posthog-node/dist/capture-v1/transform.mjs
+// node_modules/.bun/posthog-node@5.51.2/node_modules/posthog-node/dist/capture-v1/transform.mjs
 function coerceBool(value) {
   if (typeof value == "boolean")
     return value;
@@ -6009,7 +5943,7 @@ var init_transform = __esm(() => {
   ];
 });
 
-// node_modules/.bun/posthog-node@5.49.4/node_modules/posthog-node/dist/capture-v1/sender.mjs
+// node_modules/.bun/posthog-node@5.51.2/node_modules/posthog-node/dist/capture-v1/sender.mjs
 class V1CaptureSender {
   constructor(config, hooks) {
     this.config = config;
@@ -6265,11 +6199,11 @@ var init_sender = __esm(() => {
   ]);
 });
 
-// node_modules/.bun/posthog-node@5.49.4/node_modules/posthog-node/dist/ai-capture/routing.mjs
+// node_modules/.bun/posthog-node@5.51.2/node_modules/posthog-node/dist/ai-capture/routing.mjs
 var AI_CAPTURE_ROUTE = "ai-capture", AI_CAPTURE_ENDPOINT_PATH = "/i/v0/ai/batch/", AI_MAX_EVENT_BYTES = 8388608, AI_BATCH_TARGET_BYTES = 5242880;
 var init_routing2 = () => {};
 
-// node_modules/.bun/posthog-node@5.49.4/node_modules/posthog-node/dist/ai-capture/batching.mjs
+// node_modules/.bun/posthog-node@5.51.2/node_modules/posthog-node/dist/ai-capture/batching.mjs
 function eventByteSize(message) {
   return encoder.encode(safeJsonStringify(message)).length;
 }
@@ -6311,7 +6245,7 @@ var init_batching = __esm(() => {
   encoder = new TextEncoder;
 });
 
-// node_modules/.bun/posthog-node@5.49.4/node_modules/posthog-node/dist/client.mjs
+// node_modules/.bun/posthog-node@5.51.2/node_modules/posthog-node/dist/client.mjs
 function emitDeprecationWarningOnce(id, message) {
   if (_emittedDeprecations.has(id))
     return;
@@ -7061,7 +6995,16 @@ var init_client = __esm(() => {
           flags: {}
         });
       }
-      const { groups, disableGeoip, flagKeys } = resolvedOptions || {};
+      const { groups, disableGeoip } = resolvedOptions || {};
+      const flagKeys = resolvedOptions?.flagKeys ?? undefined;
+      if (flagKeys?.length === 0)
+        return new FeatureFlagEvaluations({
+          host: this._getFeatureFlagEvaluationsHost(),
+          distinctId: resolvedDistinctId,
+          groups,
+          disableGeoip,
+          flags: {}
+        });
       let { onlyEvaluateLocally, personProperties, groupProperties } = resolvedOptions || {};
       const adjustedProperties = this.addLocalPersonAndGroupProperties(resolvedDistinctId, groups, personProperties, groupProperties);
       personProperties = adjustedProperties.allPersonProperties;
@@ -7069,6 +7012,7 @@ var init_client = __esm(() => {
       const evaluationContext = this.createFeatureFlagEvaluationContext(resolvedDistinctId, groups, this.personPropertiesForLocalEvaluation(resolvedDistinctId, personProperties), groupProperties);
       if (onlyEvaluateLocally == undefined)
         onlyEvaluateLocally = this.options.strictLocalEvaluation ?? false;
+      const requestedFlagKeys = flagKeys ? new Set(flagKeys) : undefined;
       const records = {};
       let requestId;
       let evaluatedAt;
@@ -7092,7 +7036,8 @@ var init_client = __esm(() => {
           };
           locallyEvaluatedKeys.add(key);
         }
-      const fallbackToFlags = localResult ? localResult.fallbackToFlags : true;
+      const requestedFlagMissingLocally = requestedFlagKeys !== undefined && Array.from(requestedFlagKeys).some((key) => this.featureFlagsPoller?.featureFlagsByKey[key] === undefined);
+      const fallbackToFlags = localResult ? localResult.fallbackToFlags || requestedFlagMissingLocally : true;
       if (fallbackToFlags && !onlyEvaluateLocally) {
         const details = await super.getFeatureFlagDetailsStateless(evaluationContext.distinctId, evaluationContext.groups, personProperties, groupProperties, disableGeoip, flagKeys);
         if (details) {
@@ -7153,6 +7098,11 @@ var init_client = __esm(() => {
               payload
             };
         }
+      if (requestedFlagKeys !== undefined) {
+        for (const key of Object.keys(records))
+          if (!requestedFlagKeys.has(key))
+            delete records[key];
+      }
       return new FeatureFlagEvaluations({
         host: this._getFeatureFlagEvaluationsHost(),
         distinctId: resolvedDistinctId,
@@ -7561,7 +7511,7 @@ var init_client = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.49.4/node_modules/posthog-node/dist/extensions/context/context.mjs
+// node_modules/.bun/posthog-node@5.51.2/node_modules/posthog-node/dist/extensions/context/context.mjs
 import { AsyncLocalStorage } from "node:async_hooks";
 
 class PostHogContext {
@@ -7593,15 +7543,13 @@ class PostHogContext {
 }
 var init_context = () => {};
 
-// node_modules/.bun/posthog-node@5.49.4/node_modules/posthog-node/dist/gzip.node.mjs
+// node_modules/.bun/posthog-node@5.51.2/node_modules/posthog-node/dist/gzip.node.mjs
 import { gzip } from "node:zlib";
 import { promisify } from "node:util";
 async function gzipCompress2(input, isDebug = true) {
   try {
     const compressed = await gzipAsync(input);
-    return new Blob([
-      new Uint8Array(compressed)
-    ]);
+    return new Uint8Array(compressed);
   } catch (error) {
     if (isDebug)
       console.error("Failed to gzip compress data", error);
@@ -7613,7 +7561,7 @@ var init_gzip_node = __esm(() => {
   gzipAsync = promisify(gzip);
 });
 
-// node_modules/.bun/posthog-node@5.49.4/node_modules/posthog-node/dist/extensions/sentry-integration.mjs
+// node_modules/.bun/posthog-node@5.51.2/node_modules/posthog-node/dist/extensions/sentry-integration.mjs
 function createEventProcessor(_posthog, { organization, projectId, prefix, severityAllowList = [
   "error"
 ], sendExceptionsToPostHog = true } = {}) {
@@ -7688,22 +7636,22 @@ var init_sentry_integration = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.49.4/node_modules/posthog-node/dist/extensions/tracing-headers.mjs
+// node_modules/.bun/posthog-node@5.51.2/node_modules/posthog-node/dist/extensions/tracing-headers.mjs
 var init_tracing_headers2 = () => {};
 
-// node_modules/.bun/posthog-node@5.49.4/node_modules/posthog-node/dist/extensions/url-utils.mjs
+// node_modules/.bun/posthog-node@5.51.2/node_modules/posthog-node/dist/extensions/url-utils.mjs
 var init_url_utils = __esm(() => {
   init_dist();
 });
 
-// node_modules/.bun/posthog-node@5.49.4/node_modules/posthog-node/dist/extensions/express.mjs
+// node_modules/.bun/posthog-node@5.51.2/node_modules/posthog-node/dist/extensions/express.mjs
 var init_express = __esm(() => {
   init_error_tracking2();
   init_tracing_headers2();
   init_url_utils();
 });
 
-// node_modules/.bun/posthog-node@5.49.4/node_modules/posthog-node/dist/exports.mjs
+// node_modules/.bun/posthog-node@5.51.2/node_modules/posthog-node/dist/exports.mjs
 var init_exports = __esm(() => {
   init_feature_flag_evaluations();
   init_dist();
@@ -7712,7 +7660,7 @@ var init_exports = __esm(() => {
   init_types3();
 });
 
-// node_modules/.bun/posthog-node@5.49.4/node_modules/posthog-node/dist/entrypoints/index.node.mjs
+// node_modules/.bun/posthog-node@5.51.2/node_modules/posthog-node/dist/entrypoints/index.node.mjs
 var PostHog;
 var init_index_node = __esm(() => {
   init_module_node();
@@ -7955,7 +7903,7 @@ var package_default;
 var init_package = __esm(() => {
   package_default = {
     name: "@oh-my-opencode/omo-codex",
-    version: "5.0.0-beta.14",
+    version: "5.0.0-beta.21",
     type: "module",
     private: true,
     description: "Codex harness adapter for oh-my-openagent. Vendored Codex plugin namespace (omo) + TypeScript installer + telemetry.",
@@ -8160,14 +8108,14 @@ var init_posthog = __esm(() => {
 // packages/omo-codex/src/telemetry/index.ts
 var exports_telemetry = {};
 __export(exports_telemetry, {
-  getPostHogDistinctId: () => getPostHogDistinctId,
-  createPluginPostHog: () => createPluginPostHog,
-  createInstallPostHog: () => createInstallPostHog,
-  createCliPostHog: () => createCliPostHog,
-  __setOsProviderForTesting: () => __setOsProviderForTesting,
-  __setActivityStateProviderForTesting: () => __setActivityStateProviderForTesting,
+  __resetActivityStateProviderForTesting: () => __resetActivityStateProviderForTesting,
   __resetOsProviderForTesting: () => __resetOsProviderForTesting,
-  __resetActivityStateProviderForTesting: () => __resetActivityStateProviderForTesting
+  __setActivityStateProviderForTesting: () => __setActivityStateProviderForTesting,
+  __setOsProviderForTesting: () => __setOsProviderForTesting,
+  createCliPostHog: () => createCliPostHog,
+  createInstallPostHog: () => createInstallPostHog,
+  createPluginPostHog: () => createPluginPostHog,
+  getPostHogDistinctId: () => getPostHogDistinctId
 });
 var init_telemetry = __esm(() => {
   init_posthog();
@@ -8675,9 +8623,9 @@ var LEGACY_CODEX_COMPONENT_BINS = [
   { name: "codex-comment-checker", component: "comment-checker" },
   { name: "codex-lsp", component: "lsp" },
   { name: "codex-rules", component: "rules" },
-  { name: "codex-start-work-continuation", component: "start-work-continuation" },
   { name: "codex-telemetry", component: "telemetry" },
-  { name: "codex-ultrawork", component: "ultrawork" }
+  { name: "codex-ultrawork", component: "ultrawork" },
+  { name: "codex-ulw-execute-continuation", component: "ulw-execute-continuation" }
 ];
 var LEGACY_CODEX_COMPONENT_BIN_NAMES = LEGACY_CODEX_COMPONENT_BINS.map((entry) => entry.name);
 async function removeLegacyCodexComponentBins(binDir, platform) {
@@ -13875,23 +13823,23 @@ async function runLazyCodexInstallLocalCli(input) {
   return 0;
 }
 export {
-  updateCodexConfig,
-  stampGitBashMcpEnv,
-  runLazyCodexInstallLocalCli,
-  runDelegatedOmoCommand,
-  resolveDefaultRepoRootForEntrypoint,
-  resolveDefaultRepoRoot,
-  resolveCodexInstallerBinDir,
-  repairNearestProjectLocalCodexArtifacts,
-  readCodexModelCatalog,
-  parseLazyCodexInstallCliArgs,
-  linkRootRuntimeBin,
-  linkCachedPluginBins,
-  installMarketplaceLocally,
-  installCachedPlugin,
-  formatLazyCodexInstallHelp,
-  findMissingHookCommandTargets,
-  buildDelegatedOmoInvocation,
+  PASSTHROUGH_COMMANDS,
   assertHookCommandTargets,
-  PASSTHROUGH_COMMANDS
+  buildDelegatedOmoInvocation,
+  findMissingHookCommandTargets,
+  formatLazyCodexInstallHelp,
+  installCachedPlugin,
+  installMarketplaceLocally,
+  linkCachedPluginBins,
+  linkRootRuntimeBin,
+  parseLazyCodexInstallCliArgs,
+  readCodexModelCatalog,
+  repairNearestProjectLocalCodexArtifacts,
+  resolveCodexInstallerBinDir,
+  resolveDefaultRepoRoot,
+  resolveDefaultRepoRootForEntrypoint,
+  runDelegatedOmoCommand,
+  runLazyCodexInstallLocalCli,
+  stampGitBashMcpEnv,
+  updateCodexConfig
 };

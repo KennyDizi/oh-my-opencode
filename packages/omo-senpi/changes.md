@@ -1,3 +1,40 @@
+## 2026-08-25 — Name the executable in the local-launcher brand profile
+
+The sibling-store local launcher now injects `command: "omo"` on the `SENPI_BRAND`
+profile it hands the engine, matching the published omo-ai launcher. Senpi can
+render resume hints with the real executable name instead of guessing; unknown
+fields stay ignored on older engines.
+
+## 2026-08-22 — One exception-free keyword table for every ULW skill pointer
+
+The mass-ulw and ulw-skill-pointers components were the same mechanism written twice, and the
+detectors carried `ulw(?!-)` lookaheads that silently swallowed overlapping mentions: "mass
+ulw-loop" fired neither mass-ulw nor ultrawork. They are replaced by a single `skill-pointers`
+component holding one uniform target table (mass-ulw with its aliases, ulw-plan, ulw-loop,
+ulw-research) with no cross-keyword exceptions — overlapping keywords all fire, each matched
+skill gets its own hidden pointer, and the ultrawork trigger likewise drops `(?!-)` so any
+`ulw` mention arms it. Typing "mass ulw-loop" now loads ultrawork + mass-ulw + ulw-loop
+together; "ulw plan" loads ultrawork + the ulw-plan skill.
+
+CustomTypes stay stable (`omo-mass-ulw:skill-pointer`, `omo-ulw-loop/-research:skill-pointer`;
+new `omo-ulw-plan:skill-pointer`). The per-component flags `omo-senpi-mass-ulw-disabled` and
+`omo-senpi-ulw-skill-pointers-disabled` are replaced by `omo-senpi-skill-pointers-disabled`.
+Only structural dedup remains: extension-source inputs, a raw `/skill:` command for the same
+skill, expanded skill blocks, and the `<ultrawork-mode>` tag-pair guard.
+
+## 2026-08-22 — Load every skill a composite ULW invocation names
+
+"mass ulw loop" armed ultrawork and pointed at the mass-ulw skill, but nothing loaded the
+ulw-loop skill the phrase names; "mass ulw research" had the same gap. The new
+`ulw-skill-pointers` component detects `ulw loop` / `ulw-loop` / `ulwloop` and the research
+equivalents (any case) and injects one hidden skill pointer per matched skill, so a composite
+invocation now loads ultrawork, mass-ulw, and the named skill together.
+
+Suppressions mirror mass-ulw per skill — extension-source inputs, a raw `/skill:` command for
+the same skill, and an already-expanded skill block never re-inject — and queued prompts carry
+the pointers appended inside the one message so the group survives senpi's one-at-a-time queue
+drain. Gated by `omo-senpi-ulw-skill-pointers-disabled`.
+
 ## 2026-08-21 — Follow the Senpi 2026.8.21 host contract
 
 The adapter peer and development dependency now require Senpi `2026.8.21`, and the
