@@ -1,6 +1,6 @@
 {
   "name": "oh-my-opencode",
-  "version": "5.0.0-beta.21",
+  "version": "5.0.0-beta.22",
   "description": "The Best AI Agent Harness - Batteries-Included OpenCode Plugin with Multi-Model Orchestration, Parallel Background Agents, and Crafted LSP/AST Tools",
   "main": "./dist/index.js",
   "types": "dist/index.d.ts",
@@ -162,11 +162,11 @@
   },
   "homepage": "https://github.com/code-yeongyu/oh-my-openagent#readme",
   "dependencies": {
-    "@ai-sdk/anthropic": "^4.0.42",
-    "@ai-sdk/google": "^4.0.51",
-    "@ai-sdk/openai": "^4.0.47",
+    "@ai-sdk/anthropic": "^4.0.44",
+    "@ai-sdk/google": "^4.0.54",
+    "@ai-sdk/openai": "^4.0.50",
     "@ai-sdk/provider": "^4.0.8",
-    "@ai-sdk/xai": "^4.0.44",
+    "@ai-sdk/xai": "^4.0.47",
     "@clack/prompts": "^1.7.0",
     "@code-yeongyu/comment-checker": "^0.8.0",
     "@modelcontextprotocol/sdk": "^1.30.0",
@@ -178,7 +178,7 @@
     "commander": "^15.0.0",
     "detect-libc": "^2.1.2",
     "diff": "^9.0.0",
-    "js-yaml": "^5.4.0",
+    "js-yaml": "^5.4.1",
     "jsonc-parser": "^3.3.1",
     "picocolors": "^1.1.1",
     "picomatch": "^4.0.7",
@@ -186,7 +186,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@code-yeongyu/senpi": "2026.8.21",
+    "@code-yeongyu/senpi": "2026.8.27",
     "@oh-my-opencode/agents-md-core": "workspace:*",
     "@oh-my-opencode/ast-grep-mcp": "workspace:*",
     "@oh-my-opencode/boulder-state": "workspace:*",
@@ -228,18 +228,18 @@
     "typescript": "^7.0.2"
   },
   "optionalDependencies": {
-    "oh-my-opencode-darwin-arm64": "5.0.0-beta.21",
-    "oh-my-opencode-darwin-x64": "5.0.0-beta.21",
-    "oh-my-opencode-darwin-x64-baseline": "5.0.0-beta.21",
-    "oh-my-opencode-linux-arm64": "5.0.0-beta.21",
-    "oh-my-opencode-linux-arm64-musl": "5.0.0-beta.21",
-    "oh-my-opencode-linux-x64": "5.0.0-beta.21",
-    "oh-my-opencode-linux-x64-baseline": "5.0.0-beta.21",
-    "oh-my-opencode-linux-x64-musl": "5.0.0-beta.21",
-    "oh-my-opencode-linux-x64-musl-baseline": "5.0.0-beta.21",
-    "oh-my-opencode-windows-arm64": "5.0.0-beta.21",
-    "oh-my-opencode-windows-x64": "5.0.0-beta.21",
-    "oh-my-opencode-windows-x64-baseline": "5.0.0-beta.21"
+    "oh-my-opencode-darwin-arm64": "5.0.0-beta.22",
+    "oh-my-opencode-darwin-x64": "5.0.0-beta.22",
+    "oh-my-opencode-darwin-x64-baseline": "5.0.0-beta.22",
+    "oh-my-opencode-linux-arm64": "5.0.0-beta.22",
+    "oh-my-opencode-linux-arm64-musl": "5.0.0-beta.22",
+    "oh-my-opencode-linux-x64": "5.0.0-beta.22",
+    "oh-my-opencode-linux-x64-baseline": "5.0.0-beta.22",
+    "oh-my-opencode-linux-x64-musl": "5.0.0-beta.22",
+    "oh-my-opencode-linux-x64-musl-baseline": "5.0.0-beta.22",
+    "oh-my-opencode-windows-arm64": "5.0.0-beta.22",
+    "oh-my-opencode-windows-x64": "5.0.0-beta.22",
+    "oh-my-opencode-windows-x64-baseline": "5.0.0-beta.22"
   },
   "overrides": {
     "@earendil-works/pi-agent-core": "0.84.3",
@@ -255,7 +255,7 @@
   "trustedDependencies": [
     "@code-yeongyu/comment-checker"
   ],
-  "allowScripts": {
-    "file:../.bun/@code-yeongyu+comment-checker@0.8.0/node_modules/@code-yeongyu/comment-checker": true
+  "patchedDependencies": {
+    "@code-yeongyu/senpi@2026.8.26-2": "patches/@code-yeongyu%2Fsenpi@2026.8.26-2.patch"
   }
 }
