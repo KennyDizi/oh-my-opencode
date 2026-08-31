@@ -275,7 +275,6 @@ Use OS-appropriate temp directory:
 - **TYPE B (Implementation)**: Suggested Calls 2-3 - Doc Discovery Required NO
 - **TYPE C (Context)**: Suggested Calls 2-3 - Doc Discovery Required NO
 - **TYPE D (Comprehensive)**: Suggested Calls 3-5 - Doc Discovery Required YES (Phase 0.5 first)
-| Request Type | Minimum Parallel Calls
 
 **Doc Discovery is SEQUENTIAL** (tavily_search → version check → tavily_map → investigate).
 **Main phase is PARALLEL** once you know where to look.
