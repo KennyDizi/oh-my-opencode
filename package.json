@@ -162,11 +162,11 @@
   },
   "homepage": "https://github.com/code-yeongyu/oh-my-openagent#readme",
   "dependencies": {
-    "@ai-sdk/anthropic": "^4.0.45",
-    "@ai-sdk/google": "^4.0.57",
-    "@ai-sdk/openai": "^4.0.51",
-    "@ai-sdk/provider": "^4.0.8",
-    "@ai-sdk/xai": "^4.0.49",
+    "@ai-sdk/anthropic": "^4.0.46",
+    "@ai-sdk/google": "^4.0.58",
+    "@ai-sdk/openai": "^4.0.52",
+    "@ai-sdk/provider": "^4.0.9",
+    "@ai-sdk/xai": "^4.0.50",
     "@clack/prompts": "^1.7.0",
     "@code-yeongyu/comment-checker": "^0.8.0",
     "@modelcontextprotocol/sdk": "^1.30.0",
@@ -183,7 +183,7 @@
     "picocolors": "^1.1.1",
     "picomatch": "^4.0.7",
     "posthog-node": "^5.51.4",
-    "zod": "^4.5.2"
+    "zod": "^4.5.4"
   },
   "devDependencies": {
     "@code-yeongyu/senpi": "2026.8.30-3",
