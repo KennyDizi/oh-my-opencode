@@ -12214,6 +12214,11 @@
               "minimum": 1,
               "maximum": 9007199254740991
             },
+            "maxLiveDescendantsPerRoot": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
             "staleTimeoutMs": {
               "type": "number",
               "minimum": 60000
@@ -28153,6 +28158,11 @@
                   "maxDepth": {
                     "type": "integer",
                     "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  "maxLiveDescendantsPerRoot": {
+                    "type": "integer",
+                    "minimum": 0,
                     "maximum": 9007199254740991
                   },
                   "staleTimeoutMs": {
