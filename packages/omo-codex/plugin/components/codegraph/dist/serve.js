@@ -10332,6 +10332,7 @@ async function runJsonRpcStdioServer(config2) {
   const idleTimer = createIdleTimer(idleTimeoutMs, log, () => {
     isClosed = true;
     config2.onIdleTimeout?.();
+    config2.input.destroy();
   });
   const watchdog = createParentWatchdog(config2.parentWatchdog, (parentPid, pollIntervalMs) => {
     isClosed = true;
@@ -10743,7 +10744,9 @@ async function runUnavailableCodegraphMcpServer(options) {
     },
     input: options.input,
     output: options.output,
-    parentWatchdog: options.parentWatchdog ?? {}
+    idleTimeoutMs: 0,
+    parentWatchdog: options.parentWatchdog ?? {},
+    ...options.lifecycleLog === undefined ? {} : { log: options.lifecycleLog }
   });
 }
 async function handleUnavailableCodegraphMcpRequest(input, options) {
