@@ -6904,6 +6904,14 @@ var OmoMemorySyncSchema = object({
 var OmoMemorySearchSchema = object({
   enabled: boolean2().default(true)
 }).strict();
+var OmoMemoryRecallSchema = object({
+  enabled: boolean2().default(true),
+  max_items: number2().int().min(1).max(5).default(2),
+  budget_tokens: number2().int().positive().default(600),
+  excerpt_chars: number2().int().positive().default(200),
+  min_score: number2().optional(),
+  exclude: array(string2()).default([])
+}).strict();
 var OmoMemoryNudgeSchema = object({
   enabled: boolean2().default(true),
   every_user_turns: number2().int().min(1).default(10)
@@ -6950,6 +6958,14 @@ var OmoMemorySyncLayerSchema = object({
 var OmoMemorySearchLayerSchema = object({
   enabled: boolean2().optional()
 }).strict();
+var OmoMemoryRecallLayerSchema = object({
+  enabled: boolean2().optional(),
+  max_items: number2().int().min(1).max(5).optional(),
+  budget_tokens: number2().int().positive().optional(),
+  excerpt_chars: number2().int().positive().optional(),
+  min_score: number2().optional(),
+  exclude: array(string2()).optional()
+}).strict();
 var OmoMemoryNudgeLayerSchema = object({
   enabled: boolean2().optional(),
   every_user_turns: number2().int().min(1).optional()
@@ -6989,6 +7005,7 @@ var OmoMemoryAgentOverridesSchema = object({
   write_notice: OmoMemoryWriteNoticeLayerSchema.optional(),
   sync: OmoMemorySyncLayerSchema.optional(),
   search: OmoMemorySearchLayerSchema.optional(),
+  recall: OmoMemoryRecallLayerSchema.optional(),
   compile_warn_tokens: number2().int().positive().optional()
 }).strict();
 var OmoMemorySettingsSchema = object({
@@ -7018,6 +7035,13 @@ var OmoMemorySettingsSchema = object({
   write_notice: OmoMemoryWriteNoticeSchema.default({ enabled: true }),
   sync: OmoMemorySyncSchema.default({ enabled: true }),
   search: OmoMemorySearchSchema.default({ enabled: true }),
+  recall: OmoMemoryRecallSchema.default({
+    enabled: true,
+    max_items: 2,
+    budget_tokens: 600,
+    excerpt_chars: 200,
+    exclude: []
+  }),
   compile_warn_tokens: number2().int().positive().default(30000),
   agents: record(string2(), OmoMemoryAgentOverridesSchema).default({})
 }).strict();
@@ -7034,6 +7058,7 @@ var OmoMemorySettingsLayerSchema = object({
   write_notice: OmoMemoryWriteNoticeLayerSchema.optional(),
   sync: OmoMemorySyncLayerSchema.optional(),
   search: OmoMemorySearchLayerSchema.optional(),
+  recall: OmoMemoryRecallLayerSchema.optional(),
   compile_warn_tokens: number2().int().positive().optional(),
   agents: record(string2(), OmoMemoryAgentOverridesSchema).optional()
 }).strict();
