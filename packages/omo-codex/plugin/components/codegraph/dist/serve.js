@@ -6906,11 +6906,7 @@ var OmoMemorySearchSchema = object({
 }).strict();
 var OmoMemoryRecallSchema = object({
   enabled: boolean2().default(true),
-  max_items: number2().int().min(1).max(5).default(2),
-  budget_tokens: number2().int().positive().default(600),
-  excerpt_chars: number2().int().positive().default(200),
-  min_score: number2().optional(),
-  exclude: array(string2()).default([])
+  max_items: number2().int().min(1).max(5).default(2)
 }).strict();
 var OmoMemoryNudgeSchema = object({
   enabled: boolean2().default(true),
@@ -6960,11 +6956,7 @@ var OmoMemorySearchLayerSchema = object({
 }).strict();
 var OmoMemoryRecallLayerSchema = object({
   enabled: boolean2().optional(),
-  max_items: number2().int().min(1).max(5).optional(),
-  budget_tokens: number2().int().positive().optional(),
-  excerpt_chars: number2().int().positive().optional(),
-  min_score: number2().optional(),
-  exclude: array(string2()).optional()
+  max_items: number2().int().min(1).max(5).optional()
 }).strict();
 var OmoMemoryNudgeLayerSchema = object({
   enabled: boolean2().optional(),
@@ -7035,13 +7027,7 @@ var OmoMemorySettingsSchema = object({
   write_notice: OmoMemoryWriteNoticeSchema.default({ enabled: true }),
   sync: OmoMemorySyncSchema.default({ enabled: true }),
   search: OmoMemorySearchSchema.default({ enabled: true }),
-  recall: OmoMemoryRecallSchema.default({
-    enabled: true,
-    max_items: 2,
-    budget_tokens: 600,
-    excerpt_chars: 200,
-    exclude: []
-  }),
+  recall: OmoMemoryRecallSchema.default({ enabled: true, max_items: 2 }),
   compile_warn_tokens: number2().int().positive().default(30000),
   agents: record(string2(), OmoMemoryAgentOverridesSchema).default({})
 }).strict();
