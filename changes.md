@@ -1,3 +1,23 @@
+## 2026-09-02 — Build missing prebuilt inputs in the omo-native release staging
+
+The omo-native plugin staging now builds `packages/lsp-daemon/dist` and
+`packages/ast-grep-mcp/dist/cli.js` through the canonical root scripts
+(`build:lsp-daemon`, `build:ast-grep-mcp`) whenever they are absent before
+consuming them. The publish-platform workflow installs dependencies with
+`--ignore-scripts`, so the root prepare build never produced these artifacts
+there and every beta.32 platform build failed with ENOENT on the lsp-daemon
+dist. Prebuilt artifacts are still reused untouched when present, and the
+staged payload checks are unchanged.
+
+## 2026-09-02 — Give the legacy daemon fixture a cold-Windows readiness budget
+
+The Codex installer test fixture's event-driven readiness wait now allows 30
+seconds on Windows, matching the platform-specific execution budgets the
+installer integration tests already use. Assertions and event-driven behavior
+remain unchanged; only the fixture's failure deadline is widened past the flat
+5-second bound that a cold Windows runner exceeded while spawning the fixture
+daemon.
+
 ## 2026-09-01 — Defer bind-time reflection reconciliation on scheduler contention
 
 Session-start reflection reconciliation now uses a zero-wait scheduler lock and defers when a sibling session is already scheduling the same memory identity. Normal reflection reservation and completion paths retain their existing serialized wait budget.
