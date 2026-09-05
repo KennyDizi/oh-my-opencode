@@ -1310,14 +1310,6 @@
           "type": "string",
           "minLength": 1
         },
-        "tool_exposure": {
-          "default": "direct",
-          "type": "string",
-          "enum": [
-            "direct",
-            "search"
-          ]
-        },
         "reflection": {
           "default": {
             "enabled": true,
@@ -1840,7 +1832,6 @@
       "required": [
         "enabled",
         "agent",
-        "tool_exposure",
         "reflection",
         "nudge",
         "facts",
@@ -14090,13 +14081,6 @@
               "type": "string",
               "minLength": 1
             },
-            "tool_exposure": {
-              "type": "string",
-              "enum": [
-                "direct",
-                "search"
-              ]
-            },
             "reflection": {
               "type": "object",
               "properties": {
@@ -15712,13 +15696,6 @@
             "agent": {
               "type": "string",
               "minLength": 1
-            },
-            "tool_exposure": {
-              "type": "string",
-              "enum": [
-                "direct",
-                "search"
-              ]
             },
             "reflection": {
               "type": "object",
@@ -17341,13 +17318,6 @@
               "agent": {
                 "type": "string",
                 "minLength": 1
-              },
-              "tool_exposure": {
-                "type": "string",
-                "enum": [
-                  "direct",
-                  "search"
-                ]
               },
               "reflection": {
                 "type": "object",
@@ -29971,13 +29941,6 @@
                     "type": "string",
                     "minLength": 1
                   },
-                  "tool_exposure": {
-                    "type": "string",
-                    "enum": [
-                      "direct",
-                      "search"
-                    ]
-                  },
                   "reflection": {
                     "type": "object",
                     "properties": {
@@ -31593,13 +31556,6 @@
                   "agent": {
                     "type": "string",
                     "minLength": 1
-                  },
-                  "tool_exposure": {
-                    "type": "string",
-                    "enum": [
-                      "direct",
-                      "search"
-                    ]
                   },
                   "reflection": {
                     "type": "object",
