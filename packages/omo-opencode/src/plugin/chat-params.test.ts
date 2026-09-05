@@ -183,6 +183,52 @@ describe("createChatParamsHandler", () => {
     })
   })
 
+  test("preserves GPT-6 Astra default medium as direct reasoning effort", async () => {
+    //#given
+    const handler = createChatParamsHandler()
+    const message: { variant?: string } = {}
+    const input = {
+      sessionID: "ses_chat_params",
+      agent: { name: "sisyphus" },
+      model: { providerID: "openai", modelID: "gpt-6-astra-preview" },
+      provider: { id: "openai" },
+      message,
+    }
+    const output: ChatParamsOutput = {
+      options: { reasoningEffort: "medium" },
+    }
+
+    //#when
+    await handler(input, output)
+
+    //#then
+    expect(input.message.variant).toBeUndefined()
+    expect(output.options.reasoningEffort).toBe("medium")
+  })
+
+  test("preserves a supported explicit GPT-6 Astra direct reasoning effort", async () => {
+    //#given
+    const handler = createChatParamsHandler()
+    const message: { variant?: string } = {}
+    const input = {
+      sessionID: "ses_chat_params",
+      agent: { name: "sisyphus" },
+      model: { providerID: "openai", modelID: "gpt-6-astraturbo" },
+      provider: { id: "openai" },
+      message,
+    }
+    const output: ChatParamsOutput = {
+      options: { reasoningEffort: "xhigh" },
+    }
+
+    //#when
+    await handler(input, output)
+
+    //#then
+    expect(input.message.variant).toBeUndefined()
+    expect(output.options.reasoningEffort).toBe("xhigh")
+  })
+
   test("falls back to default maxOutputTokens when stored and compatibility tokens are non-positive", async () => {
     //#given
     const logSpy = spyOn(sharedModule, "log").mockImplementation(() => undefined)

@@ -22,7 +22,8 @@ Model-specific prompt variants for the Sisyphus main orchestrator. Parent `sisyp
 | `claude-fable-5.ts` | Fable 5-native: top-tier model, Opus 4.8 tuning direction |
 | `gemini.ts` | Gemini-optimized: stricter tool-usage rules, 5 NEVER rules |
 | `gpt-5-4.ts` | GPT-5.4-native: 8-block architecture, entropy-reduced, 449 LOC |
-| `gpt-5-5.ts` | Shared GPT-5.5/GPT-5.6 model-aware orchestration prompt |
+| `gpt-5-5.ts` | Shared GPT-5.5/GPT-5.6 model-aware orchestration prompt family |
+| `gpt-6-astra.ts` | Dedicated GPT-6 Astra orchestration prompt |
 | `gpt-task-system-guide.ts` | Tracking-tool guide shared by the GPT-5.5/GPT-5.6 prompt family |
 | `grok-4.ts` | Shared Grok 4.5/4.6 variant: lean, verification-loop-centered, done-contract calibration |
 | `glm-5-2.ts` | GLM-5.2-native variant with explicit failure-mode calibration |
@@ -37,7 +38,8 @@ Model-specific prompt variants for the Sisyphus main orchestrator. Parent `sisyp
 - Kimi K3 -> `kimi-k3.ts`
 - Kimi K2.7 -> `kimi-k2-7.ts`
 - Kimi K2 family -> `kimi-k2-6.ts`
-- Contains "gpt-5.5" or "gpt-5.6" -> shared `gpt-5-5.ts` prompt family with model-aware identity
+- Provider-stripped literal `gpt-6-astra*` -> dedicated `gpt-6-astra.ts` builder, checked first
+- Contains "gpt-5.5" or "gpt-5.6" -> shared `gpt-5-5.ts` implementation family with model-aware identity
 - GPT-5.4+ -> `gpt-5-4.ts`
 - Contains "claude-fable-5" -> `claude-fable-5.ts`
 - Contains "claude-opus-5" -> `claude-opus-5.ts`

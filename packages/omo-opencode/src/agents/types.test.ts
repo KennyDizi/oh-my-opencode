@@ -1,6 +1,7 @@
 import { describe, test, expect } from "bun:test";
 import {
   isGptModel,
+  isGpt6AstraModel,
   isGeminiModel,
   isGlmModel,
   isGptNativeSisyphusModel,
@@ -8,6 +9,22 @@ import {
 } from "./types";
 
 describe("isGptNativeSisyphusModel", () => {
+  test("#given GPT-6 Astra family names #then allows the literal provider-stripped prefix", () => {
+    expect(isGpt6AstraModel("gpt-6-astra")).toBe(true);
+    expect(isGptNativeSisyphusModel("gpt-6-astra")).toBe(true);
+    expect(isGptNativeSisyphusModel("openai/gpt-6-astra-preview")).toBe(true);
+    expect(isGptNativeSisyphusModel("custom/gpt-6-astraturbo")).toBe(true);
+    expect(isGptNativeSisyphusModel("openai/gpt-6-astra-kimi")).toBe(true);
+  });
+
+  test("#given GPT-6 Astra near misses #then rejects non-literal and unrelated names", () => {
+    expect(isGptNativeSisyphusModel("openai/gpt.6-astra")).toBe(false);
+    expect(isGptNativeSisyphusModel("openai/prefix-gpt-6-astra")).toBe(false);
+    expect(isGptNativeSisyphusModel("openai/gpt-6-astr")).toBe(false);
+    expect(isGptNativeSisyphusModel("openai/gpt-6")).toBe(false);
+    expect(isGptNativeSisyphusModel("gpt-6-astra/other-model")).toBe(false);
+  });
+
   test("allows GPT-5.x where x >= 4", () => {
     expect(isGptNativeSisyphusModel("openai/gpt-5.4")).toBe(true);
     expect(isGptNativeSisyphusModel("openai/gpt-5-4")).toBe(true);

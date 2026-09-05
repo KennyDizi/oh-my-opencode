@@ -80,6 +80,35 @@ describe("lowerReasoningForModel", () => {
     expect(result).toEqual({ reasoningEffort: "high" })
   })
 
+  test.each(["low", "medium", "high", "xhigh", "max"] as const)(
+    "lowers GPT-6 Astra %s through direct reasoning effort when variants are not advertised",
+    (reasoning) => {
+      // given
+      const model = { providerID: "openai", modelID: "gpt-6-astra-preview" }
+
+      // when
+      const result = lowerReasoningForModel(reasoning, model)
+
+      // then
+      expect(result).toEqual({ reasoningEffort: reasoning })
+    },
+  )
+
+  test("prefers an advertised GPT-6 Astra runtime variant over direct reasoning effort", () => {
+    // given
+    const model = {
+      providerID: "openai",
+      modelID: "gpt-6-astra-preview",
+      runtimeModel: { variants: { max: {} } },
+    }
+
+    // when
+    const result = lowerReasoningForModel("max", model)
+
+    // then
+    expect(result).toEqual({ variant: "max" })
+  })
+
   test("maps off to OpenCode's native none effort", () => {
     // given
     const model = { providerID: "test-provider", modelID: "test-model" }

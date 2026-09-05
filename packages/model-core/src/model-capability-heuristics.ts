@@ -1,8 +1,10 @@
 import { normalizeModelID } from "./model-normalization"
+import { isGpt6AstraModel } from "./model-family-detectors"
 import { parseVariantFromModelID } from "./model-string-parser"
 
 export type HeuristicModelFamilyDefinition = {
   family: string
+  matchesRawModelID?: (modelID: string) => boolean
   includes?: string[]
   pattern?: RegExp
   variants?: string[]
@@ -13,6 +15,11 @@ export type HeuristicModelFamilyDefinition = {
 }
 
 export const HEURISTIC_MODEL_FAMILY_REGISTRY: ReadonlyArray<HeuristicModelFamilyDefinition> = [
+  {
+    family: "gpt-6-astra",
+    matchesRawModelID: isGpt6AstraModel,
+    reasoningEfforts: ["low", "medium", "high", "xhigh", "max"],
+  },
   {
     family: "claude-opus",
     pattern: /claude(?:-\d+(?:-\d+)*)?-opus/,
@@ -127,6 +134,10 @@ export function detectHeuristicModelFamily(modelID: string): HeuristicModelFamil
   const normalizedModelID = normalizeModelID(parsedModel.modelID).toLowerCase()
 
   for (const definition of HEURISTIC_MODEL_FAMILY_REGISTRY) {
+    if (definition.matchesRawModelID?.(parsedModel.modelID)) {
+      return definition
+    }
+
     if (definition.pattern?.test(normalizedModelID)) {
       return definition
     }

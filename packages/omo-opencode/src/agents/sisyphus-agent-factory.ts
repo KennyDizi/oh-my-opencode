@@ -19,6 +19,7 @@ import { buildClaudeOpus5SisyphusPrompt } from "./sisyphus/claude-opus-5";
 import { buildGlm52SisyphusPrompt } from "./sisyphus/glm-5-2";
 import { buildGpt54SisyphusPrompt } from "./sisyphus/gpt-5-4";
 import { buildGpt55SisyphusPrompt } from "./sisyphus/gpt-5-5";
+import { buildGpt6AstraSisyphusPrompt } from "./sisyphus/gpt-6-astra";
 import { buildGrok4SisyphusPrompt } from "./sisyphus/grok-4";
 import { buildKimiK26SisyphusPrompt } from "./sisyphus/kimi-k2-6";
 import { buildKimiK27SisyphusPrompt } from "./sisyphus/kimi-k2-7";
@@ -32,6 +33,7 @@ import {
   isGlmModel,
   isGpt5_5Model,
   isGpt5_6Model,
+  isGpt6AstraModel,
   isGptModel,
   isGptNativeSisyphusModel,
   isGrok45Model,
@@ -54,6 +56,7 @@ export type SisyphusPromptFamily =
   | "kimi-k3"
   | "kimi-k2-7"
   | "kimi-k2-6"
+  | "gpt-6-astra"
   | "gpt-5-5"
   | "gpt-5-4"
   | "claude-fable-5"
@@ -65,6 +68,7 @@ export type SisyphusPromptFamily =
   | "fallback";
 
 export function resolveSisyphusPromptFamily(model: string): SisyphusPromptFamily {
+  if (isGpt6AstraModel(model)) return "gpt-6-astra";
   if (isKimiK3Model(model)) return "kimi-k3";
   if (isKimiK27Model(model)) return "kimi-k2-7";
   if (isKimiK2Model(model)) return "kimi-k2-6";
@@ -110,6 +114,12 @@ export function createSisyphusAgent(
         MODE,
         model,
         buildKimiK26SisyphusPrompt(model, agents, tools, skills, categories, useTaskSystem),
+      );
+    case "gpt-6-astra":
+      return buildGptSisyphusAgentConfig(
+        MODE,
+        model,
+        buildGpt6AstraSisyphusPrompt(model, agents, tools, skills, categories, useTaskSystem),
       );
     case "gpt-5-5":
       return buildGptSisyphusAgentConfig(

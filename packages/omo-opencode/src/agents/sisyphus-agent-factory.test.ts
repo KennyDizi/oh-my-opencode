@@ -1,5 +1,15 @@
 import { describe, expect, test } from "bun:test";
+import {
+  categorizeTools,
+  type AvailableAgent,
+  type AvailableCategory,
+  type AvailableSkill,
+} from "./dynamic-agent-prompt-builder";
 import { createSisyphusAgent } from "./sisyphus";
+import {
+  buildGpt55SisyphusPrompt,
+  buildGpt6AstraSisyphusPrompt,
+} from "./sisyphus/index";
 import {
   resolveSisyphusPromptFamily,
   type SisyphusPromptFamily,
@@ -35,6 +45,32 @@ describe("createSisyphusAgent", () => {
   });
 
   describe("#given routed native prompt models", () => {
+    test("#given GPT-6 Astra family names #then routes them to the GPT-6 Astra family", () => {
+      // given
+      const models = [
+        "gpt-6-astra",
+        "openai/gpt-6-astra-preview",
+        "custom/gpt-6-astraturbo",
+        "openai/gpt-6-astra-kimi",
+      ];
+
+      // when / then
+      expect(models.map(resolveSisyphusPromptFamily)).toEqual([
+        "gpt-6-astra",
+        "gpt-6-astra",
+        "gpt-6-astra",
+        "gpt-6-astra",
+      ]);
+    });
+
+    test("#given GPT-6 Astra near misses #then keeps them on the fallback family", () => {
+      // given
+      const models = ["openai/gpt.6-astra", "openai/prefix-gpt-6-astra", "openai/gpt-6"];
+
+      // when / then
+      expect(models.map(resolveSisyphusPromptFamily)).toEqual(["fallback", "fallback", "fallback"]);
+    });
+
     test("#when resolving prompt families #then maps each model id to the routed family", () => {
       // given - aliases that intentionally share a family are represented explicitly
       const cases: Array<[model: string, family: SisyphusPromptFamily]> = [
@@ -81,6 +117,81 @@ describe("createSisyphusAgent", () => {
   });
 
   describe("#given GPT-family Sisyphus models", () => {
+    test("#given a selected GPT-6 Astra model #then preserves its id and GPT defaults", () => {
+      // given
+      const model = "openai/gpt-6-astra-kimi";
+
+      // when
+      const agent = createSisyphusAgent(model);
+
+      // then
+      expect(agent.model).toBe(model);
+      expect(agent.reasoningEffort).toBe("medium");
+      expect(agent.thinking).toBeUndefined();
+    });
+
+    test("#given dynamic Astra inputs #when creating the agent #then dispatches exactly to its dedicated builder", () => {
+      // given
+      const model = "openai/gpt-6-astra-kimi";
+      const availableAgents: AvailableAgent[] = [
+        {
+          name: "oracle",
+          description: "Architecture advisor",
+          metadata: {
+            category: "advisor",
+            cost: "EXPENSIVE",
+            triggers: [{ domain: "Architecture", trigger: "Cross-system decision" }],
+          },
+        },
+      ];
+      const availableToolNames = ["lsp_diagnostics", "task_create"];
+      const availableSkills: AvailableSkill[] = [
+        {
+          name: "programming",
+          description: "TypeScript implementation guidance",
+          location: "plugin",
+        },
+      ];
+      const availableCategories: AvailableCategory[] = [
+        {
+          name: "deep",
+          description: "Complex implementation work",
+          model,
+        },
+      ];
+      const useTaskSystem = true;
+
+      // when
+      const agent = createSisyphusAgent(
+        model,
+        availableAgents,
+        availableToolNames,
+        availableSkills,
+        availableCategories,
+        useTaskSystem,
+      );
+      const astraPrompt = buildGpt6AstraSisyphusPrompt(
+        model,
+        availableAgents,
+        categorizeTools(availableToolNames),
+        availableSkills,
+        availableCategories,
+        useTaskSystem,
+      );
+      const gpt55Prompt = buildGpt55SisyphusPrompt(
+        model,
+        availableAgents,
+        categorizeTools(availableToolNames),
+        availableSkills,
+        availableCategories,
+        useTaskSystem,
+      );
+
+      // then
+      expect(agent.prompt).toBe(astraPrompt);
+      expect(agent.prompt).not.toBe(gpt55Prompt);
+    });
+
     test("#when creating agents #then preserves reasoning and leaves apply_patch available", () => {
       // given
       const models = ["openai/gpt-5.5", "openai/gpt-5.4"];

@@ -2,7 +2,7 @@
 
 import { describe, expect, spyOn, test } from "bun:test"
 import type { PluginInput } from "@opencode-ai/plugin"
-import { _resetForTesting, updateSessionAgent } from "../../features/claude-code-session-state"
+import { _resetForTesting, getSessionAgent, updateSessionAgent } from "../../features/claude-code-session-state"
 import { getAgentDisplayName } from "../../shared/agent-display-names"
 import { createNoSisyphusGptHook } from "./index"
 import { unsafeTestValue } from "../../../../../test-support/unsafe-test-value"
@@ -158,6 +158,77 @@ describe("no-sisyphus-gpt hook", () => {
     expect(showToast).toHaveBeenCalledTimes(0)
     expect(output.message.agent).toBeUndefined()
     expect(output.message.variant).toBe("high")
+  })
+
+  test("keeps explicit Sisyphus selection and variant for GPT-6 Astra without mutating session state", async () => {
+    // given
+    _resetForTesting()
+    updateSessionAgent("ses_astra_explicit", "atlas")
+    const showToast = spyOn({ fn: async () => ({}) }, "fn")
+    const hook = createNoSisyphusGptHook(createHookContext(showToast))
+    const input = {
+      sessionID: "ses_astra_explicit",
+      agent: SISYPHUS_DISPLAY,
+      model: { providerID: "openai", modelID: "gpt-6-astra-preview" },
+    }
+    const output: HookOutput = { message: { variant: "xhigh" }, parts: [] }
+
+    // when
+    await hook["chat.message"]?.(input, output)
+
+    // then
+    expect(showToast).toHaveBeenCalledTimes(0)
+    expect(input.agent).toBe(SISYPHUS_DISPLAY)
+    expect(output.message.agent).toBeUndefined()
+    expect(output.message.variant).toBe("xhigh")
+    expect(getSessionAgent("ses_astra_explicit")).toBe("atlas")
+  })
+
+  test("keeps session-derived Sisyphus selection for GPT-6 Astra without fabricating a variant", async () => {
+    // given
+    _resetForTesting()
+    updateSessionAgent("ses_astra_session", SISYPHUS_DISPLAY)
+    const showToast = spyOn({ fn: async () => ({}) }, "fn")
+    const hook = createNoSisyphusGptHook(createHookContext(showToast))
+    const input = {
+      sessionID: "ses_astra_session",
+      agent: undefined,
+      model: { providerID: "openai", modelID: "gpt-6-astraturbo" },
+    }
+    const output = createOutput()
+
+    // when
+    await hook["chat.message"]?.(input, output)
+
+    // then
+    expect(showToast).toHaveBeenCalledTimes(0)
+    expect(input.agent).toBeUndefined()
+    expect(output.message.agent).toBeUndefined()
+    expect(output.message.variant).toBeUndefined()
+    expect(getSessionAgent("ses_astra_session")).toBe(SISYPHUS_DISPLAY)
+  })
+
+  test("redirects an unrelated GPT-6 model from Sisyphus to Hephaestus", async () => {
+    // given
+    _resetForTesting()
+    updateSessionAgent("ses_gpt6_unrelated", SISYPHUS_DISPLAY)
+    const showToast = spyOn({ fn: async () => ({}) }, "fn")
+    const hook = createNoSisyphusGptHook(createHookContext(showToast))
+    const input = {
+      sessionID: "ses_gpt6_unrelated",
+      agent: SISYPHUS_DISPLAY,
+      model: { providerID: "openai", modelID: "gpt-6-orion" },
+    }
+    const output = createOutput()
+
+    // when
+    await hook["chat.message"]?.(input, output)
+
+    // then
+    expect(showToast).toHaveBeenCalledTimes(1)
+    expect(input.agent).toBe("hephaestus")
+    expect(output.message.agent).toBe("hephaestus")
+    expect(getSessionAgent("ses_gpt6_unrelated")).toBe("hephaestus")
   })
 
   test("does not show toast for non-gpt model", async () => {

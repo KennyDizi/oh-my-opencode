@@ -9,6 +9,7 @@ import {
   isClaudeOpus5Model,
   isGeminiModel,
   isGlmModel,
+  isGpt6AstraModel,
   isGptModel,
   isGrok45Model,
   isGrok46Model,
@@ -25,6 +26,37 @@ describe("model family detectors", () => {
     expect(isGptModel("openai/o3-mini")).toBe(false)
     expect(isGptModel("anthropic/claude-opus-4-7")).toBe(false)
   })
+
+  test.each([
+    "gpt-6-astra",
+    "openai/gpt-6-astra",
+    "OPENAI/GPT-6-ASTRA",
+    "openai/gpt-6-astra-20260905",
+    "openai/gpt-6-astra-preview",
+    "gpt-6-astrafast",
+    "openai/gpt-6-astra-claude-opus-5",
+  ])(
+    "#given literal GPT-6 Astra model id %s #when family detection runs #then accepts it",
+    (model) => {
+      expect(isGpt6AstraModel(model)).toBe(true)
+    },
+  )
+
+  test.each([
+    "gpt.6-astra",
+    "gpt-6",
+    "gpt-6-astr",
+    "gpt-6-other",
+    "gpt-6.1-astra",
+    "gpt-60-astra",
+    "prefix-gpt-6-astra",
+    "gpt-6-astra/gpt-5.5",
+  ])(
+    "#given non-Astra model id %s #when family detection runs #then rejects it",
+    (model) => {
+      expect(isGpt6AstraModel(model)).toBe(false)
+    },
+  )
 
   test("#given Gemini model ids #then detects Gemini family only", () => {
     expect(isGeminiModel("google/gemini-3.1-pro")).toBe(true)

@@ -326,6 +326,43 @@ describe("resolveCompatibleModelSettings", () => {
     })
   })
 
+  test("GPT-6 Astra keeps its supported reasoning efforts", () => {
+    for (const reasoningEffort of ["low", "medium", "high", "xhigh", "max"]) {
+      // when
+      const result = resolveCompatibleModelSettings({
+        providerID: "openai",
+        modelID: "openai/gpt-6-astra-preview",
+        desired: { reasoningEffort },
+      })
+
+      // then
+      expect(result.reasoningEffort).toBe(reasoningEffort)
+      expect(result.changes).toEqual([])
+    }
+  })
+
+  test("GPT-6 Astra rejects reasoning efforts outside its supported set", () => {
+    for (const reasoningEffort of ["none", "minimal", "off"]) {
+      // when
+      const result = resolveCompatibleModelSettings({
+        providerID: "openai",
+        modelID: "gpt-6-astra",
+        desired: { reasoningEffort },
+      })
+
+      // then
+      expect(result.reasoningEffort).toBeUndefined()
+      expect(result.changes).toEqual([
+        {
+          field: "reasoningEffort",
+          from: reasoningEffort,
+          to: undefined,
+          reason: "unsupported-by-model-family",
+        },
+      ])
+    }
+  })
+
   test("GitHub Copilot GPT-5 high-tier variants downgrade to high", () => {
     for (const modelID of ["gpt-5.4", "gpt-5.5", "gpt-5.6-sol", "gpt-5.6-terra", "gpt-5.6-luna"]) {
       for (const requested of ["xhigh", "max"]) {

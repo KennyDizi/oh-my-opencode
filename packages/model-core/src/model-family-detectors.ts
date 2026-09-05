@@ -7,6 +7,11 @@ export function isGptModel(model: string): boolean {
   return modelName.includes("gpt")
 }
 
+export function isGpt6AstraModel(model: string): boolean {
+  const modelName = extractModelName(model).toLowerCase()
+  return modelName.startsWith("gpt-6-astra")
+}
+
 export function isClaudeOpus46Model(model: string): boolean {
   const modelName = extractModelName(model).toLowerCase().replaceAll(".", "-")
   return modelName.includes("claude-opus-4-6")
