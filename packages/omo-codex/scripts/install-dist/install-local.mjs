@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// omo-codex-install:80e794a7ee4705f54dc0c24f45fba696230284b0708f25cc7cb6351c4fc9efcb:2ced66e414b41bd79dd734f0499f87e753723148e081a20543034065529dad8e
+// omo-codex-install:80e794a7ee4705f54dc0c24f45fba696230284b0708f25cc7cb6351c4fc9efcb:1a8e94f3b60737edcc0ecc7721997532ea1adf414bf9d99afcac2e0e8f2dbf98
 var __defProp = Object.defineProperty;
 var __returnValue = (v) => v;
 function __exportSetter(name, newValue) {
@@ -362,7 +362,7 @@ var init_env = __esm(() => {
   SEND_OPT_OUT_VALUES = ["0", "false", "no", "yes"];
 });
 
-// node_modules/.bun/posthog-node@5.51.4/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/module.node.mjs
+// node_modules/.bun/posthog-node@5.51.6/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/module.node.mjs
 import { dirname as dirname10, posix as posix2, sep as sep7 } from "node:path";
 function createModulerModifier() {
   const getModuleFromFileName = createGetModuleFromFilename();
@@ -399,520 +399,7 @@ function normalizeWindowsPath(path2) {
 }
 var init_module_node = () => {};
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/featureFlagUtils.mjs
-function getFlagDetailFromFlagAndPayload(key, value, payload) {
-  return {
-    key,
-    enabled: typeof value == "string" ? true : value,
-    variant: typeof value == "string" ? value : undefined,
-    reason: undefined,
-    metadata: {
-      id: undefined,
-      version: undefined,
-      payload: payload ? JSON.stringify(payload) : undefined,
-      description: undefined
-    }
-  };
-}
-var normalizeFlagsResponse = (flagsResponse) => {
-  if ("flags" in flagsResponse) {
-    const featureFlags = getFlagValuesFromFlags(flagsResponse.flags);
-    const featureFlagPayloads = getPayloadsFromFlags(flagsResponse.flags);
-    return {
-      ...flagsResponse,
-      featureFlags,
-      featureFlagPayloads
-    };
-  }
-  {
-    const featureFlags = flagsResponse.featureFlags ?? {};
-    const featureFlagPayloads = Object.fromEntries(Object.entries(flagsResponse.featureFlagPayloads || {}).map(([k, v]) => [
-      k,
-      parsePayload(v)
-    ]));
-    const flags = Object.fromEntries(Object.entries(featureFlags).map(([key, value]) => [
-      key,
-      getFlagDetailFromFlagAndPayload(key, value, featureFlagPayloads[key])
-    ]));
-    return {
-      ...flagsResponse,
-      featureFlags,
-      featureFlagPayloads,
-      flags
-    };
-  }
-}, getFlagValuesFromFlags = (flags) => Object.fromEntries(Object.entries(flags ?? {}).map(([key, detail]) => [
-  key,
-  getFeatureFlagValue(detail)
-]).filter(([, value]) => value !== undefined)), getPayloadsFromFlags = (flags) => {
-  const safeFlags = flags ?? {};
-  return Object.fromEntries(Object.keys(safeFlags).filter((flag) => {
-    const details = safeFlags[flag];
-    return details.enabled && details.metadata && details.metadata.payload !== undefined;
-  }).map((flag) => {
-    const payload = safeFlags[flag].metadata?.payload;
-    return [
-      flag,
-      payload ? parsePayload(payload) : undefined
-    ];
-  }));
-}, getFeatureFlagValue = (detail) => detail === undefined ? undefined : detail.variant ?? detail.enabled, parsePayload = (response) => {
-  if (typeof response != "string")
-    return response;
-  try {
-    return JSON.parse(response);
-  } catch {
-    return response;
-  }
-}, MINIMAL_FLAG_CALLED_EVENT_CAMPAIGN_PROPERTIES, MINIMAL_FLAG_CALLED_EVENT_PROPERTIES, minimizeFlagCalledEventProperties = (properties, transportKeys = []) => {
-  const minimal = {};
-  const copyKey = (key) => {
-    if (properties[key] !== undefined)
-      minimal[key] = properties[key];
-  };
-  MINIMAL_FLAG_CALLED_EVENT_PROPERTIES.forEach(copyKey);
-  transportKeys.forEach(copyKey);
-  return minimal;
-};
-var init_featureFlagUtils = __esm(() => {
-  MINIMAL_FLAG_CALLED_EVENT_CAMPAIGN_PROPERTIES = [
-    "utm_source",
-    "utm_medium",
-    "utm_campaign",
-    "utm_content",
-    "utm_term",
-    "gad_source",
-    "mc_cid",
-    "gclid",
-    "gclsrc",
-    "dclid",
-    "gbraid",
-    "wbraid",
-    "fbclid",
-    "msclkid",
-    "twclid",
-    "li_fat_id",
-    "igshid",
-    "ttclid",
-    "rdt_cid",
-    "epik",
-    "qclid",
-    "sccid",
-    "irclid",
-    "_kx"
-  ];
-  MINIMAL_FLAG_CALLED_EVENT_PROPERTIES = [
-    "$feature_flag",
-    "$feature_flag_response",
-    "$feature_flag_has_experiment",
-    "$feature_flag_id",
-    "$feature_flag_version",
-    "$feature_flag_reason",
-    "$feature_flag_request_id",
-    "$feature_flag_evaluated_at",
-    "$feature_flag_error",
-    "locally_evaluated",
-    "$groups",
-    "$process_person_profile",
-    "$geoip_disable",
-    "$current_url",
-    "$pathname",
-    "$referring_domain",
-    ...MINIMAL_FLAG_CALLED_EVENT_CAMPAIGN_PROPERTIES,
-    "$session_id",
-    "$window_id",
-    "$lib",
-    "$lib_version",
-    "$device_id",
-    "$is_server"
-  ];
-});
-
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/featureFlagLocalEvaluation.mjs
-function isValidRegex(regex) {
-  try {
-    new RegExp(regex);
-    return true;
-  } catch {
-    return false;
-  }
-}
-function parseSemverNumericIdentifier(part, raw, parsingPolicy) {
-  if (!/^\d+$/.test(part) || parsingPolicy === "strict" && part.length > 1 && part[0] === "0")
-    throw new InconclusiveMatchError(`Invalid semver: ${raw}`);
-  return parseInt(part, 10);
-}
-function parseFeatureFlagSemver(value, parsingPolicy = "strict") {
-  const text = String(value).trim().replace(/^[vV]/, "");
-  const baseVersion = text.split("-")[0].split("+")[0];
-  if (!baseVersion || baseVersion.startsWith("."))
-    throw new InconclusiveMatchError(`Invalid semver: ${value}`);
-  const parts = baseVersion.split(".");
-  const parsePart = (part) => {
-    if (part === undefined || part === "")
-      return 0;
-    return parseSemverNumericIdentifier(part, value, parsingPolicy);
-  };
-  return [
-    parsePart(parts[0]),
-    parsePart(parts[1]),
-    parsePart(parts[2])
-  ];
-}
-function compareSemverTuples(a, b) {
-  for (let i = 0;i < 3; i++) {
-    if (a[i] < b[i])
-      return -1;
-    if (a[i] > b[i])
-      return 1;
-  }
-  return 0;
-}
-function computeTildeBounds(value, parsingPolicy) {
-  const parsed = parseFeatureFlagSemver(value, parsingPolicy);
-  return {
-    lower: [
-      parsed[0],
-      parsed[1],
-      parsed[2]
-    ],
-    upper: [
-      parsed[0],
-      parsed[1] + 1,
-      0
-    ]
-  };
-}
-function computeCaretBounds(value, parsingPolicy) {
-  const [major, minor, patch] = parseFeatureFlagSemver(value, parsingPolicy);
-  const lower = [
-    major,
-    minor,
-    patch
-  ];
-  let upper;
-  upper = major > 0 ? [
-    major + 1,
-    0,
-    0
-  ] : minor > 0 ? [
-    0,
-    minor + 1,
-    0
-  ] : [
-    0,
-    0,
-    patch + 1
-  ];
-  return {
-    lower,
-    upper
-  };
-}
-function computeWildcardBounds(value, parsingPolicy) {
-  const text = String(value).trim().replace(/^[vV]/, "");
-  const cleanedText = text.replace(/\.\*$/, "").replace(/\*$/, "");
-  if (!cleanedText)
-    throw new InconclusiveMatchError(`Invalid wildcard semver: ${value}`);
-  const parts = cleanedText.split(".");
-  const parseWildcardPart = (part) => {
-    if (parsingPolicy === "legacy-permissive") {
-      const parsed = parseInt(part, 10);
-      if (!isNaN(parsed))
-        return parsed;
-    } else
-      try {
-        return parseSemverNumericIdentifier(part, value, parsingPolicy);
-      } catch {}
-    throw new InconclusiveMatchError(`Invalid wildcard semver: ${value}`);
-  };
-  const major = parseWildcardPart(parts[0]);
-  if (parts.length === 1)
-    return {
-      lower: [
-        major,
-        0,
-        0
-      ],
-      upper: [
-        major + 1,
-        0,
-        0
-      ]
-    };
-  const minor = parseWildcardPart(parts[1]);
-  return {
-    lower: [
-      major,
-      minor,
-      0
-    ],
-    upper: [
-      major,
-      minor + 1,
-      0
-    ]
-  };
-}
-function convertToDateTime(value) {
-  if (value instanceof Date)
-    return value;
-  if (typeof value == "string" || typeof value == "number") {
-    const date = new Date(value);
-    if (!isNaN(date.valueOf()))
-      return date;
-    throw new InconclusiveMatchError(`${value} is in an invalid date format`);
-  }
-  throw new InconclusiveMatchError(`The date provided ${value} must be a string, number, or date object`);
-}
-function relativeDateParseForFeatureFlagMatching(value) {
-  const regex = /^-?(?<number>[0-9]+)(?<interval>[a-z])$/;
-  const match = value.match(regex);
-  const parsedDt = new Date(new Date().toISOString());
-  if (!match || !match.groups)
-    return null;
-  const number = parseInt(match.groups["number"]);
-  if (number >= 1e4)
-    return null;
-  const interval = match.groups["interval"];
-  if (interval === "h")
-    parsedDt.setUTCHours(parsedDt.getUTCHours() - number);
-  else if (interval === "d")
-    parsedDt.setUTCDate(parsedDt.getUTCDate() - number);
-  else if (interval === "w")
-    parsedDt.setUTCDate(parsedDt.getUTCDate() - 7 * number);
-  else if (interval === "m")
-    parsedDt.setUTCMonth(parsedDt.getUTCMonth() - number);
-  else {
-    if (interval !== "y")
-      return null;
-    parsedDt.setUTCFullYear(parsedDt.getUTCFullYear() - number);
-  }
-  return parsedDt;
-}
-function matchFeatureFlagProperty(property, propertyValues, options = {}) {
-  const key = property.key;
-  const value = property.value;
-  const operator = property.operator || "exact";
-  const parsingPolicy = options.semverParsingPolicy ?? "strict";
-  const hasProperty = Object.prototype.hasOwnProperty.call(propertyValues, key);
-  if (hasProperty) {
-    if (operator === "is_not_set")
-      return false;
-  } else
-    throw new InconclusiveMatchError(`Property ${key} not found in propertyValues`);
-  const overrideValue = propertyValues[key];
-  if (overrideValue == null && !NULL_VALUES_ALLOWED_OPERATORS.includes(operator)) {
-    options.warnFunction?.(`Property ${key} cannot have a value of null/undefined with the ${operator} operator`);
-    return false;
-  }
-  const computeExactMatch = (target, actual) => {
-    if (Array.isArray(target))
-      return target.map((item) => String(item).toLowerCase()).includes(String(actual).toLowerCase());
-    return String(target).toLowerCase() === String(actual).toLowerCase();
-  };
-  const compare = (lhs, rhs, comparisonOperator) => {
-    if (comparisonOperator === "gt")
-      return lhs > rhs;
-    if (comparisonOperator === "gte")
-      return lhs >= rhs;
-    if (comparisonOperator === "lt")
-      return lhs < rhs;
-    if (comparisonOperator === "lte")
-      return lhs <= rhs;
-    throw new Error(`Invalid operator: ${comparisonOperator}`);
-  };
-  switch (operator) {
-    case "exact":
-      return computeExactMatch(value, overrideValue);
-    case "is_not":
-      return !computeExactMatch(value, overrideValue);
-    case "is_set":
-      return true;
-    case "icontains":
-      return String(overrideValue).toLowerCase().includes(String(value).toLowerCase());
-    case "not_icontains":
-      return !String(overrideValue).toLowerCase().includes(String(value).toLowerCase());
-    case "starts_with":
-      return String(overrideValue).toLowerCase().startsWith(String(value).toLowerCase());
-    case "not_starts_with":
-      return !String(overrideValue).toLowerCase().startsWith(String(value).toLowerCase());
-    case "ends_with":
-      return String(overrideValue).toLowerCase().endsWith(String(value).toLowerCase());
-    case "not_ends_with":
-      return !String(overrideValue).toLowerCase().endsWith(String(value).toLowerCase());
-    case "regex":
-      return isValidRegex(String(value)) && String(overrideValue).match(String(value)) !== null;
-    case "not_regex":
-      return isValidRegex(String(value)) && String(overrideValue).match(String(value)) === null;
-    case "gt":
-    case "gte":
-    case "lt":
-    case "lte": {
-      const parsedValue = typeof value == "number" ? value : parseFloat(String(value));
-      const parsedOverride = typeof overrideValue == "number" ? overrideValue : overrideValue != null ? parseFloat(String(overrideValue)) : NaN;
-      if (Number.isFinite(parsedValue) && Number.isFinite(parsedOverride))
-        return compare(parsedOverride, parsedValue, operator);
-      return compare(String(overrideValue), String(value), operator);
-    }
-    case "is_date_after":
-    case "is_date_before": {
-      if (typeof value == "boolean")
-        throw new InconclusiveMatchError("Date operations cannot be performed on boolean values");
-      let parsedDate = relativeDateParseForFeatureFlagMatching(String(value));
-      if (parsedDate == null)
-        parsedDate = convertToDateTime(value);
-      const overrideDate = convertToDateTime(overrideValue);
-      return operator === "is_date_before" ? overrideDate < parsedDate : overrideDate > parsedDate;
-    }
-    case "semver_eq":
-      return compareSemverTuples(parseFeatureFlagSemver(String(overrideValue), parsingPolicy), parseFeatureFlagSemver(String(value), parsingPolicy)) === 0;
-    case "semver_neq":
-      return compareSemverTuples(parseFeatureFlagSemver(String(overrideValue), parsingPolicy), parseFeatureFlagSemver(String(value), parsingPolicy)) !== 0;
-    case "semver_gt":
-      return compareSemverTuples(parseFeatureFlagSemver(String(overrideValue), parsingPolicy), parseFeatureFlagSemver(String(value), parsingPolicy)) > 0;
-    case "semver_gte":
-      return compareSemverTuples(parseFeatureFlagSemver(String(overrideValue), parsingPolicy), parseFeatureFlagSemver(String(value), parsingPolicy)) >= 0;
-    case "semver_lt":
-      return compareSemverTuples(parseFeatureFlagSemver(String(overrideValue), parsingPolicy), parseFeatureFlagSemver(String(value), parsingPolicy)) < 0;
-    case "semver_lte":
-      return compareSemverTuples(parseFeatureFlagSemver(String(overrideValue), parsingPolicy), parseFeatureFlagSemver(String(value), parsingPolicy)) <= 0;
-    case "semver_tilde": {
-      const overrideParsed = parseFeatureFlagSemver(String(overrideValue), parsingPolicy);
-      const { lower, upper } = computeTildeBounds(String(value), parsingPolicy);
-      return compareSemverTuples(overrideParsed, lower) >= 0 && compareSemverTuples(overrideParsed, upper) < 0;
-    }
-    case "semver_caret": {
-      const overrideParsed = parseFeatureFlagSemver(String(overrideValue), parsingPolicy);
-      const { lower, upper } = computeCaretBounds(String(value), parsingPolicy);
-      return compareSemverTuples(overrideParsed, lower) >= 0 && compareSemverTuples(overrideParsed, upper) < 0;
-    }
-    case "semver_wildcard": {
-      const overrideParsed = parseFeatureFlagSemver(String(overrideValue), parsingPolicy);
-      const { lower, upper } = computeWildcardBounds(String(value), parsingPolicy);
-      return compareSemverTuples(overrideParsed, lower) >= 0 && compareSemverTuples(overrideParsed, upper) < 0;
-    }
-    default:
-      throw new InconclusiveMatchError(`Unknown operator: ${operator}`);
-  }
-}
-async function hashSHA1(text) {
-  const subtle = globalThis.crypto?.subtle;
-  if (!subtle)
-    throw new Error("SubtleCrypto API not available");
-  const hashBuffer = await subtle.digest("SHA-1", new TextEncoder().encode(text));
-  return Array.from(new Uint8Array(hashBuffer)).map((byte) => byte.toString(16).padStart(2, "0")).join("");
-}
-async function getFeatureFlagHash(key, bucketingValue, salt = "") {
-  const hashString = await hashSHA1(`${key}.${bucketingValue}${salt}`);
-  return parseInt(hashString.slice(0, 15), 16) / LONG_SCALE;
-}
-function getFeatureFlagVariantLookupTable(variants) {
-  const table = [];
-  let valueMin = 0;
-  for (const variant of variants) {
-    const valueMax = valueMin + variant.rollout_percentage / 100;
-    table.push({
-      valueMin,
-      valueMax,
-      key: variant.key
-    });
-    valueMin = valueMax;
-  }
-  return table;
-}
-async function getFeatureFlagVariant(key, bucketingValue, variants) {
-  const hashValue = await getFeatureFlagHash(key, bucketingValue, "variant");
-  return getFeatureFlagVariantLookupTable(variants).find((variant) => hashValue >= variant.valueMin && hashValue < variant.valueMax)?.key;
-}
-function resolveFeatureFlagPayload(payloads, flagValue) {
-  if (flagValue === false || flagValue == null || !payloads)
-    return null;
-  const payloadKey = typeof flagValue == "boolean" ? flagValue.toString() : flagValue;
-  const payload = payloads[payloadKey] || null;
-  return payload == null ? null : parsePayload(payload);
-}
-var NULL_VALUES_ALLOWED_OPERATORS, LONG_SCALE = 1152921504606847000, InconclusiveMatchError;
-var init_featureFlagLocalEvaluation = __esm(() => {
-  init_featureFlagUtils();
-  NULL_VALUES_ALLOWED_OPERATORS = [
-    "is_not",
-    "is_set"
-  ];
-  InconclusiveMatchError = class InconclusiveMatchError extends Error {
-    constructor(message) {
-      super(message);
-      this.name = this.constructor.name;
-      Object.setPrototypeOf(this, InconclusiveMatchError.prototype);
-    }
-  };
-});
-
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/types.mjs
-var types_PostHogPersistedProperty;
-var init_types = __esm(() => {
-  types_PostHogPersistedProperty = /* @__PURE__ */ function(PostHogPersistedProperty) {
-    PostHogPersistedProperty["AnonymousId"] = "anonymous_id";
-    PostHogPersistedProperty["DistinctId"] = "distinct_id";
-    PostHogPersistedProperty["Props"] = "props";
-    PostHogPersistedProperty["EnablePersonProcessing"] = "enable_person_processing";
-    PostHogPersistedProperty["PersonMode"] = "person_mode";
-    PostHogPersistedProperty["FeatureFlagDetails"] = "feature_flag_details";
-    PostHogPersistedProperty["FeatureFlags"] = "feature_flags";
-    PostHogPersistedProperty["FeatureFlagPayloads"] = "feature_flag_payloads";
-    PostHogPersistedProperty["BootstrapFeatureFlagDetails"] = "bootstrap_feature_flag_details";
-    PostHogPersistedProperty["BootstrapFeatureFlags"] = "bootstrap_feature_flags";
-    PostHogPersistedProperty["BootstrapFeatureFlagPayloads"] = "bootstrap_feature_flag_payloads";
-    PostHogPersistedProperty["OverrideFeatureFlags"] = "override_feature_flags";
-    PostHogPersistedProperty["Queue"] = "queue";
-    PostHogPersistedProperty["AiQueue"] = "ai_queue";
-    PostHogPersistedProperty["AiCaptureQueue"] = "ai_capture_queue";
-    PostHogPersistedProperty["LogsQueue"] = "logs_queue";
-    PostHogPersistedProperty["OptedOut"] = "opted_out";
-    PostHogPersistedProperty["SessionId"] = "session_id";
-    PostHogPersistedProperty["SessionStartTimestamp"] = "session_start_timestamp";
-    PostHogPersistedProperty["SessionLastTimestamp"] = "session_timestamp";
-    PostHogPersistedProperty["PersonProperties"] = "person_properties";
-    PostHogPersistedProperty["GroupProperties"] = "group_properties";
-    PostHogPersistedProperty["InstalledAppBuild"] = "installed_app_build";
-    PostHogPersistedProperty["InstalledAppVersion"] = "installed_app_version";
-    PostHogPersistedProperty["SessionReplay"] = "session_replay";
-    PostHogPersistedProperty["PushRegistered"] = "push_registered";
-    PostHogPersistedProperty["SessionReplayEventTriggerActivatedSession"] = "session_replay_event_trigger_activated_session";
-    PostHogPersistedProperty["SurveyLastSeenDate"] = "survey_last_seen_date";
-    PostHogPersistedProperty["SurveysSeen"] = "surveys_seen";
-    PostHogPersistedProperty["Surveys"] = "surveys";
-    PostHogPersistedProperty["RemoteConfig"] = "remote_config";
-    PostHogPersistedProperty["FlagsEndpointWasHit"] = "flags_endpoint_was_hit";
-    PostHogPersistedProperty["DeviceId"] = "device_id";
-    return PostHogPersistedProperty;
-  }({});
-});
-
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/utils/json-utils.mjs
-function sanitizeString(value) {
-  let output = "";
-  for (let index = 0;index < value.length; index++) {
-    const codeUnit = value.charCodeAt(index);
-    if (codeUnit >= 55296 && codeUnit <= 56319) {
-      const nextCodeUnit = value.charCodeAt(index + 1);
-      if (nextCodeUnit >= 56320 && nextCodeUnit <= 57343) {
-        output += value[index] + value[index + 1];
-        index++;
-      } else
-        output += "�";
-    } else
-      output += codeUnit >= 56320 && codeUnit <= 57343 ? "�" : value[index];
-  }
-  return output;
-}
-var MAX_JSON_SAFE_VALUE_DEPTH = 20, MAX_JSON_SAFE_VALUE_ITEMS = 1000, MAX_JSON_SAFE_VALUE_NODES = 1e4, CIRCULAR_VALUE = "[Circular]", TRUNCATED_VALUE = "[Truncated]", UNSERIALIZABLE_VALUE = "[Unserializable]", FUNCTION_VALUE = "[Function]", dateGetTime, dateToISOString;
-var init_json_utils = __esm(() => {
-  dateGetTime = Date.prototype.getTime;
-  dateToISOString = Date.prototype.toISOString;
-});
-
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/utils/bot-detection.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/utils/bot-detection.mjs
 var DEFAULT_BLOCKED_UA_STRS, isBlockedUA = function(ua, customBlockedUserAgents = []) {
   if (!ua)
     return false;
@@ -1004,7 +491,7 @@ var init_bot_detection = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/utils/string-utils.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/utils/string-utils.mjs
 function safeJsonStringify(value) {
   const ancestors = [];
   return JSON.stringify(value, function(_key, replacementValue) {
@@ -1030,12 +517,53 @@ function safeJsonStringify(value) {
 }
 var init_string_utils = () => {};
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/utils/browser-utils.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/utils/browser-utils.mjs
 var init_browser_utils = __esm(() => {
   init_string_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/utils/type-utils.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/types.mjs
+var types_PostHogPersistedProperty;
+var init_types = __esm(() => {
+  types_PostHogPersistedProperty = /* @__PURE__ */ function(PostHogPersistedProperty) {
+    PostHogPersistedProperty["AnonymousId"] = "anonymous_id";
+    PostHogPersistedProperty["DistinctId"] = "distinct_id";
+    PostHogPersistedProperty["Props"] = "props";
+    PostHogPersistedProperty["EnablePersonProcessing"] = "enable_person_processing";
+    PostHogPersistedProperty["PersonMode"] = "person_mode";
+    PostHogPersistedProperty["FeatureFlagDetails"] = "feature_flag_details";
+    PostHogPersistedProperty["FeatureFlags"] = "feature_flags";
+    PostHogPersistedProperty["FeatureFlagPayloads"] = "feature_flag_payloads";
+    PostHogPersistedProperty["BootstrapFeatureFlagDetails"] = "bootstrap_feature_flag_details";
+    PostHogPersistedProperty["BootstrapFeatureFlags"] = "bootstrap_feature_flags";
+    PostHogPersistedProperty["BootstrapFeatureFlagPayloads"] = "bootstrap_feature_flag_payloads";
+    PostHogPersistedProperty["OverrideFeatureFlags"] = "override_feature_flags";
+    PostHogPersistedProperty["Queue"] = "queue";
+    PostHogPersistedProperty["AiQueue"] = "ai_queue";
+    PostHogPersistedProperty["AiCaptureQueue"] = "ai_capture_queue";
+    PostHogPersistedProperty["LogsQueue"] = "logs_queue";
+    PostHogPersistedProperty["OptedOut"] = "opted_out";
+    PostHogPersistedProperty["SessionId"] = "session_id";
+    PostHogPersistedProperty["SessionStartTimestamp"] = "session_start_timestamp";
+    PostHogPersistedProperty["SessionLastTimestamp"] = "session_timestamp";
+    PostHogPersistedProperty["PersonProperties"] = "person_properties";
+    PostHogPersistedProperty["GroupProperties"] = "group_properties";
+    PostHogPersistedProperty["InstalledAppBuild"] = "installed_app_build";
+    PostHogPersistedProperty["InstalledAppVersion"] = "installed_app_version";
+    PostHogPersistedProperty["SessionReplay"] = "session_replay";
+    PostHogPersistedProperty["PushRegistered"] = "push_registered";
+    PostHogPersistedProperty["SessionReplayEventTriggerActivatedSession"] = "session_replay_event_trigger_activated_session";
+    PostHogPersistedProperty["SurveyLastSeenDate"] = "survey_last_seen_date";
+    PostHogPersistedProperty["SurveysSeen"] = "surveys_seen";
+    PostHogPersistedProperty["Surveys"] = "surveys";
+    PostHogPersistedProperty["RemoteConfig"] = "remote_config";
+    PostHogPersistedProperty["FlagsEndpointWasHit"] = "flags_endpoint_was_hit";
+    PostHogPersistedProperty["DeviceId"] = "device_id";
+    return PostHogPersistedProperty;
+  }({});
+});
+
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/utils/type-utils.mjs
 function isPrimitive(value) {
   return value === null || typeof value != "object";
 }
@@ -1058,7 +586,7 @@ function isErrorEvent(event) {
   return isBuiltin(event, "ErrorEvent");
 }
 function isEvent(candidate) {
-  return typeof Event != "undefined" && isInstanceOf(candidate, Event);
+  return "u" > typeof Event && isInstanceOf(candidate, Event);
 }
 function isPlainObject(candidate) {
   return isBuiltin(candidate, "Object");
@@ -1083,7 +611,7 @@ var init_type_utils = __esm(() => {
   };
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/utils/number-utils.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/utils/number-utils.mjs
 function clampToRange(value, min, max, logger, fallbackValue) {
   if (min > max) {
     logger.warn("min cannot be greater than max.");
@@ -1100,13 +628,13 @@ function clampToRange(value, min, max, logger, fallbackValue) {
       return min;
     }
   logger.warn(" must be a number. using max or fallback. max: " + max + ", fallback: " + fallbackValue);
-  return clampToRange(fallbackValue || max, min, max, logger);
+  return clampToRange(fallbackValue ?? max, min, max, logger);
 }
 var init_number_utils = __esm(() => {
   init_type_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/utils/bucketed-rate-limiter.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/utils/bucketed-rate-limiter.mjs
 function resolveExceptionRateLimiterConfig(config = {}) {
   return {
     refillRate: config.exceptionRateLimiterRefillRate ?? config.__exceptionRateLimiterRefillRate ?? DEFAULT_EXCEPTION_RATE_LIMITER_REFILL_RATE,
@@ -1160,7 +688,7 @@ var init_bucketed_rate_limiter = __esm(() => {
   init_number_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/vendor/uuidv7.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/vendor/uuidv7.mjs
 class UUID {
   constructor(bytes) {
     this.bytes = bytes;
@@ -1332,10 +860,10 @@ var DIGITS = "0123456789abcdef", getDefaultRandom = () => ({
   nextUint32: () => 65536 * Math.trunc(65536 * Math.random()) + Math.trunc(65536 * Math.random()) >>> 0
 }), defaultGenerator, uuidv7 = () => uuidv7obj().toString(), uuidv7obj = () => (defaultGenerator || (defaultGenerator = new V7Generator)).generate();
 var init_uuidv7 = __esm(() => {
-  /*! For license information please see uuidv7.mjs.LICENSE.txt */
+  /*! LICENSE: uuidv7.mjs.LICENSE.txt */
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/utils/promise-queue.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/utils/promise-queue.mjs
 class PromiseQueue {
   add(promise) {
     const promiseUUID = uuidv7();
@@ -1377,7 +905,7 @@ var init_promise_queue = __esm(() => {
   init_uuidv7();
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/utils/logger.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/utils/logger.mjs
 function createConsole(consoleLike = console) {
   const lockedMethods = {
     log: consoleLike.log.bind(consoleLike),
@@ -1419,8 +947,8 @@ var _createLogger = (prefix, maybeCall, consoleLike) => {
 }, passThrough = (fn) => fn();
 var init_logger = () => {};
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/utils/user-agent-utils.mjs
-var MOBILE = "Mobile", IOS = "iOS", ANDROID = "Android", TABLET = "Tablet", ANDROID_TABLET, APPLE = "Apple", APPLE_WATCH, SAFARI = "Safari", BLACKBERRY = "BlackBerry", SAMSUNG = "Samsung", SAMSUNG_BROWSER, SAMSUNG_INTERNET, CHROME = "Chrome", CHROME_OS, CHROME_IOS, INTERNET_EXPLORER = "Internet Explorer", INTERNET_EXPLORER_MOBILE, OPERA = "Opera", OPERA_MINI, EDGE = "Edge", MICROSOFT_EDGE, FIREFOX = "Firefox", FIREFOX_IOS, NINTENDO = "Nintendo", PLAYSTATION = "PlayStation", XBOX = "Xbox", ANDROID_MOBILE, MOBILE_SAFARI, WINDOWS = "Windows", WINDOWS_PHONE, GENERIC = "Generic", GENERIC_MOBILE, GENERIC_TABLET, KONQUEROR = "Konqueror", OCULUS_BROWSER = "Oculus Browser", VIVALDI = "Vivaldi", YANDEX = "Yandex", WHALE = "Whale", DUCKDUCKGO = "DuckDuckGo", PALE_MOON = "Pale Moon", WATERFOX = "Waterfox", BRAVE = "Brave", GOOGLE_SEARCH_APP = "Google Search App", BROWSER_VERSION_REGEX_SUFFIX = "(\\d+(\\.\\d+)?)", DEFAULT_BROWSER_VERSION_REGEX, XBOX_REGEX, PLAYSTATION_REGEX, NINTENDO_REGEX, BLACKBERRY_REGEX, windowsVersionMap, versionRegexes, osMatchers;
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/utils/user-agent-utils.mjs
+var MOBILE = "Mobile", IOS = "iOS", ANDROID = "Android", TABLET = "Tablet", ANDROID_TABLET, APPLE = "Apple", APPLE_WATCH, SAFARI = "Safari", BLACKBERRY = "BlackBerry", SAMSUNG = "Samsung", SAMSUNG_BROWSER, SAMSUNG_INTERNET, CHROME = "Chrome", CHROME_OS, CHROME_IOS, INTERNET_EXPLORER = "Internet Explorer", INTERNET_EXPLORER_MOBILE, OPERA = "Opera", OPERA_MINI, EDGE = "Edge", MICROSOFT_EDGE, FIREFOX = "Firefox", FIREFOX_IOS, NINTENDO = "Nintendo", PLAYSTATION = "PlayStation", XBOX = "Xbox", ANDROID_MOBILE, MOBILE_SAFARI, WINDOWS = "Windows", WINDOWS_PHONE, GENERIC = "Generic", GENERIC_MOBILE, GENERIC_TABLET, KONQUEROR = "Konqueror", OCULUS_BROWSER = "Oculus Browser", VIVALDI = "Vivaldi", YANDEX = "Yandex", WHALE = "Whale", DUCKDUCKGO = "DuckDuckGo", PALE_MOON = "Pale Moon", WATERFOX = "Waterfox", BRAVE = "Brave", CLAUDE = "Claude", CODEX = "Codex", CHATGPT = "ChatGPT", GOOGLE_SEARCH_APP = "Google Search App", BROWSER_VERSION_REGEX_SUFFIX = "(\\d+(\\.\\d+)?)", DEFAULT_BROWSER_VERSION_REGEX, AI_APP_VERSION_REGEX, XBOX_REGEX, PLAYSTATION_REGEX, NINTENDO_REGEX, BLACKBERRY_REGEX, windowsVersionMap, versionRegexes, osMatchers;
 var init_user_agent_utils = __esm(() => {
   init_string_utils();
   init_type_utils();
@@ -1440,6 +968,7 @@ var init_user_agent_utils = __esm(() => {
   GENERIC_MOBILE = GENERIC + " " + MOBILE.toLowerCase();
   GENERIC_TABLET = GENERIC + " " + TABLET.toLowerCase();
   DEFAULT_BROWSER_VERSION_REGEX = new RegExp("Version/" + BROWSER_VERSION_REGEX_SUFFIX);
+  AI_APP_VERSION_REGEX = new RegExp("(" + CLAUDE + "|" + CODEX + "|" + CHATGPT + ")\\/" + BROWSER_VERSION_REGEX_SUFFIX);
   XBOX_REGEX = new RegExp(XBOX, "i");
   PLAYSTATION_REGEX = new RegExp(PLAYSTATION + " \\w+", "i");
   NINTENDO_REGEX = new RegExp(NINTENDO + " \\w+", "i");
@@ -1515,6 +1044,15 @@ var init_user_agent_utils = __esm(() => {
     ],
     [BRAVE]: [
       new RegExp(BRAVE + "\\/" + BROWSER_VERSION_REGEX_SUFFIX)
+    ],
+    [CLAUDE]: [
+      AI_APP_VERSION_REGEX
+    ],
+    [CODEX]: [
+      AI_APP_VERSION_REGEX
+    ],
+    [CHATGPT]: [
+      AI_APP_VERSION_REGEX
     ],
     [DUCKDUCKGO]: [
       new RegExp("(DuckDuckGo|Ddg)\\/" + BROWSER_VERSION_REGEX_SUFFIX)
@@ -1688,7 +1226,30 @@ var init_user_agent_utils = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/utils/index.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/utils/json-utils.mjs
+function sanitizeString(value) {
+  let output = "";
+  for (let index = 0;index < value.length; index++) {
+    const codeUnit = value.charCodeAt(index);
+    if (codeUnit >= 55296 && codeUnit <= 56319) {
+      const nextCodeUnit = value.charCodeAt(index + 1);
+      if (nextCodeUnit >= 56320 && nextCodeUnit <= 57343) {
+        output += value[index] + value[index + 1];
+        index++;
+      } else
+        output += "�";
+    } else
+      output += codeUnit >= 56320 && codeUnit <= 57343 ? "�" : value[index];
+  }
+  return output;
+}
+var MAX_JSON_SAFE_VALUE_DEPTH = 20, MAX_JSON_SAFE_VALUE_ITEMS = 1000, MAX_JSON_SAFE_VALUE_NODES = 1e4, CIRCULAR_VALUE = "[Circular]", TRUNCATED_VALUE = "[Truncated]", UNSERIALIZABLE_VALUE = "[Unserializable]", FUNCTION_VALUE = "[Function]", dateGetTime, dateToISOString;
+var init_json_utils = __esm(() => {
+  dateGetTime = Date.prototype.getTime;
+  dateToISOString = Date.prototype.toISOString;
+});
+
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/utils/index.mjs
 function isValidUUID(value) {
   return typeof value == "string" && UUID_REGEX.test(value);
 }
@@ -1778,720 +1339,7 @@ var init_utils = __esm(() => {
   UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/gzip.mjs
-function isGzipSupported() {
-  return "CompressionStream" in globalThis && "TextEncoder" in globalThis && "Response" in globalThis && typeof Response.prototype.blob == "function";
-}
-async function gzipCompress(input, isDebug = true, options) {
-  try {
-    const inputBytes = new TextEncoder().encode(input);
-    const compressedStream = new globalThis.CompressionStream("gzip");
-    const writer = compressedStream.writable.getWriter();
-    const writePromise = writer.write(inputBytes).then(() => writer.close()).catch(async (err) => {
-      try {
-        await writer.abort(err);
-      } catch {}
-      throw err;
-    });
-    const responsePromise = new Response(compressedStream.readable).blob();
-    const [compressed] = await Promise.all([
-      responsePromise,
-      writePromise
-    ]);
-    await validateNativeGzip(compressed, inputBytes);
-    return compressed;
-  } catch (error) {
-    if (options?.rethrow)
-      throw error;
-    if (isDebug)
-      console.error("Failed to gzip compress data", error);
-    return null;
-  }
-}
-var NATIVE_GZIP_VALIDATION_ERROR = "NativeGzipValidationError", GZIP_MAGIC_FIRST_BYTE = 31, GZIP_MAGIC_SECOND_BYTE = 139, GZIP_DEFLATE_METHOD = 8, hasGzipMagic = (bytes) => bytes.length >= 2 && bytes[0] === GZIP_MAGIC_FIRST_BYTE && bytes[1] === GZIP_MAGIC_SECOND_BYTE, crc32Table, getCrc32Table = () => {
-  if (crc32Table)
-    return crc32Table;
-  crc32Table = [];
-  for (let i = 0;i < 256; i++) {
-    let crc = i;
-    for (let j = 0;j < 8; j++)
-      crc = 1 & crc ? 3988292384 ^ crc >>> 1 : crc >>> 1;
-    crc32Table[i] = crc >>> 0;
-  }
-  return crc32Table;
-}, crc32 = (bytes) => {
-  const table = getCrc32Table();
-  let crc = 4294967295;
-  for (let i = 0;i < bytes.length; i++)
-    crc = table[(crc ^ bytes[i]) & 255] ^ crc >>> 8;
-  return (4294967295 ^ crc) >>> 0;
-}, throwNativeGzipValidationError = (reason) => {
-  throw createNamedError(NATIVE_GZIP_VALIDATION_ERROR, `Native gzip produced invalid output: ${reason}`);
-}, validateNativeGzip = async (compressed, inputBytes) => {
-  if (compressed.size < 18)
-    throwNativeGzipValidationError("too-short");
-  const header = new Uint8Array(await compressed.slice(0, 10).arrayBuffer());
-  if (!hasGzipMagic(header) || header[2] !== GZIP_DEFLATE_METHOD)
-    throwNativeGzipValidationError("invalid-header");
-  const trailer = new DataView(await compressed.slice(compressed.size - 8).arrayBuffer());
-  if (trailer.getUint32(0, true) !== crc32(inputBytes))
-    throwNativeGzipValidationError("invalid-crc");
-  const inputSize = inputBytes.length >>> 0;
-  if (trailer.getUint32(4, true) !== inputSize)
-    throwNativeGzipValidationError("invalid-size");
-};
-var init_gzip = __esm(() => {
-  init_types();
-  init_utils();
-});
-
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/logs/logs-utils.mjs
-function newState() {
-  return {
-    ancestors: new WeakSet,
-    remainingNodes: MAX_JSON_SAFE_VALUE_NODES
-  };
-}
-function toOtlpKeyValueList(attrs, logger2) {
-  try {
-    return encodeKeyValueList(attrs, logger2, newState(), 0);
-  } catch {
-    return [];
-  }
-}
-function encodeAnyValue(value, logger2, state, depth) {
-  if (state.remainingNodes <= 0)
-    return {
-      stringValue: TRUNCATED_VALUE
-    };
-  state.remainingNodes--;
-  if (isBoolean(value))
-    return {
-      boolValue: value
-    };
-  if (typeof value == "number") {
-    if (!Number.isFinite(value))
-      return {
-        stringValue: String(value)
-      };
-    if (Number.isInteger(value)) {
-      if (Number.isSafeInteger(value))
-        return {
-          intValue: String(value)
-        };
-      if (typeof BigInt == "undefined")
-        return {
-          stringValue: String(value)
-        };
-      const decimal = BigInt(value).toString();
-      if (value >= INT64_RANGE_LIMIT || value < -INT64_RANGE_LIMIT) {
-        logger2?.debug(`Attribute ${decimal} is outside the int64 range; encoding it as a string`);
-        return {
-          stringValue: decimal
-        };
-      }
-      return {
-        intValue: decimal
-      };
-    }
-    return {
-      doubleValue: value
-    };
-  }
-  if (typeof value == "string")
-    return {
-      stringValue: sanitizeString(value)
-    };
-  if (typeof value == "function")
-    return {
-      stringValue: FUNCTION_VALUE
-    };
-  if (typeof value == "symbol")
-    return {
-      stringValue: String(value)
-    };
-  if (typeof value == "object" && value !== null) {
-    if (state.ancestors.has(value))
-      return {
-        stringValue: CIRCULAR_VALUE
-      };
-    if (depth >= MAX_JSON_SAFE_VALUE_DEPTH)
-      return {
-        stringValue: TRUNCATED_VALUE
-      };
-    if (value instanceof Date) {
-      const time = value.getTime();
-      const iso = Number.isFinite(time) ? value.toISOString() : String(value);
-      return {
-        stringValue: typeof iso == "string" ? sanitizeString(iso) : String(iso)
-      };
-    }
-    state.ancestors.add(value);
-    try {
-      try {
-        const toJSON = value.toJSON;
-        if (typeof toJSON == "function")
-          return encodeAnyValue(toJSON.call(value), logger2, state, depth + 1);
-      } catch {}
-      if (isArray(value))
-        return {
-          arrayValue: {
-            values: encodeArrayValues(value, logger2, state, depth + 1)
-          }
-        };
-      return {
-        kvlistValue: {
-          values: encodeKeyValueList(value, logger2, state, depth + 1)
-        }
-      };
-    } finally {
-      state.ancestors.delete(value);
-    }
-  }
-  return {
-    stringValue: sanitizeString(String(value))
-  };
-}
-function encodeArrayValues(values, logger2, state, depth) {
-  const result = [];
-  const itemCount = Math.min(values.length, MAX_JSON_SAFE_VALUE_ITEMS);
-  let index = 0;
-  for (;index < itemCount && state.remainingNodes > 0; index++)
-    try {
-      const element = index in values ? values[index] : undefined;
-      if (isNullish(element))
-        continue;
-      result.push(encodeAnyValue(element, logger2, state, depth));
-    } catch {
-      result.push({
-        stringValue: UNSERIALIZABLE_VALUE
-      });
-    }
-  if (values.length > index)
-    result.push({
-      stringValue: TRUNCATED_VALUE
-    });
-  return result;
-}
-function encodeKeyValueList(attrs, logger2, state, depth) {
-  const result = [];
-  for (const key in attrs)
-    if (propertyIsEnumerable.call(attrs, key)) {
-      if (result.length >= MAX_JSON_SAFE_VALUE_ITEMS || state.remainingNodes <= 0) {
-        logger2?.debug("Attributes truncated: the value exceeds the OTLP encoder budget");
-        break;
-      }
-      try {
-        const value = attrs[key];
-        if (isNull(value) || isUndefined(value))
-          continue;
-        result.push({
-          key: sanitizeString(key),
-          value: encodeAnyValue(value, logger2, state, depth)
-        });
-      } catch {
-        result.push({
-          key: sanitizeString(key),
-          value: {
-            stringValue: UNSERIALIZABLE_VALUE
-          }
-        });
-      }
-    }
-  return result;
-}
-var OTLP_SEVERITY_MAP, DEFAULT_OTLP_SEVERITY, INT64_RANGE_LIMIT = 9223372036854776000, propertyIsEnumerable;
-var init_logs_utils = __esm(() => {
-  init_utils();
-  init_json_utils();
-  OTLP_SEVERITY_MAP = {
-    trace: {
-      text: "TRACE",
-      number: 1
-    },
-    debug: {
-      text: "DEBUG",
-      number: 5
-    },
-    info: {
-      text: "INFO",
-      number: 9
-    },
-    warn: {
-      text: "WARN",
-      number: 13
-    },
-    error: {
-      text: "ERROR",
-      number: 17
-    },
-    fatal: {
-      text: "FATAL",
-      number: 21
-    }
-  };
-  DEFAULT_OTLP_SEVERITY = OTLP_SEVERITY_MAP.info;
-  propertyIsEnumerable = Object.prototype.propertyIsEnumerable;
-});
-
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/logs/index.mjs
-var init_logs = __esm(() => {
-  init_logs_utils();
-  init_types();
-  init_utils();
-});
-
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/metrics/metrics-utils.mjs
-function msToUnixNano(ms) {
-  return String(ms) + "000000";
-}
-function seriesKey(type, name, unit, attributes) {
-  let attrsKey = "";
-  if (attributes) {
-    const keys = Object.keys(attributes).sort();
-    attrsKey = keys.map((k) => `${JSON.stringify(k)}:${JSON.stringify(attributes[k])}`).join(",");
-  }
-  return `${type}\x00${name}\x00${unit ?? ""}\x00${attrsKey}`;
-}
-function bucketIndexFor(value, bounds) {
-  for (let i = 0;i < bounds.length; i++)
-    if (value <= bounds[i])
-      return i;
-  return bounds.length;
-}
-function buildMetricsResourceAttributes(config, scopeName, scopeVersion) {
-  return {
-    ...config.resourceAttributes,
-    "service.name": config.serviceName || "unknown_service",
-    ...config.environment && {
-      "deployment.environment": config.environment
-    },
-    ...config.serviceVersion && {
-      "service.version": config.serviceVersion
-    },
-    "telemetry.sdk.name": scopeName,
-    "telemetry.sdk.version": scopeVersion
-  };
-}
-function buildOtlpMetricsPayload(metrics, resourceAttributes, scopeName, scopeVersion) {
-  return {
-    resourceMetrics: [
-      {
-        resource: {
-          attributes: toOtlpKeyValueList(resourceAttributes)
-        },
-        scopeMetrics: [
-          {
-            scope: {
-              name: scopeName,
-              version: scopeVersion
-            },
-            metrics
-          }
-        ]
-      }
-    ]
-  };
-}
-var DEFAULT_HISTOGRAM_BOUNDS;
-var init_metrics_utils = __esm(() => {
-  init_logs_utils();
-  DEFAULT_HISTOGRAM_BOUNDS = [
-    0,
-    5,
-    10,
-    25,
-    50,
-    75,
-    100,
-    250,
-    500,
-    750,
-    1000,
-    2500,
-    5000,
-    7500,
-    1e4
-  ];
-});
-
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/metrics/config.mjs
-function resolveMetricsConfig(config) {
-  const resourceAttributes = config?.resourceAttributes;
-  return {
-    serviceName: resourceAttributes?.["service.name"] ?? config?.serviceName,
-    serviceVersion: resourceAttributes?.["service.version"] ?? config?.serviceVersion,
-    environment: resourceAttributes?.["deployment.environment"] ?? config?.environment,
-    resourceAttributes,
-    beforeSend: config?.beforeSend,
-    flushIntervalMs: config?.flushIntervalMs ?? DEFAULT_FLUSH_INTERVAL_MS,
-    maxSeriesPerFlush: config?.maxSeriesPerFlush ?? DEFAULT_MAX_SERIES_PER_FLUSH
-  };
-}
-var DEFAULT_FLUSH_INTERVAL_MS = 1e4, DEFAULT_MAX_SERIES_PER_FLUSH = 1000;
-var init_config = () => {};
-
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/metrics/index.mjs
-class PostHogMetrics {
-  constructor(_instance, _config, _logger) {
-    this._instance = _instance;
-    this._config = _config;
-    this._logger = _logger;
-    this._series = new Map;
-    this._flushPromise = null;
-    this._seriesCapWarned = false;
-    this._typeByName = new Map;
-    this._typeCollisionWarned = new Set;
-    this._generation = 0;
-  }
-  count(name, value = 1, options) {
-    this._capture({
-      name,
-      type: "count",
-      value,
-      unit: options?.unit,
-      attributes: options?.attributes
-    });
-  }
-  gauge(name, value, options) {
-    this._capture({
-      name,
-      type: "gauge",
-      value,
-      unit: options?.unit,
-      attributes: options?.attributes
-    });
-  }
-  histogram(name, value, options) {
-    this._capture({
-      name,
-      type: "histogram",
-      value,
-      unit: options?.unit,
-      attributes: options?.attributes
-    });
-  }
-  flush() {
-    const prev = this._flushPromise;
-    const run = async () => {
-      if (prev)
-        await prev.catch(() => {});
-      await this._doFlush();
-    };
-    const p = run().finally(() => {
-      if (this._flushPromise === p)
-        this._flushPromise = null;
-    });
-    this._flushPromise = p;
-    return p;
-  }
-  drainWindow() {
-    if (this._series.size === 0)
-      return null;
-    const window = this._series;
-    this._series = new Map;
-    this._seriesCapWarned = false;
-    this._typeByName = new Map;
-    this._typeCollisionWarned = new Set;
-    return this._buildPayload(window);
-  }
-  reset() {
-    this._generation++;
-    this._clearFlushTimer();
-    this._series = new Map;
-    this._flushPromise = null;
-    this._seriesCapWarned = false;
-    this._typeByName = new Map;
-    this._typeCollisionWarned = new Set;
-  }
-  _capture(sample) {
-    if (this._instance.isDisabled || this._instance.optedOut)
-      return;
-    const filtered = this._runBeforeSend(sample);
-    if (filtered === null)
-      return;
-    if (!filtered.name || typeof filtered.name != "string")
-      return void this._logger.warn("Dropping metric with empty name");
-    if (typeof filtered.value != "number" || !Number.isFinite(filtered.value))
-      return void this._logger.warn(`Dropping metric '${filtered.name}': value must be a finite number`);
-    if (filtered.type === "count" && filtered.value < 0)
-      return void this._logger.warn(`Dropping count '${filtered.name}': counters are monotonic, value must be >= 0`);
-    let attributes;
-    let key;
-    try {
-      attributes = filtered.attributes ? {
-        ...filtered.attributes
-      } : undefined;
-      key = seriesKey(filtered.type, filtered.name, filtered.unit, attributes);
-    } catch (e) {
-      this._logger.warn(`Dropping metric '${filtered.name}': attributes could not be serialized`, e);
-      return;
-    }
-    let state = this._series.get(key);
-    if (!state) {
-      if (!this._admitNewSeries())
-        return;
-      state = {
-        name: filtered.name,
-        type: filtered.type,
-        unit: filtered.unit,
-        attributes,
-        windowStartMs: Date.now()
-      };
-      this._series.set(key, state);
-    }
-    const seenType = this._typeByName.get(filtered.name);
-    if (seenType === undefined)
-      this._typeByName.set(filtered.name, filtered.type);
-    else if (seenType !== filtered.type && !this._typeCollisionWarned.has(filtered.name)) {
-      this._typeCollisionWarned.add(filtered.name);
-      this._logger.warn(`Metric name '${filtered.name}' is already used as a ${seenType}; recording it as a ${filtered.type} too will blend both series in charts. Use a distinct name.`);
-    }
-    this._fold(state, filtered.value);
-    this._armFlushTimer();
-  }
-  _admitNewSeries() {
-    if (this._series.size < this._config.maxSeriesPerFlush)
-      return true;
-    if (!this._seriesCapWarned) {
-      this._seriesCapWarned = true;
-      this._logger.warn(`Metric series cap reached (${this._config.maxSeriesPerFlush} per flush window); dropping new series until the next flush. Reduce attribute cardinality.`);
-    }
-    return false;
-  }
-  _fold(state, value) {
-    switch (state.type) {
-      case "count":
-        state.total = (state.total ?? 0) + value;
-        break;
-      case "gauge":
-        state.last = value;
-        break;
-      case "histogram": {
-        if (!state.hist)
-          state.hist = {
-            count: 0,
-            sum: 0,
-            min: value,
-            max: value,
-            bucketCounts: new Array(DEFAULT_HISTOGRAM_BOUNDS.length + 1).fill(0)
-          };
-        const hist = state.hist;
-        hist.count += 1;
-        hist.sum += value;
-        hist.min = Math.min(hist.min, value);
-        hist.max = Math.max(hist.max, value);
-        hist.bucketCounts[bucketIndexFor(value, DEFAULT_HISTOGRAM_BOUNDS)] += 1;
-        break;
-      }
-    }
-  }
-  _runBeforeSend(sample) {
-    const beforeSend = this._config.beforeSend;
-    if (!beforeSend)
-      return sample;
-    const fns = isArray(beforeSend) ? beforeSend : [
-      beforeSend
-    ];
-    let result = sample;
-    for (const fn of fns)
-      try {
-        const next = fn(result);
-        if (!next) {
-          this._logger.info("Metric was rejected in beforeSend function");
-          return null;
-        }
-        result = next;
-      } catch (e) {
-        this._logger.error("Error in beforeSend function for metric:", e);
-        return null;
-      }
-    return result;
-  }
-  _armFlushTimer() {
-    if (this._flushTimer)
-      return;
-    this._flushTimer = safeSetTimeout(() => {
-      this._flushTimer = undefined;
-      this.flush().catch((e) => {
-        this._logger.error("Metrics flush failed:", e);
-      });
-    }, this._config.flushIntervalMs);
-  }
-  _clearFlushTimer() {
-    if (this._flushTimer) {
-      clearTimeout(this._flushTimer);
-      this._flushTimer = undefined;
-    }
-  }
-  async _doFlush() {
-    if (this._series.size === 0)
-      return;
-    const window = this._series;
-    this._series = new Map;
-    this._seriesCapWarned = false;
-    this._typeByName = new Map;
-    this._typeCollisionWarned = new Set;
-    const generation = this._generation;
-    const outcome = await this._instance._sendMetricsBatch(this._buildPayload(window));
-    if (generation !== this._generation)
-      return;
-    switch (outcome.kind) {
-      case "ok":
-        return;
-      case "retry-later":
-        this._mergeWindowBack(window);
-        this._armFlushTimer();
-        return;
-      case "too-large":
-        this._logger.warn("Metrics batch exceeded the server size limit and was dropped");
-        return;
-      case "fatal":
-        this._logger.error("Failed to send metrics batch:", outcome.error);
-        return;
-    }
-  }
-  _buildPayload(window) {
-    return buildOtlpMetricsPayload(this._buildMetrics(window), buildMetricsResourceAttributes(this._config, this._instance.getLibraryId(), this._instance.getLibraryVersion()), this._instance.getLibraryId(), this._instance.getLibraryVersion());
-  }
-  _buildMetrics(window) {
-    const nowNano = msToUnixNano(Date.now());
-    const byMetric = new Map;
-    for (const state of window.values()) {
-      const metricKey = seriesKey(state.type, state.name, state.unit, undefined);
-      let metric = byMetric.get(metricKey);
-      if (!metric) {
-        metric = {
-          name: state.name,
-          ...state.unit && {
-            unit: state.unit
-          }
-        };
-        if (state.type === "count")
-          metric.sum = {
-            aggregationTemporality: OTLP_TEMPORALITY_DELTA,
-            isMonotonic: true,
-            dataPoints: []
-          };
-        else if (state.type === "gauge")
-          metric.gauge = {
-            dataPoints: []
-          };
-        else
-          metric.histogram = {
-            aggregationTemporality: OTLP_TEMPORALITY_DELTA,
-            dataPoints: []
-          };
-        byMetric.set(metricKey, metric);
-      }
-      const attributes = toOtlpKeyValueList(state.attributes ?? {}, this._logger);
-      const startNano = msToUnixNano(state.windowStartMs);
-      if (state.type === "count") {
-        const dp = {
-          attributes,
-          startTimeUnixNano: startNano,
-          timeUnixNano: nowNano,
-          asDouble: state.total ?? 0
-        };
-        metric.sum.dataPoints.push(dp);
-      } else if (state.type === "gauge") {
-        const dp = {
-          attributes,
-          timeUnixNano: nowNano,
-          asDouble: state.last ?? 0
-        };
-        metric.gauge.dataPoints.push(dp);
-      } else if (state.hist) {
-        const dp = {
-          attributes,
-          startTimeUnixNano: startNano,
-          timeUnixNano: nowNano,
-          count: state.hist.count,
-          sum: state.hist.sum,
-          min: state.hist.min,
-          max: state.hist.max,
-          bucketCounts: state.hist.bucketCounts,
-          explicitBounds: DEFAULT_HISTOGRAM_BOUNDS
-        };
-        metric.histogram.dataPoints.push(dp);
-      }
-    }
-    return Array.from(byMetric.values());
-  }
-  _mergeWindowBack(window) {
-    for (const [key, old] of window) {
-      const current = this._series.get(key);
-      if (!current) {
-        if (this._admitNewSeries())
-          this._series.set(key, old);
-        continue;
-      }
-      current.windowStartMs = Math.min(current.windowStartMs, old.windowStartMs);
-      switch (current.type) {
-        case "count":
-          current.total = (current.total ?? 0) + (old.total ?? 0);
-          break;
-        case "gauge":
-          break;
-        case "histogram":
-          if (old.hist)
-            if (current.hist) {
-              current.hist.count += old.hist.count;
-              current.hist.sum += old.hist.sum;
-              current.hist.min = Math.min(current.hist.min, old.hist.min);
-              current.hist.max = Math.max(current.hist.max, old.hist.max);
-              for (let i = 0;i < current.hist.bucketCounts.length; i++)
-                current.hist.bucketCounts[i] += old.hist.bucketCounts[i];
-            } else
-              current.hist = old.hist;
-          break;
-      }
-    }
-  }
-}
-var OTLP_TEMPORALITY_DELTA = 1;
-var init_metrics = __esm(() => {
-  init_utils();
-  init_logs_utils();
-  init_metrics_utils();
-  init_config();
-});
-
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/surveys/validation.mjs
-var init_validation = __esm(() => {
-  init_types();
-});
-
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/cookie.mjs
-var init_cookie = __esm(() => {
-  init_utils();
-  init_uuidv7();
-});
-
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/eventemitter.mjs
-class SimpleEventEmitter {
-  constructor() {
-    this.events = {};
-    this.events = {};
-  }
-  on(event, listener) {
-    if (!this.events[event])
-      this.events[event] = [];
-    this.events[event].push(listener);
-    return () => {
-      this.events[event] = this.events[event].filter((x) => x !== listener);
-    };
-  }
-  emit(event, payload) {
-    for (const listener of this.events[event] || [])
-      listener(payload);
-    for (const listener of this.events["*"] || [])
-      listener(event, payload);
-  }
-}
-var init_eventemitter = () => {};
-
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/error-tracking/chunk-ids.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/error-tracking/chunk-ids.mjs
 function getFilenameToChunkIdMap(stackParser) {
   const chunkIdMap = globalThis._posthogChunkIds;
   if (!chunkIdMap)
@@ -2529,7 +1377,7 @@ function getFilenameToChunkIdMap(stackParser) {
 var parsedStackResults, lastKeysCount, cachedFilenameChunkIds;
 var init_chunk_ids = () => {};
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/error-tracking/error-properties-builder.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/error-tracking/error-properties-builder.mjs
 class ErrorPropertiesBuilder {
   constructor(coercers, stackParser, modifiers = []) {
     this.coercers = coercers;
@@ -2655,13 +1503,13 @@ var init_error_properties_builder = __esm(() => {
   init_chunk_ids();
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/error-tracking/parsers/base.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/error-tracking/parsers/base.mjs
 function createFrame(platform, filename, func, lineno, colno) {
   const frame = {
     platform,
     filename,
     function: func === "<anonymous>" ? UNKNOWN_FUNCTION : func,
-    in_app: !filename?.startsWith(MASKED_URL_PREFIX) && filename !== ANONYMOUS_FILENAME
+    in_app: !!filename && !filename.startsWith(MASKED_URL_PREFIX) && filename !== ANONYMOUS_FILENAME
   };
   if (!isUndefined(lineno))
     frame.lineno = lineno;
@@ -2674,7 +1522,7 @@ var init_base = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/error-tracking/parsers/safari.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/error-tracking/parsers/safari.mjs
 var extractSafariExtensionDetails = (func, filename) => {
   const isSafariExtension = func.indexOf("safari-extension") !== -1;
   const isSafariWebExtension = func.indexOf("safari-web-extension") !== -1;
@@ -2690,7 +1538,7 @@ var init_safari = __esm(() => {
   init_base();
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/error-tracking/parsers/chrome.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/error-tracking/parsers/chrome.mjs
 var chromeRegexNoFnName, chromeRegex, chromeEvalRegex, chromeStackLineParser = (line, platform) => {
   const noFnParts = chromeRegexNoFnName.exec(line);
   if (noFnParts) {
@@ -2720,7 +1568,7 @@ var init_chrome = __esm(() => {
   chromeEvalRegex = /\((\S*)(?::(\d+))(?::(\d+))\)/;
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/error-tracking/parsers/gecko.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/error-tracking/parsers/gecko.mjs
 var geckoREgex, geckoEvalRegex, geckoStackLineParser = (line, platform) => {
   const parts = geckoREgex.exec(line);
   if (parts) {
@@ -2747,7 +1595,7 @@ var init_gecko = __esm(() => {
   geckoEvalRegex = /(\S+) line (\d+)(?: > eval line \d+)* > eval/i;
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/error-tracking/parsers/winjs.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/error-tracking/parsers/winjs.mjs
 var winjsRegex, winjsStackLineParser = (line, platform) => {
   const parts = winjsRegex.exec(line);
   return parts ? createFrame(platform, parts[2], parts[1] || UNKNOWN_FUNCTION, +parts[3], parts[4] ? +parts[4] : undefined) : undefined;
@@ -2757,7 +1605,7 @@ var init_winjs = __esm(() => {
   winjsRegex = /^\s*at (?:((?:\[object object\])?.+) )?\(?((?:[-a-z]+):.*?):(\d+)(?::(\d+))?\)?\s*$/i;
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/error-tracking/parsers/opera.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/error-tracking/parsers/opera.mjs
 var opera10Regex, opera10StackLineParser = (line, platform) => {
   const parts = opera10Regex.exec(line);
   return parts ? createFrame(platform, parts[2], parts[3] || UNKNOWN_FUNCTION, +parts[1]) : undefined;
@@ -2771,7 +1619,7 @@ var init_opera = __esm(() => {
   opera11Regex = / line (\d+), column (\d+)\s*(?:in (?:<anonymous function: ([^>]+)>|([^)]+))\(.*\))? in (.*):\s*$/i;
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/error-tracking/parsers/node.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/error-tracking/parsers/node.mjs
 function filenameIsInApp(filename, isNative = false) {
   const isInternal = isNative || filename && !filename.startsWith("/") && !filename.match(/^[A-Z]:/) && !filename.startsWith(".") && !filename.match(/^[a-zA-Z]([a-zA-Z0-9.\-+])*:\/\//);
   return !isInternal && filename !== undefined && !filename.includes("node_modules/");
@@ -2847,7 +1695,7 @@ var init_node = __esm(() => {
   PROMISE_INDEX = /^index \d+$/;
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/error-tracking/parsers/index.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/error-tracking/parsers/index.mjs
 function reverseAndStripFrames(stack) {
   if (!stack.length)
     return [];
@@ -2901,7 +1749,7 @@ var init_parsers = __esm(() => {
   WEBPACK_ERROR_REGEXP = /\(error: (.*)\)/;
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/error-tracking/coercers/dom-exception-coercer.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/error-tracking/coercers/dom-exception-coercer.mjs
 class DOMExceptionCoercer {
   match(err) {
     return this.isDOMException(err) || this.isDOMError(err);
@@ -2935,7 +1783,7 @@ var init_dom_exception_coercer = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/error-tracking/coercers/error-coercer.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/error-tracking/coercers/error-coercer.mjs
 class ErrorCoercer {
   match(err) {
     return isError(err);
@@ -2968,9 +1816,8 @@ var init_error_coercer = __esm(() => {
   init_type_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/error-tracking/coercers/error-event-coercer.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/error-tracking/coercers/error-event-coercer.mjs
 class ErrorEventCoercer {
-  constructor() {}
   match(err) {
     if (!isErrorEvent(err))
       return false;
@@ -3006,7 +1853,7 @@ var init_error_event_coercer = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/error-tracking/coercers/string-coercer.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/error-tracking/coercers/string-coercer.mjs
 class StringCoercer {
   match(input) {
     return typeof input == "string";
@@ -3039,7 +1886,7 @@ var init_string_coercer = __esm(() => {
   ERROR_TYPES_PATTERN = /^(?:[Uu]ncaught (?:exception: )?)?(?:((?:Eval|Internal|Range|Reference|Syntax|Type|URI|)Error): )?(.*)$/i;
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/error-tracking/types.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/error-tracking/types.mjs
 var severityLevels;
 var init_types2 = __esm(() => {
   severityLevels = [
@@ -3052,7 +1899,7 @@ var init_types2 = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/error-tracking/coercers/utils.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/error-tracking/coercers/utils.mjs
 function extractExceptionKeysForMessage(err, maxLength = 40) {
   const keys = Object.keys(err);
   keys.sort();
@@ -3070,7 +1917,7 @@ function extractExceptionKeysForMessage(err, maxLength = 40) {
 }
 var init_utils2 = () => {};
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/error-tracking/coercers/object-coercer.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/error-tracking/coercers/object-coercer.mjs
 class ObjectCoercer {
   match(candidate) {
     return typeof candidate == "object" && candidate !== null;
@@ -3141,7 +1988,7 @@ var init_object_coercer = __esm(() => {
   init_utils2();
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/error-tracking/coercers/event-coercer.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/error-tracking/coercers/event-coercer.mjs
 class EventCoercer {
   match(err) {
     return isEvent(err);
@@ -3161,7 +2008,7 @@ var init_event_coercer = __esm(() => {
   init_utils2();
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/error-tracking/coercers/primitive-coercer.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/error-tracking/coercers/primitive-coercer.mjs
 class PrimitiveCoercer {
   match(candidate) {
     return isPrimitive(candidate);
@@ -3179,7 +2026,7 @@ var init_primitive_coercer = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/error-tracking/coercers/promise-rejection-event.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/error-tracking/coercers/promise-rejection-event.mjs
 class PromiseRejectionEventCoercer {
   match(err) {
     return isBuiltin(err, "PromiseRejectionEvent") || this.isCustomEventWrappingRejection(err);
@@ -3219,7 +2066,7 @@ var init_promise_rejection_event = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/error-tracking/coercers/index.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/error-tracking/coercers/index.mjs
 var init_coercers = __esm(() => {
   init_dom_exception_coercer();
   init_error_coercer();
@@ -3231,7 +2078,7 @@ var init_coercers = __esm(() => {
   init_promise_rejection_event();
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/error-tracking/utils.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/error-tracking/utils.mjs
 class ReduceableCache {
   constructor(_maxSize) {
     this._maxSize = _maxSize;
@@ -3258,7 +2105,7 @@ class ReduceableCache {
 }
 var init_utils3 = () => {};
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/error-tracking/exception-steps.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/error-tracking/exception-steps.mjs
 function resolveExceptionStepsConfig(config) {
   if (!config)
     return {
@@ -3333,7 +2180,7 @@ class ExceptionStepsBuffer {
   }
 }
 function normalizePositiveInteger(input, fallback) {
-  if (!isNumber(input) || input === 1 / 0 || input === -1 / 0)
+  if (!isNumber(input) || 1 / 0 === input || -1 / 0 === input)
     return fallback;
   const normalized = Math.floor(input);
   if (normalized < 0)
@@ -3367,7 +2214,7 @@ function normalizeAndSerializeStep(step) {
   }
 }
 function getUtf8ByteLength(value) {
-  if (typeof TextEncoder != "undefined")
+  if ("u" > typeof TextEncoder)
     return new TextEncoder().encode(value).length;
   const encoded = encodeURIComponent(value);
   let byteLength = 0;
@@ -3396,14 +2243,14 @@ var init_exception_steps = __esm(() => {
   };
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/error-tracking/release.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/error-tracking/release.mjs
 function getInjectedReleaseId() {
   const injected = globalThis._posthogReleaseId;
   return typeof injected == "string" && injected.length > 0 ? injected : undefined;
 }
 var init_release = () => {};
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/error-tracking/index.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/error-tracking/index.mjs
 var exports_error_tracking = {};
 __export(exports_error_tracking, {
   DEFAULT_EXCEPTION_STEPS_CONFIG: () => DEFAULT_EXCEPTION_STEPS_CONFIG,
@@ -3442,7 +2289,232 @@ var init_error_tracking = __esm(() => {
   init_release();
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/posthog-core-stateless.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/cookie.mjs
+var init_cookie = __esm(() => {
+  init_utils();
+  init_uuidv7();
+});
+
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/featureFlagUtils.mjs
+function getFlagDetailFromFlagAndPayload(key, value, payload) {
+  return {
+    key,
+    enabled: typeof value == "string" ? true : value,
+    variant: typeof value == "string" ? value : undefined,
+    reason: undefined,
+    metadata: {
+      id: undefined,
+      version: undefined,
+      payload: payload ? JSON.stringify(payload) : undefined,
+      description: undefined
+    }
+  };
+}
+var normalizeFlagsResponse = (flagsResponse) => {
+  if ("flags" in flagsResponse) {
+    const featureFlags = getFlagValuesFromFlags(flagsResponse.flags);
+    const featureFlagPayloads = getPayloadsFromFlags(flagsResponse.flags);
+    return {
+      ...flagsResponse,
+      featureFlags,
+      featureFlagPayloads
+    };
+  }
+  {
+    const featureFlags = flagsResponse.featureFlags ?? {};
+    const featureFlagPayloads = Object.fromEntries(Object.entries(flagsResponse.featureFlagPayloads || {}).map(([k, v]) => [
+      k,
+      parsePayload(v)
+    ]));
+    const flags = Object.fromEntries(Object.entries(featureFlags).map(([key, value]) => [
+      key,
+      getFlagDetailFromFlagAndPayload(key, value, featureFlagPayloads[key])
+    ]));
+    return {
+      ...flagsResponse,
+      featureFlags,
+      featureFlagPayloads,
+      flags
+    };
+  }
+}, getFlagValuesFromFlags = (flags) => Object.fromEntries(Object.entries(flags ?? {}).map(([key, detail]) => [
+  key,
+  getFeatureFlagValue(detail)
+]).filter(([, value]) => value !== undefined)), getPayloadsFromFlags = (flags) => {
+  const safeFlags = flags ?? {};
+  return Object.fromEntries(Object.keys(safeFlags).filter((flag) => {
+    const details = safeFlags[flag];
+    return details.enabled && details.metadata && details.metadata.payload !== undefined;
+  }).map((flag) => {
+    const payload = safeFlags[flag].metadata?.payload;
+    return [
+      flag,
+      payload ? parsePayload(payload) : undefined
+    ];
+  }));
+}, getFeatureFlagValue = (detail) => detail === undefined ? undefined : detail.variant ?? detail.enabled, parsePayload = (response) => {
+  if (typeof response != "string")
+    return response;
+  try {
+    return JSON.parse(response);
+  } catch {
+    return response;
+  }
+}, MINIMAL_FLAG_CALLED_EVENT_CAMPAIGN_PROPERTIES, MINIMAL_FLAG_CALLED_EVENT_PROPERTIES, minimizeFlagCalledEventProperties = (properties, transportKeys = []) => {
+  const minimal = {};
+  const copyKey = (key) => {
+    if (properties[key] !== undefined)
+      minimal[key] = properties[key];
+  };
+  MINIMAL_FLAG_CALLED_EVENT_PROPERTIES.forEach(copyKey);
+  transportKeys.forEach(copyKey);
+  return minimal;
+};
+var init_featureFlagUtils = __esm(() => {
+  MINIMAL_FLAG_CALLED_EVENT_CAMPAIGN_PROPERTIES = [
+    "utm_source",
+    "utm_medium",
+    "utm_campaign",
+    "utm_content",
+    "utm_term",
+    "gad_source",
+    "mc_cid",
+    "gclid",
+    "gclsrc",
+    "dclid",
+    "gbraid",
+    "wbraid",
+    "fbclid",
+    "msclkid",
+    "twclid",
+    "li_fat_id",
+    "igshid",
+    "ttclid",
+    "rdt_cid",
+    "epik",
+    "qclid",
+    "sccid",
+    "irclid",
+    "_kx"
+  ];
+  MINIMAL_FLAG_CALLED_EVENT_PROPERTIES = [
+    "$feature_flag",
+    "$feature_flag_response",
+    "$feature_flag_has_experiment",
+    "$feature_flag_id",
+    "$feature_flag_version",
+    "$feature_flag_reason",
+    "$feature_flag_request_id",
+    "$feature_flag_evaluated_at",
+    "$feature_flag_error",
+    "locally_evaluated",
+    "$groups",
+    "$process_person_profile",
+    "$geoip_disable",
+    "$current_url",
+    "$pathname",
+    "$referring_domain",
+    ...MINIMAL_FLAG_CALLED_EVENT_CAMPAIGN_PROPERTIES,
+    "$session_id",
+    "$window_id",
+    "$lib",
+    "$lib_version",
+    "$device_id",
+    "$is_server"
+  ];
+});
+
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/eventemitter.mjs
+class SimpleEventEmitter {
+  constructor() {
+    this.events = {};
+    this.events = {};
+  }
+  on(event, listener) {
+    if (!this.events[event])
+      this.events[event] = [];
+    this.events[event].push(listener);
+    return () => {
+      this.events[event] = this.events[event].filter((x) => x !== listener);
+    };
+  }
+  emit(event, payload) {
+    for (const listener of this.events[event] || [])
+      listener(payload);
+    for (const listener of this.events["*"] || [])
+      listener(event, payload);
+  }
+}
+var init_eventemitter = () => {};
+
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/gzip.mjs
+function isGzipSupported() {
+  return "CompressionStream" in globalThis && "TextEncoder" in globalThis && "Response" in globalThis && typeof Response.prototype.blob == "function";
+}
+async function gzipCompress(input, isDebug = true, options) {
+  try {
+    const inputBytes = new TextEncoder().encode(input);
+    const compressedStream = new globalThis.CompressionStream("gzip");
+    const writer = compressedStream.writable.getWriter();
+    const writePromise = writer.write(inputBytes).then(() => writer.close()).catch(async (err) => {
+      try {
+        await writer.abort(err);
+      } catch {}
+      throw err;
+    });
+    const responsePromise = new Response(compressedStream.readable).blob();
+    const [compressed] = await Promise.all([
+      responsePromise,
+      writePromise
+    ]);
+    await validateNativeGzip(compressed, inputBytes);
+    return compressed;
+  } catch (error) {
+    if (options?.rethrow)
+      throw error;
+    if (isDebug)
+      console.error("Failed to gzip compress data", error);
+    return null;
+  }
+}
+var NATIVE_GZIP_VALIDATION_ERROR = "NativeGzipValidationError", GZIP_MAGIC_FIRST_BYTE = 31, GZIP_MAGIC_SECOND_BYTE = 139, GZIP_DEFLATE_METHOD = 8, hasGzipMagic = (bytes) => bytes.length >= 2 && bytes[0] === GZIP_MAGIC_FIRST_BYTE && bytes[1] === GZIP_MAGIC_SECOND_BYTE, crc32Table, getCrc32Table = () => {
+  if (crc32Table)
+    return crc32Table;
+  crc32Table = [];
+  for (let i = 0;i < 256; i++) {
+    let crc = i;
+    for (let j = 0;j < 8; j++)
+      crc = 1 & crc ? 3988292384 ^ crc >>> 1 : crc >>> 1;
+    crc32Table[i] = crc >>> 0;
+  }
+  return crc32Table;
+}, crc32 = (bytes) => {
+  const table = getCrc32Table();
+  let crc = 4294967295;
+  for (let i = 0;i < bytes.length; i++)
+    crc = table[(crc ^ bytes[i]) & 255] ^ crc >>> 8;
+  return (4294967295 ^ crc) >>> 0;
+}, throwNativeGzipValidationError = (reason) => {
+  throw createNamedError(NATIVE_GZIP_VALIDATION_ERROR, `Native gzip produced invalid output: ${reason}`);
+}, validateNativeGzip = async (compressed, inputBytes) => {
+  if (compressed.size < 18)
+    throwNativeGzipValidationError("too-short");
+  const header = new Uint8Array(await compressed.slice(0, 10).arrayBuffer());
+  if (!hasGzipMagic(header) || header[2] !== GZIP_DEFLATE_METHOD)
+    throwNativeGzipValidationError("invalid-header");
+  const trailer = new DataView(await compressed.slice(compressed.size - 8).arrayBuffer());
+  if (trailer.getUint32(0, true) !== crc32(inputBytes))
+    throwNativeGzipValidationError("invalid-crc");
+  const inputSize = inputBytes.length >>> 0;
+  if (trailer.getUint32(4, true) !== inputSize)
+    throwNativeGzipValidationError("invalid-size");
+};
+var init_gzip = __esm(() => {
+  init_types();
+  init_utils();
+});
+
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/posthog-core-stateless.mjs
 async function logFlushError(err) {
   if (err instanceof PostHogFetchHttpError) {
     let text = "";
@@ -4523,7 +3595,7 @@ var init_posthog_core_stateless = __esm(() => {
   };
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/posthog-core.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/posthog-core.mjs
 var init_posthog_core = __esm(() => {
   init_featureFlagUtils();
   init_types();
@@ -4532,22 +3604,1163 @@ var init_posthog_core = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/tracing-headers.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/tracing-headers.mjs
 var init_tracing_headers = __esm(() => {
   init_type_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.49.2/node_modules/@posthog/core/dist/index.mjs
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/featureFlagLocalEvaluation.mjs
+function isTruthyOrFalsyPropertyValue(value) {
+  if (typeof value == "boolean")
+    return true;
+  if (typeof value == "string") {
+    const lowercaseValue = value.toLowerCase();
+    return lowercaseValue === "true" || lowercaseValue === "false";
+  }
+  if (!Array.isArray(value))
+    return false;
+  for (let index = 0;index < value.length; index++)
+    if (!isTruthyOrFalsyPropertyValue(index in value ? value[index] : null))
+      return false;
+  return true;
+}
+function isTruthyPropertyValue(value) {
+  if (typeof value == "boolean")
+    return value;
+  if (typeof value == "string")
+    return value.toLowerCase() === "true";
+  if (!Array.isArray(value))
+    return false;
+  for (let index = 0;index < value.length; index++)
+    if (!isTruthyPropertyValue(index in value ? value[index] : null))
+      return false;
+  return true;
+}
+function assertUnicodeScalarString(value) {
+  for (let index = 0;index < value.length; index++) {
+    const unit = value.charCodeAt(index);
+    if (unit >= 55296 && unit <= 56319) {
+      const next = value.charCodeAt(index + 1);
+      if (index + 1 >= value.length || next < 56320 || next > 57343)
+        throw new InconclusiveMatchError("Cannot stringify an unpaired surrogate like the flags service");
+      index++;
+    } else if (unit >= 56320 && unit <= 57343)
+      throw new InconclusiveMatchError("Cannot stringify an unpaired surrogate like the flags service");
+  }
+}
+function assertJsonRepresentable(value, seen = new Set) {
+  if (value === null || typeof value == "boolean")
+    return;
+  if (typeof value == "string")
+    return void assertUnicodeScalarString(value);
+  if (typeof value == "number") {
+    if (!Number.isFinite(value))
+      throw new InconclusiveMatchError(`Cannot represent non-finite number ${value} like the flags service`);
+    return;
+  }
+  if (Array.isArray(value)) {
+    if (seen.has(value))
+      throw new InconclusiveMatchError("Cannot represent a circular array during local evaluation");
+    seen.add(value);
+    try {
+      for (let index = 0;index < value.length; index++)
+        if (index in value)
+          assertJsonRepresentable(value[index], seen);
+    } finally {
+      seen.delete(value);
+    }
+    return;
+  }
+  if (typeof value == "object") {
+    const prototype = Object.getPrototypeOf(value);
+    if (prototype !== Object.prototype && prototype !== null)
+      throw new InconclusiveMatchError("Cannot represent a non-JSON object like the flags service");
+    if (seen.has(value))
+      throw new InconclusiveMatchError("Cannot represent a circular object during local evaluation");
+    seen.add(value);
+    try {
+      for (const key of Object.keys(value)) {
+        assertUnicodeScalarString(key);
+        assertJsonRepresentable(value[key], seen);
+      }
+    } finally {
+      seen.delete(value);
+    }
+    return;
+  }
+  throw new InconclusiveMatchError(`Cannot represent ${typeof value} like the flags service`);
+}
+function compareJsonObjectKeys(left, right) {
+  let leftIndex = 0;
+  let rightIndex = 0;
+  while (leftIndex < left.length && rightIndex < right.length) {
+    const leftUnit = left.charCodeAt(leftIndex);
+    const rightUnit = right.charCodeAt(rightIndex);
+    const leftIsHighSurrogate = leftUnit >= 55296 && leftUnit <= 56319;
+    const rightIsHighSurrogate = rightUnit >= 55296 && rightUnit <= 56319;
+    const leftNext = leftIsHighSurrogate ? left.charCodeAt(leftIndex + 1) : 0;
+    const rightNext = rightIsHighSurrogate ? right.charCodeAt(rightIndex + 1) : 0;
+    const leftCodePoint = leftIsHighSurrogate ? (leftUnit - 55296) * 1024 + leftNext - 56320 + 65536 : leftUnit;
+    const rightCodePoint = rightIsHighSurrogate ? (rightUnit - 55296) * 1024 + rightNext - 56320 + 65536 : rightUnit;
+    if (leftCodePoint !== rightCodePoint)
+      return leftCodePoint - rightCodePoint;
+    leftIndex += leftIsHighSurrogate ? 2 : 1;
+    rightIndex += rightIsHighSurrogate ? 2 : 1;
+  }
+  return left.length - right.length;
+}
+function serializeJsonValue(value, seen = new Set) {
+  if (value === null)
+    return "null";
+  if (typeof value == "string") {
+    assertUnicodeScalarString(value);
+    return JSON.stringify(value);
+  }
+  if (typeof value == "boolean")
+    return value ? "true" : "false";
+  if (typeof value == "number") {
+    if (!Number.isFinite(value))
+      throw new InconclusiveMatchError(`Cannot stringify non-finite number ${value} like the flags service`);
+    if (Number.isInteger(value))
+      throw new InconclusiveMatchError(`Cannot distinguish integer ${value} from an integral JSON float during local evaluation`);
+    return String(value);
+  }
+  if (Array.isArray(value)) {
+    if (seen.has(value))
+      throw new InconclusiveMatchError("Cannot stringify a circular array during local evaluation");
+    seen.add(value);
+    try {
+      const items = [];
+      for (let index = 0;index < value.length; index++)
+        items.push(index in value ? serializeJsonValue(value[index], seen) : "null");
+      return `[${items.join(",")}]`;
+    } finally {
+      seen.delete(value);
+    }
+  }
+  if (typeof value == "object") {
+    const prototype = Object.getPrototypeOf(value);
+    if (prototype !== Object.prototype && prototype !== null)
+      throw new InconclusiveMatchError("Cannot stringify a non-JSON object like the flags service");
+    if (seen.has(value))
+      throw new InconclusiveMatchError("Cannot stringify a circular object during local evaluation");
+    seen.add(value);
+    try {
+      const keys = Object.keys(value);
+      keys.forEach(assertUnicodeScalarString);
+      return `{${keys.sort(compareJsonObjectKeys).map((key) => `${JSON.stringify(key)}:${serializeJsonValue(value[key], seen)}`).join(",")}}`;
+    } finally {
+      seen.delete(value);
+    }
+  }
+  throw new InconclusiveMatchError(`Cannot stringify ${typeof value} like the flags service`);
+}
+function exactMatchString(value) {
+  if (typeof value == "string") {
+    assertUnicodeScalarString(value);
+    return value;
+  }
+  return serializeJsonValue(value);
+}
+function isValidRegex(regex) {
+  try {
+    new RegExp(regex);
+    return true;
+  } catch {
+    return false;
+  }
+}
+function asciiLowercase(value) {
+  return String(value).replace(/[A-Z]/g, (character) => character.toLowerCase());
+}
+function parseSemverNumericIdentifier(part, raw, parsingPolicy) {
+  if (!/^\d+$/.test(part) || parsingPolicy === "strict" && part.length > 1 && part[0] === "0")
+    throw new InconclusiveMatchError(`Invalid semver: ${raw}`);
+  return parseInt(part, 10);
+}
+function parseFeatureFlagSemver(value, parsingPolicy = "strict") {
+  const text = String(value).trim().replace(/^[vV]/, "");
+  const baseVersion = text.split("-")[0].split("+")[0];
+  if (!baseVersion || baseVersion.startsWith("."))
+    throw new InconclusiveMatchError(`Invalid semver: ${value}`);
+  const parts = baseVersion.split(".");
+  const parsePart = (part) => {
+    if (part === undefined || part === "")
+      return 0;
+    return parseSemverNumericIdentifier(part, value, parsingPolicy);
+  };
+  return [
+    parsePart(parts[0]),
+    parsePart(parts[1]),
+    parsePart(parts[2])
+  ];
+}
+function compareSemverTuples(a, b) {
+  for (let i = 0;i < 3; i++) {
+    if (a[i] < b[i])
+      return -1;
+    if (a[i] > b[i])
+      return 1;
+  }
+  return 0;
+}
+function computeTildeBounds(value, parsingPolicy) {
+  const parsed = parseFeatureFlagSemver(value, parsingPolicy);
+  return {
+    lower: [
+      parsed[0],
+      parsed[1],
+      parsed[2]
+    ],
+    upper: [
+      parsed[0],
+      parsed[1] + 1,
+      0
+    ]
+  };
+}
+function computeCaretBounds(value, parsingPolicy) {
+  const [major, minor, patch] = parseFeatureFlagSemver(value, parsingPolicy);
+  const lower = [
+    major,
+    minor,
+    patch
+  ];
+  let upper;
+  upper = major > 0 ? [
+    major + 1,
+    0,
+    0
+  ] : minor > 0 ? [
+    0,
+    minor + 1,
+    0
+  ] : [
+    0,
+    0,
+    patch + 1
+  ];
+  return {
+    lower,
+    upper
+  };
+}
+function computeWildcardBounds(value, parsingPolicy) {
+  const text = String(value).trim().replace(/^[vV]/, "");
+  const cleanedText = text.replace(/\.\*$/, "").replace(/\*$/, "");
+  if (!cleanedText)
+    throw new InconclusiveMatchError(`Invalid wildcard semver: ${value}`);
+  const parts = cleanedText.split(".");
+  const parseWildcardPart = (part) => {
+    if (parsingPolicy === "legacy-permissive") {
+      const parsed = parseInt(part, 10);
+      if (!isNaN(parsed))
+        return parsed;
+    } else
+      try {
+        return parseSemverNumericIdentifier(part, value, parsingPolicy);
+      } catch {}
+    throw new InconclusiveMatchError(`Invalid wildcard semver: ${value}`);
+  };
+  const major = parseWildcardPart(parts[0]);
+  if (parts.length === 1)
+    return {
+      lower: [
+        major,
+        0,
+        0
+      ],
+      upper: [
+        major + 1,
+        0,
+        0
+      ]
+    };
+  const minor = parseWildcardPart(parts[1]);
+  return {
+    lower: [
+      major,
+      minor,
+      0
+    ],
+    upper: [
+      major,
+      minor + 1,
+      0
+    ]
+  };
+}
+function convertToDateTime(value) {
+  if (value instanceof Date)
+    return value;
+  if (typeof value == "string" || typeof value == "number") {
+    const date = new Date(value);
+    if (!isNaN(date.valueOf()))
+      return date;
+    throw new InconclusiveMatchError(`${value} is in an invalid date format`);
+  }
+  throw new InconclusiveMatchError(`The date provided ${value} must be a string, number, or date object`);
+}
+function relativeDateParseForFeatureFlagMatching(value) {
+  const regex = /^-?(?<number>[0-9]+)(?<interval>[a-z])$/;
+  const match = value.match(regex);
+  const parsedDt = new Date(new Date().toISOString());
+  if (!match || !match.groups)
+    return null;
+  const number = parseInt(match.groups["number"]);
+  if (number >= 1e4)
+    return null;
+  const interval = match.groups["interval"];
+  if (interval === "h")
+    parsedDt.setUTCHours(parsedDt.getUTCHours() - number);
+  else if (interval === "d")
+    parsedDt.setUTCDate(parsedDt.getUTCDate() - number);
+  else if (interval === "w")
+    parsedDt.setUTCDate(parsedDt.getUTCDate() - 7 * number);
+  else if (interval === "m")
+    parsedDt.setUTCMonth(parsedDt.getUTCMonth() - number);
+  else {
+    if (interval !== "y")
+      return null;
+    parsedDt.setUTCFullYear(parsedDt.getUTCFullYear() - number);
+  }
+  return parsedDt;
+}
+function matchFeatureFlagProperty(property, propertyValues, options = {}) {
+  const key = property.key;
+  const value = property.value;
+  const operator = property.operator || "exact";
+  const parsingPolicy = options.semverParsingPolicy ?? "strict";
+  const hasProperty = Object.prototype.hasOwnProperty.call(propertyValues, key);
+  if (hasProperty) {
+    if (operator === "is_not_set")
+      return false;
+    else if (operator === "is_set")
+      return true;
+  } else
+    throw new InconclusiveMatchError(`Property ${key} not found in propertyValues`);
+  const overrideValue = propertyValues[key];
+  if (overrideValue === undefined) {
+    options.warnFunction?.(`Property ${key} cannot have a value of undefined with the ${operator} operator`);
+    return operator === "is_not";
+  }
+  if (overrideValue === null && !NULL_VALUES_ALLOWED_OPERATORS.includes(operator) && operator !== "exact" && operator !== "is_not") {
+    options.warnFunction?.(`Property ${key} cannot have a value of null with the ${operator} operator`);
+    return false;
+  }
+  const computeExactMatch = (target, actual) => {
+    if (isTruthyOrFalsyPropertyValue(target)) {
+      assertJsonRepresentable(actual);
+      return isTruthyPropertyValue(target) === isTruthyPropertyValue(actual);
+    }
+    if (Array.isArray(target)) {
+      const actualString = exactMatchString(actual).toLowerCase();
+      return target.some((item) => exactMatchString(item).toLowerCase() === actualString);
+    }
+    return exactMatchString(target).toLowerCase() === exactMatchString(actual).toLowerCase();
+  };
+  const compare = (lhs, rhs, comparisonOperator) => {
+    if (comparisonOperator === "gt")
+      return lhs > rhs;
+    if (comparisonOperator === "gte")
+      return lhs >= rhs;
+    if (comparisonOperator === "lt")
+      return lhs < rhs;
+    if (comparisonOperator === "lte")
+      return lhs <= rhs;
+    throw new Error(`Invalid operator: ${comparisonOperator}`);
+  };
+  switch (operator) {
+    case "exact":
+      return computeExactMatch(value, overrideValue);
+    case "is_not":
+      return !computeExactMatch(value, overrideValue);
+    case "is_set":
+      return true;
+    case "icontains":
+      return asciiLowercase(overrideValue).includes(asciiLowercase(value));
+    case "not_icontains":
+      return !asciiLowercase(overrideValue).includes(asciiLowercase(value));
+    case "starts_with":
+      return asciiLowercase(overrideValue).startsWith(asciiLowercase(value));
+    case "not_starts_with":
+      return !asciiLowercase(overrideValue).startsWith(asciiLowercase(value));
+    case "ends_with":
+      return asciiLowercase(overrideValue).endsWith(asciiLowercase(value));
+    case "not_ends_with":
+      return !asciiLowercase(overrideValue).endsWith(asciiLowercase(value));
+    case "regex":
+      return isValidRegex(String(value)) && String(overrideValue).match(String(value)) !== null;
+    case "not_regex":
+      return isValidRegex(String(value)) && String(overrideValue).match(String(value)) === null;
+    case "gt":
+    case "gte":
+    case "lt":
+    case "lte": {
+      const parsedValue = typeof value == "number" ? value : parseFloat(String(value));
+      const parsedOverride = typeof overrideValue == "number" ? overrideValue : overrideValue != null ? parseFloat(String(overrideValue)) : 0 / 0;
+      if (Number.isFinite(parsedValue) && Number.isFinite(parsedOverride))
+        return compare(parsedOverride, parsedValue, operator);
+      return compare(String(overrideValue), String(value), operator);
+    }
+    case "is_date_after":
+    case "is_date_before": {
+      if (typeof value == "boolean")
+        throw new InconclusiveMatchError("Date operations cannot be performed on boolean values");
+      let parsedDate = relativeDateParseForFeatureFlagMatching(String(value));
+      if (parsedDate == null)
+        parsedDate = convertToDateTime(value);
+      const overrideDate = convertToDateTime(overrideValue);
+      return operator === "is_date_before" ? overrideDate < parsedDate : overrideDate > parsedDate;
+    }
+    case "semver_eq":
+      return compareSemverTuples(parseFeatureFlagSemver(String(overrideValue), parsingPolicy), parseFeatureFlagSemver(String(value), parsingPolicy)) === 0;
+    case "semver_neq":
+      return compareSemverTuples(parseFeatureFlagSemver(String(overrideValue), parsingPolicy), parseFeatureFlagSemver(String(value), parsingPolicy)) !== 0;
+    case "semver_gt":
+      return compareSemverTuples(parseFeatureFlagSemver(String(overrideValue), parsingPolicy), parseFeatureFlagSemver(String(value), parsingPolicy)) > 0;
+    case "semver_gte":
+      return compareSemverTuples(parseFeatureFlagSemver(String(overrideValue), parsingPolicy), parseFeatureFlagSemver(String(value), parsingPolicy)) >= 0;
+    case "semver_lt":
+      return compareSemverTuples(parseFeatureFlagSemver(String(overrideValue), parsingPolicy), parseFeatureFlagSemver(String(value), parsingPolicy)) < 0;
+    case "semver_lte":
+      return compareSemverTuples(parseFeatureFlagSemver(String(overrideValue), parsingPolicy), parseFeatureFlagSemver(String(value), parsingPolicy)) <= 0;
+    case "semver_tilde": {
+      const overrideParsed = parseFeatureFlagSemver(String(overrideValue), parsingPolicy);
+      const { lower, upper } = computeTildeBounds(String(value), parsingPolicy);
+      return compareSemverTuples(overrideParsed, lower) >= 0 && compareSemverTuples(overrideParsed, upper) < 0;
+    }
+    case "semver_caret": {
+      const overrideParsed = parseFeatureFlagSemver(String(overrideValue), parsingPolicy);
+      const { lower, upper } = computeCaretBounds(String(value), parsingPolicy);
+      return compareSemverTuples(overrideParsed, lower) >= 0 && compareSemverTuples(overrideParsed, upper) < 0;
+    }
+    case "semver_wildcard": {
+      const overrideParsed = parseFeatureFlagSemver(String(overrideValue), parsingPolicy);
+      const { lower, upper } = computeWildcardBounds(String(value), parsingPolicy);
+      return compareSemverTuples(overrideParsed, lower) >= 0 && compareSemverTuples(overrideParsed, upper) < 0;
+    }
+    default:
+      throw new InconclusiveMatchError(`Unknown operator: ${operator}`);
+  }
+}
+async function hashSHA1(text) {
+  const subtle = globalThis.crypto?.subtle;
+  if (!subtle)
+    throw new Error("SubtleCrypto API not available");
+  const hashBuffer = await subtle.digest("SHA-1", new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(hashBuffer)).map((byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+async function getFeatureFlagHash(key, bucketingValue, salt = "") {
+  const hashString = await hashSHA1(`${key}.${bucketingValue}${salt}`);
+  return parseInt(hashString.slice(0, 15), 16) / LONG_SCALE;
+}
+function getFeatureFlagVariantLookupTable(variants) {
+  const table = [];
+  let valueMin = 0;
+  for (const variant of variants) {
+    const valueMax = valueMin + variant.rollout_percentage / 100;
+    table.push({
+      valueMin,
+      valueMax,
+      key: variant.key
+    });
+    valueMin = valueMax;
+  }
+  return table;
+}
+async function getFeatureFlagVariant(key, bucketingValue, variants) {
+  const hashValue = await getFeatureFlagHash(key, bucketingValue, "variant");
+  return getFeatureFlagVariantLookupTable(variants).find((variant) => hashValue >= variant.valueMin && hashValue < variant.valueMax)?.key;
+}
+function resolveFeatureFlagPayload(payloads, flagValue) {
+  if (flagValue === false || flagValue == null || !payloads)
+    return null;
+  const payloadKey = typeof flagValue == "boolean" ? flagValue.toString() : flagValue;
+  const payload = payloads[payloadKey] || null;
+  return payload == null ? null : parsePayload(payload);
+}
+var NULL_VALUES_ALLOWED_OPERATORS, LONG_SCALE = 1152921504606847000, InconclusiveMatchError;
+var init_featureFlagLocalEvaluation = __esm(() => {
+  init_featureFlagUtils();
+  NULL_VALUES_ALLOWED_OPERATORS = [
+    "is_not",
+    "is_set"
+  ];
+  InconclusiveMatchError = class InconclusiveMatchError extends Error {
+    constructor(message) {
+      super(message);
+      this.name = this.constructor.name;
+      Object.setPrototypeOf(this, InconclusiveMatchError.prototype);
+    }
+  };
+});
+
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/utils/otlp-any-value.mjs
+function newState() {
+  return {
+    ancestors: new WeakSet,
+    remainingNodes: MAX_JSON_SAFE_VALUE_NODES
+  };
+}
+function toOtlpKeyValueList(attrs, logger2) {
+  try {
+    return encodeKeyValueList(attrs, logger2, newState(), 0);
+  } catch {
+    return [];
+  }
+}
+function encodeBigInt(value, logger2) {
+  const decimal = value.toString();
+  const limit = BigInt(INT64_RANGE_LIMIT_DECIMAL);
+  if (value >= limit || value < -limit) {
+    logger2?.debug(`Attribute ${decimal} is outside the int64 range; encoding it as a string`);
+    return {
+      stringValue: decimal
+    };
+  }
+  return {
+    intValue: decimal
+  };
+}
+function encodeAnyValue(value, logger2, state, depth) {
+  if (state.remainingNodes <= 0)
+    return {
+      stringValue: TRUNCATED_VALUE
+    };
+  state.remainingNodes--;
+  if (isBoolean(value))
+    return {
+      boolValue: value
+    };
+  if (typeof value == "bigint")
+    return encodeBigInt(value, logger2);
+  if (typeof value == "number") {
+    if (!Number.isFinite(value))
+      return {
+        stringValue: String(value)
+      };
+    if (Number.isInteger(value)) {
+      if (Number.isSafeInteger(value))
+        return {
+          intValue: String(value)
+        };
+      if ("u" < typeof BigInt)
+        return {
+          stringValue: String(value)
+        };
+      const decimal = BigInt(value).toString();
+      if (value >= INT64_RANGE_LIMIT || value < -INT64_RANGE_LIMIT) {
+        logger2?.debug(`Attribute ${decimal} is outside the int64 range; encoding it as a string`);
+        return {
+          stringValue: decimal
+        };
+      }
+      return {
+        intValue: decimal
+      };
+    }
+    return {
+      doubleValue: value
+    };
+  }
+  if (typeof value == "string")
+    return {
+      stringValue: sanitizeString(value)
+    };
+  if (typeof value == "function")
+    return {
+      stringValue: FUNCTION_VALUE
+    };
+  if (typeof value == "symbol")
+    return {
+      stringValue: String(value)
+    };
+  if (typeof value == "object" && value !== null) {
+    if (state.ancestors.has(value))
+      return {
+        stringValue: CIRCULAR_VALUE
+      };
+    if (depth >= MAX_JSON_SAFE_VALUE_DEPTH)
+      return {
+        stringValue: TRUNCATED_VALUE
+      };
+    if (value instanceof Date) {
+      const time = value.getTime();
+      const iso = Number.isFinite(time) ? value.toISOString() : String(value);
+      return {
+        stringValue: typeof iso == "string" ? sanitizeString(iso) : String(iso)
+      };
+    }
+    state.ancestors.add(value);
+    try {
+      try {
+        const toJSON = value.toJSON;
+        if (typeof toJSON == "function")
+          return encodeAnyValue(toJSON.call(value), logger2, state, depth + 1);
+      } catch {}
+      if (isArray(value))
+        return {
+          arrayValue: {
+            values: encodeArrayValues(value, logger2, state, depth + 1)
+          }
+        };
+      return {
+        kvlistValue: {
+          values: encodeKeyValueList(value, logger2, state, depth + 1)
+        }
+      };
+    } finally {
+      state.ancestors.delete(value);
+    }
+  }
+  return {
+    stringValue: sanitizeString(String(value))
+  };
+}
+function encodeArrayValues(values, logger2, state, depth) {
+  const result = [];
+  const itemCount = Math.min(values.length, MAX_JSON_SAFE_VALUE_ITEMS);
+  let index = 0;
+  for (;index < itemCount && state.remainingNodes > 0; index++)
+    try {
+      const element = index in values ? values[index] : undefined;
+      if (isNullish(element))
+        continue;
+      result.push(encodeAnyValue(element, logger2, state, depth));
+    } catch {
+      result.push({
+        stringValue: UNSERIALIZABLE_VALUE
+      });
+    }
+  if (values.length > index)
+    result.push({
+      stringValue: TRUNCATED_VALUE
+    });
+  return result;
+}
+function encodeKeyValueList(attrs, logger2, state, depth) {
+  const result = [];
+  for (const key in attrs)
+    if (propertyIsEnumerable.call(attrs, key)) {
+      if (!key) {
+        logger2?.debug("Dropping an attribute with an empty key");
+        continue;
+      }
+      if (result.length >= MAX_JSON_SAFE_VALUE_ITEMS || state.remainingNodes <= 0) {
+        logger2?.debug("Attributes truncated: the value exceeds the OTLP encoder budget");
+        break;
+      }
+      try {
+        const value = attrs[key];
+        if (isNull(value) || isUndefined(value))
+          continue;
+        result.push({
+          key: sanitizeString(key),
+          value: encodeAnyValue(value, logger2, state, depth)
+        });
+      } catch {
+        result.push({
+          key: sanitizeString(key),
+          value: {
+            stringValue: UNSERIALIZABLE_VALUE
+          }
+        });
+      }
+    }
+  return result;
+}
+var INT64_RANGE_LIMIT = 9223372036854776000, INT64_RANGE_LIMIT_DECIMAL = "9223372036854775808", propertyIsEnumerable;
+var init_otlp_any_value = __esm(() => {
+  init_type_utils();
+  init_json_utils();
+  propertyIsEnumerable = Object.prototype.propertyIsEnumerable;
+});
+
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/utils/otlp-resource.mjs
+function buildOtlpResourceAttributes(config, sdkName, sdkVersion) {
+  return {
+    ...config.resourceAttributes,
+    "service.name": config.serviceName || "unknown_service",
+    ...config.environment && {
+      "deployment.environment": config.environment
+    },
+    ...config.serviceVersion && {
+      "service.version": config.serviceVersion
+    },
+    "telemetry.sdk.name": sdkName,
+    "telemetry.sdk.version": sdkVersion
+  };
+}
+var init_otlp_resource = () => {};
+
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/logs/logs-utils.mjs
+var OTLP_SEVERITY_MAP, DEFAULT_OTLP_SEVERITY;
+var init_logs_utils = __esm(() => {
+  init_utils();
+  init_json_utils();
+  init_otlp_any_value();
+  init_otlp_resource();
+  OTLP_SEVERITY_MAP = {
+    trace: {
+      text: "TRACE",
+      number: 1
+    },
+    debug: {
+      text: "DEBUG",
+      number: 5
+    },
+    info: {
+      text: "INFO",
+      number: 9
+    },
+    warn: {
+      text: "WARN",
+      number: 13
+    },
+    error: {
+      text: "ERROR",
+      number: 17
+    },
+    fatal: {
+      text: "FATAL",
+      number: 21
+    }
+  };
+  DEFAULT_OTLP_SEVERITY = OTLP_SEVERITY_MAP.info;
+});
+
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/logs/index.mjs
+var init_logs = __esm(() => {
+  init_logs_utils();
+  init_types();
+  init_utils();
+});
+
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/metrics/metrics-utils.mjs
+function msToUnixNano(ms) {
+  return String(ms) + "000000";
+}
+function seriesKey(type, name, unit, attributes) {
+  let attrsKey = "";
+  if (attributes) {
+    const keys = Object.keys(attributes).sort();
+    attrsKey = keys.map((k) => `${JSON.stringify(k)}:${JSON.stringify(attributes[k])}`).join(",");
+  }
+  return `${type}\x00${name}\x00${unit ?? ""}\x00${attrsKey}`;
+}
+function bucketIndexFor(value, bounds) {
+  for (let i = 0;i < bounds.length; i++)
+    if (value <= bounds[i])
+      return i;
+  return bounds.length;
+}
+function buildMetricsResourceAttributes(config, scopeName, scopeVersion) {
+  return buildOtlpResourceAttributes(config, scopeName, scopeVersion);
+}
+function buildOtlpMetricsPayload(metrics, resourceAttributes, scopeName, scopeVersion) {
+  return {
+    resourceMetrics: [
+      {
+        resource: {
+          attributes: toOtlpKeyValueList(resourceAttributes)
+        },
+        scopeMetrics: [
+          {
+            scope: {
+              name: scopeName,
+              version: scopeVersion
+            },
+            metrics
+          }
+        ]
+      }
+    ]
+  };
+}
+var DEFAULT_HISTOGRAM_BOUNDS;
+var init_metrics_utils = __esm(() => {
+  init_otlp_any_value();
+  init_otlp_resource();
+  DEFAULT_HISTOGRAM_BOUNDS = [
+    0,
+    5,
+    10,
+    25,
+    50,
+    75,
+    100,
+    250,
+    500,
+    750,
+    1000,
+    2500,
+    5000,
+    7500,
+    1e4
+  ];
+});
+
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/metrics/config.mjs
+function resolveMetricsConfig(config) {
+  const resourceAttributes = config?.resourceAttributes;
+  return {
+    serviceName: resourceAttributes?.["service.name"] ?? config?.serviceName,
+    serviceVersion: resourceAttributes?.["service.version"] ?? config?.serviceVersion,
+    environment: resourceAttributes?.["deployment.environment"] ?? config?.environment,
+    resourceAttributes,
+    beforeSend: config?.beforeSend,
+    flushIntervalMs: config?.flushIntervalMs ?? DEFAULT_FLUSH_INTERVAL_MS,
+    maxSeriesPerFlush: config?.maxSeriesPerFlush ?? DEFAULT_MAX_SERIES_PER_FLUSH
+  };
+}
+var DEFAULT_FLUSH_INTERVAL_MS = 1e4, DEFAULT_MAX_SERIES_PER_FLUSH = 1000;
+var init_config = () => {};
+
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/metrics/index.mjs
+class PostHogMetrics {
+  constructor(_instance, _config, _logger) {
+    this._instance = _instance;
+    this._config = _config;
+    this._logger = _logger;
+    this._series = new Map;
+    this._flushPromise = null;
+    this._seriesCapWarned = false;
+    this._typeByName = new Map;
+    this._typeCollisionWarned = new Set;
+    this._generation = 0;
+  }
+  count(name, value = 1, options) {
+    this._capture({
+      name,
+      type: "count",
+      value,
+      unit: options?.unit,
+      attributes: options?.attributes
+    });
+  }
+  gauge(name, value, options) {
+    this._capture({
+      name,
+      type: "gauge",
+      value,
+      unit: options?.unit,
+      attributes: options?.attributes
+    });
+  }
+  histogram(name, value, options) {
+    this._capture({
+      name,
+      type: "histogram",
+      value,
+      unit: options?.unit,
+      attributes: options?.attributes
+    });
+  }
+  flush() {
+    const prev = this._flushPromise;
+    const run = async () => {
+      if (prev)
+        await prev.catch(() => {});
+      await this._doFlush();
+    };
+    const p = run().finally(() => {
+      if (this._flushPromise === p)
+        this._flushPromise = null;
+    });
+    this._flushPromise = p;
+    return p;
+  }
+  drainWindow() {
+    if (this._series.size === 0)
+      return null;
+    const window = this._series;
+    this._series = new Map;
+    this._seriesCapWarned = false;
+    this._typeByName = new Map;
+    this._typeCollisionWarned = new Set;
+    return this._buildPayload(window);
+  }
+  reset() {
+    this._generation++;
+    this._clearFlushTimer();
+    this._series = new Map;
+    this._flushPromise = null;
+    this._seriesCapWarned = false;
+    this._typeByName = new Map;
+    this._typeCollisionWarned = new Set;
+  }
+  _capture(sample) {
+    if (this._instance.isDisabled || this._instance.optedOut)
+      return;
+    const filtered = this._runBeforeSend(sample);
+    if (filtered === null)
+      return;
+    if (!filtered.name || typeof filtered.name != "string")
+      return void this._logger.warn("Dropping metric with empty name");
+    if (typeof filtered.value != "number" || !Number.isFinite(filtered.value))
+      return void this._logger.warn(`Dropping metric '${filtered.name}': value must be a finite number`);
+    if (filtered.type === "count" && filtered.value < 0)
+      return void this._logger.warn(`Dropping count '${filtered.name}': counters are monotonic, value must be >= 0`);
+    let attributes;
+    let key;
+    try {
+      attributes = filtered.attributes ? {
+        ...filtered.attributes
+      } : undefined;
+      key = seriesKey(filtered.type, filtered.name, filtered.unit, attributes);
+    } catch (e) {
+      this._logger.warn(`Dropping metric '${filtered.name}': attributes could not be serialized`, e);
+      return;
+    }
+    let state = this._series.get(key);
+    if (!state) {
+      if (!this._admitNewSeries())
+        return;
+      state = {
+        name: filtered.name,
+        type: filtered.type,
+        unit: filtered.unit,
+        attributes,
+        windowStartMs: Date.now()
+      };
+      this._series.set(key, state);
+    }
+    const seenType = this._typeByName.get(filtered.name);
+    if (seenType === undefined)
+      this._typeByName.set(filtered.name, filtered.type);
+    else if (seenType !== filtered.type && !this._typeCollisionWarned.has(filtered.name)) {
+      this._typeCollisionWarned.add(filtered.name);
+      this._logger.warn(`Metric name '${filtered.name}' is already used as a ${seenType}; recording it as a ${filtered.type} too will blend both series in charts. Use a distinct name.`);
+    }
+    this._fold(state, filtered.value);
+    this._armFlushTimer();
+  }
+  _admitNewSeries() {
+    if (this._series.size < this._config.maxSeriesPerFlush)
+      return true;
+    if (!this._seriesCapWarned) {
+      this._seriesCapWarned = true;
+      this._logger.warn(`Metric series cap reached (${this._config.maxSeriesPerFlush} per flush window); dropping new series until the next flush. Reduce attribute cardinality.`);
+    }
+    return false;
+  }
+  _fold(state, value) {
+    switch (state.type) {
+      case "count":
+        state.total = (state.total ?? 0) + value;
+        break;
+      case "gauge":
+        state.last = value;
+        break;
+      case "histogram": {
+        if (!state.hist)
+          state.hist = {
+            count: 0,
+            sum: 0,
+            min: value,
+            max: value,
+            bucketCounts: new Array(DEFAULT_HISTOGRAM_BOUNDS.length + 1).fill(0)
+          };
+        const hist = state.hist;
+        hist.count += 1;
+        hist.sum += value;
+        hist.min = Math.min(hist.min, value);
+        hist.max = Math.max(hist.max, value);
+        hist.bucketCounts[bucketIndexFor(value, DEFAULT_HISTOGRAM_BOUNDS)] += 1;
+        break;
+      }
+    }
+  }
+  _runBeforeSend(sample) {
+    const beforeSend = this._config.beforeSend;
+    if (!beforeSend)
+      return sample;
+    const fns = isArray(beforeSend) ? beforeSend : [
+      beforeSend
+    ];
+    let result = sample;
+    for (const fn of fns)
+      try {
+        const next = fn(result);
+        if (!next) {
+          this._logger.info("Metric was rejected in beforeSend function");
+          return null;
+        }
+        result = next;
+      } catch (e) {
+        this._logger.error("Error in beforeSend function for metric:", e);
+        return null;
+      }
+    return result;
+  }
+  _armFlushTimer() {
+    if (this._flushTimer)
+      return;
+    this._flushTimer = safeSetTimeout(() => {
+      this._flushTimer = undefined;
+      this.flush().catch((e) => {
+        this._logger.error("Metrics flush failed:", e);
+      });
+    }, this._config.flushIntervalMs);
+  }
+  _clearFlushTimer() {
+    if (this._flushTimer) {
+      clearTimeout(this._flushTimer);
+      this._flushTimer = undefined;
+    }
+  }
+  async _doFlush() {
+    if (this._series.size === 0)
+      return;
+    const window = this._series;
+    this._series = new Map;
+    this._seriesCapWarned = false;
+    this._typeByName = new Map;
+    this._typeCollisionWarned = new Set;
+    const generation = this._generation;
+    const outcome = await this._instance._sendMetricsBatch(this._buildPayload(window));
+    if (generation !== this._generation)
+      return;
+    switch (outcome.kind) {
+      case "ok":
+        return;
+      case "retry-later":
+        this._mergeWindowBack(window);
+        this._armFlushTimer();
+        return;
+      case "too-large":
+        this._logger.warn("Metrics batch exceeded the server size limit and was dropped");
+        return;
+      case "fatal":
+        this._logger.error("Failed to send metrics batch:", outcome.error);
+        return;
+    }
+  }
+  _buildPayload(window) {
+    return buildOtlpMetricsPayload(this._buildMetrics(window), buildMetricsResourceAttributes(this._config, this._instance.getLibraryId(), this._instance.getLibraryVersion()), this._instance.getLibraryId(), this._instance.getLibraryVersion());
+  }
+  _buildMetrics(window) {
+    const nowNano = msToUnixNano(Date.now());
+    const byMetric = new Map;
+    for (const state of window.values()) {
+      const metricKey = seriesKey(state.type, state.name, state.unit, undefined);
+      let metric = byMetric.get(metricKey);
+      if (!metric) {
+        metric = {
+          name: state.name,
+          ...state.unit && {
+            unit: state.unit
+          }
+        };
+        if (state.type === "count")
+          metric.sum = {
+            aggregationTemporality: OTLP_TEMPORALITY_DELTA,
+            isMonotonic: true,
+            dataPoints: []
+          };
+        else if (state.type === "gauge")
+          metric.gauge = {
+            dataPoints: []
+          };
+        else
+          metric.histogram = {
+            aggregationTemporality: OTLP_TEMPORALITY_DELTA,
+            dataPoints: []
+          };
+        byMetric.set(metricKey, metric);
+      }
+      const attributes = toOtlpKeyValueList(state.attributes ?? {}, this._logger);
+      const startNano = msToUnixNano(state.windowStartMs);
+      if (state.type === "count") {
+        const dp = {
+          attributes,
+          startTimeUnixNano: startNano,
+          timeUnixNano: nowNano,
+          asDouble: state.total ?? 0
+        };
+        metric.sum.dataPoints.push(dp);
+      } else if (state.type === "gauge") {
+        const dp = {
+          attributes,
+          timeUnixNano: nowNano,
+          asDouble: state.last ?? 0
+        };
+        metric.gauge.dataPoints.push(dp);
+      } else if (state.hist) {
+        const dp = {
+          attributes,
+          startTimeUnixNano: startNano,
+          timeUnixNano: nowNano,
+          count: state.hist.count,
+          sum: state.hist.sum,
+          min: state.hist.min,
+          max: state.hist.max,
+          bucketCounts: state.hist.bucketCounts,
+          explicitBounds: DEFAULT_HISTOGRAM_BOUNDS
+        };
+        metric.histogram.dataPoints.push(dp);
+      }
+    }
+    return Array.from(byMetric.values());
+  }
+  _mergeWindowBack(window) {
+    for (const [key, old] of window) {
+      const current = this._series.get(key);
+      if (!current) {
+        if (this._admitNewSeries())
+          this._series.set(key, old);
+        continue;
+      }
+      current.windowStartMs = Math.min(current.windowStartMs, old.windowStartMs);
+      switch (current.type) {
+        case "count":
+          current.total = (current.total ?? 0) + (old.total ?? 0);
+          break;
+        case "gauge":
+          break;
+        case "histogram":
+          if (old.hist)
+            if (current.hist) {
+              current.hist.count += old.hist.count;
+              current.hist.sum += old.hist.sum;
+              current.hist.min = Math.min(current.hist.min, old.hist.min);
+              current.hist.max = Math.max(current.hist.max, old.hist.max);
+              for (let i = 0;i < current.hist.bucketCounts.length; i++)
+                current.hist.bucketCounts[i] += old.hist.bucketCounts[i];
+            } else
+              current.hist = old.hist;
+          break;
+      }
+    }
+  }
+}
+var OTLP_TEMPORALITY_DELTA = 1;
+var init_metrics = __esm(() => {
+  init_utils();
+  init_otlp_any_value();
+  init_metrics_utils();
+  init_config();
+});
+
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/surveys/validation.mjs
+var init_validation = __esm(() => {
+  init_types();
+});
+
+// node_modules/.bun/@posthog+core@1.50.5/node_modules/@posthog/core/dist/index.mjs
 var init_dist = __esm(() => {
+  init_error_tracking();
   init_featureFlagUtils();
   init_featureFlagLocalEvaluation();
   init_gzip();
   init_logs_utils();
+  init_otlp_any_value();
+  init_otlp_resource();
   init_logs();
   init_metrics();
   init_uuidv7();
   init_validation();
-  init_error_tracking();
   init_utils();
   init_cookie();
   init_posthog_core();
@@ -4556,7 +4769,7 @@ var init_dist = __esm(() => {
   init_types();
 });
 
-// node_modules/.bun/posthog-node@5.51.4/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/context-lines.node.mjs
+// node_modules/.bun/posthog-node@5.51.6/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/context-lines.node.mjs
 import { constants as constants2 } from "node:fs";
 import { open as promises_open } from "node:fs/promises";
 import { isAbsolute as isAbsolute7 } from "node:path";
@@ -4843,7 +5056,7 @@ var init_context_lines_node = __esm(() => {
   LRU_FILE_CONTENTS_FS_READ_FAILED = new exports_error_tracking.ReduceableCache(20);
 });
 
-// node_modules/.bun/posthog-node@5.51.4/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/relative-path.node.mjs
+// node_modules/.bun/posthog-node@5.51.6/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/relative-path.node.mjs
 import { isAbsolute as isAbsolute8, relative as relative4, sep as sep8 } from "node:path";
 function createRelativePathModifier(basePath = process.cwd()) {
   const isWindows = sep8 === "\\";
@@ -4860,11 +5073,11 @@ function createRelativePathModifier(basePath = process.cwd()) {
 }
 var init_relative_path_node = () => {};
 
-// node_modules/.bun/posthog-node@5.51.4/node_modules/posthog-node/dist/version.mjs
-var version = "5.51.4";
+// node_modules/.bun/posthog-node@5.51.6/node_modules/posthog-node/dist/version.mjs
+var version = "5.51.6";
 var init_version = () => {};
 
-// node_modules/.bun/posthog-node@5.51.4/node_modules/posthog-node/dist/types.mjs
+// node_modules/.bun/posthog-node@5.51.6/node_modules/posthog-node/dist/types.mjs
 var FeatureFlagError2;
 var init_types3 = __esm(() => {
   FeatureFlagError2 = {
@@ -4875,7 +5088,7 @@ var init_types3 = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.51.4/node_modules/posthog-node/dist/feature-flag-evaluations.mjs
+// node_modules/.bun/posthog-node@5.51.6/node_modules/posthog-node/dist/feature-flag-evaluations.mjs
 class FeatureFlagEvaluations {
   constructor(init) {
     this._host = init.host;
@@ -5011,7 +5224,7 @@ var init_feature_flag_evaluations = __esm(() => {
   init_types3();
 });
 
-// node_modules/.bun/posthog-node@5.51.4/node_modules/posthog-node/dist/extensions/feature-flags/feature-flags.mjs
+// node_modules/.bun/posthog-node@5.51.6/node_modules/posthog-node/dist/extensions/feature-flags/feature-flags.mjs
 function setCustomErrorPrototype(error, constructor) {
   error.name = constructor.name;
   Error.captureStackTrace(error, constructor);
@@ -5642,7 +5855,7 @@ var init_feature_flags = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.51.4/node_modules/posthog-node/dist/extensions/error-tracking/autocapture.mjs
+// node_modules/.bun/posthog-node@5.51.6/node_modules/posthog-node/dist/extensions/error-tracking/autocapture.mjs
 function splitNodeOptions(nodeOptions) {
   const args = [];
   let current = "";
@@ -5743,7 +5956,7 @@ var init_autocapture = __esm(() => {
   STARTUP_UNHANDLED_REJECTION_MODE = getUnhandledRejectionMode();
 });
 
-// node_modules/.bun/posthog-node@5.51.4/node_modules/posthog-node/dist/extensions/error-tracking/index.mjs
+// node_modules/.bun/posthog-node@5.51.6/node_modules/posthog-node/dist/extensions/error-tracking/index.mjs
 class error_tracking_ErrorTracking {
   constructor(client, options, _logger) {
     this.client = client;
@@ -5817,7 +6030,7 @@ var init_error_tracking2 = __esm(() => {
   init_dist();
 });
 
-// node_modules/.bun/posthog-node@5.51.4/node_modules/posthog-node/dist/storage-memory.mjs
+// node_modules/.bun/posthog-node@5.51.6/node_modules/posthog-node/dist/storage-memory.mjs
 class PostHogMemoryStorage {
   getProperty(key) {
     return this._memoryStorage[key];
@@ -5831,7 +6044,7 @@ class PostHogMemoryStorage {
 }
 var init_storage_memory = () => {};
 
-// node_modules/.bun/posthog-node@5.51.4/node_modules/posthog-node/dist/capture-v1/config.mjs
+// node_modules/.bun/posthog-node@5.51.6/node_modules/posthog-node/dist/capture-v1/config.mjs
 function isCaptureMode(value) {
   return value === "v0" || value === "v1";
 }
@@ -5841,14 +6054,14 @@ function resolveCaptureMode() {
 }
 var init_config2 = () => {};
 
-// node_modules/.bun/posthog-node@5.51.4/node_modules/posthog-node/dist/capture-v1/routing.mjs
+// node_modules/.bun/posthog-node@5.51.6/node_modules/posthog-node/dist/capture-v1/routing.mjs
 function isLegacyOnlyEvent(message) {
   return typeof message.event == "string" && message.event.startsWith(AI_EVENT_PREFIX);
 }
 var AI_EVENT_PREFIX = "$ai_", ANALYTICS_ROUTE = "analytics", AI_ROUTE = "ai";
 var init_routing = () => {};
 
-// node_modules/.bun/posthog-node@5.51.4/node_modules/posthog-node/dist/capture-v1/errors.mjs
+// node_modules/.bun/posthog-node@5.51.6/node_modules/posthog-node/dist/capture-v1/errors.mjs
 var CaptureV1Error;
 var init_errors = __esm(() => {
   CaptureV1Error = class CaptureV1Error extends Error {
@@ -5868,7 +6081,7 @@ var init_errors = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.51.4/node_modules/posthog-node/dist/capture-v1/transform.mjs
+// node_modules/.bun/posthog-node@5.51.6/node_modules/posthog-node/dist/capture-v1/transform.mjs
 function coerceBool(value) {
   if (typeof value == "boolean")
     return value;
@@ -5986,7 +6199,7 @@ var init_transform = __esm(() => {
   ];
 });
 
-// node_modules/.bun/posthog-node@5.51.4/node_modules/posthog-node/dist/capture-v1/sender.mjs
+// node_modules/.bun/posthog-node@5.51.6/node_modules/posthog-node/dist/capture-v1/sender.mjs
 class V1CaptureSender {
   constructor(config, hooks) {
     this.config = config;
@@ -6242,11 +6455,11 @@ var init_sender = __esm(() => {
   ]);
 });
 
-// node_modules/.bun/posthog-node@5.51.4/node_modules/posthog-node/dist/ai-capture/routing.mjs
+// node_modules/.bun/posthog-node@5.51.6/node_modules/posthog-node/dist/ai-capture/routing.mjs
 var AI_CAPTURE_ROUTE = "ai-capture", AI_CAPTURE_ENDPOINT_PATH = "/i/v0/ai/batch/", AI_MAX_EVENT_BYTES = 8388608, AI_BATCH_TARGET_BYTES = 5242880;
 var init_routing2 = () => {};
 
-// node_modules/.bun/posthog-node@5.51.4/node_modules/posthog-node/dist/ai-capture/batching.mjs
+// node_modules/.bun/posthog-node@5.51.6/node_modules/posthog-node/dist/ai-capture/batching.mjs
 function eventByteSize(message) {
   return encoder.encode(safeJsonStringify(message)).length;
 }
@@ -6288,7 +6501,7 @@ var init_batching = __esm(() => {
   encoder = new TextEncoder;
 });
 
-// node_modules/.bun/posthog-node@5.51.4/node_modules/posthog-node/dist/client.mjs
+// node_modules/.bun/posthog-node@5.51.6/node_modules/posthog-node/dist/client.mjs
 function emitDeprecationWarningOnce(id, message) {
   if (_emittedDeprecations.has(id))
     return;
@@ -7555,7 +7768,7 @@ var init_client = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.51.4/node_modules/posthog-node/dist/extensions/context/context.mjs
+// node_modules/.bun/posthog-node@5.51.6/node_modules/posthog-node/dist/extensions/context/context.mjs
 import { AsyncLocalStorage } from "node:async_hooks";
 
 class PostHogContext {
@@ -7587,7 +7800,7 @@ class PostHogContext {
 }
 var init_context = () => {};
 
-// node_modules/.bun/posthog-node@5.51.4/node_modules/posthog-node/dist/gzip.node.mjs
+// node_modules/.bun/posthog-node@5.51.6/node_modules/posthog-node/dist/gzip.node.mjs
 import { gzip } from "node:zlib";
 import { promisify } from "node:util";
 async function gzipCompress2(input, isDebug = true) {
@@ -7605,7 +7818,7 @@ var init_gzip_node = __esm(() => {
   gzipAsync = promisify(gzip);
 });
 
-// node_modules/.bun/posthog-node@5.51.4/node_modules/posthog-node/dist/extensions/sentry-integration.mjs
+// node_modules/.bun/posthog-node@5.51.6/node_modules/posthog-node/dist/extensions/sentry-integration.mjs
 function createEventProcessor(_posthog, { organization, projectId, prefix, severityAllowList = [
   "error"
 ], sendExceptionsToPostHog = true } = {}) {
@@ -7680,22 +7893,22 @@ var init_sentry_integration = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.51.4/node_modules/posthog-node/dist/extensions/tracing-headers.mjs
+// node_modules/.bun/posthog-node@5.51.6/node_modules/posthog-node/dist/extensions/tracing-headers.mjs
 var init_tracing_headers2 = () => {};
 
-// node_modules/.bun/posthog-node@5.51.4/node_modules/posthog-node/dist/extensions/url-utils.mjs
+// node_modules/.bun/posthog-node@5.51.6/node_modules/posthog-node/dist/extensions/url-utils.mjs
 var init_url_utils = __esm(() => {
   init_dist();
 });
 
-// node_modules/.bun/posthog-node@5.51.4/node_modules/posthog-node/dist/extensions/express.mjs
+// node_modules/.bun/posthog-node@5.51.6/node_modules/posthog-node/dist/extensions/express.mjs
 var init_express = __esm(() => {
   init_error_tracking2();
   init_tracing_headers2();
   init_url_utils();
 });
 
-// node_modules/.bun/posthog-node@5.51.4/node_modules/posthog-node/dist/exports.mjs
+// node_modules/.bun/posthog-node@5.51.6/node_modules/posthog-node/dist/exports.mjs
 var init_exports = __esm(() => {
   init_feature_flag_evaluations();
   init_dist();
@@ -7704,7 +7917,7 @@ var init_exports = __esm(() => {
   init_types3();
 });
 
-// node_modules/.bun/posthog-node@5.51.4/node_modules/posthog-node/dist/entrypoints/index.node.mjs
+// node_modules/.bun/posthog-node@5.51.6/node_modules/posthog-node/dist/entrypoints/index.node.mjs
 var PostHog;
 var init_index_node = __esm(() => {
   init_module_node();
