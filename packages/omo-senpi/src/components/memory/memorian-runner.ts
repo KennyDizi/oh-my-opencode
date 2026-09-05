@@ -21,7 +21,6 @@ import { join } from "node:path"
 
 import {
   PendingNudges,
-  loadMemorianPersona,
   validateNudges,
   type MemoryIdentityPaths,
   type RecallCandidate,
@@ -39,8 +38,9 @@ import type { ComponentLogger } from "../../extension/types"
 import type { SenpiOmoConfigResult } from "../config-resolution"
 import type { RecallTranscriptTurn } from "./recall-wiring"
 import { resolveReflectionModel, type ReflectionModelResolution } from "./worker/resolve-model"
-import { createMemorianNudgeTool, MEMORIAN_NUDGE_TOOL_NAME } from "./memorian-nudge-tool"
-import { buildMemorianPrompt, memorianCandidatesPayload, renderTranscriptWindow } from "./memorian-prompt"
+import { classifyJudgeTurn, normalizeGateReason } from "./memorian-judge-outcome"
+import { buildMemorianJudgeSpec } from "./memorian-judge-spec"
+import { memorianCandidatesPayload, renderTranscriptWindow } from "./memorian-prompt"
 import { abortAndDispose } from "./memorian-lifecycle"
 
 const QUICK_CATEGORY = "quick"
@@ -88,24 +88,26 @@ export interface MemorianGateLaunchInput {
 }
 
 /** Precise failure causes: which stage of the in-process launch died. */
-export type MemorianGateFailureCause = "session_create_failed" | "deadline" | "child_failed"
+export type MemorianGateFailureCause = "session_create_failed" | "deadline" | "child_failed" | "launch_failed"
 
 export type MemorianGateLaunchResult =
   /** Another gate run holds the latch; this trigger is dropped. */
-  | { readonly status: "active" }
+  | { readonly status: "active"; readonly runId?: string }
   /** No candidates, or the quick category could not resolve. */
-  | { readonly status: "skipped"; readonly cause?: string; readonly model?: string; readonly candidateCount?: number }
+  | { readonly status: "skipped"; readonly cause?: string; readonly model?: string; readonly candidateCount?: number; readonly runId?: string }
   /** The child ran and said nothing the parent accepted. */
-  | { readonly status: "empty" }
+  | { readonly status: "empty"; readonly runId?: string }
   /** The child session could not be created, outran its deadline, or its turn failed. */
   | {
     readonly status: "failed"
     readonly cause?: MemorianGateFailureCause
     readonly model?: string
     readonly candidateCount?: number
+    readonly reason?: string
+    readonly runId?: string
   }
-  | { readonly status: "dropped"; readonly cause?: string; readonly model?: string; readonly candidateCount?: number }
-  | { readonly status: "nudged"; readonly nudges: readonly RecallNudge[]; readonly model?: string }
+  | { readonly status: "dropped"; readonly cause?: string; readonly model?: string; readonly candidateCount?: number; readonly runId?: string }
+  | { readonly status: "nudged"; readonly nudges: readonly RecallNudge[]; readonly model?: string; readonly runId: string }
 
 type LaunchState = { cancelled: boolean }
 
@@ -124,8 +126,9 @@ export class MemorianGateRunner {
     if (this.activeLaunch !== undefined) return { status: "active" }
     const state: LaunchState = { cancelled: false }
     const operation = this.launchOnce(input, state).catch((error: unknown) => {
-      this.options.logger?.warn("memorian gate launch failed", { error: describe(error) })
-      return { status: "failed", cause: "child_failed" } as const
+      const reason = normalizeGateReason(describe(error))
+      this.options.logger?.warn("memorian gate launch failed", { error: reason })
+      return { status: "failed", cause: "launch_failed", reason } as const
     })
     this.activeLaunch = operation
     this.activeState = state
@@ -167,7 +170,8 @@ export class MemorianGateRunner {
     const runId = randomUUID()
     const accepted: RecallNudge[] = []
     const judged = await this.runJudge(input, resolution, runId, accepted, state)
-    if (judged.status === "failed") return judged
+    if (judged.status === "failed" || judged.status === "dropped") return judged
+    if (state.cancelled) return { status: "dropped", cause: "cancelled", runId, candidateCount: input.candidates.length }
     // Defence in depth: the closure already validated every recorded nudge at call time, and this
     // re-validation is a no-op for already-validated input (it also drops duplicate paths should
     // the judge repeat one after an accepted call).
@@ -199,7 +203,7 @@ export class MemorianGateRunner {
         ? { status: "dropped", cause: "cancelled", candidateCount: input.candidates.length }
         : this.dropAfterCompaction(input)
     }
-    return { status: "nudged", nudges, model: resolution.model }
+    return { status: "nudged", nudges, model: resolution.model, runId }
   }
 
   /**
@@ -229,7 +233,7 @@ export class MemorianGateRunner {
     runId: string,
     accepted: RecallNudge[],
     state: LaunchState,
-  ): Promise<{ readonly status: "completed" } | Extract<MemorianGateLaunchResult, { readonly status: "failed" }>> {
+  ): Promise<{ readonly status: "completed" } | Extract<MemorianGateLaunchResult, { readonly status: "failed" | "dropped" }>> {
     let deadlineTimer: ReturnType<typeof setTimeout> | undefined
     let deadlineReached = false
     const deadline = new Promise<"deadline">((resolve) => {
@@ -255,37 +259,12 @@ export class MemorianGateRunner {
       ) ?? taskRuntime.createInProcessJudgeRunner(
         this.options.createSession === undefined ? {} : { createSession: this.options.createSession },
       )
-      return runner.start({
-        taskId: `memorian-${runId}`,
-        cwd: runDir,
-        sessionDir: runDir,
-        agentDir: resolveAgentHome({ env: this.options.env }),
-        modelRegistry: input.modelRegistry,
-        model: input.modelRegistry === undefined
-          ? undefined
-          : taskRuntime.findModelReference(input.modelRegistry, resolution.model),
-        ...(resolution.thinking === undefined ? {} : { thinkingLevel: resolution.thinking }),
-        toolAllowlist: [MEMORIAN_NUDGE_TOOL_NAME],
-        memberScopedTools: [
-          createMemorianNudgeTool({
-            candidates: new Set(input.candidates.map((candidate) => candidate.path)),
-            surfaced: input.surfaced,
-            maxItems: input.maxItems,
-            accepted,
-          }),
-        ],
-        depth: 1,
-        parentSessionId: input.sessionId,
-        rootSessionId: input.sessionId,
-        systemPrompt: loadMemorianPersona(),
-        promptEnvelope: "bare",
-        prompt: buildMemorianPrompt(input),
-      })
+      return runner.start(buildMemorianJudgeSpec({ launch: input, runId, runDir, agentDir: resolveAgentHome({ env: this.options.env }), model: input.modelRegistry === undefined ? undefined : taskRuntime.findModelReference(input.modelRegistry, resolution.model), ...(resolution.thinking === undefined ? {} : { thinkingLevel: resolution.thinking }), accepted }))
     })()
     const setupResult = setup.then(
-      (handle) => {
+      async (handle) => {
         if (deadlineReached || state.cancelled) {
-          void abortAndDispose(handle, this.options.logger, runId)
+          await abortAndDispose(handle, this.options.logger, runId)
           return undefined
         }
         this.activeHandle = handle
@@ -300,25 +279,32 @@ export class MemorianGateRunner {
     try {
       const settled = await Promise.race([setupResult, deadline])
       if (settled === "deadline" || settled === undefined) {
-        this.options.logger?.warn("memorian gate deadline exceeded", { runId })
-        if (settled === "deadline") state.cancelled = true
         const handle = this.activeHandle
         if (handle !== undefined) await abortAndDispose(handle, this.options.logger, runId)
-        return { status: "failed", cause: "deadline", model: resolution.model, candidateCount: input.candidates.length }
+        if (state.cancelled && settled === undefined) {
+          return { status: "dropped", cause: "cancelled", runId, candidateCount: input.candidates.length }
+        }
+        this.options.logger?.warn("memorian gate deadline exceeded", { runId })
+        state.cancelled = true
+        return { status: "failed", cause: "deadline", model: resolution.model, candidateCount: input.candidates.length, runId }
       }
       const turn = await Promise.race([settled.waitForIdle(), deadline])
       if (turn === "deadline") {
         this.options.logger?.warn("memorian gate deadline exceeded", { runId })
         await abortAndDispose(settled, this.options.logger, runId)
-        return { status: "failed", cause: "deadline", model: resolution.model, candidateCount: input.candidates.length }
+        return { status: "failed", cause: "deadline", model: resolution.model, candidateCount: input.candidates.length, runId }
       }
-      if (turn.status !== "completed") {
-        return { status: "failed", cause: "child_failed", model: resolution.model, candidateCount: input.candidates.length }
+      const classification = classifyJudgeTurn(turn)
+      if (classification.status === "failed") {
+        const reason = normalizeGateReason(classification.reason)
+        this.options.logger?.warn("memorian gate child failed", { runId, cause: "child_failed", reason })
+        return { status: "failed", cause: "child_failed", reason, runId, model: resolution.model, candidateCount: input.candidates.length }
       }
+      if (classification.status === "dropped") return { status: "dropped", cause: "cancelled", runId, candidateCount: input.candidates.length }
       return { status: "completed" }
     } catch (error) {
-      this.options.logger?.warn("memorian gate child session creation failed", { error: describe(error), runId })
-      return { status: "failed", cause: "session_create_failed", model: resolution.model, candidateCount: input.candidates.length }
+      this.options.logger?.warn("memorian gate child session creation failed", { error: normalizeGateReason(describe(error)), runId })
+      return { status: "failed", cause: "session_create_failed", reason: normalizeGateReason(describe(error)), runId, model: resolution.model, candidateCount: input.candidates.length }
     } finally {
       const handle = (clearTimeout(deadlineTimer), this.activeHandle)
       if (handle !== undefined) {
