@@ -436,7 +436,7 @@ Capability data comes from provider runtime metadata first. OmO also ships bundl
 | **Multimodal Looker** | `gpt-5.6-sol` | `openai\|openai-codex\|opencode/gpt-5.6-sol (low)` → `opencode-go/kimi-k3` → `zai-coding-plan/glm-4.6v` → `openai\|openai-codex\|github-copilot\|opencode/gpt-5-nano`
 | **Prometheus** | `claude-fable-5` | `anthropic\|github-copilot\|opencode/claude-fable-5 (xhigh)` → `opencode-go\|kimi-for-coding\|moonshotai\|opencode/kimi-k3 (max)`
 | **Metis** | `claude-opus-5` | `anthropic\|github-copilot\|opencode/claude-opus-5 (high)` → `opencode-go\|kimi-for-coding\|moonshotai\|opencode/kimi-k3 (low)`
-| **Momus** | `gpt-5.6-terra` | `openai\|openai-codex/gpt-5.6-terra (high)` → `github-copilot/gpt-5.6-terra (high)` → `openai\|openai-codex\|opencode/gpt-5.6-sol (xhigh)` → `github-copilot/gpt-5.6-sol (high)` → `anthropic\|github-copilot\|opencode/claude-opus-5 (max)` → `google\|github-copilot\|opencode/gemini-3.1-pro (high)` → `opencode-go/glm-5.2`
+| **Momus** | `gpt-6-astra` | `openai\|openai-codex/gpt-6-astra (xhigh)` → `github-copilot/gpt-6-astra (high)` → `openai\|openai-codex\|opencode/gpt-6-astra (high)` → `anthropic\|github-copilot\|opencode/claude-opus-5 (max)` → `google\|github-copilot\|opencode/gemini-3.1-pro (high)` → `opencode-go/glm-5.2`
 | **Atlas** | `claude-sonnet-5` | `anthropic\|github-copilot\|opencode/claude-sonnet-5` → `opencode-go/kimi-k3` → `openai\|openai-codex\|github-copilot\|opencode/gpt-5.6-sol (medium)` → `opencode-go/minimax-m3` → `minimax-coding-plan\|minimax-cn-coding-plan/MiniMax-M3` → `opencode-go/minimax-m2.7`
 | **Sisyphus Junior** | `claude-sonnet-5` | `anthropic\|github-copilot\|opencode/claude-sonnet-5` → `opencode-go/kimi-k3` → `openai\|openai-codex\|github-copilot\|opencode/gpt-5.6-sol (medium)` → `opencode-go/minimax-m3` → `minimax-coding-plan\|minimax-cn-coding-plan/MiniMax-M3` → `opencode-go/minimax-m2.7` → `opencode/big-pickle`
 
@@ -607,7 +607,6 @@ Configured under `memory` in `omo.json`, with per-agent overrides under `memory.
   "memory": {
     "enabled": true,
     "agent": "auto",
-    "tool_exposure": "direct",
     "reflection": { "trigger": { "step_count": 25 } },
     "nudge": { "every_user_turns": 10 },
     "dream": { "idle_minutes": 30 },
@@ -622,13 +621,8 @@ Configured under `memory` in `omo.json`, with per-agent overrides under `memory.
 | -------------------- | ---------- | ------------------------------------------------------------------------------- |
 | `enabled`            | `true`     | Master switch for the whole memory component                                     |
 | `agent`              | `"auto"`   | Which agent identity owns the memory repository                                  |
-| `tool_exposure`      | `"direct"` | `direct` registers the memory tools always-on; `search` opts into the MCP server |
 | `compile_warn_tokens`| `30000`    | Warn when the compiled memory block exceeds this many tokens                     |
 | `agents`             | `{}`       | Per-agent overrides; any block below may be overridden field by field            |
-
-`tool_exposure` defaults to `direct` deliberately. The `search` value moves the tools behind
-senpi's `tool_search` catalog through an extension-declared MCP server, which keeps the tool list
-smaller but removes memory entirely if that server fails to start.
 
 #### Reflection
 

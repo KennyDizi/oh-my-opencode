@@ -1,3 +1,55 @@
+## 2026-09-05 — Sweep the remaining task examples and the delegate schema to background-by-default
+
+The gate review of #7795 found model-facing text that still prescribed `run_in_background=false`: the
+delegate tool's own parameter schema (`packages/omo-opencode/src/tools/delegate-task/tools.ts`, "Use true
+ONLY for parallel exploration; otherwise omit or pass false"), the category/skills delegation guide that
+the GPT-5.5/5.6/6 Sisyphus prompt embeds, the Sisyphus default/gemini and execution examples, the Atlas
+section builder and system-reminder template, the wave-plan template in `delegate-task/constants.ts`
+("IN PARALLEL" waves with `false`), the task-resume-info continuation line, delegate-core's retry
+guidance and its `missing_run_in_background` fix hint, and the GPT Atlas and ultrawork prompts in
+`packages/prompts-core` (Atlas said task execution "blocks for verification"; ultrawork spawned oracle
+and plan synchronously). Every example now shows `run_in_background=true`; the Atlas rule reads "the
+completion notification wakes you to verify; `false` only for a short child whose result gates your very
+next call"; the schema and fix hint carry the same rule as the tool description. Left as they are, on
+purpose: the anti-examples that already say "never wait synchronously for explore/librarian", the
+ralph-loop Oracle review (its continuation flow reads the verdict in the same turn), the refactor
+command template that states it needs the result synchronously, and runtime messages that describe a
+sync call factually.
+
+## 2026-09-05 — Make background the standard spawn in every task-tool prompt surface
+
+The text the model reads about `run_in_background` now says the same thing on both editions: `true` is the
+standard spawn (the call returns at once and the child's result arrives as a message or completion
+notification), `false` blocks the turn and is reserved for a short child whose result gates the very next
+call. Before this, `packages/senpi-task/src/tools/task/description.ts` said "only for parallel independent
+work; the default waits", `params.ts` labelled `false` as the default, `packages/omo-opencode/src/agents/sisyphus/gpt-5-5.ts`
+and `sisyphus-junior/gpt-5-5.ts` prescribed `false` "for synchronous work where the next step depends on
+the result" and a synchronous Oracle even though the same prompt said Oracle runs in the background, and
+`packages/omo-opencode/src/tools/delegate-task/tool-description.ts` allowed `true` "ONLY for parallel
+exploration with 5+ independent queries". Each line is rewritten at its source; runtime defaults are
+unchanged. This is the omo half of the GPT-6 Astra async-first change (senpi #1381 rewrote the preset's
+`## Asynchronous Work` section); a live backtest against gpt-6-astra with the old text showed 6/6
+single-dependent delegations spawned in the foreground, and 1/3 still foreground with the new preset but
+the old tool text. The delegate-task `AGENTS.md` mode table follows.
+
+## 2026-09-05 — Replace momus's GPT-5.6 rungs with GPT-6 Astra
+
+Momus is the reviewer, so it gets Astra's deepest practical tier instead of the GPT-5.6 pair it used to
+lead with. Its chain now opens on `openai|openai-codex/gpt-6-astra (xhigh)`, then
+`github-copilot/gpt-6-astra (high)` because GitHub Copilot serves every Copilot GPT reasoning model
+through a backend that hangs above `high`, then `openai|openai-codex|opencode/gpt-6-astra (high)` so an
+opencode-only account still lands on Astra. The two Terra rungs and the two Sol rungs are gone rather
+than demoted — the request was a replacement — and the non-GPT tail (`claude-opus-5 (max)` →
+`gemini-3.1-pro (high)` → `glm-5.2`) is untouched and in the same order. Both independent chain
+transcriptions move together: model-core's `AGENT_MODEL_REQUIREMENTS` and senpi-task's hand-mirrored
+`AGENT_FALLBACK_CHAINS`, whose pinned length for momus drops from 7 to 6.
+
+No prompt gating change was needed: `createMomusAgent` already routes GPT-6 through `isGpt6Model` to the
+GPT-5.6-tuned prompt at high reasoning effort and high text verbosity, and the chain's `xhigh` arrives
+separately as the resolved variant. The installer's generated config follows the chain, so an
+OpenAI-only setup now writes `openai/gpt-6-astra` xhigh with `openai/gpt-6-astra` high beneath it, and a
+Copilot-only setup writes `github-copilot/gpt-6-astra` high with the Opus and Gemini rungs beneath.
+
 ## 2026-09-05 — Give ultrabrain, deep, and unspecified-high GPT-6 Astra prompt appends and make Astra their real default
 
 The three category prompt appends now have GPT-6 Astra variants in both editions
@@ -8,7 +60,7 @@ rather than a restatement of it: ultrabrain states the success criteria of a max
 answer (evidence cited from this turn, executable claims executed, a self-falsification pass, rejected
 alternatives and open assumptions named, one decision-complete recommendation); deep keeps one goal and
 one deliverable with a generous exploration budget, the goal as authorization, numbered steps as one
-atomic task, and the harness fact that a question ends the turn unfinished; unspecified-high asks for a
+atomic task, fixes trace at least two levels above the symptom to the root cause, and the harness fact that a question ends the turn unfinished; unspecified-high asks for a
 survey of the whole affected surface (callers, sibling modules, tests, docs, schemas, config, CI, git
 history), at least two weighed approaches, and delivery across every surface found. The previous
 ultrabrain append prescribed a "Bottom line" response format that the Astra preset bans as a stock
