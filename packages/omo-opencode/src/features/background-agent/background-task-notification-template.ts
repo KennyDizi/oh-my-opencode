@@ -98,7 +98,7 @@ export function buildBackgroundTaskNotificationText(input: {
       body = `${formatTaskSummaryLine(task)}\n`
     }
 
-    const resultCollectionInstruction = "All sibling background tasks are complete. Your next action should be to call `background_output(task_id=\"<id>\")` for each task ID above."
+    const resultCollectionInstruction = "All sibling background tasks are completed. Your next action is to call `background_output(task_id=\"<id>\")` for each task ID above."
 
     return `<system-reminder>
 ${header}

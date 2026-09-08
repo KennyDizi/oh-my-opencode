@@ -110,7 +110,7 @@ describe("buildBackgroundTaskNotificationText", () => {
       })
 
       // then
-      expect(notification).toContain("All sibling background tasks are complete.")
+      expect(notification).toContain("All sibling background tasks are completed.")
       expect(notification).not.toContain("Wait for the all-complete notification")
     })
 
