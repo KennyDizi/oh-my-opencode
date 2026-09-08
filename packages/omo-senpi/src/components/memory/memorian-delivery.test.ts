@@ -56,7 +56,13 @@ describe("createMemorianDelivery", () => {
     const f = await fixture()
     const calls: unknown[] = []
     const coordinator = new IdleInjectionCoordinator(() => undefined)
-    const delivery = createMemorianDelivery({ ledgerFor: () => f.ledger, pendingFor: () => f.pending, coordinator, sendMessage: (message, options) => calls.push({ message, options }), appendEntry: (...entry) => calls.push(entry) })
+    const delivery = createMemorianDelivery({
+      ledgerFor: () => f.ledger,
+      pendingFor: () => f.pending,
+      coordinator,
+      sendMessage: (message, options) => calls.push({ message, options }),
+      appendEntry: (...entry) => calls.push(entry),
+    })
     await delivery.accept(SESSION_ID, f.context, [NUDGE], 0)
     await delivery.onToolResult(SESSION_ID, f.context, { hasPendingMessages: () => false, isIdle: () => false })
     expect(calls).toHaveLength(2)

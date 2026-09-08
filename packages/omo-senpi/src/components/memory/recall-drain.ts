@@ -92,6 +92,7 @@ export function createRecallDrain(options: RecallDrainOptions): RecallDrain {
       },
       paths: nudges.map((nudge) => nudge.path),
       nudges,
+      sessionId: session.id,
     }
 
     try {
@@ -152,6 +153,7 @@ interface RecallInjection {
   }
   readonly paths: readonly string[]
   readonly nudges: readonly RecallNudge[]
+  readonly sessionId: string
 }
 
 function isBeforeAgentStart(payload: unknown): boolean {

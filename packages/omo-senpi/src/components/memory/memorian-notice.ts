@@ -39,10 +39,12 @@ export const renderMemorianNudgedEntry: EntryRenderer<unknown> = (entry, options
   const [first, ...rest] = nudges
   if (first === undefined) return undefined
   // The notice is written in the agent's own voice: a nudge is a recollection the agent just had,
-  // not a third-party act report. `via` stays in the record for forensics but is never drawn.
+  // not a third-party act report. `via` stays in the record for forensics but is never drawn. The
+  // title is one fixed "Aha!" — opener-era records may still carry an `opener` field, and it is
+  // ignored so every notice reads the same.
   return noticeComponent({
     glyph: "✦",
-    title: "Aha moment!",
+    title: "Aha!",
     tone: "accent",
     why: `just remembered: ${first.hint}`,
     extra: [
