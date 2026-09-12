@@ -472,6 +472,9 @@ jobs:
           jq --arg v "$VERSION" '.version = $v' packages/omo-senpi/package.json > tmp.json && mv tmp.json packages/omo-senpi/package.json
           node packages/omo-senpi/plugin/scripts/sync-version.mjs
           node packages/omo-codex/plugin/scripts/sync-hook-status-messages.mjs
+          # Stamp the authored ## [Unreleased] notes into this release's section so the released
+          # commit carries the notes the GitHub release body is later extracted from.
+          bun run script/stamp-release-changelog.ts "$VERSION"
           npm --prefix packages/omo-codex/plugin install --package-lock-only --ignore-scripts --no-audit --fund=false
           bun install --lockfile-only
 
@@ -481,7 +484,7 @@ jobs:
 
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
-          git add package.json packages/omo-native/package.json packages/oh-my-opencode-*/package.json packages/omo-senpi/package.json packages/omo-senpi/plugin/package.json packages/omo-codex/package.json packages/omo-codex/plugin/package.json packages/omo-codex/plugin/package-lock.json packages/omo-codex/plugin/.codex-plugin/plugin.json packages/omo-codex/plugin/components/*/package.json packages/omo-codex/plugin/hooks/*.json packages/omo-codex/plugin/components/*/hooks/hooks.json bun.lock
+          git add CHANGELOG.md package.json packages/omo-native/package.json packages/oh-my-opencode-*/package.json packages/omo-senpi/package.json packages/omo-senpi/plugin/package.json packages/omo-codex/package.json packages/omo-codex/plugin/package.json packages/omo-codex/plugin/package-lock.json packages/omo-codex/plugin/.codex-plugin/plugin.json packages/omo-codex/plugin/components/*/package.json packages/omo-codex/plugin/hooks/*.json packages/omo-codex/plugin/components/*/hooks/hooks.json bun.lock
           git add -f packages/omo-senpi/plugin/extensions
           git diff --cached --quiet || git commit -m "release: v${VERSION}"
 
@@ -994,8 +997,42 @@ jobs:
           JOB_SUMMARY_NEXT: Check package existence probes first, then npm publish logs and the LazyCodex smoke section.
         run: GITHUB_STEP_SUMMARY="$GITHUB_STEP_SUMMARY" bash .github/scripts/write-job-summary.sh
 
+  verify-release-notes:
+    runs-on: ubuntu-latest
+    needs: [release-metadata, prepare-release-state]
+    if: >-
+      always() &&
+      needs.release-metadata.result == 'success' &&
+      needs.prepare-release-state.result == 'success'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.prepare-release-state.outputs.release_sha }}
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.2"
+      # Fail before the platform builds rather than after them: the release body is extracted
+      # from this commit's CHANGELOG section, so a source prepared without one can never publish.
+      - name: Verify the release notes exist on the prepared source
+        env:
+          VERSION: ${{ needs.release-metadata.outputs.version }}
+        run: bun run script/print-release-notes.ts "$VERSION" > /dev/null
+
+      - name: Write job summary
+        if: always()
+        shell: bash
+        env:
+          JOB_SUMMARY_TITLE: Release notes preflight
+          JOB_SUMMARY_STATUS: ${{ job.status }}
+          JOB_SUMMARY_DETAILS: |
+            - Extracts this version's CHANGELOG section from the prepared release source.
+            - Fails closed when the section is absent, empty, or duplicated.
+            - Runs before the platform builds so a source without notes cannot burn a tag.
+          JOB_SUMMARY_NEXT: Author the notes under [Unreleased] and prepare a fresh release state.
+        run: GITHUB_STEP_SUMMARY="$GITHUB_STEP_SUMMARY" bash .github/scripts/write-job-summary.sh
+
   publish-platform:
-    needs: [gate-reuse, preflight-trust, release-metadata, prepare-release-state]
+    needs: [gate-reuse, preflight-trust, release-metadata, prepare-release-state, verify-release-notes]
     if: >-
       always() &&
       github.repository == 'code-yeongyu/oh-my-openagent' &&
@@ -1041,11 +1078,17 @@ jobs:
         run: bun install --frozen-lockfile --ignore-scripts
 
       - name: Generate changelog
-        run: |
-          bun run script/generate-changelog.ts > /tmp/changelog.md
-          cat /tmp/changelog.md
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.release-metadata.outputs.version }}
+        run: |
+          # The release body comes from the CHANGELOG section stamped into the released commit,
+          # so the notes are reviewed in the release PR rather than written after publication.
+          # Fail-closed: a missing or empty section aborts before the release is created.
+          set -euo pipefail
+          bun run script/generate-changelog.ts > /tmp/contributors.md || true
+          bun run script/print-release-notes.ts "$VERSION" /tmp/contributors.md > /tmp/changelog.md
+          cat /tmp/changelog.md
 
 
       - name: Checkout LazyCodex marketplace
