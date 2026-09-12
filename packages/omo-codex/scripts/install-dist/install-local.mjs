@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// omo-codex-install:bc3bb113ea819d8b72c7576db558adb445ad7b64a2dbd605369dbfedf2f94008:c774206feb2d79f38bab5ef122103c3ce8495c96f0382649e1685b87b97680ec
+// omo-codex-install:bc3bb113ea819d8b72c7576db558adb445ad7b64a2dbd605369dbfedf2f94008:735b1e1781da0419b47fb8aecfbb3435e54e654fe0d05cbdf2174df9034a1302
 var __esm = (fn, res, err) => () => {
   if (fn)
     try {
@@ -358,7 +358,7 @@ var init_env = __esm(() => {
   SEND_OPT_OUT_VALUES = ["0", "false", "no", "yes"];
 });
 
-// node_modules/.bun/posthog-node@5.51.7/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/module.node.mjs
+// node_modules/.bun/posthog-node@5.52.1/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/module.node.mjs
 import { dirname as dirname10, posix as posix2, sep as sep7 } from "node:path";
 function createModulerModifier() {
   const getModuleFromFileName = createGetModuleFromFilename();
@@ -395,7 +395,119 @@ function normalizeWindowsPath(path) {
 }
 var init_module_node = () => {};
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/utils/bot-detection.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/types.mjs
+var types_PostHogPersistedProperty;
+var init_types = __esm(() => {
+  types_PostHogPersistedProperty = /* @__PURE__ */ function(PostHogPersistedProperty) {
+    PostHogPersistedProperty["AnonymousId"] = "anonymous_id";
+    PostHogPersistedProperty["DistinctId"] = "distinct_id";
+    PostHogPersistedProperty["Props"] = "props";
+    PostHogPersistedProperty["EnablePersonProcessing"] = "enable_person_processing";
+    PostHogPersistedProperty["PersonMode"] = "person_mode";
+    PostHogPersistedProperty["FeatureFlagDetails"] = "feature_flag_details";
+    PostHogPersistedProperty["FeatureFlags"] = "feature_flags";
+    PostHogPersistedProperty["FeatureFlagPayloads"] = "feature_flag_payloads";
+    PostHogPersistedProperty["BootstrapFeatureFlagDetails"] = "bootstrap_feature_flag_details";
+    PostHogPersistedProperty["BootstrapFeatureFlags"] = "bootstrap_feature_flags";
+    PostHogPersistedProperty["BootstrapFeatureFlagPayloads"] = "bootstrap_feature_flag_payloads";
+    PostHogPersistedProperty["OverrideFeatureFlags"] = "override_feature_flags";
+    PostHogPersistedProperty["Queue"] = "queue";
+    PostHogPersistedProperty["AiQueue"] = "ai_queue";
+    PostHogPersistedProperty["AiCaptureQueue"] = "ai_capture_queue";
+    PostHogPersistedProperty["LogsQueue"] = "logs_queue";
+    PostHogPersistedProperty["OptedOut"] = "opted_out";
+    PostHogPersistedProperty["SessionId"] = "session_id";
+    PostHogPersistedProperty["SessionStartTimestamp"] = "session_start_timestamp";
+    PostHogPersistedProperty["SessionLastTimestamp"] = "session_timestamp";
+    PostHogPersistedProperty["PersonProperties"] = "person_properties";
+    PostHogPersistedProperty["GroupProperties"] = "group_properties";
+    PostHogPersistedProperty["InstalledAppBuild"] = "installed_app_build";
+    PostHogPersistedProperty["InstalledAppVersion"] = "installed_app_version";
+    PostHogPersistedProperty["SessionReplay"] = "session_replay";
+    PostHogPersistedProperty["PushRegistered"] = "push_registered";
+    PostHogPersistedProperty["SessionReplayEventTriggerActivatedSession"] = "session_replay_event_trigger_activated_session";
+    PostHogPersistedProperty["SurveyLastSeenDate"] = "survey_last_seen_date";
+    PostHogPersistedProperty["SurveysSeen"] = "surveys_seen";
+    PostHogPersistedProperty["Surveys"] = "surveys";
+    PostHogPersistedProperty["RemoteConfig"] = "remote_config";
+    PostHogPersistedProperty["FlagsEndpointWasHit"] = "flags_endpoint_was_hit";
+    PostHogPersistedProperty["DeviceId"] = "device_id";
+    return PostHogPersistedProperty;
+  }({});
+});
+
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/utils/string-utils.mjs
+function safeJsonStringify(value) {
+  const ancestors = [];
+  return JSON.stringify(value, function(_key, replacementValue) {
+    if (typeof replacementValue == "bigint")
+      return replacementValue.toString();
+    if (typeof replacementValue == "function" || typeof replacementValue == "symbol")
+      return;
+    if (replacementValue instanceof Error)
+      return {
+        name: replacementValue.name,
+        message: replacementValue.message,
+        stack: replacementValue.stack
+      };
+    if (replacementValue && typeof replacementValue == "object") {
+      while (ancestors.length > 0 && ancestors[ancestors.length - 1] !== this)
+        ancestors.pop();
+      if (ancestors.includes(replacementValue))
+        return "[Circular]";
+      ancestors.push(replacementValue);
+    }
+    return replacementValue;
+  }) ?? "null";
+}
+var init_string_utils = () => {};
+
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/utils/type-utils.mjs
+function isPrimitive(value) {
+  return value === null || typeof value != "object";
+}
+function isBuiltin(candidate, className) {
+  return Object.prototype.toString.call(candidate) === `[object ${className}]`;
+}
+function isError(candidate) {
+  switch (Object.prototype.toString.call(candidate)) {
+    case "[object Error]":
+    case "[object Exception]":
+    case "[object DOMException]":
+    case "[object DOMError]":
+    case "[object WebAssembly.Exception]":
+      return true;
+    default:
+      return isInstanceOf(candidate, Error);
+  }
+}
+function isEvent(candidate) {
+  return "u" > typeof Event && isInstanceOf(candidate, Event);
+}
+function isPlainObject(candidate) {
+  return isBuiltin(candidate, "Object");
+}
+function isInstanceOf(candidate, base) {
+  try {
+    return candidate instanceof base;
+  } catch {
+    return false;
+  }
+}
+var nativeIsArray, ObjProto, type_utils_hasOwnProperty, type_utils_toString, isArray, isObject = (x) => x === Object(x) && !isArray(x), isUndefined = (x) => x === undefined, isString = (x) => type_utils_toString.call(x) == "[object String]", isEmptyString = (x) => isString(x) && x.trim().length === 0, isNull = (x) => x === null, isNullish = (x) => isUndefined(x) || isNull(x), isNumber = (x) => type_utils_toString.call(x) == "[object Number]" && x === x, isBoolean = (x) => type_utils_toString.call(x) === "[object Boolean]";
+var init_type_utils = __esm(() => {
+  init_types();
+  init_string_utils();
+  nativeIsArray = Array.isArray;
+  ObjProto = Object.prototype;
+  type_utils_hasOwnProperty = ObjProto.hasOwnProperty;
+  type_utils_toString = ObjProto.toString;
+  isArray = nativeIsArray || function(obj) {
+    return type_utils_toString.call(obj) === "[object Array]";
+  };
+});
+
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/utils/bot-detection.mjs
 var DEFAULT_BLOCKED_UA_STRS, isBlockedUA = function(ua, customBlockedUserAgents = []) {
   if (!ua)
     return false;
@@ -487,124 +599,12 @@ var init_bot_detection = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/utils/string-utils.mjs
-function safeJsonStringify(value) {
-  const ancestors = [];
-  return JSON.stringify(value, function(_key, replacementValue) {
-    if (typeof replacementValue == "bigint")
-      return replacementValue.toString();
-    if (typeof replacementValue == "function" || typeof replacementValue == "symbol")
-      return;
-    if (replacementValue instanceof Error)
-      return {
-        name: replacementValue.name,
-        message: replacementValue.message,
-        stack: replacementValue.stack
-      };
-    if (replacementValue && typeof replacementValue == "object") {
-      while (ancestors.length > 0 && ancestors[ancestors.length - 1] !== this)
-        ancestors.pop();
-      if (ancestors.includes(replacementValue))
-        return "[Circular]";
-      ancestors.push(replacementValue);
-    }
-    return replacementValue;
-  }) ?? "null";
-}
-var init_string_utils = () => {};
-
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/utils/browser-utils.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/utils/browser-utils.mjs
 var init_browser_utils = __esm(() => {
   init_string_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/types.mjs
-var types_PostHogPersistedProperty;
-var init_types = __esm(() => {
-  types_PostHogPersistedProperty = /* @__PURE__ */ function(PostHogPersistedProperty) {
-    PostHogPersistedProperty["AnonymousId"] = "anonymous_id";
-    PostHogPersistedProperty["DistinctId"] = "distinct_id";
-    PostHogPersistedProperty["Props"] = "props";
-    PostHogPersistedProperty["EnablePersonProcessing"] = "enable_person_processing";
-    PostHogPersistedProperty["PersonMode"] = "person_mode";
-    PostHogPersistedProperty["FeatureFlagDetails"] = "feature_flag_details";
-    PostHogPersistedProperty["FeatureFlags"] = "feature_flags";
-    PostHogPersistedProperty["FeatureFlagPayloads"] = "feature_flag_payloads";
-    PostHogPersistedProperty["BootstrapFeatureFlagDetails"] = "bootstrap_feature_flag_details";
-    PostHogPersistedProperty["BootstrapFeatureFlags"] = "bootstrap_feature_flags";
-    PostHogPersistedProperty["BootstrapFeatureFlagPayloads"] = "bootstrap_feature_flag_payloads";
-    PostHogPersistedProperty["OverrideFeatureFlags"] = "override_feature_flags";
-    PostHogPersistedProperty["Queue"] = "queue";
-    PostHogPersistedProperty["AiQueue"] = "ai_queue";
-    PostHogPersistedProperty["AiCaptureQueue"] = "ai_capture_queue";
-    PostHogPersistedProperty["LogsQueue"] = "logs_queue";
-    PostHogPersistedProperty["OptedOut"] = "opted_out";
-    PostHogPersistedProperty["SessionId"] = "session_id";
-    PostHogPersistedProperty["SessionStartTimestamp"] = "session_start_timestamp";
-    PostHogPersistedProperty["SessionLastTimestamp"] = "session_timestamp";
-    PostHogPersistedProperty["PersonProperties"] = "person_properties";
-    PostHogPersistedProperty["GroupProperties"] = "group_properties";
-    PostHogPersistedProperty["InstalledAppBuild"] = "installed_app_build";
-    PostHogPersistedProperty["InstalledAppVersion"] = "installed_app_version";
-    PostHogPersistedProperty["SessionReplay"] = "session_replay";
-    PostHogPersistedProperty["PushRegistered"] = "push_registered";
-    PostHogPersistedProperty["SessionReplayEventTriggerActivatedSession"] = "session_replay_event_trigger_activated_session";
-    PostHogPersistedProperty["SurveyLastSeenDate"] = "survey_last_seen_date";
-    PostHogPersistedProperty["SurveysSeen"] = "surveys_seen";
-    PostHogPersistedProperty["Surveys"] = "surveys";
-    PostHogPersistedProperty["RemoteConfig"] = "remote_config";
-    PostHogPersistedProperty["FlagsEndpointWasHit"] = "flags_endpoint_was_hit";
-    PostHogPersistedProperty["DeviceId"] = "device_id";
-    return PostHogPersistedProperty;
-  }({});
-});
-
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/utils/type-utils.mjs
-function isPrimitive(value) {
-  return value === null || typeof value != "object";
-}
-function isBuiltin(candidate, className) {
-  return Object.prototype.toString.call(candidate) === `[object ${className}]`;
-}
-function isError(candidate) {
-  switch (Object.prototype.toString.call(candidate)) {
-    case "[object Error]":
-    case "[object Exception]":
-    case "[object DOMException]":
-    case "[object DOMError]":
-    case "[object WebAssembly.Exception]":
-      return true;
-    default:
-      return isInstanceOf(candidate, Error);
-  }
-}
-function isEvent(candidate) {
-  return "u" > typeof Event && isInstanceOf(candidate, Event);
-}
-function isPlainObject(candidate) {
-  return isBuiltin(candidate, "Object");
-}
-function isInstanceOf(candidate, base) {
-  try {
-    return candidate instanceof base;
-  } catch {
-    return false;
-  }
-}
-var nativeIsArray, ObjProto, type_utils_hasOwnProperty, type_utils_toString, isArray, isObject = (x) => x === Object(x) && !isArray(x), isUndefined = (x) => x === undefined, isString = (x) => type_utils_toString.call(x) == "[object String]", isEmptyString = (x) => isString(x) && x.trim().length === 0, isNull = (x) => x === null, isNullish = (x) => isUndefined(x) || isNull(x), isNumber = (x) => type_utils_toString.call(x) == "[object Number]" && x === x, isBoolean = (x) => type_utils_toString.call(x) === "[object Boolean]";
-var init_type_utils = __esm(() => {
-  init_types();
-  init_string_utils();
-  nativeIsArray = Array.isArray;
-  ObjProto = Object.prototype;
-  type_utils_hasOwnProperty = ObjProto.hasOwnProperty;
-  type_utils_toString = ObjProto.toString;
-  isArray = nativeIsArray || function(obj) {
-    return type_utils_toString.call(obj) === "[object Array]";
-  };
-});
-
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/utils/number-utils.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/utils/number-utils.mjs
 function clampToRange(value, min, max, logger, fallbackValue) {
   if (min > max) {
     logger.warn("min cannot be greater than max.");
@@ -627,7 +627,7 @@ var init_number_utils = __esm(() => {
   init_type_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/utils/bucketed-rate-limiter.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/utils/bucketed-rate-limiter.mjs
 function resolveExceptionRateLimiterConfig(config = {}) {
   return {
     refillRate: config.exceptionRateLimiterRefillRate ?? config.__exceptionRateLimiterRefillRate ?? DEFAULT_EXCEPTION_RATE_LIMITER_REFILL_RATE,
@@ -681,7 +681,7 @@ var init_bucketed_rate_limiter = __esm(() => {
   init_number_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/vendor/uuidv7.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/vendor/uuidv7.mjs
 class UUID {
   constructor(bytes) {
     this.bytes = bytes;
@@ -856,7 +856,7 @@ var init_uuidv7 = __esm(() => {
   /*! LICENSE: uuidv7.mjs.LICENSE.txt */
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/utils/promise-queue.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/utils/promise-queue.mjs
 class PromiseQueue {
   add(promise) {
     const promiseUUID = uuidv7();
@@ -898,7 +898,7 @@ var init_promise_queue = __esm(() => {
   init_uuidv7();
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/utils/logger.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/utils/logger.mjs
 function createConsole(consoleLike = console) {
   const lockedMethods = {
     log: consoleLike.log.bind(consoleLike),
@@ -940,7 +940,7 @@ var _createLogger = (prefix, maybeCall, consoleLike) => {
 }, passThrough = (fn) => fn();
 var init_logger = () => {};
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/utils/user-agent-utils.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/utils/user-agent-utils.mjs
 var MOBILE = "Mobile", IOS = "iOS", ANDROID = "Android", TABLET = "Tablet", ANDROID_TABLET, APPLE = "Apple", APPLE_WATCH, SAFARI = "Safari", BLACKBERRY = "BlackBerry", SAMSUNG = "Samsung", SAMSUNG_BROWSER, SAMSUNG_INTERNET, CHROME = "Chrome", CHROME_OS, CHROME_IOS, INTERNET_EXPLORER = "Internet Explorer", INTERNET_EXPLORER_MOBILE, OPERA = "Opera", OPERA_MINI, EDGE = "Edge", MICROSOFT_EDGE, FIREFOX = "Firefox", FIREFOX_IOS, NINTENDO = "Nintendo", PLAYSTATION = "PlayStation", XBOX = "Xbox", ANDROID_MOBILE, MOBILE_SAFARI, WINDOWS = "Windows", WINDOWS_PHONE, GENERIC = "Generic", GENERIC_MOBILE, GENERIC_TABLET, KONQUEROR = "Konqueror", OCULUS_BROWSER = "Oculus Browser", VIVALDI = "Vivaldi", YANDEX = "Yandex", WHALE = "Whale", DUCKDUCKGO = "DuckDuckGo", PALE_MOON = "Pale Moon", WATERFOX = "Waterfox", BRAVE = "Brave", CLAUDE = "Claude", CODEX = "Codex", CHATGPT = "ChatGPT", GOOGLE_SEARCH_APP = "Google Search App", BROWSER_VERSION_REGEX_SUFFIX = "(\\d+(\\.\\d+)?)", DEFAULT_BROWSER_VERSION_REGEX, AI_APP_VERSION_REGEX, XBOX_REGEX, PLAYSTATION_REGEX, NINTENDO_REGEX, BLACKBERRY_REGEX, windowsVersionMap, versionRegexes, osMatchers;
 var init_user_agent_utils = __esm(() => {
   init_string_utils();
@@ -1219,10 +1219,10 @@ var init_user_agent_utils = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/utils/webview-app-utils.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/utils/webview-app-utils.mjs
 var init_webview_app_utils = () => {};
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/utils/json-utils.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/utils/json-utils.mjs
 function sanitizeString(value) {
   let output = "";
   for (let index = 0;index < value.length; index++) {
@@ -1239,13 +1239,38 @@ function sanitizeString(value) {
   }
   return output;
 }
+function assignUserAttributes(target, source) {
+  if (!source)
+    return target;
+  let keys = [];
+  try {
+    keys = Object.keys(source);
+  } catch {
+    keys = [];
+  }
+  for (const key of keys) {
+    let value;
+    try {
+      value = source[key];
+    } catch {
+      value = UNSERIALIZABLE_VALUE;
+    }
+    Object.defineProperty(target, key, {
+      value,
+      enumerable: true,
+      writable: true,
+      configurable: true
+    });
+  }
+  return target;
+}
 var MAX_JSON_SAFE_VALUE_DEPTH = 20, MAX_JSON_SAFE_VALUE_ITEMS = 1000, MAX_JSON_SAFE_VALUE_NODES = 1e4, CIRCULAR_VALUE = "[Circular]", TRUNCATED_VALUE = "[Truncated]", UNSERIALIZABLE_VALUE = "[Unserializable]", FUNCTION_VALUE = "[Function]", dateGetTime, dateToISOString;
 var init_json_utils = __esm(() => {
   dateGetTime = Date.prototype.getTime;
   dateToISOString = Date.prototype.toISOString;
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/utils/index.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/utils/index.mjs
 function isValidUUID(value) {
   return typeof value == "string" && UUID_REGEX.test(value);
 }
@@ -1320,8 +1345,9 @@ function allSettled(promises) {
     reason
   }))));
 }
-var STRING_FORMAT = "utf8", UUID_REGEX;
+var STRING_FORMAT = "utf8", UUID_REGEX, isPromise = (obj) => obj && typeof obj.then == "function";
 var init_utils = __esm(() => {
+  init_type_utils();
   init_json_utils();
   init_bot_detection();
   init_browser_utils();
@@ -1336,7 +1362,7 @@ var init_utils = __esm(() => {
   UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/error-tracking/chunk-ids.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/error-tracking/chunk-ids.mjs
 function getFilenameToChunkIdMap(stackParser) {
   const chunkIdMap = globalThis._posthogChunkIds;
   if (!chunkIdMap)
@@ -1374,7 +1400,7 @@ function getFilenameToChunkIdMap(stackParser) {
 var parsedStackResults, lastKeysCount, cachedFilenameChunkIds;
 var init_chunk_ids = () => {};
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/error-tracking/error-properties-builder.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/error-tracking/error-properties-builder.mjs
 class ErrorPropertiesBuilder {
   constructor(coercers, stackParser, modifiers = []) {
     this.coercers = coercers;
@@ -1500,13 +1526,19 @@ var init_error_properties_builder = __esm(() => {
   init_chunk_ids();
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/error-tracking/parsers/base.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/error-tracking/parsers/base.mjs
+function isAppFilename(filename) {
+  if (!filename || filename === ANONYMOUS_FILENAME)
+    return false;
+  const scheme = URL_SCHEME.exec(filename);
+  return !scheme || APP_URL_SCHEMES.includes(scheme[1].toLowerCase());
+}
 function createFrame(platform, filename, func, lineno, colno) {
   const frame = {
     platform,
     filename,
     function: func === "<anonymous>" ? UNKNOWN_FUNCTION : func,
-    in_app: !!filename && !filename.startsWith(MASKED_URL_PREFIX) && filename !== ANONYMOUS_FILENAME
+    in_app: isAppFilename(filename)
   };
   if (!isUndefined(lineno))
     frame.lineno = lineno;
@@ -1514,12 +1546,25 @@ function createFrame(platform, filename, func, lineno, colno) {
     frame.colno = colno;
   return frame;
 }
-var UNKNOWN_FUNCTION = "?", MASKED_URL_PREFIX = "webkit-masked-url://", ANONYMOUS_FILENAME = "<anonymous>";
+var UNKNOWN_FUNCTION = "?", ANONYMOUS_FILENAME = "<anonymous>", URL_SCHEME, APP_URL_SCHEMES;
 var init_base = __esm(() => {
   init_utils();
+  URL_SCHEME = /^([a-z][a-z0-9.+-]+):/i;
+  APP_URL_SCHEMES = [
+    "http",
+    "https",
+    "file",
+    "blob",
+    "app",
+    "capacitor",
+    "ionic",
+    "webpack",
+    "webpack-internal",
+    "ng"
+  ];
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/error-tracking/parsers/safari.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/error-tracking/parsers/safari.mjs
 var extractSafariExtensionDetails = (func, filename) => {
   const isSafariExtension = func.indexOf("safari-extension") !== -1;
   const isSafariWebExtension = func.indexOf("safari-web-extension") !== -1;
@@ -1535,7 +1580,7 @@ var init_safari = __esm(() => {
   init_base();
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/error-tracking/parsers/chrome.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/error-tracking/parsers/chrome.mjs
 var chromeRegexNoFnName, chromeRegex, chromeEvalRegex, chromeStackLineParser = (line, platform) => {
   const noFnParts = chromeRegexNoFnName.exec(line);
   if (noFnParts) {
@@ -1565,7 +1610,7 @@ var init_chrome = __esm(() => {
   chromeEvalRegex = /\((\S*)(?::(\d+))(?::(\d+))\)/;
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/error-tracking/parsers/gecko.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/error-tracking/parsers/gecko.mjs
 var geckoREgex, geckoEvalRegex, geckoStackLineParser = (line, platform) => {
   const parts = geckoREgex.exec(line);
   if (parts) {
@@ -1592,17 +1637,17 @@ var init_gecko = __esm(() => {
   geckoEvalRegex = /(\S+) line (\d+)(?: > eval line \d+)* > eval/i;
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/error-tracking/parsers/winjs.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/error-tracking/parsers/winjs.mjs
 var init_winjs = __esm(() => {
   init_base();
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/error-tracking/parsers/opera.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/error-tracking/parsers/opera.mjs
 var init_opera = __esm(() => {
   init_base();
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/error-tracking/parsers/node.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/error-tracking/parsers/node.mjs
 function filenameIsInApp(filename, isNative = false) {
   const isInternal = isNative || filename && !filename.startsWith("/") && !filename.match(/^[A-Z]:/) && !filename.startsWith(".") && !filename.match(/^[a-zA-Z]([a-zA-Z0-9.\-+])*:\/\//);
   return !isInternal && filename !== undefined && !filename.includes("node_modules/");
@@ -1678,7 +1723,77 @@ var init_node = __esm(() => {
   PROMISE_INDEX = /^index \d+$/;
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/error-tracking/parsers/index.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/error-tracking/parsers/index.mjs
+function isSameFrame(a, b) {
+  return a.filename === b.filename && a.function === b.function && a.module === b.module && a.lineno === b.lineno && a.colno === b.colno;
+}
+function collapseRepeatedCycle(frames) {
+  for (let length = 1;length <= MAX_REPEATED_CYCLE_LENGTH; length++) {
+    const start = frames.length - 2 * length;
+    if (start < 0)
+      break;
+    let isCycle = true;
+    for (let offset = 0;offset < length; offset++) {
+      const inner = frames[start + offset];
+      if (!isSameFrame(inner, frames[start + length + offset])) {
+        isCycle = false;
+        break;
+      }
+    }
+    if (isCycle) {
+      for (let offset = 0;offset < length; offset++)
+        frames[start + offset] = frames[start + length + offset];
+      frames.length = start + length;
+      return {
+        start,
+        length
+      };
+    }
+  }
+}
+function trimPartialCycle(frames, cycle) {
+  const copyEnd = cycle.start + cycle.length;
+  const partialLength = partialCycleLength(frames, cycle);
+  if (partialLength)
+    frames.splice(copyEnd + partialLength === frames.length ? copyEnd : cycle.start, partialLength);
+}
+function innermostPartialCycleLength(frames, cycle) {
+  let partialStart = cycle.start;
+  while (partialStart > 0 && isSameFrame(frames[partialStart - 1], frames[partialStart - 1 + cycle.length]))
+    partialStart--;
+  return cycle.start - partialStart;
+}
+function partialCycleLength(frames, cycle) {
+  const copyEnd = cycle.start + cycle.length;
+  let partialEnd = copyEnd;
+  while (partialEnd < frames.length && isSameFrame(frames[partialEnd], frames[partialEnd - cycle.length]))
+    partialEnd++;
+  return partialEnd - copyEnd;
+}
+function survivingFrameCount(frames, cycles) {
+  const innermostCycle = cycles[0];
+  let count = frames.length - (innermostCycle ? innermostPartialCycleLength(frames, innermostCycle) : 0);
+  for (const cycle of cycles)
+    count -= partialCycleLength(frames, cycle);
+  return count;
+}
+function canonicalizeCycleRotation(frames) {
+  const keys = frames.map((frame) => `${frame.function}|${frame.filename}|${frame.lineno}|${frame.colno}|${frame.module}`);
+  let first = 0;
+  for (let i = 1;i < keys.length; i++)
+    if (isSmallerRotation(keys, i, first))
+      first = i;
+  frames.push(...frames.splice(0, first));
+}
+function isSmallerRotation(keys, candidate, best) {
+  for (let offset = 0;offset < keys.length; offset++) {
+    const left = keys[(candidate + offset) % keys.length];
+    const right = keys[(best + offset) % keys.length];
+    if (left !== right)
+      return left < right;
+  }
+  return false;
+}
 function reverseAndStripFrames(stack) {
   if (!stack.length)
     return [];
@@ -1701,7 +1816,9 @@ function createStackParser(platform, ...parsers) {
     const frames = [];
     const lines = stack.split(`
 `);
-    for (let i = skipFirstLines;i < lines.length; i++) {
+    const endLine = Math.min(lines.length, skipFirstLines + STACKTRACE_LINE_LIMIT);
+    const repeatedCycles = [];
+    for (let i = skipFirstLines;i < endLine; i++) {
       const line = lines[i];
       if (line.length > 1024)
         continue;
@@ -1711,17 +1828,41 @@ function createStackParser(platform, ...parsers) {
           const frame = parser(cleanedLine, platform);
           if (frame) {
             frames.push(frame);
+            const cycle = collapseRepeatedCycle(frames);
+            if (cycle) {
+              for (let i = repeatedCycles.length - 1;i >= 0; i--) {
+                const previous = repeatedCycles[i];
+                if (previous.start + previous.length <= cycle.start)
+                  break;
+                repeatedCycles.pop();
+              }
+              repeatedCycles.push(cycle);
+            }
             break;
           }
         }
-        if (frames.length >= STACKTRACE_FRAME_LIMIT)
+        if (survivingFrameCount(frames, repeatedCycles) >= STACKTRACE_FRAME_LIMIT)
           break;
       }
     }
+    const sections = [
+      ...repeatedCycles
+    ].sort((a, b) => b.start - a.start);
+    const innermostSection = sections[sections.length - 1];
+    if (innermostSection) {
+      const trimmed = innermostPartialCycleLength(frames, innermostSection);
+      frames.splice(innermostSection.start - trimmed, trimmed);
+      for (const cycle of sections)
+        cycle.start -= trimmed;
+    }
+    for (const cycle of sections)
+      trimPartialCycle(frames, cycle);
+    if (repeatedCycles.some((cycle) => cycle.start === 0 && frames.length === cycle.length))
+      canonicalizeCycleRotation(frames);
     return reverseAndStripFrames(frames);
   };
 }
-var WEBPACK_ERROR_REGEXP, STACKTRACE_FRAME_LIMIT = 50;
+var WEBPACK_ERROR_REGEXP, STACKTRACE_FRAME_LIMIT = 50, MAX_REPEATED_CYCLE_LENGTH = 10, STACKTRACE_LINE_LIMIT = 1000;
 var init_parsers = __esm(() => {
   init_base();
   init_chrome();
@@ -1732,12 +1873,12 @@ var init_parsers = __esm(() => {
   WEBPACK_ERROR_REGEXP = /\(error: (.*)\)/;
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/error-tracking/coercers/dom-exception-coercer.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/error-tracking/coercers/dom-exception-coercer.mjs
 var init_dom_exception_coercer = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/error-tracking/coercers/error-coercer.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/error-tracking/coercers/error-coercer.mjs
 class ErrorCoercer {
   match(err) {
     return isError(err);
@@ -1770,12 +1911,12 @@ var init_error_coercer = __esm(() => {
   init_type_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/error-tracking/coercers/error-event-coercer.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/error-tracking/coercers/error-event-coercer.mjs
 var init_error_event_coercer = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/error-tracking/coercers/string-coercer.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/error-tracking/coercers/string-coercer.mjs
 class StringCoercer {
   match(input) {
     return typeof input == "string";
@@ -1808,7 +1949,7 @@ var init_string_coercer = __esm(() => {
   ERROR_TYPES_PATTERN = /^(?:[Uu]ncaught (?:exception: )?)?(?:((?:Eval|Internal|Range|Reference|Syntax|Type|URI|)Error): )?(.*)$/i;
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/error-tracking/types.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/error-tracking/types.mjs
 var severityLevels;
 var init_types2 = __esm(() => {
   severityLevels = [
@@ -1821,7 +1962,7 @@ var init_types2 = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/error-tracking/coercers/utils.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/error-tracking/coercers/utils.mjs
 function extractExceptionKeysForMessage(err, maxLength = 40) {
   const keys = Object.keys(err);
   keys.sort();
@@ -1839,7 +1980,7 @@ function extractExceptionKeysForMessage(err, maxLength = 40) {
 }
 var init_utils2 = () => {};
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/error-tracking/coercers/object-coercer.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/error-tracking/coercers/object-coercer.mjs
 class ObjectCoercer {
   match(candidate) {
     return typeof candidate == "object" && candidate !== null;
@@ -1910,7 +2051,7 @@ var init_object_coercer = __esm(() => {
   init_utils2();
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/error-tracking/coercers/event-coercer.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/error-tracking/coercers/event-coercer.mjs
 class EventCoercer {
   match(err) {
     return isEvent(err);
@@ -1930,7 +2071,7 @@ var init_event_coercer = __esm(() => {
   init_utils2();
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/error-tracking/coercers/primitive-coercer.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/error-tracking/coercers/primitive-coercer.mjs
 class PrimitiveCoercer {
   match(candidate) {
     return isPrimitive(candidate);
@@ -1948,12 +2089,12 @@ var init_primitive_coercer = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/error-tracking/coercers/promise-rejection-event.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/error-tracking/coercers/promise-rejection-event.mjs
 var init_promise_rejection_event = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/error-tracking/coercers/index.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/error-tracking/coercers/index.mjs
 var init_coercers = __esm(() => {
   init_dom_exception_coercer();
   init_error_coercer();
@@ -1965,7 +2106,7 @@ var init_coercers = __esm(() => {
   init_promise_rejection_event();
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/error-tracking/utils.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/error-tracking/utils.mjs
 class ReduceableCache {
   constructor(_maxSize) {
     this._maxSize = _maxSize;
@@ -1992,7 +2133,7 @@ class ReduceableCache {
 }
 var init_utils3 = () => {};
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/error-tracking/exception-steps.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/error-tracking/exception-steps.mjs
 var EXCEPTION_STEP_INTERNAL_FIELDS, RESERVED_EXCEPTION_STEP_KEYS;
 var init_exception_steps = __esm(() => {
   init_utils();
@@ -2006,14 +2147,14 @@ var init_exception_steps = __esm(() => {
   ]);
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/error-tracking/release.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/error-tracking/release.mjs
 function getInjectedReleaseId() {
   const injected = globalThis._posthogReleaseId;
   return typeof injected == "string" && injected.length > 0 ? injected : undefined;
 }
 var init_release = () => {};
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/error-tracking/index.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/error-tracking/index.mjs
 var init_error_tracking = __esm(() => {
   init_error_properties_builder();
   init_parsers();
@@ -2023,13 +2164,13 @@ var init_error_tracking = __esm(() => {
   init_release();
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/cookie.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/cookie.mjs
 var init_cookie = __esm(() => {
   init_utils();
   init_uuidv7();
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/featureFlagUtils.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/featureFlagUtils.mjs
 function getFlagDetailFromFlagAndPayload(key, value, payload) {
   return {
     key,
@@ -2158,7 +2299,7 @@ var init_featureFlagUtils = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/eventemitter.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/eventemitter.mjs
 class SimpleEventEmitter {
   constructor() {
     this.events = {};
@@ -2181,7 +2322,7 @@ class SimpleEventEmitter {
 }
 var init_eventemitter = () => {};
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/gzip.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/gzip.mjs
 function isGzipSupported() {
   return "CompressionStream" in globalThis && "TextEncoder" in globalThis && "Response" in globalThis && typeof Response.prototype.blob == "function";
 }
@@ -2248,7 +2389,66 @@ var init_gzip = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/posthog-core-stateless.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/utils/retry-after.mjs
+function parseRetryAfterMs(value, now = Date.now()) {
+  if (typeof value != "string" || !value)
+    return;
+  const raw = value.trim();
+  const trimmed = /^\d+\s*,/.test(raw) ? raw.slice(0, raw.indexOf(",")).trim() : raw;
+  const seconds = /^\d+$/.test(trimmed) ? Number(trimmed) : 0 / 0;
+  if (!Number.isFinite(seconds) && /^[+-]?[\d.]+$/.test(trimmed))
+    return;
+  const ms = Number.isFinite(seconds) ? 1000 * seconds : Date.parse(trimmed) - now;
+  if (!Number.isFinite(ms) || ms <= 0)
+    return;
+  return Math.min(ms, MAX_RETRY_AFTER_MS);
+}
+
+class RetryAfterWindow {
+  record(outcome) {
+    if (outcome.kind === "too-large")
+      return;
+    if (outcome.kind !== "retry-later")
+      return void this.reset();
+    if (!outcome.retryAfterMs)
+      return;
+    const open = this.isOpen();
+    const now = Date.now();
+    const asked = Math.min(outcome.retryAfterMs, MAX_RETRY_AFTER_MS);
+    if (!open) {
+      this._installedAt = now;
+      this._until = now + asked;
+      return;
+    }
+    this._until = Math.max(this._until, Math.min(now + asked, this._installedAt + MAX_RETRY_AFTER_MS));
+  }
+  remainingMs() {
+    const now = Date.now();
+    if (now < this._installedAt - CLOCK_STEP_TOLERANCE_MS) {
+      this.reset();
+      return 0;
+    }
+    const remaining = Math.min(MAX_RETRY_AFTER_MS, Math.max(0, this._until - now));
+    if (remaining === 0)
+      this.reset();
+    return remaining;
+  }
+  isOpen() {
+    return this.remainingMs() > 0;
+  }
+  reset() {
+    this._until = 0;
+    this._installedAt = 0;
+  }
+  constructor() {
+    this._until = 0;
+    this._installedAt = 0;
+  }
+}
+var MAX_RETRY_AFTER_MS = 300000, CLOCK_STEP_TOLERANCE_MS = 5000;
+var init_retry_after = () => {};
+
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/posthog-core-stateless.mjs
 async function logFlushError(err) {
   if (err instanceof PostHogFetchHttpError) {
     let text = "";
@@ -2277,6 +2477,17 @@ function isRetryableFlagsFetchError(err) {
   const cause = err.error;
   const code = cause?.code ?? cause?.cause?.code;
   return code !== "ECONNREFUSED";
+}
+function byteLengthOf(body) {
+  try {
+    if (typeof body != "string")
+      return body instanceof Uint8Array ? body.byteLength : body.size;
+    if ("u" > typeof Buffer)
+      return Buffer.byteLength(body, STRING_FORMAT);
+    return new TextEncoder().encode(body).length;
+  } catch {
+    return 0;
+  }
 }
 function isPostHogFetchContentTooLargeError(err) {
   return typeof err == "object" && err instanceof PostHogFetchHttpError && err.status === 413;
@@ -2867,9 +3078,12 @@ class PostHogCoreStateless {
   flushBackground() {
     if (this.pendingFlushPromise)
       return;
-    this.flush().catch(async (err) => {
+    this.flushAutomatic().catch(async (err) => {
       await logFlushError(err);
     });
+  }
+  flushAutomatic() {
+    return this.flush();
   }
   async waitForPendingPromises(maxPromiseId, ignoredPromises = []) {
     const ignoredPendingPromises = ignoredPromises.filter((promise) => !!promise);
@@ -3047,25 +3261,46 @@ class PostHogCoreStateless {
       sentFromRoute += batchMessages.length;
     }
   }
-  async _sendOtlpBatch({ path, payload }) {
+  async _sendOtlpBatch({ path, auth, payload }) {
     if (this.disabled)
       return {
         kind: "fatal",
         error: new Error("The client is disabled")
       };
-    const serialized = JSON.stringify(payload);
-    const url = `${this.host}/i/v1/${path}?token=${encodeURIComponent(this.apiKey)}`;
+    let serialized;
+    try {
+      serialized = JSON.stringify(payload);
+    } catch (error) {
+      this.logMsgIfDebug(() => console.warn(`[PostHog] Could not serialize a ${path} batch; reporting it as too large`, error));
+      return {
+        kind: "too-large",
+        measuredLocally: true
+      };
+    }
+    const payloadBytes = byteLengthOf(serialized);
+    if (payloadBytes > OTLP_MAX_BODY_BYTES) {
+      this.logMsgIfDebug(() => console.warn(`[PostHog] Not sending a ${path} batch of ${payloadBytes} bytes: the endpoint accepts at most ${OTLP_MAX_BODY_BYTES}`));
+      return {
+        kind: "too-large",
+        measuredLocally: true
+      };
+    }
+    const url = auth === "bearer" ? `${this.host}/i/v1/${path}` : `${this.host}/i/v1/${path}?token=${encodeURIComponent(this.apiKey)}`;
     const gzippedPayload = this.disableCompression ? null : await this.compressPayload(serialized);
+    const body = gzippedPayload || serialized;
     const fetchOptions = {
       method: "POST",
       headers: {
         ...this.getCustomHeaders(),
         "Content-Type": "application/json",
+        ...auth === "bearer" && {
+          Authorization: `Bearer ${this.apiKey}`
+        },
         ...gzippedPayload !== null && {
           "Content-Encoding": "gzip"
         }
       },
-      body: gzippedPayload || serialized
+      body
     };
     try {
       await this.fetchWithRetry(url, fetchOptions, {
@@ -3073,6 +3308,8 @@ class PostHogCoreStateless {
       }, {
         retryCheck: (err) => {
           if (isPostHogFetchContentTooLargeError(err))
+            return false;
+          if (err instanceof PostHogFetchHttpError && err.retryAfterMs !== undefined)
             return false;
           return isPostHogFetchRetryableError(err);
         }
@@ -3085,11 +3322,16 @@ class PostHogCoreStateless {
         return {
           kind: "too-large"
         };
-      if (isPostHogFetchRetryableError(err))
+      if (isPostHogFetchRetryableError(err)) {
+        const retryAfterMs = err instanceof PostHogFetchHttpError ? err.retryAfterMs : undefined;
         return {
           kind: "retry-later",
-          error: err
+          error: err,
+          ...retryAfterMs !== undefined && {
+            retryAfterMs
+          }
         };
+      }
       return {
         kind: "fatal",
         error: err
@@ -3099,30 +3341,27 @@ class PostHogCoreStateless {
   async _sendLogsBatch(payload) {
     return this._sendOtlpBatch({
       path: "logs",
+      auth: "query-token",
       payload
     });
   }
   async _sendMetricsBatch(payload) {
     return this._sendOtlpBatch({
       path: "metrics",
+      auth: "query-token",
+      payload
+    });
+  }
+  async _sendTracesBatch(payload) {
+    return this._sendOtlpBatch({
+      path: "traces",
+      auth: "bearer",
       payload
     });
   }
   async fetchWithRetry(url, options, responseHandling, retryOptions, requestTimeout) {
     const body = options.body ? options.body : "";
-    let reqByteLength = -1;
-    try {
-      reqByteLength = body instanceof Blob ? body.size : body instanceof Uint8Array ? body.byteLength : Buffer.byteLength(body, STRING_FORMAT);
-    } catch {
-      if (body instanceof Blob)
-        reqByteLength = body.size;
-      else if (body instanceof Uint8Array)
-        reqByteLength = body.byteLength;
-      else {
-        const encoded = new TextEncoder().encode(body);
-        reqByteLength = encoded.length;
-      }
-    }
+    const reqByteLength = byteLengthOf(body);
     const retriableOptions = {
       ...this._retryOptions,
       ...retryOptions
@@ -3258,13 +3497,14 @@ var PostHogFetchHttpError, PostHogFetchNetworkError, applyCallerFeatureFlagOverr
   for (const key of Object.keys(callerProperties))
     if (key.startsWith("$feature/") || key === "$active_feature_flags")
       target[key] = callerProperties[key];
-}, DEFAULT_QUEUE_ROUTE = "default";
+}, OTLP_MAX_BODY_BYTES = 10485760, DEFAULT_QUEUE_ROUTE = "default";
 var init_posthog_core_stateless = __esm(() => {
   init_eventemitter();
   init_featureFlagUtils();
   init_gzip();
   init_types();
   init_utils();
+  init_retry_after();
   init_uuidv7();
   init_error_tracking();
   PostHogFetchHttpError = class PostHogFetchHttpError extends Error {
@@ -3273,6 +3513,13 @@ var init_posthog_core_stateless = __esm(() => {
     }
     get status() {
       return this.response.status;
+    }
+    get retryAfterMs() {
+      try {
+        return parseRetryAfterMs(this.response.headers?.get("retry-after"));
+      } catch {
+        return;
+      }
     }
     get bodyReadTimedOut() {
       return this._bodyReadTimedOut;
@@ -3329,7 +3576,7 @@ var init_posthog_core_stateless = __esm(() => {
   };
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/posthog-core.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/posthog-core.mjs
 var init_posthog_core = __esm(() => {
   init_featureFlagUtils();
   init_types();
@@ -3338,12 +3585,12 @@ var init_posthog_core = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/tracing-headers.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/tracing-headers.mjs
 var init_tracing_headers = __esm(() => {
   init_type_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/featureFlagLocalEvaluation.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/featureFlagLocalEvaluation.mjs
 function isTruthyOrFalsyPropertyValue(value) {
   if (typeof value == "boolean")
     return true;
@@ -3830,7 +4077,7 @@ var init_featureFlagLocalEvaluation = __esm(() => {
   };
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/utils/otlp-any-value.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/utils/otlp-any-value.mjs
 function newState() {
   return {
     ancestors: new WeakSet,
@@ -4011,10 +4258,10 @@ var init_otlp_any_value = __esm(() => {
   propertyIsEnumerable = Object.prototype.propertyIsEnumerable;
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/utils/otlp-resource.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/utils/otlp-resource.mjs
 function buildOtlpResourceAttributes(config, sdkName, sdkVersion) {
   return {
-    ...config.resourceAttributes,
+    ...assignUserAttributes({}, config.resourceAttributes),
     "service.name": config.serviceName || "unknown_service",
     ...config.environment && {
       "deployment.environment": config.environment
@@ -4026,9 +4273,63 @@ function buildOtlpResourceAttributes(config, sdkName, sdkVersion) {
     "telemetry.sdk.version": sdkVersion
   };
 }
-var init_otlp_resource = () => {};
+function toOtlpResourceKeyValueList(attributes, logger) {
+  const user = assignUserAttributes({}, attributes);
+  const sdk = {};
+  for (const key of SDK_RESOURCE_KEYS)
+    if (Object.prototype.hasOwnProperty.call(user, key)) {
+      sdk[key] = user[key];
+      delete user[key];
+    }
+  return [
+    ...toOtlpKeyValueList(user, logger),
+    ...toOtlpKeyValueList(sdk, logger)
+  ];
+}
+function normalizeOsName(name) {
+  if (!name)
+    return;
+  return Object.prototype.hasOwnProperty.call(OS_NAMES, name) ? OS_NAMES[name] : name;
+}
+function osResourceAttributes(name, version) {
+  const osName = normalizeOsName(name);
+  return {
+    ...osName ? {
+      "os.name": osName
+    } : {},
+    ...version ? {
+      "os.version": version
+    } : {}
+  };
+}
+var SDK_RESOURCE_KEYS, OS_NAMES;
+var init_otlp_resource = __esm(() => {
+  init_json_utils();
+  init_otlp_any_value();
+  SDK_RESOURCE_KEYS = [
+    "service.name",
+    "deployment.environment",
+    "service.version",
+    "telemetry.sdk.name",
+    "telemetry.sdk.version"
+  ];
+  OS_NAMES = {
+    darwin: "macOS",
+    win32: "Windows",
+    cygwin: "Windows",
+    linux: "Linux",
+    android: "Android",
+    freebsd: "FreeBSD",
+    openbsd: "OpenBSD",
+    netbsd: "NetBSD",
+    sunos: "SunOS",
+    aix: "AIX",
+    haiku: "Haiku",
+    "Mac OS X": "macOS"
+  };
+});
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/logs/logs-utils.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/logs/logs-utils.mjs
 var OTLP_SEVERITY_MAP, DEFAULT_OTLP_SEVERITY;
 var init_logs_utils = __esm(() => {
   init_utils();
@@ -4064,14 +4365,63 @@ var init_logs_utils = __esm(() => {
   DEFAULT_OTLP_SEVERITY = OTLP_SEVERITY_MAP.info;
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/logs/index.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/utils/flush-timer.mjs
+class FlushTimer {
+  constructor(_onFire) {
+    this._onFire = _onFire;
+    this._firesAt = 0;
+  }
+  get pending() {
+    return !!this._timer;
+  }
+  arm(delayMs) {
+    this.clear();
+    this._firesAt = Date.now() + delayMs;
+    this._timer = safeSetTimeout(() => {
+      this._timer = undefined;
+      this._onFire();
+    }, delayMs);
+  }
+  armNoEarlierThan(delayMs) {
+    if (this._timer && Date.now() + delayMs <= this._firesAt)
+      return;
+    this.arm(delayMs);
+  }
+  clear() {
+    if (this._timer) {
+      clearTimeout(this._timer);
+      this._timer = undefined;
+    }
+  }
+}
+var init_flush_timer = __esm(() => {
+  init_utils();
+});
+
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/utils/backoff.mjs
+function drawJitter() {
+  return 1 - JITTER + Math.random() * JITTER * 2;
+}
+function backoffDelayMs(baseMs, failures, jitter, maxMs) {
+  const exponent = Math.min(Math.max(0, failures - 1), MAX_FLUSH_BACKOFF_EXPONENT);
+  const delay = baseMs * 2 ** exponent;
+  const capped = maxMs === undefined ? delay : Math.min(delay, Math.max(maxMs, baseMs));
+  return Math.round(capped * jitter);
+}
+var MAX_FLUSH_BACKOFF_EXPONENT = 6, MAX_FLUSH_BACKOFF_MS = 30000, JITTER = 0.25, NO_JITTER = 1;
+var init_backoff = () => {};
+
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/logs/index.mjs
 var init_logs = __esm(() => {
   init_logs_utils();
   init_types();
   init_utils();
+  init_flush_timer();
+  init_retry_after();
+  init_backoff();
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/metrics/metrics-utils.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/metrics/metrics-utils.mjs
 function msToUnixNano(ms) {
   return String(ms) + "000000";
 }
@@ -4097,7 +4447,7 @@ function buildOtlpMetricsPayload(metrics, resourceAttributes, scopeName, scopeVe
     resourceMetrics: [
       {
         resource: {
-          attributes: toOtlpKeyValueList(resourceAttributes)
+          attributes: toOtlpResourceKeyValueList(resourceAttributes)
         },
         scopeMetrics: [
           {
@@ -4114,7 +4464,6 @@ function buildOtlpMetricsPayload(metrics, resourceAttributes, scopeName, scopeVe
 }
 var DEFAULT_HISTOGRAM_BOUNDS;
 var init_metrics_utils = __esm(() => {
-  init_otlp_any_value();
   init_otlp_resource();
   DEFAULT_HISTOGRAM_BOUNDS = [
     0,
@@ -4135,7 +4484,7 @@ var init_metrics_utils = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/metrics/config.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/metrics/config.mjs
 function resolveMetricsConfig(config) {
   const resourceAttributes = config?.resourceAttributes;
   return {
@@ -4151,17 +4500,23 @@ function resolveMetricsConfig(config) {
 var DEFAULT_FLUSH_INTERVAL_MS = 1e4, DEFAULT_MAX_SERIES_PER_FLUSH = 1000;
 var init_config = () => {};
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/metrics/index.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/metrics/index.mjs
 class PostHogMetrics {
   constructor(_instance, _config, _logger) {
     this._instance = _instance;
     this._config = _config;
     this._logger = _logger;
     this._series = new Map;
+    this._flushTimer = new FlushTimer(() => this.flush().catch((e) => {
+      this._logger.error("Metrics flush failed:", e);
+    }));
     this._flushPromise = null;
     this._seriesCapWarned = false;
     this._typeByName = new Map;
     this._typeCollisionWarned = new Set;
+    this._retryAfter = new RetryAfterWindow;
+    this._consecutiveFlushFailures = 0;
+    this._flushJitter = NO_JITTER;
     this._generation = 0;
   }
   count(name, value = 1, options) {
@@ -4217,7 +4572,10 @@ class PostHogMetrics {
   }
   reset() {
     this._generation++;
-    this._clearFlushTimer();
+    this._retryAfter.reset();
+    this._consecutiveFlushFailures = 0;
+    this._flushJitter = NO_JITTER;
+    this._flushTimer.clear();
     this._series = new Map;
     this._flushPromise = null;
     this._seriesCapWarned = false;
@@ -4329,22 +4687,15 @@ class PostHogMetrics {
     return result;
   }
   _armFlushTimer() {
-    if (this._flushTimer)
+    if (this._flushTimer.pending)
       return;
-    this._flushTimer = safeSetTimeout(() => {
-      this._flushTimer = undefined;
-      this.flush().catch((e) => {
-        this._logger.error("Metrics flush failed:", e);
-      });
-    }, this._config.flushIntervalMs);
+    this._flushTimer.arm(this._nextFlushDelay());
   }
-  _clearFlushTimer() {
-    if (this._flushTimer) {
-      clearTimeout(this._flushTimer);
-      this._flushTimer = undefined;
-    }
+  _nextFlushDelay() {
+    return Math.max(backoffDelayMs(this._config.flushIntervalMs, this._consecutiveFlushFailures, this._flushJitter, MAX_FLUSH_BACKOFF_MS), this._retryAfter.remainingMs());
   }
   async _doFlush() {
+    this._flushTimer.clear();
     if (this._series.size === 0)
       return;
     const window = this._series;
@@ -4356,12 +4707,22 @@ class PostHogMetrics {
     const outcome = await this._instance._sendMetricsBatch(this._buildPayload(window));
     if (generation !== this._generation)
       return;
+    this._retryAfter.record(outcome);
+    if (outcome.kind === "retry-later") {
+      this._consecutiveFlushFailures++;
+      this._flushJitter = drawJitter();
+    } else {
+      this._consecutiveFlushFailures = 0;
+      this._flushJitter = NO_JITTER;
+    }
+    if (this._flushTimer.pending)
+      this._flushTimer.arm(this._nextFlushDelay());
     switch (outcome.kind) {
       case "ok":
         return;
       case "retry-later":
         this._mergeWindowBack(window);
-        this._armFlushTimer();
+        this._flushTimer.armNoEarlierThan(this._nextFlushDelay());
         return;
       case "too-large":
         this._logger.warn("Metrics batch exceeded the server size limit and was dropped");
@@ -4472,17 +4833,1465 @@ class PostHogMetrics {
 var OTLP_TEMPORALITY_DELTA = 1;
 var init_metrics = __esm(() => {
   init_utils();
+  init_flush_timer();
+  init_retry_after();
+  init_backoff();
   init_otlp_any_value();
   init_metrics_utils();
   init_config();
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/surveys/validation.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/traces/ids.mjs
+function getRandomBytes(byteLength) {
+  const bytes = new Uint8Array(byteLength);
+  const cryptoLike = globalThis.crypto;
+  if (cryptoLike && typeof cryptoLike.getRandomValues == "function")
+    try {
+      cryptoLike.getRandomValues(bytes);
+      return bytes;
+    } catch {}
+  for (let i = 0;i < byteLength; i++)
+    bytes[i] = Math.floor(256 * Math.random());
+  return bytes;
+}
+function bytesToHex(bytes) {
+  let hex = "";
+  for (let i = 0;i < bytes.length; i++)
+    hex += bytes[i].toString(16).padStart(2, "0");
+  return hex;
+}
+function randomHexId(byteLength) {
+  const hex = bytesToHex(getRandomBytes(byteLength));
+  return /[^0]/.test(hex) ? hex : hex.slice(0, -1) + "1";
+}
+function newTraceId() {
+  return randomHexId(TRACE_ID_BYTES);
+}
+function newSpanId() {
+  return randomHexId(SPAN_ID_BYTES);
+}
+function isValidHexId(value, length, invalid) {
+  return typeof value == "string" && value.length === length && value !== invalid && HEX_RE.test(value);
+}
+function isValidTraceId(value) {
+  return isValidHexId(value, TRACE_ID_HEX, INVALID_TRACE_ID);
+}
+function isValidSpanId(value) {
+  return isValidHexId(value, SPAN_ID_HEX, INVALID_SPAN_ID);
+}
+var TRACE_ID_BYTES = 16, SPAN_ID_BYTES = 8, TRACE_ID_HEX, SPAN_ID_HEX, INVALID_TRACE_ID, INVALID_SPAN_ID, HEX_RE;
+var init_ids = __esm(() => {
+  TRACE_ID_HEX = 2 * TRACE_ID_BYTES;
+  SPAN_ID_HEX = 2 * SPAN_ID_BYTES;
+  INVALID_TRACE_ID = "0".repeat(TRACE_ID_HEX);
+  INVALID_SPAN_ID = "0".repeat(SPAN_ID_HEX);
+  HEX_RE = /^[0-9a-f]+$/;
+});
+
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/traces/traceparent.mjs
+function parseTraceparent(value) {
+  const fields = matchTraceparent(value);
+  return fields && {
+    traceId: fields.traceId,
+    spanId: fields.spanId,
+    flags: definedFlags(fields.flags)
+  };
+}
+function definedFlags(flags) {
+  return 1 & parseInt(flags, 16) ? TRACE_FLAGS_SAMPLED : TRACE_FLAGS_UNSAMPLED;
+}
+function matchTraceparent(value) {
+  if (typeof value != "string")
+    return;
+  const match = TRACEPARENT_RE.exec(value.trim());
+  if (!match)
+    return;
+  const [, version, traceId, spanId, flags, trailing] = match;
+  if (version === "ff")
+    return;
+  if (version === "00" && trailing)
+    return;
+  if (!isValidTraceId(traceId) || !isValidSpanId(spanId))
+    return;
+  return {
+    version,
+    traceId,
+    spanId,
+    flags
+  };
+}
+function normalizeTraceparent(value) {
+  return matchTraceparent(value) && value.trim();
+}
+function traceparentHeader(value) {
+  return Array.isArray(value) && value.length === 1 ? value[0] : value;
+}
+function formatTraceparent(traceId, spanId, flags = TRACE_FLAGS_SAMPLED) {
+  return `00-${traceId}-${spanId}-${flags}`;
+}
+function sanitizeTracestate(value) {
+  if (typeof value != "string")
+    return;
+  const trimmed = value.trim();
+  if (!trimmed)
+    return;
+  if (/[^\x20-\x7e\t]/.test(trimmed))
+    return;
+  const members = trimmed.split(",");
+  if (members.length > TRACESTATE_MAX_MEMBERS)
+    return;
+  for (const member of members)
+    if (member.trim() && !member.includes("="))
+      return;
+  if (trimmed.length <= TRACESTATE_MAX_LENGTH)
+    return trimmed;
+  return trimToLength(members);
+}
+function trimToLength(members) {
+  const kept = [
+    ...members
+  ];
+  const joinedLength = () => kept.reduce((total, member) => total + member.length, 0) + kept.length - 1;
+  for (let index = kept.length - 1;index >= 0 && joinedLength() > TRACESTATE_MAX_LENGTH; index--)
+    if (kept[index].length > TRACESTATE_LARGE_MEMBER_LENGTH)
+      kept.splice(index, 1);
+  while (kept.length && joinedLength() > TRACESTATE_MAX_LENGTH)
+    kept.pop();
+  return kept.length ? kept.join(",") : undefined;
+}
+var TRACEPARENT_RE, TRACE_FLAGS_SAMPLED = "01", TRACE_FLAGS_UNSAMPLED = "00", TRACESTATE_MAX_MEMBERS = 32, TRACESTATE_MAX_LENGTH = 512, TRACESTATE_LARGE_MEMBER_LENGTH = 128;
+var init_traceparent = __esm(() => {
+  init_ids();
+  TRACEPARENT_RE = /^([0-9a-f]{2})-([0-9a-f]{32})-([0-9a-f]{16})-([0-9a-f]{2})(-.*)?$/;
+});
+
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/traces/sanitize.mjs
+function sanitizeName(name, label, maxLength, logger) {
+  if (typeof name == "string" && name.trim())
+    return name.length > maxLength ? name.slice(0, maxLength) : name;
+  logger?.debug(`${label} must be a non-empty string; using "${FALLBACK_SPAN_NAME}"`);
+  return FALLBACK_SPAN_NAME;
+}
+function toEpochMs(value) {
+  if (value == null)
+    return;
+  let ms = value;
+  if (value instanceof Date)
+    try {
+      ms = value.getTime();
+    } catch {
+      return;
+    }
+  if (typeof ms != "number" || !Number.isFinite(ms))
+    return;
+  if (ms < MIN_TIMESTAMP_MS || ms > MAX_TIMESTAMP_MS)
+    return;
+  return ms;
+}
+function resolveStartTime(value, now, logger) {
+  const supplied = toEpochMs(value);
+  if (supplied === undefined) {
+    if (value !== undefined)
+      logger?.debug("Span startTime is out of range or not a valid time; using the current time");
+    return now;
+  }
+  if (now - supplied > DEEP_BACKDATE_WARNING_MS)
+    logger?.debug("Span startTime is more than 24 hours in the past; the server will clamp it to receive time and keep the original in $originalTimestamp");
+  else if (supplied > now)
+    logger?.debug("Span startTime is in the future; the span may export with a zero duration");
+  return supplied;
+}
+function clampEndTime(endTime, startTime) {
+  return endTime < startTime ? startTime : endTime;
+}
+function resolveSuppliedTime(value, derived, label, logger) {
+  const supplied = toEpochMs(value);
+  if (supplied === undefined) {
+    if (value !== undefined)
+      logger?.debug(`Span ${label} is out of range or not a valid time; using the derived time`);
+    return derived;
+  }
+  return supplied;
+}
+var FALLBACK_SPAN_NAME = "unknown", MAX_TIMESTAMP_MS = 9223372036854, MIN_TIMESTAMP_MS = 0, DEEP_BACKDATE_WARNING_MS = 86400000;
+var init_sanitize = () => {};
+
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/traces/span.mjs
+function monotonicNow() {
+  const perf = globalThis.performance;
+  return typeof perf?.now == "function" ? perf.now() : undefined;
+}
+
+class PostHogSpan {
+  constructor(init, _onEnd, _logger) {
+    this._onEnd = _onEnd;
+    this._logger = _logger;
+    this._events = [];
+    this._ended = false;
+    this._userAttributeCount = 0;
+    this._userEventCount = 0;
+    this._droppedAttributes = 0;
+    this._droppedEvents = 0;
+    this._traceId = init.traceId;
+    this._spanId = init.spanId;
+    this._parentSpanId = init.parentSpanId;
+    this._traceState = init.traceState;
+    this._traceFlags = init.traceFlags ?? TRACE_FLAGS_SAMPLED;
+    this._parentIsRemote = init.parentIsRemote ?? false;
+    this._name = init.name;
+    this._kind = init.kind;
+    this._autoKeys = new Set(init.autoAttributeKeys);
+    this._maxAttributes = init.maxAttributes;
+    this._maxEvents = init.maxEvents;
+    this._maxAttributesPerEvent = init.maxAttributesPerEvent;
+    this._maxAttributeValueLength = init.maxAttributeValueLength;
+    this._attributes = Object.create(null);
+    for (const key of Object.keys(init.attributes))
+      this._writeAttribute(key, init.attributes[key]);
+    this._startMono = init.backdated ? undefined : monotonicNow();
+    this._startTime = init.clockAnchor && this._startMono !== undefined ? init.clockAnchor.wall + (this._startMono - init.clockAnchor.mono) : init.startTime;
+    if (this._startMono !== undefined)
+      this._clockAnchor = init.clockAnchor ?? {
+        wall: this._startTime,
+        mono: this._startMono
+      };
+  }
+  _now() {
+    if (this._startMono !== undefined) {
+      const mono = monotonicNow();
+      if (mono !== undefined)
+        return this._startTime + Math.max(0, mono - this._startMono);
+    }
+    return Date.now();
+  }
+  _mutable(operation) {
+    if (this._ended) {
+      this._logger?.debug(`Ignoring ${operation} on a span that has already ended`);
+      return false;
+    }
+    return true;
+  }
+  _writeAttribute(key, value) {
+    if (isNullish(value)) {
+      if (key in this._attributes && !this._autoKeys.has(key))
+        this._userAttributeCount--;
+      delete this._attributes[key];
+      return;
+    }
+    if (!this._autoKeys.has(key) && !(key in this._attributes)) {
+      if (this._userAttributeCount >= this._maxAttributes)
+        return void this._droppedAttributes++;
+      this._userAttributeCount++;
+    }
+    this._attributes[key] = truncateAttributeValue(value, this._maxAttributeValueLength);
+  }
+  setAttribute(key, value) {
+    if (this._mutable("setAttribute"))
+      this._writeAttribute(key, value);
+    return this;
+  }
+  setAttributes(attributes) {
+    if (this._mutable("setAttributes")) {
+      const safe = assignUserAttributes({}, attributes);
+      for (const key of Object.keys(safe))
+        this._writeAttribute(key, safe[key]);
+    }
+    return this;
+  }
+  addEvent(name, attributes, timestamp) {
+    if (this._mutable("addEvent")) {
+      if (this._userEventCount >= this._maxEvents) {
+        this._droppedEvents++;
+        return this;
+      }
+      this._userEventCount++;
+      const bounded = attributes && boundAttributes(attributes, this._maxAttributesPerEvent, this._maxAttributeValueLength);
+      this._events.push({
+        name: sanitizeName(name, "Span event name", this._maxAttributeValueLength, this._logger),
+        timestamp: resolveSuppliedTime(timestamp, this._now(), "event timestamp", this._logger),
+        ...bounded && {
+          attributes: bounded.attributes,
+          ...bounded.dropped && {
+            droppedAttributesCount: bounded.dropped
+          }
+        }
+      });
+    }
+    return this;
+  }
+  setStatus(status, message) {
+    if (this._mutable("setStatus")) {
+      if (status !== "ok" && status !== "error") {
+        this._logger?.debug(`Ignoring unknown span status "${String(status)}"; expected "ok" or "error"`);
+        return this;
+      }
+      this._status = {
+        code: status,
+        ...message && {
+          message: truncateString(message, this._maxAttributeValueLength)
+        }
+      };
+    }
+    return this;
+  }
+  get statusIsExplicitlyOk() {
+    return this._status?.code === "ok";
+  }
+  recordException(error) {
+    if (!this._mutable("recordException"))
+      return this;
+    const { type, message, stack } = describeError(error);
+    this.addEvent(EXCEPTION_EVENT_NAME, {
+      "exception.type": type,
+      "exception.message": message,
+      ...stack && {
+        "exception.stacktrace": stack
+      }
+    });
+    return this.setStatus("error", message);
+  }
+  updateName(name) {
+    if (this._mutable("updateName"))
+      this._name = sanitizeName(name, "Span name", this._maxAttributeValueLength, this._logger);
+    return this;
+  }
+  traceparent() {
+    return formatTraceparent(this._traceId, this._spanId, this._traceFlags);
+  }
+  tracestate() {
+    return this._traceState ?? null;
+  }
+  childContext() {
+    return {
+      traceId: this._traceId,
+      parentSpanId: this._spanId,
+      traceState: this._traceState,
+      traceFlags: this._traceFlags,
+      clockAnchor: this._clockAnchor
+    };
+  }
+  end(endTime) {
+    if (this._ended)
+      return void this._logger?.debug("Ignoring end() on a span that has already ended");
+    this._ended = true;
+    const derived = this._now();
+    const resolved = resolveSuppliedTime(endTime, derived, "end time", this._logger);
+    this._onEnd({
+      traceId: this._traceId,
+      spanId: this._spanId,
+      ...this._parentSpanId && {
+        parentSpanId: this._parentSpanId
+      },
+      ...this._traceState && {
+        traceState: this._traceState
+      },
+      traceFlags: this._traceFlags,
+      parentIsRemote: this._parentIsRemote,
+      name: this._name,
+      kind: this._kind,
+      ...this._status && {
+        status: this._status
+      },
+      attributes: {
+        ...this._attributes
+      },
+      events: this._events,
+      startTime: this._startTime,
+      endTime: clampEndTime(resolved, this._startTime),
+      ...this._droppedAttributes && {
+        droppedAttributesCount: this._droppedAttributes
+      },
+      ...this._droppedEvents && {
+        droppedEventsCount: this._droppedEvents
+      }
+    }, this._autoKeys);
+  }
+}
+function safeString(value) {
+  try {
+    return typeof value == "string" ? value : String(value);
+  } catch {
+    return UNSERIALIZABLE_VALUE;
+  }
+}
+function nonNegativeCount(value) {
+  if (typeof value != "number" || !Number.isFinite(value) || value <= 0)
+    return 0;
+  return Math.min(Math.floor(value), MAX_UINT32);
+}
+function orderedKeys(attributes, keysBeforeHook) {
+  if (!keysBeforeHook.length)
+    return Object.keys(attributes);
+  const beforeHook = keysBeforeHook.filter((key) => Object.prototype.propertyIsEnumerable.call(attributes, key));
+  const seen = new Set(beforeHook);
+  return [
+    ...beforeHook,
+    ...Object.keys(attributes).filter((key) => !seen.has(key))
+  ];
+}
+function applySpanLimits(record, autoKeys, maxAttributes, maxEvents, maxAttributesPerEvent, maxAttributeValueLength, keysBeforeHook = []) {
+  let kept = 0;
+  let droppedAttributes = 0;
+  const attributes = {};
+  for (const key of orderedKeys(record.attributes, keysBeforeHook)) {
+    const value = record.attributes[key];
+    if (!isNullish(value)) {
+      if (!autoKeys.has(key)) {
+        if (kept >= maxAttributes) {
+          droppedAttributes++;
+          continue;
+        }
+        kept++;
+      }
+      Object.defineProperty(attributes, key, {
+        value: truncateAttributeValue(value, maxAttributeValueLength),
+        enumerable: true,
+        writable: true,
+        configurable: true
+      });
+    }
+  }
+  record.attributes = attributes;
+  if (droppedAttributes)
+    record.droppedAttributesCount = nonNegativeCount(record.droppedAttributesCount) + droppedAttributes;
+  let keptEvents = 0;
+  let droppedEvents = 0;
+  const events = [];
+  for (const event of record.events) {
+    if (keptEvents >= maxEvents) {
+      droppedEvents++;
+      continue;
+    }
+    keptEvents++;
+    if (event.attributes) {
+      const bounded = boundAttributes(event.attributes, maxAttributesPerEvent, maxAttributeValueLength);
+      event.attributes = bounded.attributes;
+      if (bounded.dropped)
+        event.droppedAttributesCount = nonNegativeCount(event.droppedAttributesCount) + bounded.dropped;
+    }
+    events.push(event);
+  }
+  record.events = events;
+  if (droppedEvents)
+    record.droppedEventsCount = nonNegativeCount(record.droppedEventsCount) + droppedEvents;
+  if (record.status?.message)
+    record.status = {
+      ...record.status,
+      message: truncateString(safeString(record.status.message), maxAttributeValueLength)
+    };
+}
+
+class NoopSpan {
+  setAttribute() {
+    return this;
+  }
+  setAttributes() {
+    return this;
+  }
+  addEvent() {
+    return this;
+  }
+  setStatus() {
+    return this;
+  }
+  recordException() {
+    return this;
+  }
+  updateName() {
+    return this;
+  }
+  traceparent() {
+    return null;
+  }
+  tracestate() {
+    return null;
+  }
+  end() {}
+}
+function readStack(error) {
+  try {
+    const stack = error.stack;
+    return typeof stack == "string" && stack ? {
+      stack
+    } : {};
+  } catch {
+    return {};
+  }
+}
+function inertSpan(options, active) {
+  const parent = traceparentHeader(options?.parent) ?? active;
+  const inbound = typeof parent == "string" || parent == null ? parent : readHandle(parent, "traceparent");
+  const traceparent = normalizeTraceparent(inbound);
+  if (!traceparent)
+    return NOOP_SPAN;
+  const tracestate = typeof parent == "string" || parent == null ? options?.tracestate : readHandle(parent, "tracestate");
+  return new PassThroughSpan(traceparent, sanitizeTracestate(tracestate));
+}
+function readHandle(parent, method) {
+  try {
+    const fn = parent[method];
+    return typeof fn == "function" ? fn.call(parent) : undefined;
+  } catch {
+    return;
+  }
+}
+function truncateString(value, maxLength) {
+  return value.length > maxLength ? value.slice(0, maxLength) : value;
+}
+function truncateAttributeValue(value, maxLength) {
+  return truncateValue(value, maxLength, {
+    ancestors: new WeakSet,
+    remainingNodes: MAX_JSON_SAFE_VALUE_NODES
+  }, 0);
+}
+function truncateValue(value, maxLength, state, depth) {
+  if (value === null || typeof value != "object") {
+    if (isNullish(value))
+      return value;
+    if (state.remainingNodes <= 0)
+      return value;
+    state.remainingNodes--;
+    return typeof value == "string" ? truncateString(value, maxLength) : value;
+  }
+  if (state.ancestors.has(value))
+    return CIRCULAR_VALUE;
+  if (state.remainingNodes <= 0 || depth >= MAX_JSON_SAFE_VALUE_DEPTH)
+    return value;
+  state.remainingNodes--;
+  state.ancestors.add(value);
+  try {
+    if (value instanceof Date)
+      return value;
+    const resolved = resolveToJson(value);
+    if (resolved.selfDescribed)
+      return isNullish(resolved.value) ? String(resolved.value) : truncateValue(resolved.value, maxLength, state, depth + 1);
+    if (isArray(value)) {
+      const walked = Math.min(value.length, MAX_JSON_SAFE_VALUE_ITEMS);
+      const boundedItems = [];
+      for (let index = 0;index < walked; index++)
+        try {
+          boundedItems.push(truncateValue(value[index], maxLength, state, depth + 1));
+        } catch {
+          boundedItems.push(UNSERIALIZABLE_VALUE);
+        }
+      if (value.length > walked)
+        boundedItems.length = value.length;
+      return boundedItems;
+    }
+    const bounded = {};
+    let emittable = 0;
+    for (const key of Object.keys(value)) {
+      if (emittable >= MAX_JSON_SAFE_VALUE_ITEMS)
+        break;
+      let boundedItem;
+      try {
+        boundedItem = truncateValue(value[key], maxLength, state, depth + 1);
+      } catch {
+        boundedItem = UNSERIALIZABLE_VALUE;
+      }
+      if (key && !isNullish(boundedItem))
+        emittable++;
+      Object.defineProperty(bounded, key, {
+        value: boundedItem,
+        enumerable: true,
+        writable: true,
+        configurable: true
+      });
+    }
+    return bounded;
+  } catch {
+    return value;
+  } finally {
+    state.ancestors.delete(value);
+  }
+}
+function resolveToJson(value) {
+  try {
+    const toJSON = value.toJSON;
+    if (typeof toJSON == "function")
+      return {
+        selfDescribed: true,
+        value: toJSON.call(value)
+      };
+  } catch {}
+  return {
+    selfDescribed: false
+  };
+}
+function boundAttributes(source, max, maxLength) {
+  let keys;
+  try {
+    keys = Object.keys(source);
+  } catch {
+    return {
+      attributes: {},
+      dropped: 0
+    };
+  }
+  const attributes = {};
+  let kept = 0;
+  let dropped = 0;
+  for (const key of keys) {
+    if (kept >= max) {
+      dropped++;
+      continue;
+    }
+    let value;
+    try {
+      value = truncateAttributeValue(source[key], maxLength);
+    } catch {
+      value = UNSERIALIZABLE_VALUE;
+    }
+    if (!isNullish(value)) {
+      kept++;
+      Object.defineProperty(attributes, key, {
+        value,
+        enumerable: true,
+        writable: true,
+        configurable: true
+      });
+    }
+  }
+  return {
+    attributes,
+    dropped
+  };
+}
+function truncateAttributes(attributes, maxLength) {
+  for (const key of Object.keys(attributes))
+    attributes[key] = truncateAttributeValue(attributes[key], maxLength);
+  return attributes;
+}
+function runWithActiveSpan(contextManager, span, fn) {
+  return span === NOOP_SPAN ? fn(span) : contextManager.with(span, () => fn(span));
+}
+function describeError(error) {
+  try {
+    const stack = readStack(error);
+    if (isError(error))
+      return {
+        type: error.name || "Error",
+        message: error.message || "",
+        ...stack
+      };
+    if (typeof error == "string")
+      return {
+        type: "string",
+        message: error
+      };
+    if (error && typeof error == "object") {
+      const maybe = error;
+      if (typeof maybe.message == "string")
+        return {
+          type: typeof maybe.name == "string" ? maybe.name : "Object",
+          message: maybe.message,
+          ...stack
+        };
+    }
+    return {
+      type: typeof error,
+      message: String(error)
+    };
+  } catch {
+    return {
+      type: typeof error,
+      message: ""
+    };
+  }
+}
+var EXCEPTION_EVENT_NAME = "exception", MAX_UINT32 = 4294967295, NOOP_SPAN, PassThroughSpan;
+var init_span = __esm(() => {
+  init_traceparent();
+  init_sanitize();
+  init_utils();
+  init_json_utils();
+  NOOP_SPAN = /* @__PURE__ */ new NoopSpan;
+  PassThroughSpan = class PassThroughSpan extends NoopSpan {
+    constructor(_traceparent, _tracestate) {
+      super(), this._traceparent = _traceparent, this._tracestate = _tracestate;
+    }
+    traceparent() {
+      return this._traceparent;
+    }
+    tracestate() {
+      return this._tracestate ?? null;
+    }
+  };
+});
+
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/traces/otlp.mjs
+function spanFlags(record) {
+  const traceFlags = parseInt(record.traceFlags, 16);
+  const w3c = Number.isFinite(traceFlags) ? 255 & traceFlags : TRACE_FLAGS_SAMPLED2;
+  return w3c | SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE | (record.parentIsRemote ? SPAN_FLAGS_CONTEXT_IS_REMOTE : 0);
+}
+function wireString(value) {
+  if (typeof value == "string")
+    return sanitizeString(value);
+  try {
+    return sanitizeString(String(value));
+  } catch {
+    return UNSERIALIZABLE_VALUE;
+  }
+}
+function spanKindToOtlp(kind) {
+  if (kind && Object.prototype.hasOwnProperty.call(SPAN_KIND_TO_OTLP, kind))
+    return SPAN_KIND_TO_OTLP[kind];
+  return SPAN_KIND_TO_OTLP.internal;
+}
+function msToUnixNanoString(ms) {
+  let whole = Math.floor(ms);
+  let fractionalNanos = Math.round((ms - whole) * 1e6);
+  if (fractionalNanos >= 1e6) {
+    whole += 1;
+    fractionalNanos = 0;
+  }
+  return String(whole) + String(fractionalNanos).padStart(6, "0");
+}
+function toOtlpEvent(event, logger) {
+  const encoded = {
+    name: wireString(event.name),
+    timeUnixNano: msToUnixNanoString(event.timestamp)
+  };
+  if (event.attributes) {
+    const attributes = toOtlpKeyValueList(event.attributes, logger);
+    if (attributes.length)
+      encoded.attributes = attributes;
+  }
+  const dropped = nonNegativeCount(event.droppedAttributesCount);
+  if (dropped)
+    encoded.droppedAttributesCount = dropped;
+  return encoded;
+}
+function buildOtlpSpan(record, logger) {
+  const span = {
+    traceId: record.traceId,
+    spanId: record.spanId,
+    name: wireString(record.name),
+    kind: spanKindToOtlp(record.kind),
+    startTimeUnixNano: msToUnixNanoString(record.startTime),
+    endTimeUnixNano: msToUnixNanoString(record.endTime),
+    flags: spanFlags(record)
+  };
+  if (record.parentSpanId)
+    span.parentSpanId = record.parentSpanId;
+  if (record.traceState)
+    span.traceState = wireString(record.traceState);
+  const attributes = toOtlpKeyValueList(record.attributes, logger);
+  if (attributes.length)
+    span.attributes = attributes;
+  if (record.events.length)
+    span.events = record.events.map((event) => toOtlpEvent(event, logger));
+  const droppedAttributes = nonNegativeCount(record.droppedAttributesCount);
+  if (droppedAttributes)
+    span.droppedAttributesCount = droppedAttributes;
+  const droppedEvents = nonNegativeCount(record.droppedEventsCount);
+  if (droppedEvents)
+    span.droppedEventsCount = droppedEvents;
+  if (record.status)
+    span.status = {
+      code: SPAN_STATUS_TO_OTLP[record.status.code],
+      ...record.status.message && {
+        message: wireString(record.status.message)
+      }
+    };
+  return span;
+}
+function buildTracesResourceAttributes(config, sdkName, sdkVersion) {
+  return buildOtlpResourceAttributes(config, sdkName, sdkVersion);
+}
+function buildOtlpTracesPayload(spans, resourceAttributes, scopeName, scopeVersion, logger) {
+  return {
+    resourceSpans: [
+      {
+        resource: {
+          attributes: toOtlpResourceKeyValueList(resourceAttributes, logger)
+        },
+        scopeSpans: [
+          {
+            scope: {
+              name: scopeName,
+              version: scopeVersion
+            },
+            spans
+          }
+        ]
+      }
+    ]
+  };
+}
+var SPAN_KIND_TO_OTLP, SPAN_STATUS_TO_OTLP, TRACE_FLAGS_SAMPLED2 = 1, SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE = 256, SPAN_FLAGS_CONTEXT_IS_REMOTE = 512;
+var init_otlp = __esm(() => {
+  init_span();
+  init_otlp_any_value();
+  init_json_utils();
+  init_otlp_resource();
+  SPAN_KIND_TO_OTLP = {
+    internal: 1,
+    server: 2,
+    client: 3,
+    producer: 4,
+    consumer: 5
+  };
+  SPAN_STATUS_TO_OTLP = {
+    ok: 1,
+    error: 2
+  };
+});
+
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/traces/index.mjs
+function clockNow() {
+  return monotonicNow() ?? Date.now();
+}
+function isOwnSpan(value) {
+  try {
+    return value instanceof PostHogSpan;
+  } catch {
+    return false;
+  }
+}
+function remoteContext(header, tracestate) {
+  const remote = parseTraceparent(header);
+  if (!remote)
+    return;
+  return {
+    traceId: remote.traceId,
+    parentSpanId: remote.spanId,
+    traceState: sanitizeTracestate(tracestate),
+    traceFlags: remote.flags,
+    isRemote: true
+  };
+}
+function looksLikeSpan(value) {
+  try {
+    return typeof value.traceparent == "function";
+  } catch {
+    return false;
+  }
+}
+function isSpanRecordShape(record) {
+  return !!record.attributes && typeof record.attributes == "object" && !Array.isArray(record.attributes) && Array.isArray(record.events) && record.name !== undefined && record.kind !== undefined && record.startTime !== undefined && record.endTime !== undefined;
+}
+function restoreField(record, field, value) {
+  if (record[field] !== value)
+    record[field] = value;
+}
+function withRestoredIdentity(hooked, original) {
+  try {
+    const descriptors = Object.getOwnPropertyDescriptors(hooked);
+    for (const field of [
+      "traceId",
+      "spanId",
+      "parentSpanId",
+      "traceState"
+    ])
+      descriptors[field] = {
+        value: original[field],
+        enumerable: true,
+        writable: true,
+        configurable: true
+      };
+    return Object.create(Object.getPrototypeOf(hooked), descriptors);
+  } catch {
+    return hooked;
+  }
+}
+
+class PostHogTraces {
+  constructor(_instance, _config, _logger, _getContext, _contextManager, _onSpanQueued) {
+    this._instance = _instance;
+    this._config = _config;
+    this._logger = _logger;
+    this._getContext = _getContext;
+    this._contextManager = _contextManager;
+    this._onSpanQueued = _onSpanQueued;
+    this._queue = [];
+    this._flushTimer = new FlushTimer(() => this._flushInBackground());
+    this._flushPromise = null;
+    this._droppedSinceWarning = 0;
+    this._lastDropWarningAt = 0;
+    this._dropReasons = new Set;
+    this._consecutiveFlushFailures = 0;
+    this._flushJitter = NO_JITTER;
+    this._retryAfter = new RetryAfterWindow;
+    this._headBatchFailures = 0;
+    this._headBatchSize = 0;
+    this._headBatchChargeableAt = 0;
+    this._generation = 0;
+    this._liveSpans = new Map;
+    this._maxExportBatchSize = _config.maxExportBatchSize;
+  }
+  startSpan(name, options) {
+    if (this._instance.isDisabled || this._instance.optedOut)
+      return inertSpan(options, this._contextManager.active());
+    const explicitParent = traceparentHeader(options?.parent);
+    if (explicitParent && typeof explicitParent != "string" && !isOwnSpan(explicitParent)) {
+      if (looksLikeSpan(explicitParent)) {
+        this._logger.debug("Span parent is not a span from this SDK; returning an inert span");
+        return inertSpan(options, this._contextManager.active());
+      }
+      this._logger.debug("Ignoring an unusable span parent");
+    }
+    const parent = this._resolveParent(explicitParent, options);
+    this._evictAgedSpans();
+    if (this._liveSpans.size >= this._config.maxLiveSpans) {
+      this._recordDrop(1, `the live-span limit (${this._config.maxLiveSpans}) was reached — spans are being started and never ended`);
+      return inertSpan(options, this._contextManager.active());
+    }
+    const now = Date.now();
+    const startTime = resolveStartTime(options?.startTime, now, this._logger);
+    const spanId = newSpanId();
+    this._liveSpans.set(spanId, clockNow());
+    const autoAttributes = this._autoContextAttributes();
+    return new PostHogSpan({
+      traceId: parent?.traceId ?? newTraceId(),
+      spanId,
+      parentSpanId: parent?.parentSpanId,
+      traceState: parent?.traceState,
+      traceFlags: parent?.traceFlags,
+      parentIsRemote: parent?.isRemote,
+      name: sanitizeName(name, "Span name", this._config.maxAttributeValueLength, this._logger),
+      kind: options?.kind ?? "internal",
+      attributes: assignUserAttributes({
+        ...autoAttributes
+      }, options?.attributes),
+      autoAttributeKeys: Object.keys(autoAttributes),
+      maxAttributes: this._config.maxAttributesPerSpan,
+      maxEvents: this._config.maxEventsPerSpan,
+      maxAttributesPerEvent: this._config.maxAttributesPerEvent,
+      maxAttributeValueLength: this._config.maxAttributeValueLength,
+      startTime,
+      backdated: startTime !== now,
+      clockAnchor: toEpochMs(options?.startTime) === undefined ? parent?.clockAnchor : undefined
+    }, (record, autoKeys) => this._onSpanEnd(record, autoKeys), this._logger);
+  }
+  withSpan(name, optionsOrFn, maybeFn) {
+    const options = typeof optionsOrFn == "function" ? undefined : optionsOrFn;
+    const fn = typeof optionsOrFn == "function" ? optionsOrFn : maybeFn;
+    const span = this.startSpan(name, options);
+    try {
+      const result = runWithActiveSpan(this._contextManager, span, fn);
+      if (isPromise(result))
+        return result.then((value) => {
+          span.end();
+          return value;
+        }, (error) => {
+          this._recordCallbackError(span, error);
+          span.end();
+          throw error;
+        });
+      span.end();
+      return result;
+    } catch (error) {
+      this._recordCallbackError(span, error);
+      span.end();
+      throw error;
+    }
+  }
+  getActiveSpan() {
+    return this._contextManager.active() ?? null;
+  }
+  get throttled() {
+    return this._retryAfter.isOpen();
+  }
+  async flush() {
+    for (;; ) {
+      if (!this._queue.length)
+        return;
+      const inFlight = this._flushPromise;
+      const removed = await (inFlight ?? this._startFlush());
+      if (!removed)
+        return;
+    }
+  }
+  _startFlush() {
+    this._flushTimer.clear();
+    const startedAtGeneration = this._generation;
+    const promise = Promise.resolve().then(() => startedAtGeneration === this._generation ? this._flushInner() : 0).finally(() => {
+      if (this._flushPromise === promise)
+        this._flushPromise = null;
+      this._armFlushTimerIfQueuedNoEarlierThan();
+    });
+    this._flushPromise = promise;
+    return promise;
+  }
+  reset() {
+    this._flushTimer.clear();
+    if (this._queue.length)
+      this._logger.critical(`Discarding ${this._queue.length} span(s) that were still queued when tracing was shut down. Raise the shutdown timeout or flush earlier if they matter.`);
+    this._queue = [];
+    this._liveSpans.clear();
+    this._flushPromise = null;
+    this._generation++;
+    this._maxExportBatchSize = this._config.maxExportBatchSize;
+    this._droppedSinceWarning = 0;
+    this._dropReasons.clear();
+    this._lastDropWarningAt = 0;
+    this._consecutiveFlushFailures = 0;
+    this._flushJitter = NO_JITTER;
+    this._retryAfter.reset();
+    this._resetHeadBatchBudget();
+  }
+  _resetHeadBatchBudget() {
+    this._headBatchFailures = 0;
+    this._headBatchChargeableAt = 0;
+  }
+  _resolveParent(explicit, options) {
+    if (typeof explicit == "string") {
+      const remote = remoteContext(explicit, options?.tracestate);
+      if (!remote)
+        this._logger.debug("Ignoring malformed traceparent; starting a new trace");
+      return remote;
+    }
+    if (isOwnSpan(explicit))
+      return explicit.childContext();
+    const active = this._contextManager.active();
+    if (isOwnSpan(active))
+      return active.childContext();
+    if (active instanceof PassThroughSpan)
+      return remoteContext(active.traceparent(), active.tracestate() ?? undefined);
+  }
+  _autoContextAttributes() {
+    let context;
+    try {
+      context = this._getContext();
+    } catch (error) {
+      this._logger.debug("Failed to read tracing context; span will carry no PostHog attributes", error);
+      return {};
+    }
+    const attributes = {};
+    if (context.distinctId)
+      attributes.posthogDistinctId = context.distinctId;
+    if (context.sessionId)
+      attributes.sessionId = context.sessionId;
+    if (context.currentUrl)
+      attributes["url.full"] = context.currentUrl;
+    if (context.screenName)
+      attributes["screen.name"] = context.screenName;
+    if (context.appState)
+      attributes["app.state"] = context.appState;
+    return attributes;
+  }
+  _recordCallbackError(span, error) {
+    if (!(span instanceof PostHogSpan))
+      return;
+    const { type, message, stack } = describeError(error);
+    span.addEvent("exception", {
+      "exception.type": type,
+      "exception.message": message,
+      ...stack && {
+        "exception.stacktrace": stack
+      }
+    });
+    if (!span.statusIsExplicitlyOk)
+      span.setStatus("error", message);
+  }
+  _evictAgedSpans() {
+    const cutoff = clockNow() - this._config.maxSpanAgeMs;
+    let evicted = 0;
+    for (const [spanId, startedAt] of this._liveSpans) {
+      if (startedAt > cutoff)
+        break;
+      this._liveSpans.delete(spanId);
+      evicted++;
+    }
+    if (evicted)
+      this._recordDrop(evicted, `they were still live after ${this._config.maxSpanAgeMs}ms`);
+  }
+  _onSpanEnd(incoming, autoKeys) {
+    if (!this._liveSpans.delete(incoming.spanId))
+      return;
+    if (this._instance.isDisabled || this._instance.optedOut)
+      return void this._recordDrop(1, "the user has opted out");
+    const record = this._runBeforeSpanSend(incoming, autoKeys);
+    if (!record)
+      return;
+    this._reportLimitDrops(record);
+    if (this._queue.length >= this._config.maxQueueSize)
+      return void this._recordDrop(1, `the queue is full (${this._config.maxQueueSize}) — raise the flush frequency or reduce span volume`);
+    this._queue.push(record);
+    try {
+      this._onSpanQueued?.();
+    } catch (error) {
+      this._logger.debug("Span queue notification failed", error);
+    }
+    if (!(this._queue.length >= this._maxExportBatchSize) || this._consecutiveFlushFailures || this._retryAfter.isOpen())
+      this._armFlushTimerIfQueued();
+    else
+      this._flushInBackground();
+  }
+  _reportLimitDrops(record) {
+    const attributes = record.droppedAttributesCount ?? 0;
+    const events = record.droppedEventsCount ?? 0;
+    let eventAttributes = 0;
+    for (const event of record.events)
+      eventAttributes += event.droppedAttributesCount ?? 0;
+    if (attributes || events || eventAttributes)
+      this._logger.debug(`Span limits discarded data from "${record.name}": ${attributes} attributes, ${events} events, ${eventAttributes} event attributes`);
+  }
+  _runBeforeSpanSend(record, autoKeys) {
+    if (!this._config.beforeSpanSend.length)
+      return record;
+    const identity = {
+      traceId: record.traceId,
+      spanId: record.spanId,
+      parentSpanId: record.parentSpanId,
+      traceState: record.traceState
+    };
+    const originalTimes = {
+      startTime: record.startTime,
+      endTime: record.endTime
+    };
+    const originalDropped = {
+      attributes: record.droppedAttributesCount,
+      events: record.droppedEventsCount
+    };
+    const keysBeforeHook = Object.keys(record.attributes);
+    const originalPropagation = {
+      traceFlags: record.traceFlags,
+      parentIsRemote: record.parentIsRemote
+    };
+    const originalStatus = record.status && {
+      ...record.status
+    };
+    let hooked = record;
+    let current = record;
+    try {
+      for (const hook of this._config.beforeSpanSend) {
+        const result = hook(hooked);
+        if (!result) {
+          this._recordDrop(1, "beforeSpanSend dropped it");
+          return null;
+        }
+        hooked = this._keepSpanIdentity(result, identity);
+      }
+      const rebuilt = {
+        traceId: identity.traceId,
+        spanId: identity.spanId,
+        parentSpanId: identity.parentSpanId,
+        traceState: identity.traceState,
+        name: hooked.name,
+        kind: hooked.kind,
+        status: hooked.status,
+        attributes: hooked.attributes,
+        events: hooked.events,
+        startTime: hooked.startTime,
+        endTime: hooked.endTime,
+        traceFlags: originalPropagation.traceFlags,
+        parentIsRemote: originalPropagation.parentIsRemote,
+        droppedAttributesCount: originalDropped.attributes,
+        droppedEventsCount: originalDropped.events
+      };
+      current = rebuilt;
+      if (!isSpanRecordShape(current)) {
+        this._logger.debug("beforeSpanSend did not return a span record; dropping the span");
+        this._recordDrop(1, "beforeSpanSend returned an unusable record");
+        return null;
+      }
+      current.name = sanitizeName(current.name, "Span name", this._config.maxAttributeValueLength, this._logger);
+      if (current.status && current.status.code !== "ok" && current.status.code !== "error") {
+        this._logger.debug("beforeSpanSend set an unknown span status; keeping the original");
+        current.status = originalStatus;
+      }
+      current.startTime = toEpochMs(current.startTime) ?? originalTimes.startTime;
+      current.endTime = clampEndTime(toEpochMs(current.endTime) ?? originalTimes.endTime, current.startTime);
+      const sanitizedEvents = [];
+      for (const event of current.events)
+        try {
+          sanitizedEvents.push({
+            ...event,
+            name: sanitizeName(event.name, "Span event name", this._config.maxAttributeValueLength, this._logger),
+            timestamp: resolveSuppliedTime(event.timestamp, current.startTime, "event timestamp", this._logger)
+          });
+        } catch {
+          this._logger.debug("beforeSpanSend left an unreadable span event; dropping it");
+        }
+      current.events = sanitizedEvents;
+      applySpanLimits(current, autoKeys, this._config.maxAttributesPerSpan, this._config.maxEventsPerSpan, this._config.maxAttributesPerEvent, this._config.maxAttributeValueLength, keysBeforeHook);
+      return current;
+    } catch (error) {
+      this._logger.debug("beforeSpanSend failed; dropping the span rather than exporting it unscrubbed", error);
+      this._recordDrop(1, "beforeSpanSend failed");
+      return null;
+    }
+  }
+  _keepSpanIdentity(hooked, original) {
+    if (hooked.traceId !== original.traceId || hooked.spanId !== original.spanId || hooked.parentSpanId !== original.parentSpanId)
+      this._logger.debug("beforeSpanSend changed a span identity field; keeping the original ids");
+    try {
+      restoreField(hooked, "traceId", original.traceId);
+      restoreField(hooked, "spanId", original.spanId);
+      restoreField(hooked, "parentSpanId", original.parentSpanId);
+      restoreField(hooked, "traceState", original.traceState);
+    } catch {
+      return withRestoredIdentity(hooked, original);
+    }
+    return hooked;
+  }
+  _recordDrop(count, reason) {
+    this._droppedSinceWarning += count;
+    this._dropReasons.add(reason);
+    if (Date.now() - this._lastDropWarningAt >= this._config.flushIntervalMs)
+      this._warnAboutDrops();
+  }
+  _warnAboutDrops() {
+    if (!this._droppedSinceWarning)
+      return;
+    this._lastDropWarningAt = Date.now();
+    this._logger.warn(`Dropping ${this._droppedSinceWarning} span(s): ${[
+      ...this._dropReasons
+    ].join("; ")}`);
+    this._droppedSinceWarning = 0;
+    this._dropReasons.clear();
+  }
+  _encodeBatch(batch) {
+    const encoded = [];
+    for (const record of batch)
+      try {
+        encoded.push(buildOtlpSpan(record, this._logger));
+      } catch (error) {
+        this._logger.debug("Failed to encode a span; dropping it", error);
+        this._recordDrop(1, "its attributes could not be encoded");
+      }
+    return encoded;
+  }
+  _discardQueueIfConsentWithdrawn() {
+    if (!this._instance.isDisabled && !this._instance.optedOut)
+      return 0;
+    const discarded = this._queue.length;
+    this._queue = [];
+    this._resetHeadBatchBudget();
+    this._recordDrop(discarded, "the user has opted out");
+    this._warnAboutDrops();
+    return discarded;
+  }
+  async _flushInner() {
+    if (!this._queue.length)
+      return 0;
+    const discardedBeforeDrain = this._discardQueueIfConsentWithdrawn();
+    if (discardedBeforeDrain)
+      return discardedBeforeDrain;
+    const resourceAttributes = truncateAttributes(buildTracesResourceAttributes(this._config, this._instance.getLibraryId(), this._instance.getLibraryVersion()), this._config.maxAttributeValueLength);
+    const scopeName = this._instance.getLibraryId();
+    const scopeVersion = this._instance.getLibraryVersion();
+    let remaining = this._queue.length;
+    let removed = 0;
+    let localCap = 1 / 0;
+    const generation = this._generation;
+    try {
+      while (remaining > 0 && this._queue.length > 0) {
+        const discardedMidDrain = this._discardQueueIfConsentWithdrawn();
+        if (discardedMidDrain)
+          return removed + discardedMidDrain;
+        const cap = this._headBatchFailures > 0 ? Math.min(this._maxExportBatchSize, this._headBatchSize) : this._maxExportBatchSize;
+        const size = Math.max(1, Math.min(cap, localCap, remaining, this._queue.length));
+        const batch = this._queue.slice(0, size);
+        const spans = this._encodeBatch(batch);
+        if (!spans.length) {
+          this._queue.splice(0, size);
+          remaining -= size;
+          removed += size;
+          this._resetHeadBatchBudget();
+          continue;
+        }
+        const chargeable = clockNow() >= this._headBatchChargeableAt && !this._retryAfter.isOpen();
+        const outcome = await this._instance._sendTracesBatch(buildOtlpTracesPayload(spans, resourceAttributes, scopeName, scopeVersion, this._logger));
+        if (generation !== this._generation)
+          break;
+        this._retryAfter.record(outcome);
+        if (outcome.kind === "ok") {
+          this._consecutiveFlushFailures = 0;
+          this._flushJitter = NO_JITTER;
+          this._resetHeadBatchBudget();
+          this._queue.splice(0, size);
+          remaining -= size;
+          removed += size;
+          if (this._maxExportBatchSize < this._config.maxExportBatchSize)
+            this._maxExportBatchSize++;
+          continue;
+        }
+        if (outcome.kind === "too-large") {
+          if (size === 1) {
+            this._queue.splice(0, 1);
+            remaining -= 1;
+            removed += 1;
+            this._recordDrop(1, "it is too large for the ingestion endpoint");
+            this._consecutiveFlushFailures = 0;
+            this._flushJitter = NO_JITTER;
+            this._resetHeadBatchBudget();
+            continue;
+          }
+          const halved = Math.max(1, Math.floor(size / 2));
+          if (outcome.measuredLocally)
+            localCap = halved;
+          else
+            this._maxExportBatchSize = halved;
+          this._resetHeadBatchBudget();
+          this._logger.debug(`Batch too large; retrying the same spans in batches of ${halved}`);
+          continue;
+        }
+        if (outcome.kind === "retry-later") {
+          this._consecutiveFlushFailures++;
+          this._flushJitter = drawJitter();
+          this._headBatchSize = size;
+          if (chargeable) {
+            this._headBatchFailures++;
+            this._headBatchChargeableAt = clockNow() + this._nextFlushDelay();
+          }
+          if (this._headBatchFailures < MAX_RETRIES_PER_BATCH) {
+            this._logger.debug("Span export failed; retrying on the next flush", outcome.error);
+            return removed;
+          }
+          this._queue.splice(0, size);
+          remaining -= size;
+          removed += size;
+          this._consecutiveFlushFailures = 0;
+          this._flushJitter = NO_JITTER;
+          this._resetHeadBatchBudget();
+          this._recordDrop(size, `the ingestion endpoint failed ${MAX_RETRIES_PER_BATCH} times in a row`);
+          if (this._retryAfter.isOpen())
+            return removed;
+          continue;
+        }
+        this._logger.debug("Dropping a span batch the ingestion endpoint rejected", outcome.error);
+        this._queue.splice(0, size);
+        remaining -= size;
+        removed += size;
+        this._consecutiveFlushFailures = 0;
+        this._flushJitter = NO_JITTER;
+        this._resetHeadBatchBudget();
+        this._recordDrop(size, "the ingestion endpoint rejected the batch");
+      }
+      return removed;
+    } finally {
+      this._warnAboutDrops();
+    }
+  }
+  _flushInBackground() {
+    if (this._backgroundFlush)
+      return;
+    this._backgroundFlush = this.flush().catch((error) => {
+      this._logger.debug("Background span flush failed", error);
+    }).finally(() => {
+      this._backgroundFlush = undefined;
+      this._armFlushTimerIfQueuedNoEarlierThan();
+    });
+  }
+  _armFlushTimerIfQueued() {
+    if (this._flushTimer.pending || !this._queue.length)
+      return;
+    this._flushTimer.arm(this._nextFlushDelay());
+  }
+  _armFlushTimerIfQueuedNoEarlierThan() {
+    if (!this._queue.length)
+      return;
+    this._flushTimer.armNoEarlierThan(this._nextFlushDelay());
+  }
+  _nextFlushDelay() {
+    return Math.max(backoffDelayMs(this._config.flushIntervalMs, this._consecutiveFlushFailures, this._flushJitter, MAX_FLUSH_BACKOFF_MS), this._retryAfter.remainingMs());
+  }
+}
+var MAX_RETRIES_PER_BATCH = 8;
+var init_traces = __esm(() => {
+  init_span();
+  init_ids();
+  init_traceparent();
+  init_sanitize();
+  init_json_utils();
+  init_otlp();
+  init_utils();
+  init_flush_timer();
+  init_retry_after();
+  init_backoff();
+});
+
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/traces/context.mjs
+class SyncSpanContextManager {
+  active() {
+    return this._active;
+  }
+  with(span, fn) {
+    const previous = this._active;
+    this._active = span;
+    try {
+      return fn();
+    } finally {
+      this._active = previous;
+    }
+  }
+}
+var init_context = () => {};
+
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/traces/config.mjs
+function positiveInteger(value, fallback) {
+  return typeof value == "number" && Number.isInteger(value) && value >= 1 ? value : fallback;
+}
+function withUsableIdentityKeys(attributes) {
+  if (!attributes || typeof attributes != "object" || Array.isArray(attributes))
+    return;
+  try {
+    if (IDENTITY_KEYS.every((key) => !(key in attributes) || typeof attributes[key] == "string"))
+      return attributes;
+    const usable = {
+      ...attributes
+    };
+    for (const key of IDENTITY_KEYS)
+      if (key in usable && typeof usable[key] != "string")
+        delete usable[key];
+    return usable;
+  } catch {
+    return;
+  }
+}
+function resolveBeforeSpanSend(beforeSpanSend, logger) {
+  if (!beforeSpanSend)
+    return [];
+  const supplied = [
+    beforeSpanSend
+  ].flat().filter((hook) => Boolean(hook));
+  const hooks = supplied.filter((hook) => typeof hook == "function");
+  if (hooks.length !== supplied.length)
+    logger?.critical(`beforeSpanSend: ignoring ${supplied.length - hooks.length} of ${supplied.length} entries that are not functions. Spans export without them, so whatever they were redacting is not redacted.`);
+  return hooks;
+}
+function resolveTracesConfig(config, hostResourceAttributes, logger) {
+  const resourceAttributes = assignUserAttributes({
+    ...hostResourceAttributes
+  }, withUsableIdentityKeys(config?.resourceAttributes));
+  const maxExportBatchSize = positiveInteger(config?.maxExportBatchSize, DEFAULT_MAX_EXPORT_BATCH_SIZE);
+  return {
+    serviceName: resourceAttributes?.["service.name"] ?? config?.serviceName,
+    serviceVersion: resourceAttributes?.["service.version"] ?? config?.serviceVersion,
+    environment: resourceAttributes?.["deployment.environment"] ?? config?.environment,
+    resourceAttributes,
+    beforeSpanSend: resolveBeforeSpanSend(config?.beforeSpanSend, logger),
+    maxAttributesPerSpan: positiveInteger(config?.maxAttributesPerSpan, DEFAULT_MAX_ATTRIBUTES_PER_SPAN),
+    maxEventsPerSpan: positiveInteger(config?.maxEventsPerSpan, DEFAULT_MAX_EVENTS_PER_SPAN),
+    maxAttributesPerEvent: DEFAULT_MAX_ATTRIBUTES_PER_EVENT,
+    maxAttributeValueLength: positiveInteger(config?.maxAttributeValueLength, DEFAULT_MAX_ATTRIBUTE_VALUE_LENGTH),
+    flushIntervalMs: positiveInteger(config?.flushIntervalMs, DEFAULT_FLUSH_INTERVAL_MS2),
+    maxExportBatchSize,
+    maxQueueSize: Math.max(positiveInteger(config?.maxQueueSize, DEFAULT_MAX_QUEUE_SIZE), maxExportBatchSize),
+    maxLiveSpans: positiveInteger(config?.maxLiveSpans, DEFAULT_MAX_LIVE_SPANS),
+    maxSpanAgeMs: positiveInteger(config?.maxSpanAgeMs, DEFAULT_MAX_SPAN_AGE_MS)
+  };
+}
+var DEFAULT_FLUSH_INTERVAL_MS2 = 5000, DEFAULT_MAX_EXPORT_BATCH_SIZE = 512, DEFAULT_MAX_QUEUE_SIZE = 2048, DEFAULT_MAX_ATTRIBUTES_PER_SPAN = 128, DEFAULT_MAX_EVENTS_PER_SPAN = 128, DEFAULT_MAX_ATTRIBUTES_PER_EVENT = 128, DEFAULT_MAX_ATTRIBUTE_VALUE_LENGTH = 8192, DEFAULT_MAX_LIVE_SPANS = 1e4, DEFAULT_MAX_SPAN_AGE_MS = 3600000, IDENTITY_KEYS;
+var init_config2 = __esm(() => {
+  init_json_utils();
+  IDENTITY_KEYS = [
+    "service.name",
+    "service.version",
+    "deployment.environment"
+  ];
+});
+
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/surveys/validation.mjs
 var init_validation = __esm(() => {
   init_types();
 });
 
-// node_modules/.bun/@posthog+core@1.51.0/node_modules/@posthog/core/dist/index.mjs
+// node_modules/.bun/@posthog+core@1.53.2/node_modules/@posthog/core/dist/index.mjs
 var init_dist = __esm(() => {
   init_error_tracking();
   init_featureFlagUtils();
@@ -4493,6 +6302,10 @@ var init_dist = __esm(() => {
   init_otlp_resource();
   init_logs();
   init_metrics();
+  init_traces();
+  init_context();
+  init_span();
+  init_config2();
   init_uuidv7();
   init_validation();
   init_utils();
@@ -4503,7 +6316,7 @@ var init_dist = __esm(() => {
   init_types();
 });
 
-// node_modules/.bun/posthog-node@5.51.7/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/context-lines.node.mjs
+// node_modules/.bun/posthog-node@5.52.1/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/context-lines.node.mjs
 import { constants as constants2 } from "node:fs";
 import { open as promises_open } from "node:fs/promises";
 import { isAbsolute as isAbsolute7 } from "node:path";
@@ -4790,7 +6603,7 @@ var init_context_lines_node = __esm(() => {
   LRU_FILE_CONTENTS_FS_READ_FAILED = new ReduceableCache(20);
 });
 
-// node_modules/.bun/posthog-node@5.51.7/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/relative-path.node.mjs
+// node_modules/.bun/posthog-node@5.52.1/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/relative-path.node.mjs
 import { isAbsolute as isAbsolute8, relative as relative4, sep as sep8 } from "node:path";
 function createRelativePathModifier(basePath = process.cwd()) {
   const isWindows = sep8 === "\\";
@@ -4807,11 +6620,11 @@ function createRelativePathModifier(basePath = process.cwd()) {
 }
 var init_relative_path_node = () => {};
 
-// node_modules/.bun/posthog-node@5.51.7/node_modules/posthog-node/dist/version.mjs
-var version = "5.51.7";
+// node_modules/.bun/posthog-node@5.52.1/node_modules/posthog-node/dist/version.mjs
+var version = "5.52.1";
 var init_version = () => {};
 
-// node_modules/.bun/posthog-node@5.51.7/node_modules/posthog-node/dist/types.mjs
+// node_modules/.bun/posthog-node@5.52.1/node_modules/posthog-node/dist/types.mjs
 var FeatureFlagError2;
 var init_types3 = __esm(() => {
   FeatureFlagError2 = {
@@ -4822,7 +6635,7 @@ var init_types3 = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.51.7/node_modules/posthog-node/dist/feature-flag-evaluations.mjs
+// node_modules/.bun/posthog-node@5.52.1/node_modules/posthog-node/dist/feature-flag-evaluations.mjs
 class FeatureFlagEvaluations {
   constructor(init) {
     this._host = init.host;
@@ -4958,7 +6771,7 @@ var init_feature_flag_evaluations = __esm(() => {
   init_types3();
 });
 
-// node_modules/.bun/posthog-node@5.51.7/node_modules/posthog-node/dist/extensions/feature-flags/feature-flags.mjs
+// node_modules/.bun/posthog-node@5.52.1/node_modules/posthog-node/dist/extensions/feature-flags/feature-flags.mjs
 function setCustomErrorPrototype(error, constructor) {
   error.name = constructor.name;
   Error.captureStackTrace(error, constructor);
@@ -5589,7 +7402,7 @@ var init_feature_flags = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.51.7/node_modules/posthog-node/dist/extensions/error-tracking/autocapture.mjs
+// node_modules/.bun/posthog-node@5.52.1/node_modules/posthog-node/dist/extensions/error-tracking/autocapture.mjs
 function splitNodeOptions(nodeOptions) {
   const args = [];
   let current = "";
@@ -5690,7 +7503,7 @@ var init_autocapture = __esm(() => {
   STARTUP_UNHANDLED_REJECTION_MODE = getUnhandledRejectionMode();
 });
 
-// node_modules/.bun/posthog-node@5.51.7/node_modules/posthog-node/dist/extensions/error-tracking/index.mjs
+// node_modules/.bun/posthog-node@5.52.1/node_modules/posthog-node/dist/extensions/error-tracking/index.mjs
 class error_tracking_ErrorTracking {
   constructor(client, options, _logger) {
     this.client = client;
@@ -5765,7 +7578,7 @@ var init_error_tracking2 = __esm(() => {
   error_tracking_default = error_tracking_ErrorTracking;
 });
 
-// node_modules/.bun/posthog-node@5.51.7/node_modules/posthog-node/dist/storage-memory.mjs
+// node_modules/.bun/posthog-node@5.52.1/node_modules/posthog-node/dist/storage-memory.mjs
 class PostHogMemoryStorage {
   getProperty(key) {
     return this._memoryStorage[key];
@@ -5779,7 +7592,7 @@ class PostHogMemoryStorage {
 }
 var init_storage_memory = () => {};
 
-// node_modules/.bun/posthog-node@5.51.7/node_modules/posthog-node/dist/capture-v1/config.mjs
+// node_modules/.bun/posthog-node@5.52.1/node_modules/posthog-node/dist/capture-v1/config.mjs
 function isCaptureMode(value) {
   return value === "v0" || value === "v1";
 }
@@ -5787,16 +7600,16 @@ function resolveCaptureMode() {
   const envMode = "u" > typeof process ? process.env?.POSTHOG_CAPTURE_MODE : undefined;
   return isCaptureMode(envMode) ? envMode : "v0";
 }
-var init_config2 = () => {};
+var init_config3 = () => {};
 
-// node_modules/.bun/posthog-node@5.51.7/node_modules/posthog-node/dist/capture-v1/routing.mjs
+// node_modules/.bun/posthog-node@5.52.1/node_modules/posthog-node/dist/capture-v1/routing.mjs
 function isLegacyOnlyEvent(message) {
   return typeof message.event == "string" && message.event.startsWith(AI_EVENT_PREFIX);
 }
 var AI_EVENT_PREFIX = "$ai_", ANALYTICS_ROUTE = "analytics", AI_ROUTE = "ai";
 var init_routing = () => {};
 
-// node_modules/.bun/posthog-node@5.51.7/node_modules/posthog-node/dist/capture-v1/errors.mjs
+// node_modules/.bun/posthog-node@5.52.1/node_modules/posthog-node/dist/capture-v1/errors.mjs
 var CaptureV1Error;
 var init_errors = __esm(() => {
   CaptureV1Error = class CaptureV1Error extends Error {
@@ -5816,7 +7629,7 @@ var init_errors = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.51.7/node_modules/posthog-node/dist/capture-v1/transform.mjs
+// node_modules/.bun/posthog-node@5.52.1/node_modules/posthog-node/dist/capture-v1/transform.mjs
 function coerceBool(value) {
   if (typeof value == "boolean")
     return value;
@@ -5934,7 +7747,7 @@ var init_transform = __esm(() => {
   ];
 });
 
-// node_modules/.bun/posthog-node@5.51.7/node_modules/posthog-node/dist/capture-v1/sender.mjs
+// node_modules/.bun/posthog-node@5.52.1/node_modules/posthog-node/dist/capture-v1/sender.mjs
 class V1CaptureSender {
   constructor(config, hooks) {
     this.config = config;
@@ -6190,11 +8003,11 @@ var init_sender = __esm(() => {
   ]);
 });
 
-// node_modules/.bun/posthog-node@5.51.7/node_modules/posthog-node/dist/ai-capture/routing.mjs
+// node_modules/.bun/posthog-node@5.52.1/node_modules/posthog-node/dist/ai-capture/routing.mjs
 var AI_CAPTURE_ROUTE = "ai-capture", AI_CAPTURE_ENDPOINT_PATH = "/i/v0/ai/batch/", AI_MAX_EVENT_BYTES = 8388608, AI_BATCH_TARGET_BYTES = 5242880;
 var init_routing2 = () => {};
 
-// node_modules/.bun/posthog-node@5.51.7/node_modules/posthog-node/dist/ai-capture/batching.mjs
+// node_modules/.bun/posthog-node@5.52.1/node_modules/posthog-node/dist/ai-capture/batching.mjs
 function eventByteSize(message) {
   return encoder.encode(safeJsonStringify(message)).length;
 }
@@ -6236,7 +8049,7 @@ var init_batching = __esm(() => {
   encoder = new TextEncoder;
 });
 
-// node_modules/.bun/posthog-node@5.51.7/node_modules/posthog-node/dist/client.mjs
+// node_modules/.bun/posthog-node@5.52.1/node_modules/posthog-node/dist/client.mjs
 function emitDeprecationWarningOnce(id, message) {
   if (_emittedDeprecations.has(id))
     return;
@@ -6280,7 +8093,7 @@ var init_client = __esm(() => {
   init_feature_flags();
   init_error_tracking2();
   init_storage_memory();
-  init_config2();
+  init_config3();
   init_routing();
   init_sender();
   init_batching();
@@ -6341,8 +8154,26 @@ var init_client = __esm(() => {
       super.enqueue(type, message, options, explicitRoute);
       this.scheduleDebouncedFlush();
     }
+    _flushEventsAndSpans(skipThrottledSpans = false) {
+      const events = this.flushWithPendingPromises();
+      if (!this._traces || skipThrottledSpans && this._traces.throttled)
+        return events;
+      return allSettled([
+        events,
+        this._traces.flush().catch(() => {})
+      ]).then(([eventsResult]) => {
+        if (eventsResult.status === "rejected")
+          throw eventsResult.reason;
+      });
+    }
+    flushAutomatic() {
+      return this._flushKeepingRuntimeAlive(true);
+    }
     async flush() {
-      const flushPromise = this.flushWithPendingPromises();
+      return this._flushKeepingRuntimeAlive(false);
+    }
+    _flushKeepingRuntimeAlive(skipThrottledSpans) {
+      const flushPromise = this._flushEventsAndSpans(skipThrottledSpans);
       const waitUntil = this.options.waitUntil;
       if (waitUntil && !this._waitUntilCycle)
         try {
@@ -6395,7 +8226,7 @@ var init_client = __esm(() => {
     async resolveWaitUntilFlush() {
       const resolve = this._consumeWaitUntilCycle();
       try {
-        await this.flushWithPendingPromises();
+        await this._flushEventsAndSpans();
       } catch {} finally {
         resolve?.();
       }
@@ -6496,6 +8327,45 @@ var init_client = __esm(() => {
       if (!this._metrics)
         this._metrics = new PostHogMetrics(this, resolveMetricsConfig(this.options.metrics), this._logger);
       return this._metrics;
+    }
+    initializeSpanContextManager() {
+      return new SyncSpanContextManager;
+    }
+    hostResourceAttributes() {
+      return {};
+    }
+    get _spanContextManager() {
+      if (!this._spanContext)
+        this._spanContext = this.initializeSpanContextManager();
+      return this._spanContext;
+    }
+    get _tracesPipeline() {
+      if (!this.options.traces)
+        return;
+      if (!this._traces)
+        this._traces = new PostHogTraces(this, resolveTracesConfig(this.options.traces, this.hostResourceAttributes(), this._logger), this._logger, () => this._tracingContext(), this._spanContextManager, () => this.scheduleDebouncedFlush());
+      return this._traces;
+    }
+    _tracingContext() {
+      const context = this.context?.get();
+      return {
+        distinctId: context?.distinctId,
+        sessionId: context?.sessionId
+      };
+    }
+    startSpan(name, options) {
+      return this._tracesPipeline?.startSpan(name, options) ?? inertSpan(options, this._spanContextManager.active());
+    }
+    withSpan(name, optionsOrFn, maybeFn) {
+      const options = typeof optionsOrFn == "function" ? undefined : optionsOrFn;
+      const fn = typeof optionsOrFn == "function" ? optionsOrFn : maybeFn;
+      const pipeline = this._tracesPipeline;
+      if (!pipeline)
+        return runWithActiveSpan(this._spanContextManager, inertSpan(options, this._spanContextManager.active()), fn);
+      return options ? pipeline.withSpan(name, options, fn) : pipeline.withSpan(name, fn);
+    }
+    getActiveSpan() {
+      return this._spanContextManager.active() ?? null;
     }
     getCustomUserAgent() {
       return `${this.getLibraryId()}/${this.getLibraryVersion()}`;
@@ -7250,6 +9120,10 @@ var init_client = __esm(() => {
         await raceWithTimeout(this._metrics.flush().catch(() => {}), Math.max(0, shutdownDeadlineMs - Date.now()));
         this._metrics.reset();
       }
+      if (this._traces) {
+        await raceWithTimeout(this._traces.flush().catch(() => {}), Math.max(0, shutdownDeadlineMs - Date.now()));
+        this._traces.reset();
+      }
       try {
         return await super._shutdown(Math.max(0, shutdownDeadlineMs - Date.now()));
       } finally {
@@ -7503,7 +9377,7 @@ var init_client = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.51.7/node_modules/posthog-node/dist/extensions/context/context.mjs
+// node_modules/.bun/posthog-node@5.52.1/node_modules/posthog-node/dist/extensions/context/context.mjs
 import { AsyncLocalStorage } from "node:async_hooks";
 
 class PostHogContext {
@@ -7533,9 +9407,25 @@ class PostHogContext {
     };
   }
 }
-var init_context = () => {};
+var init_context2 = () => {};
 
-// node_modules/.bun/posthog-node@5.51.7/node_modules/posthog-node/dist/gzip.node.mjs
+// node_modules/.bun/posthog-node@5.52.1/node_modules/posthog-node/dist/extensions/context/span-context.node.mjs
+import { AsyncLocalStorage as AsyncLocalStorage2 } from "node:async_hooks";
+
+class AsyncLocalStorageSpanContextManager {
+  active() {
+    return this._storage.getStore();
+  }
+  with(span, fn) {
+    return this._storage.run(span, fn);
+  }
+  constructor() {
+    this._storage = new AsyncLocalStorage2;
+  }
+}
+var init_span_context_node = () => {};
+
+// node_modules/.bun/posthog-node@5.52.1/node_modules/posthog-node/dist/gzip.node.mjs
 import { gzip } from "node:zlib";
 import { promisify } from "node:util";
 async function gzipCompress2(input, isDebug = true) {
@@ -7553,7 +9443,22 @@ var init_gzip_node = __esm(() => {
   gzipAsync = promisify(gzip);
 });
 
-// node_modules/.bun/posthog-node@5.51.7/node_modules/posthog-node/dist/extensions/sentry-integration.mjs
+// node_modules/.bun/posthog-node@5.52.1/node_modules/posthog-node/dist/host-os.node.mjs
+import { platform, release as release2 } from "node:os";
+function hostOsResourceAttributes() {
+  let osName;
+  let osVersion;
+  try {
+    osName = platform();
+    osVersion = release2();
+  } catch {}
+  return osResourceAttributes(osName, osVersion);
+}
+var init_host_os_node = __esm(() => {
+  init_dist();
+});
+
+// node_modules/.bun/posthog-node@5.52.1/node_modules/posthog-node/dist/extensions/sentry-integration.mjs
 function createEventProcessor(_posthog, { organization, projectId, prefix, severityAllowList = [
   "error"
 ], sendExceptionsToPostHog = true } = {}) {
@@ -7630,22 +9535,22 @@ var init_sentry_integration = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.51.7/node_modules/posthog-node/dist/extensions/tracing-headers.mjs
+// node_modules/.bun/posthog-node@5.52.1/node_modules/posthog-node/dist/extensions/tracing-headers.mjs
 var init_tracing_headers2 = () => {};
 
-// node_modules/.bun/posthog-node@5.51.7/node_modules/posthog-node/dist/extensions/url-utils.mjs
+// node_modules/.bun/posthog-node@5.52.1/node_modules/posthog-node/dist/extensions/url-utils.mjs
 var init_url_utils = __esm(() => {
   init_dist();
 });
 
-// node_modules/.bun/posthog-node@5.51.7/node_modules/posthog-node/dist/extensions/express.mjs
+// node_modules/.bun/posthog-node@5.52.1/node_modules/posthog-node/dist/extensions/express.mjs
 var init_express = __esm(() => {
   init_error_tracking2();
   init_tracing_headers2();
   init_url_utils();
 });
 
-// node_modules/.bun/posthog-node@5.51.7/node_modules/posthog-node/dist/exports.mjs
+// node_modules/.bun/posthog-node@5.52.1/node_modules/posthog-node/dist/exports.mjs
 var init_exports = __esm(() => {
   init_feature_flag_evaluations();
   init_dist();
@@ -7654,7 +9559,7 @@ var init_exports = __esm(() => {
   init_types3();
 });
 
-// node_modules/.bun/posthog-node@5.51.7/node_modules/posthog-node/dist/entrypoints/index.node.mjs
+// node_modules/.bun/posthog-node@5.52.1/node_modules/posthog-node/dist/entrypoints/index.node.mjs
 var PostHog;
 var init_index_node = __esm(() => {
   init_module_node();
@@ -7662,8 +9567,10 @@ var init_index_node = __esm(() => {
   init_relative_path_node();
   init_client();
   init_dist();
-  init_context();
+  init_context2();
+  init_span_context_node();
   init_gzip_node();
+  init_host_os_node();
   init_exports();
   PostHog = class PostHog extends PostHogBackendClient {
     getLibraryId() {
@@ -7674,6 +9581,12 @@ var init_index_node = __esm(() => {
     }
     initializeContext() {
       return new PostHogContext;
+    }
+    initializeSpanContextManager() {
+      return new AsyncLocalStorageSpanContextManager;
+    }
+    hostResourceAttributes() {
+      return hostOsResourceAttributes();
     }
     createErrorPropertiesBuilder() {
       return new ErrorPropertiesBuilder([
