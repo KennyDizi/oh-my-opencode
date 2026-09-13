@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Engine: senpi 2026.9.13
+
+**OMO Native now runs on the fully upstream-synced senpi harness.** senpi merged the upstream engine (earendil-works/pi) across the session and storage layer, the protocol v8 / Chord transport, the fullscreen TUI renderer, the clipboard natives, and the model catalogs, while every fork invariant — CalVer, the CLI, the JSONL RPC surface, the Astra overlays, themes, gist share, and the held dependency pins — survived the merge. The changes below are the ones you can see.
+
+**Extensions can stream model calls.** `ctx.modelRegistry.stream()` and `streamSimple()` let an extension drive a configured provider with resolved authentication, so extension-authored tools talk to models the way the core does.
+
+**Compaction is tunable per model.** `compaction.modelOverrides` adds per-model `reserveTokens` and `keepRecentTokens`, falling back to the ordinary compaction settings; `compaction.model` still picks the summarizer.
+
+**The async ask-user question is reachable without a chord.** Pressing Enter on an empty editor or running `/answer` opens the pending question when a terminal, multiplexer, or rival keymap swallows the shortcut, and the shortcut itself is now the rebindable `app.question.answer` keybinding (default `alt+a`, `option+a` on macOS) listed in `/hotkeys`. The widget above the editor now shows the pending question and its options inline.
+
+**Built-in tools sample against their schemas by default.** `read`, `bash`, `powershell`, `edit`, and `write` now use strict-prefer JSON-schema sampling without the experimental flag; an extension can opt a tool out with `constrainedSampling: false`.
+
+**Fullscreen transcript polish.** Hold Alt to scroll the wheel five times faster, click "Jump to latest message" (or the `tui.altScreen.bottom` shortcut) to return to the bottom, and search stays fast on large transcripts through cached results and visible-only highlighting.
+
+**Retries stay responsive.** Agent-level retry backoff is capped at `retry.maxAgentDelayMs` (60s by default) so a long transient outage no longer stalls behind an ever-growing delay; the retry profiles and jitter still shape the wait under that ceiling.
+
+**Direct RPC steering runs the full input path.** `steer` and `follow_up` over the stdio RPC now go through extension `input` handlers and skill/template expansion instead of bypassing them.
+
+**Devin SWE-2 effort variants route correctly.** `swe-2-high`, `swe-2-max`, `swe-2-low`, and `swe-2-high-lite` resolve to the Kimi K3 preset.
+
+**Trusted Notification hooks.** Builtin hooks v1 gained a `Notification` event for ask-user question settlements (answer or timeout), so a user-defined trusted command can fire a desktop or mobile push on `ask-user-timeout` while hooks are enabled.
+
+**A batch of upstream correctness fixes.** No more premature missing-model errors after login (the catalog is awaited first), extension tools without a parameter schema are rejected at registration instead of breaking requests, OpenAI Codex SSE terminal events without a trailing blank line now parse, skills stay available when Bash is the only enabled tool, image EXIF orientation survives non-EXIF APP1 segments, imported sessions no longer overwrite a same-named session, session forks keep their compaction boundary, and managed `fd`/ripgrep downloads work on musl Linux and without the GitHub Releases API.
+
+## [5.0.0-beta.60] - 2026-09-12
+
+### Engine: senpi 2026.9.12-2
+
+**Cursor keeps the whole conversation.** Admission used to enforce a fixed 50 KB aggregate budget on every Cursor request and delete the oldest whole turns when blanking tool results was not enough: a conversation with zero tool calls could lose its first turn, and a nominal 1M-token window was reduced to roughly 6K tokens of retained history. Admission now caps each tool result, blanks the oldest tool bodies if the model input still exceeds the effective window, and never deletes a turn. The effective window follows the ceiling Cursor itself reports for the model on every conversation checkpoint — recorded per model id, persisted across restarts, and applied to context usage and compaction thresholds — with the committed capability table as the bootstrap. An oversized history is admitted, logged, and answered by overflow compaction instead of being silently shortened (senpi #1603, #1624).
+
+**Long-lived RPC hosts never starve session spawns.** A worker's 64 session-write grants counted every path it had ever been granted for the life of the worker, so after about 40-60 turns of helper sessions, forks and switches every sub-agent, task and workflow spawn inside one conversation died permanently with `session_path_in_use`. Grants now track writers that are still alive: the worker reports its live session-write paths on every snapshot, the host releases superseded grants, an explicit open no longer burns a phantom grant on a path that is never created, and a genuinely exhausted budget reports the distinct `session_reservation_limit` instead of a path conflict (senpi #1612, #1622).
+
+**The async ask-user shortcut works in default macOS terminals.** Terminals that let Option compose characters (Terminal.app, iTerm2, Ghostty, kitty) deliver `option+a` as `å`, so the advertised `option+a` expansion did nothing there; on macOS the composed glyph now expands the pending question too, `alt+a` keeps working everywhere, and other platforms keep treating those glyphs as text (senpi #1620, #1621).
+
+### Agent toolkit
+
+**The toolkit SDK is typed.** Workflow and task code drive the toolkit through a typed ULW SDK with an in-process Native adapter instead of stringly command shapes, and the toolkit is exposed as a typed tool; the packed plugin pins the lazy toolkit runtime with a deterministic no-spawn proof (#8172).
+
+**The plugin installer knows the toolkit bundle.** The required-artifact manifest lists the new lazy toolkit bundle, so a fresh local install no longer misses it.
+
 ### Breaking
 
 **The retired `metis` / `momus` agent ids are gone.** Their one-release read alias shipped in 5.0.0-beta.51 and is now removed: `omo.json` `agents.metis` / `agents.momus` no longer resolve to `plan-consultant` / `plan-reviewer` (such a key now defines an ordinary custom agent under that name and emits no startup notice), `subagent_type: "metis"|"momus"`, `allowed_subagents` entries, team members, and workflow node routes are all taken verbatim, and the deprecation notices that named them are gone. Rename them to `plan-consultant` / `plan-reviewer`.
