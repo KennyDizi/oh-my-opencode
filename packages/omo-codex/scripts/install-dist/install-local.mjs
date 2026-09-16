@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// omo-codex-install:6df5dbbbb7ca9b9dce86fae98a525a9caa7de96caed85a4b77d4e8b4ab4d1501:44e791d4cee340fe34b5cdfae26b2db2c22ad1d04569f4f4691f9ae0b0f4beb6
+// omo-codex-install:6df5dbbbb7ca9b9dce86fae98a525a9caa7de96caed85a4b77d4e8b4ab4d1501:ac78adcc53c85572daf2ded19b8c730c8c5bdacd7b0d6393a27d3a6e0dfd10a6
 var __esm = (fn, res, err) => () => {
   if (fn)
     try {
@@ -9936,7 +9936,7 @@ var package_default;
 var init_package = __esm(() => {
   package_default = {
     name: "@oh-my-opencode/omo-codex",
-    version: "5.0.0-beta.62",
+    version: "5.0.0-beta.65",
     type: "module",
     private: true,
     description: "Codex harness adapter for oh-my-openagent. Vendored Codex plugin namespace (omo) + TypeScript installer + telemetry.",
@@ -16461,8 +16461,8 @@ var OmoGitMasterSettingsShape = {
 };
 var OmoGitMasterSettingsLayerSchema = object(OmoGitMasterSettingsShape).partial().strict();
 var OmoGitMasterSettingsSchema = OmoGitMasterSettingsLayerSchema.extend({
-  commit_footer: union([boolean2(), string2()]).default(true),
-  include_co_authored_by: boolean2().default(true)
+  commit_footer: union([boolean2(), string2()]).default(false),
+  include_co_authored_by: boolean2().default(false)
 }).strict();
 
 // packages/omo-config-core/src/schema/harness.ts
@@ -16865,6 +16865,7 @@ var OmoFormatOnMutationSchema = OmoFormatOnMutationLayerSchema.extend({
 
 // packages/omo-config-core/src/schema/config.ts
 var OmoOpenCodeHarnessConfigSchema = record(string2(), unknown());
+var OmoDisabledSkillsSchema = array(string2());
 var OmoTypedHarnessConfigSchema = object({
   formatOnMutation: OmoFormatOnMutationLayerSchema.optional(),
   categories: OmoCategoriesConfigSchema.optional(),
@@ -16876,7 +16877,8 @@ var OmoTypedHarnessConfigSchema = object({
   model_profiles: OmoModelProfilesLayerSchema.optional(),
   model_profile: string2().optional(),
   memory: OmoMemorySettingsLayerSchema.optional(),
-  telemetry: OmoTelemetrySettingsLayerSchema.optional()
+  telemetry: OmoTelemetrySettingsLayerSchema.optional(),
+  disabled_skills: OmoDisabledSkillsSchema.optional()
 }).strict();
 var OmoConfigProfileSchema = object({
   formatOnMutation: OmoFormatOnMutationLayerSchema.optional(),
@@ -16890,6 +16892,7 @@ var OmoConfigProfileSchema = object({
   model_profile: string2().optional(),
   memory: OmoMemorySettingsLayerSchema.optional(),
   telemetry: OmoTelemetrySettingsLayerSchema.optional(),
+  disabled_skills: OmoDisabledSkillsSchema.optional(),
   "[opencode]": OmoOpenCodeHarnessConfigSchema.optional(),
   "[senpi]": OmoTypedHarnessConfigSchema.optional(),
   "[codex]": OmoTypedHarnessConfigSchema.optional()
@@ -16907,6 +16910,7 @@ var OmoConfigSchema = object({
   model_profile: string2().optional(),
   memory: OmoMemorySettingsSchema.optional(),
   telemetry: OmoTelemetrySettingsSchema.optional(),
+  disabled_skills: OmoDisabledSkillsSchema.optional(),
   "[opencode]": OmoOpenCodeHarnessConfigSchema.optional(),
   "[senpi]": OmoTypedHarnessConfigSchema.optional(),
   "[codex]": OmoTypedHarnessConfigSchema.optional(),
@@ -16927,6 +16931,7 @@ var OmoConfigLayerSchema = object({
   model_profile: string2().optional(),
   memory: OmoMemorySettingsLayerSchema.optional(),
   telemetry: OmoTelemetrySettingsLayerSchema.optional(),
+  disabled_skills: OmoDisabledSkillsSchema.optional(),
   "[opencode]": OmoOpenCodeHarnessConfigSchema.optional(),
   "[senpi]": OmoTypedHarnessConfigSchema.optional(),
   "[codex]": OmoTypedHarnessConfigSchema.optional(),
