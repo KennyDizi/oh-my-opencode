@@ -1,3 +1,4 @@
+// allow: SIZE_OK - register() is the remaining host-wiring graph after engine/runners/liveness splits; further cuts would scatter the register surface.
 import { loadSenpiOmoConfig } from "../config-resolution"
 import {
   TEAM_LEAD_SENTINEL,
@@ -20,6 +21,7 @@ import {
   type TeamToolsService,
 } from "@oh-my-opencode/senpi-task"
 
+import type { IdleInjectionCoordinator } from "../../extension/idle-injection-coordinator"
 import type { ComponentContext, OmoSenpiComponent, SenpiExtensionAPI } from "../../extension/types"
 import { CATEGORY_UNAVAILABLE_MESSAGE_TYPE } from "./category-unavailable-warning"
 import { registerTaskCommands } from "./commands"
@@ -41,6 +43,7 @@ import { wireSessionStartProcessSweep } from "./process-sweep"
 import { createTaskStatusUi } from "./status-ui"
 import { missingTaskCapabilities } from "./surface"
 import { createTaskSkillLoader } from "./task-skill-loader"
+import { registerWorkpoolTool } from "./workpool-tool"
 
 const TASK_ENABLED_FLAG = "omo-task"
 
@@ -120,7 +123,7 @@ export function createTaskComponent(options: TaskComponentOptions = {}): OmoSenp
           ),
         ...(ctx.idleCoordinator === undefined ? {} : { coordinator: ctx.idleCoordinator }),
       })
-      registerTaskTools(pi, engine, teamTools.service, teamTools.leadPollers.resolveDefaultTeamRunId, skillInvocations, dagRuntime)
+      registerTaskTools(pi, engine, teamTools.service, teamTools.leadPollers.resolveDefaultTeamRunId, skillInvocations, dagRuntime, ctx.idleCoordinator)
       registerTeamTools(pi, teamTools)
       registerRemovedTeamWaitHint(pi)
       registerTaskCommands(pi, engine.manager)
@@ -211,17 +214,12 @@ function registerTaskTools(
   resolveDefaultTeamRunId: TaskSendTeamRouting["resolveDefaultTeamRunId"],
   skillInvocations: SkillInvocationTracker,
   dagRuntime: DagRuntime,
+  coordinator?: IdleInjectionCoordinator,
 ): void {
   const resolveCallerSessionId = defaultResolveCallerSessionId
   const manager = engine.manager
   pi.registerTool({
-    ...createTaskTool({
-      manager,
-      omoConfig: engine.omoConfig,
-      agents: engine.agents,
-      loadSkills: engine.loadSkills,
-      resolveSkillInvocations: (sessionId: string) => skillInvocations.stateFor(sessionId),
-    }),
+    ...createTaskTool(engine.taskToolDeps((sessionId: string) => skillInvocations.stateFor(sessionId))),
   })
   pi.registerTool({
     ...createTaskSendTool({
@@ -233,6 +231,7 @@ function registerTaskTools(
   pi.registerTool({ ...createTaskCancelTool({ manager }) })
   pi.registerTool({ ...createTaskOutputTool({ manager, stateDir: engine.stateDir, resolveCallerSessionId }) })
   registerDagTool(pi, engine, dagRuntime)
+  registerWorkpoolTool(pi, engine, skillInvocations, coordinator)
 }
 
 function registerDagTool(pi: SenpiExtensionAPI, engine: TaskEngine, runtime: DagRuntime): void {

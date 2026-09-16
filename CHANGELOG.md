@@ -7,6 +7,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.0-beta.65] - 2026-09-16
+
+### OmO
+
+**A Kibitzer nudge is reference now, not an order.** The recalled-memory block used to open with "It is a hint, not current state, verify before relying on it; read the source path for full context", which reads as a task, and it arrives on the user channel, so the model treats it with a user turn's authority. Across 3,143 deliveries in local sessions this month, 465 sent the agent to open the recalled note and 75 turned into a different task; 72 of those 75 happened in sessions whose context held no real user request, where the nudge was the only instruction in view. The header now names the sender and the standing of the block: a background memory advisor put it there, it may or may not apply, it is reference only, and the current task stands. Korean hints get the Korean equivalent, and both headers are shorter than the ones they replace.
+
+**The Kibitzer writes observations, not instructions.** More than half of the hints it delivered this month were phrased as orders ("verify these before ...", "하지 말아야 합니다"). Its persona now asks for one sentence about what the stored note records, shows an instruction-shaped hint as a worked bad example, and carries the same block the renderer produces, pinned byte for byte by a test. The rule is enforced where nudges are admitted: a hint carrying the second person, opening with an imperative, or ending in a Korean request form is refused with the reason and the fix, and the judge keeps its single correction. Nudges stored under the old contract still render in past sessions.
+
+**`<memory_notice>` stopped claiming messages left the live context.** It reported the session branch length on every prompt, so a fresh session with 15 entries and no compaction read "12 previous messages ... have left the live context". It now counts the messages a compaction actually removed, omits the line when nothing was compacted, and skips the notice entirely when it would carry no lines. The standing fact that recalled memory arrives on its own and has no tool to call moved into the compiled memory block, where it belongs.
+
+**Plan Effort is five bands, and `disabled_skills` works on Native.** An `**Effort:**` value written as a duration ("200 hours", "3 days") is rewritten to the band that bounds it, Quick through XL, with a warning that explains the bands, so an hour count never reaches the summary a reader sees first. `disabled_skills` is a canonical key of `~/.omo/omo.jsonc` across the shared base, the harness blocks and profiles; on Native the bundled skills now arrive through discovery minus every disabled name, with user, project, harness and profile layers unioned.
+
+## [5.0.0-beta.64] - 2026-09-16
+
+### Engine: senpi 2026.9.16
+
+**Reasoning shows up while the model is still reasoning.** Claude lanes used to sit on a "Working" line for the whole thinking phase and then dump the entire reasoning block at once, because the empty-response recovery wrapper buffered every event until the first visible text or tool call. Seven days of session files say 80% of Claude turns with thinking were held that way, a median of 16 seconds, 37 seconds at p90. The wrapper now starts forwarding at the first meaningful event, so thinking arrives as the model produces it and the assistant message opens as soon as the provider answers. A turn that streams reasoning and then ends with nothing is no longer replayed inside the stream, where a second start would duplicate the message: it ends as a retryable error that keeps what you already saw, and the session's own turn retry re-requests it. Kimi keeps the old buffered path on purpose, since its reasoning channel is where misrouted tool calls land.
+
+**`read` returns structure for JSON.** Eligible `.json` files come back as a segmented structural view with declaration-safe folding instead of raw bytes, while TypeScript and JavaScript stay verbatim because the measured candidate missed the required saving for both. Explicit `offset`/`limit` requests, truncated input, markdown and `.txt` keep the old path.
+
+**One extension can no longer hold quit hostage.** Every `session_shutdown` handler runs under a host budget and receives a per-handler `signal` that aborts when it overruns, so a slow handler stops blocking quit, `/reload`, `/new`, `/resume` and forks. The budget is configurable.
+
+**JavaScript eval cells can publish tools to their children.** `tool(fn, metadata?)` registers a named function as a fenced tool for in-process children, the worker answers describe and invoke requests on a pump separate from the top-level run queue, and `workpool(agent, name, mode?)` lands in the JS, Python, Ruby and Julia preludes as a thin adapter over the host workpool tool. Background `agent(..., handle: true)` now requires a structured task id and run epoch from the host.
+
+**Terminal teardown escalates instead of hoping.** `TerminalSession.terminate()` signals, waits, and escalates to `SIGKILL`; the session registry gained grace settings for the forced kill and for detached children, and detached cleanup kills what survives its grace. An opt-in Bun terminal backend is available behind `SENPI_BUN_TERMINAL`.
+
+**Session lists stopped mixing durable and live state.** `SessionMetadata` replaces `SessionSummary` for `listSessions()` and server snapshots, runtime state comes only from an acquired session, and the protocol gained transport-neutral CBOR schemas with length-prefixed framing.
+
+### OmO
+
+**ulw-loop survives an eval-kernel reload.** A reload used to drop `PI_SESSION_CWD` and `PI_GOAL_STORE_FILE`, which failed the toolkit with `PI_SESSION_CWD is required` and hid the live driver goal, so the loop advised creating a goal that already existed. Both are now derived from the session file before falling back, each fallback names its remediation, and the help text, `addGoal` criteria and artifact paths came along in the same pass.
+
+**The Kibitzer stopped reading your whole disk.** Its read-only grep walked the entire workspace and read every file up to 1MB; on a real 277,000-file workspace the walk alone cost 2.5 seconds and a rare pattern read everything. Candidates now come from git so `.gitignore` counts, the scan stops at file-count, byte and wall-clock budgets, and it honors the turn's abort signal instead of running past the wake deadline. Candidate collection also went incremental: per-trigger CPU on the 800-document fixture dropped from 308 ms to 5 ms with identical output, which removes the pause that landed on every tool call in a large memory corpus.
+
+**Session shutdown no longer waits on the Kibitzer.** The memory extension used to await its sidecar's shutdown and the facts cancellation outside the 1.5-second drain budget, so a slow lease release stalled quit, `/reload`, `/new` and `/resume` and starved the steps queued behind it. Both awaits now race the drain deadline and finish detached, and the wake lease and the sidecar directory lock are still released. Every wake is bounded from admission as well: the 90-second deadline is armed before the child starts, a 300-second total cap holds through steer re-arms, and a stall during child start ends the wake, hands the slot back and disposes the late child.
+
+**Typed task handles.** Background task handles carry a run epoch, so a handle from a previous run cannot be mistaken for the live one.
+
+**`workpool` is a new host tool for keyed, batched fan-out.** `workpool create { name, agent, mode?, tools? }` opens a pool whose workers run a `category` or `subagent_type` with a prompt; `push { pool_id, items: [{ key, input }] }` returns `{ pool_id, item_ids }` at once without waiting for capacity, and scheduling happens one event-loop turn after the durable receipt, so every later wake is event-driven. `inspect` reads the persisted record with each item's status and its data or error, `close` stops intake and lets in-flight items finish, and `cancel` marks queued and assigned items `cancelled` and cancels their workers. Pool ids are `wp_<32 hex>`, item ids `wi_<32 hex>`. Re-pushing a key with byte-identical input is idempotent; a divergent re-push is a `yield_conflict`. A pool worker takes the same admission lease, per-model concurrency slot and spawn-policy checks as a `task` spawn, so nothing in a pool bypasses admission. One acknowledged aggregate result is delivered through the idle-injection path without polling, and it survives a reconnect once.
+
+**Pool workers default to `keep_alive`.** On one real batch, keeping a worker warm between items answered at a p95 of 12 to 13 seconds against 42 to 51 seconds fresh, on about a fifth of the tokens, with identical correctness, so `keep_alive` is the default and `fresh` stays available per pool. A worker that yields after a stale-kernel error produces one keyed error and the single aggregate, never an automatic retry.
+
+**A parent's JavaScript tools are scoped to the child that receives them.** A grant is computed from the child's resolved effective tool set, so a curated read-only agent, a child whose policy is narrower than the parent for any write-capable tool, and process, team and non-JavaScript children are refused with a typed error and no child session. A revived child re-checks the parent kernel's generation and revision on every call: a reset, a same-name redefinition or a new host without the live binding returns `kernel_tool_stale` or `tools_unavailable` on the child's own result channel instead of running a stale closure.
+
+## [5.0.0-beta.63] - 2026-09-15
+
 ### Breaking
 
 **OpenCode's `agent-browser` provider and builtin skill have been removed.**
@@ -19,7 +65,7 @@ or written playwright-core scripts against local Chrome; these script paths
 are not new provider enum values. The retained provider choices are
 `playwright`, `dev-browser`, and `playwright-cli`.
 
-### Engine: senpi 2026.9.15 (adopting 2026.9.13-2 as well)
+### Engine: senpi 2026.9.15-2 (adopting 2026.9.13-2 and 2026.9.15 as well)
 
 **Concurrent questions queue instead of overwriting each other.** Two async questions used to race, and the second one replaced the first. They now sit in a queue: the widget shows `+N more`, `alt+down` cycles through them from an empty composer, and each request keeps its own draft and its own idle deadline. Answering got faster too — a digit on an empty composer answers the shown question, a single-select single question submits on that digit, `/answer` lists or opens a specific request, and typed text binds to one request with a `↳ reply to <header>` label. An answered, commented, dismissed or timed-out question collapses to a `↳ <header>: <answer>` chip you can click to expand.
 
@@ -49,6 +95,20 @@ are not new provider enum values. The retained provider choices are
 
 **Publishing stages what the lockfile says.** The packed tarball now mirrors `publish-deps.lock.json` whatever the developer's package manager did to `node_modules`: nested manifest entries are staged at their manifest path from a version-matched copy, npm's workspace-local placements keep the top-level slot, and packages the manifest no longer lists are pruned. A tarball staged from a bun-hoisted install used to ship `htmlparser2@10` next to a stale `entities@8`, and compiling the engine failed on `No matching export ... for import "fromCodePoint"`.
 
+**Closing an RPC session is ordered now.** `close_session` acknowledgements and `session_closed` events, including worker-failure terminals, go out only after the session registry has dropped the entry, so a `list_sessions` issued right after never returns the closed session. Filesystem watchers are cancelled together with shutdown, every disposer is joined before the process exits, a reentrant shutdown shares that join and keeps its failure exit code, and nonpersistent RPC probes never start watchers.
+
+**The RPC host watchdog stopped spawning `ps`.** Its ppid fallback ran `ps -o lstart=` every 250 ms while the supervisor was alive, and long-lived shared hosts piled up thousands of `ps` children, zombies on runtimes that fail to reap them. A dead supervisor is reaped by its own parent and the host is reparented, so the free `kill(pid, 0)` plus a ppid comparison sees the loss with no child process at all.
+
+**Paused monitors cost nothing.** A paused file watch clears its 250 ms poll timer outright, with no stat or SHA-256 digest work, and resume runs one immediate check so a change made during the pause still fires. Session-output line buffers cap at 64 KiB, so a stream without newlines can no longer grow a monitor's retained tail without bound.
+
+**Eval cells stop hoarding memory in long sessions.** Settled detached cells leave the live registry for a 32-entry snapshot store, where `peek`, `stop` and waiting for a terminal state still work for recent cells; the JS kernel's unconsumed tool-call queue is capped at 256 and cleared on interrupt, reset, close and crash, as the subprocess kernel already did; and per-cell display buffers cap at 8 images, 24 MB and 64 JSON outputs with an elision note. Detached and completed eval cards render static with a frozen elapsed time instead of repainting at 1 Hz forever, and a live ticker whose row stopped rendering stops itself after 60 idle ticks and rearms on the next render, so transcript rebuilds and session switches no longer pile up intervals.
+
+**Standalone binaries ship codemode once.** The compiled binary loads codemode from the staged on-disk package instead of a second embedded copy; the sidecar carries its JS parser dependency and keeps the bun-1-4 skill.
+
+**Multi-day sessions stopped freezing on the status ticker.** Deciding the working/retry animation cadence used to re-parse the whole session file every tick, which periodically froze the UI on long, compaction-trimmed sessions; it now reads an O(1) entry count that `SessionManager` maintains as entries land.
+
+**Cursor CLI OAuth no longer probes on every start.** The startup `cursor-agent models` probe runs only when the lane is usable (not disabled, `cursor-agent` installed, an account bound) and inside that account's HOME, and every `cursor-agent` spawn gets the same explicit environment allowlist instead of the inherited `process.env`. A hermetic or SSH-launched session therefore never trips the CLI's macOS keychain preflight, which used to surface as a blocking "Keychain Not Found" dialog on the console.
+
 ### OmO
 
 **omo.dev is rebuilt for people who do not already know what an agent harness is.** The site carries the OmO brand, one install path, the 2026-09-14 manifesto in English and Korean, and a landing page that shows the Kibitzer loop and the main loop running side by side on a research-to-deck scenario. Open Graph cards render from the Figma brand file with the live GitHub star count. Download stats are all-or-nothing now and count `omo-ai`, so a partial registry response no longer publishes a number that is quietly too low. Lark joins the messaging platforms, the ones that are not shipped yet say so, and the Korean copy breaks its lines where a Korean reader would.
@@ -71,7 +131,7 @@ are not new provider enum values. The retained provider choices are
 
 **Plan consultants run on Fable 5.1 max.** The plan-consultant chain is headed by Fable 5.1 max with a guarded model-core mirror, qwen3.7-plus joins as a utility rung, and every builtin OpenAI rung routes through `openai-codex`.
 
-**Windows and RPC hardening.** The omo-senpi adapter's Windows compatibility races are gone, the native RPC surface rejects incomplete patch targets and malformed stream events instead of acting on them, and the css-tree sidecar trio is embedded only when the engine actually ships it.
+**Windows and RPC hardening.** The omo-senpi adapter's Windows compatibility races are gone, the native RPC surface rejects incomplete patch targets and malformed stream events instead of acting on them, the postinstall guard that installs that serializer accepts the engine's new `createRpcShutdown` entry (the previous guard refused any senpi built after 2026.9.15), and the css-tree sidecar trio is embedded only when the engine actually ships it.
 
 **Quieter startup.** omo-senpi declares itself a system package, so its skills and extensions leave the compact startup banner and appear only in the expanded view. Memory-repo skills pin to the user scope on engines that accept scoped entries.
 

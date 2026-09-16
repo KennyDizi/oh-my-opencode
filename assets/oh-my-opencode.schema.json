@@ -10775,21 +10775,21 @@
     },
     "git_master": {
       "default": {
-        "commit_footer": true,
-        "include_co_authored_by": true,
+        "commit_footer": false,
+        "include_co_authored_by": false,
         "git_env_prefix": "GIT_MASTER=1"
       },
       "type": "object",
       "properties": {
         "commit_footer": {
-          "default": true,
+          "default": false,
           "type": [
             "boolean",
             "string"
           ]
         },
         "include_co_authored_by": {
-          "default": true,
+          "default": false,
           "type": "boolean"
         },
         "git_env_prefix": {
