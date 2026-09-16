@@ -164,16 +164,16 @@
   },
   "homepage": "https://github.com/code-yeongyu/oh-my-openagent#readme",
   "dependencies": {
-    "@ai-sdk/anthropic": "^4.0.53",
-    "@ai-sdk/google": "^4.0.69",
-    "@ai-sdk/openai": "^4.0.66",
-    "@ai-sdk/provider": "^4.0.14",
-    "@ai-sdk/xai": "^4.0.58",
+    "@ai-sdk/anthropic": "^4.0.54",
+    "@ai-sdk/google": "^4.0.72",
+    "@ai-sdk/openai": "^4.0.67",
+    "@ai-sdk/provider": "^4.0.15",
+    "@ai-sdk/xai": "^5.0.0",
     "@clack/prompts": "^1.8.1",
     "@code-yeongyu/comment-checker": "^0.8.0",
     "@modelcontextprotocol/sdk": "^1.30.0",
-    "@opencode-ai/plugin": "1.18.30",
-    "@opencode-ai/sdk": "1.18.30",
+    "@opencode-ai/plugin": "1.18.31",
+    "@opencode-ai/sdk": "1.18.31",
     "@opentui/core": "^0.5.11",
     "@opentui/keymap": "^0.5.11",
     "@opentui/solid": "^0.5.11",
@@ -184,7 +184,7 @@
     "jsonc-parser": "^3.3.1",
     "picocolors": "^1.1.1",
     "picomatch": "^4.0.7",
-    "posthog-node": "^5.52.1",
+    "posthog-node": "^5.52.4",
     "zod": "^4.6.5"
   },
   "devDependencies": {
@@ -224,7 +224,7 @@
     "@xterm/xterm": "^6.0.0",
     "bun-types": "1.4.2",
     "node-pty": "^1.1.0",
-    "puppeteer-core": "^25.10.0",
+    "puppeteer-core": "^25.11.0",
     "typescript": "^7.0.2"
   },
   "optionalDependencies": {
@@ -246,10 +246,10 @@
     "@earendil-works/pi-ai": "0.85.1",
     "@earendil-works/pi-coding-agent": "0.85.1",
     "@earendil-works/pi-tui": "0.85.1",
-    "hono": "^4.13.7",
+    "hono": "^4.13.8",
     "@hono/node-server": "^2.1.1",
     "express-rate-limit": "^8.7.0",
-    "fast-uri": "^4.1.4",
+    "fast-uri": "^4.1.5",
     "path-to-regexp": "^8.4.2"
   },
   "trustedDependencies": []
