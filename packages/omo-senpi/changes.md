@@ -1,3 +1,94 @@
+## `task-host-e2e.mjs`: live QA for daemon-hosted task children
+
+`scripts/qa/task-host-e2e.mjs` drives a REAL compiled omo binary against a throwaway sandbox and asks
+whether a `process` child actually lives as a session of `omo daemon`. It follows `task-rpc-e2e.mjs`'s
+isolation model with two additions the compiled binary forces: all THREE agent-dir names are pointed at
+the sandbox (the binary reads `OMO_` first, so setting only `SENPI_` hands it the real agent dir), and
+`HOME` is a sandbox dir before the FIRST call, because the binary provisions its runtime under
+`$HOME/.omo/binary-runtime/<ver>/`. The daemon loads extensions only from its launch spec, and the spec
+refuses absolute paths, so the keyless mock provider is copied into the sandbox's provisioned plugin
+root and added there - the repo and every real install are untouched.
+
+Scenarios A (two parents x 16 children on one daemon), B (detach/attach), C/C2 (team members, parking),
+D (DAG child toolset), E/E2/E3/E4 (generation handoff), F (zombie budget), G (CLI exit codes + a tmux
+pty attach), H/H2 (a pre-wave-2 host, a fail-closed legacy client) and I (the default-mode rule) each
+write a JSON result, a transcript and a cleanup receipt. A scenario whose input this machine does not
+have - a second build of a newer epoch, a spec-less newer senpi, a pre-change engine CLI, a DAG-run
+driver - reports `skipped` with the exact command that would run it, never a pass. `--baseline` records
+what the current mainline omob does instead, and `--self-test` proves the harness itself without a
+binary.
+
+## daemon-launch-spec.json ships in every payload
+
+The task daemon's launch spec was generated at build time but reached only the source tree: the
+native payload copies root-level files from an allowlist, the npm plugin publishes from `files`, and
+neither listed it, so every installed `omo daemon run` exited 5 with "launch spec missing". It is on
+both lists now and on `REQUIRED_PLUGIN_ARTIFACTS`, so a payload without it fails the build.
+
+## 2026-09-17 — Process children go to the shared daemon, and the plugin gates itself per session
+
+`DEFAULT_RUNNER_FACTORIES.process` now builds an `RpcHostRunner` (children as sessions of the
+machine-wide daemon) with the per-child `RpcProcessRunner` as its loud fallback. `process_runner:
+"child-process"` and win32 keep the per-child runner; both inputs are injectable on
+`RunnerBuildContext` (`platform`, `agentDir`, `env`, `onHostWarning`) so the selection is testable
+without pretending to run on Windows.
+
+`host-execution-mode.ts` owns this session's daemon wiring: the gate that answers
+`default_execution_mode: "auto"` (ensure once, read the capabilities, fail closed to in-process) and
+the deduped notice list the gate and the runner share. Each distinct `host_unavailable:<reason>` is
+logged once and appears once in `task_output`, so the parent learns why its children are not daemon
+sessions without reading a log file.
+
+Session-role gating replaces the process-wide env checks: the task component registers nothing for a
+`dag_child` (parity with the per-child launch, which drops omo's own `-e` entry for DAG children) or
+a `member` session, the session-start process sweep skips any child session, and a memory run is
+one-shot when the session says it is a child. Every one of them falls back to the old environment
+variables for the per-child process runner.
+
+## 2026-09-17 — the residency registry reads the runner's kind, not the pid
+
+`components/task/residency-registry.ts` used to derive a resident's kind from `handle.pid`
+(`undefined` meant in-process). A child that is a SESSION of the shared daemon also has no pid, so
+it was classified in-process — and `terminate()` for an in-process resident is a deliberate no-op.
+Cancel, eviction and the TTL sweep therefore left the daemon session running with nobody attached.
+The kind now comes from `ManagedChildHandle.kind`, which the runner adapters set; a handle from
+before that field shipped is in-process by construction.
+
+## 2026-09-17 — the thread surface reads the shared task-daemon socket resolver
+
+`components/thread/live-surface.ts` no longer spells out its own socket-name list. `THREAD_SOCKET_ENV_NAMES`
+is now the list exported by `senpi-task`'s `runners/rpc-host/daemon.ts`, and `resolveThreadSocket`
+delegates to `resolveTaskHostSocket(env, resolveAgentHome({ env }))`. Precedence and the
+`<agentDir>/rpc/rpc.sock` fallback are unchanged; the point is that the thread tools and the shared
+task daemon can no longer disagree about which socket the machine's engine host listens on.
+
+## 2026-09-17 — the absent-path bwrap rebind is synchronous again, and exit-time containment blocks
+
+Making the session-reachable probes async left two contracts of the memory component broken.
+
+`defaultProbe` in `sandbox-platform.ts` became `async`, so it returned a Promise even for the
+branch that deliberately spawns nothing: an executable a test's injected `which` resolved to a
+path that does not exist on this machine. `buildPathSandboxTransform` reads the probe's
+Promise-ness as "defer the verdict", so a Linux transform built over a runtime write dir that
+does not exist yet stopped returning its `--bind` arguments and returned a Promise instead - the
+rebind of the absent path was no longer in the built arguments at all. Only the branch that
+actually spawns bwrap is async now; the existence gate answers synchronously, so a seam-resolved
+executable keeps a synchronous transform while a real `/usr/bin/bwrap` is still probed off the
+event loop.
+
+The supervisor's hard termination lost its synchronous form, and with it the `process.once("exit")`
+containment. `spawnTerminationCommand` in `worker/supervisor-process-identity.ts` takes
+`synchronous` again and `runSupervisor` passes it from the exit handler alone. An exit handler
+cannot await, and the "error" event of an async child is queued on a loop that never turns again:
+measured on bun 1.4.2, a taskkill spawned there finishes only after the supervisor is gone, and one
+that cannot be spawned at all (`ENOENT`) writes nothing anywhere. The blocking form finishes before
+the supervisor exits and throws that `ENOENT` into the containment's own `catch`, which is what puts
+it on the run's stderr. Every other caller - the signal handlers, the deadline hard kill, the
+injected posix signal command - stays async. That branch is also the second spawn call
+`worker/windows-console-hide.test.ts` audits for `windowsHide: true`; without it the audit had
+nothing left to check in that file and would have passed on a chain with no taskkill spawn at all.
+
+
 ## 2026-09-17 - Defer plugin startup work past the first paint
 
 ### What changed

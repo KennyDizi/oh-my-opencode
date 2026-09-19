@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// omo-codex-install:6df5dbbbb7ca9b9dce86fae98a525a9caa7de96caed85a4b77d4e8b4ab4d1501:6ad28e080ce150e4d89eaad610b079d84061e1e52fa36bdd25df8fadeb71c1b5
+// omo-codex-install:6df5dbbbb7ca9b9dce86fae98a525a9caa7de96caed85a4b77d4e8b4ab4d1501:3c6bce37961f4372e7c2b78e2ab9fec1cea693a615e783a683b2c0382bd0b67d
 var __esm = (fn, res, err) => () => {
   if (fn)
     try {
@@ -9936,7 +9936,7 @@ var package_default;
 var init_package = __esm(() => {
   package_default = {
     name: "@oh-my-opencode/omo-codex",
-    version: "5.0.0-beta.71",
+    version: "5.0.0-beta.75",
     type: "module",
     private: true,
     description: "Codex harness adapter for oh-my-openagent. Vendored Codex plugin namespace (omo) + TypeScript installer + telemetry.",
@@ -16721,7 +16721,10 @@ var OmoTaskDagSettingsSchema = object({
   max_prompt_bytes: number2().int().positive().default(262144)
 }).strict();
 var OmoTaskSettingsSchema = object({
-  default_execution_mode: _enum(["in-process", "process"]).default("in-process"),
+  default_execution_mode: _enum(["auto", "in-process", "process"]).default("auto"),
+  process_runner: _enum(["host", "child-process"]).default("host"),
+  host_engine_policy: _enum(["upgrade", "fallback"]).default("upgrade"),
+  host_idle_exit_ms: number2().int().positive().optional(),
   default_concurrency: number2().int().nonnegative().default(5),
   global_concurrency: number2().int().nonnegative().default(8),
   provider_concurrency: record(string2(), number2().int().nonnegative()).optional(),
@@ -16766,7 +16769,10 @@ var OmoTaskWarningsLayerSchema = object({
   unavailable_categories: boolean2().optional()
 }).strict();
 var OmoTaskSettingsLayerSchema = object({
-  default_execution_mode: _enum(["in-process", "process"]).optional(),
+  default_execution_mode: _enum(["auto", "in-process", "process"]).optional(),
+  process_runner: _enum(["host", "child-process"]).optional(),
+  host_engine_policy: _enum(["upgrade", "fallback"]).optional(),
+  host_idle_exit_ms: number2().int().positive().optional(),
   default_concurrency: number2().int().nonnegative().optional(),
   global_concurrency: number2().int().nonnegative().optional(),
   provider_concurrency: record(string2(), number2().int().nonnegative()).optional(),
