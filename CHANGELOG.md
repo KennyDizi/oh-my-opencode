@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.0-beta.78] - 2026-09-19
+
+### Engine: senpi 2026.9.19-2
+
+**Goal-driven sessions compact before the wall.** A session running under a goal loop had every one of its turns started by the goal extension, and those turns skipped the compaction extension's proactive policy entirely: nothing compacted between the 80% threshold and the hard reserve valve at 96% of the window, the idle warm summary was never applied, and the turn that finally crossed the valve paid a from-scratch summarization while the screen sat on `Compacting...` for five to eight minutes. On a 1M-token model that looked like omo hanging. Hidden trigger turns now pass through `before_agent_start` the way a typed prompt does, so the proactive policy and the warm summary apply to them too (senpi#1329).
+
+## [5.0.0-beta.77] - 2026-09-19
+
+### Engine: senpi 2026.9.19
+
+**Extensions that pull in jsdom or whatwg-url load again.** The engine's extension loader wrapped every CommonJS dependency in a prologue that declared `exports` as a constant, so a module written as `module.exports = exports = { ... }` (the published shape of `whatwg-url/lib/utils.js` and jsdom's generated IDL utils) failed to parse and took the whole extension graph down with `This assignment will throw because "exports" is a constant`. pi-webfetch was the reported casualty. CommonJS now evaluates inside Node's module function wrapper, the per-file `require` carries a `resolve` that returns the file's absolute path (jsdom locates its XHR sync worker that way), and a module inside a require cycle receives the partially built exports of the module still evaluating instead of `undefined`, so `@acemir/cssom`'s mutual requires resolve. A dependency whose body throws is evicted, so a later require re-throws instead of returning a half-built module, and `.mjs` / `.mts` files stay on the ESM path even without import or export statements.
+
+### Fixed
+
+**A repeat omob build no longer ships the previous build's engine copies.** The reusable senpi cache clone kept the publish staging that the last build wrote into its workspaces, and the bundler resolved the agent core from that stale copy instead of the commit being built. Once the engine gained an export that copy lacked, every refresh failed with `No matching export ... for import "prepareReadFolder"` and the launcher refused to start; before that, it silently bundled a three-day-old agent core. The staging is now discarded before every install. ([#8477](https://github.com/code-yeongyu/oh-my-openagent/issues/8477))
+
+## [5.0.0-beta.76] - 2026-09-19
+
+### Engine: senpi 2026.9.18-6
+
+**A published install can start its daemon again.** Every release from 2026.9.18-4 onward shipped a bundle that could not start a shared host at all: the bundler emitted no `host-lifecycle` entry, so the deferred import resolved to a chunk nobody wrote, and once that was fixed the launcher spawned the emitted chunk itself - a module, not a program - which returned without ever listening. `host ensure` answered `exited with code 0 before answering get_protocol_info`, and the daemon's stderr log was empty because it is truncated on every generation start, so nothing was left to read. Bundled builds now re-enter the CLI through the same internal route compiled binaries use, and the CLI entry comes from the package's declared `bin` rather than from counting `..`, which lands on the package root once the module is bundled.
+
+**The engine pin moves as one.** The senpi version is declared in four manifests plus their peer dependencies and resolutions; advancing only the root resolves two copies at once and produces a type error that reads exactly like a breaking API change but is not. They now move together, and the lockstep test that catches a half-applied bump moves with them.
+
 ## [5.0.0-beta.75] - 2026-09-18
 
 ### Engine: senpi 2026.9.18-4
