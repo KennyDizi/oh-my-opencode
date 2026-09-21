@@ -49,16 +49,18 @@ export const CATEGORY_FALLBACK_CHAINS: Readonly<Record<string, readonly Delegate
     { providers: ["github-copilot"], model: "gpt-5.6-sol", variant: "max" },
     { providers: ["openai-codex", "opencode"], model: "gpt-5.6-sol", variant: "max" }
   ],
-  deep: [
-    {
-      providers: ["openai-codex", "github-copilot", "opencode"],
-      model: "gpt-6-astra",
-      variant: "high",
-    },
+  "deep-low": [
     {
       providers: ["openai-codex", "github-copilot", "opencode"],
       model: "gpt-5.6-sol",
       variant: "medium",
+    }
+  ],
+  "deep-high": [
+    {
+      providers: ["openai-codex", "github-copilot", "opencode"],
+      model: "gpt-6-astra",
+      variant: "high",
     }
   ],
   artistry: [
@@ -138,12 +140,17 @@ export const CATEGORY_FALLBACK_CHAINS: Readonly<Record<string, readonly Delegate
     {
       providers: ["claude-sdk-oauth", "anthropic", "anthropic-api", "github-copilot", "opencode"],
       model: "claude-fable-5-1",
-      variant: "medium",
+      variant: "low",
     },
     {
       providers: ["kimi-coding", "kimi-for-coding", "moonshotai", "opencode-go"],
       model: "kimi-k3",
-      variant: "max",
+      variant: "low",
+    },
+    {
+      providers: ["claude-sdk-oauth", "anthropic", "anthropic-api", "github-copilot", "opencode"],
+      model: "claude-opus-4-6",
+      variant: "low",
     }
   ],
 }

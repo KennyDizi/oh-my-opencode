@@ -282,12 +282,12 @@ describe("resolveCategory", () => {
     const resolved = expectResolved(result)
     expect(resolved.spec.provider).toBe("kimi-coding")
     expect(resolved.spec.modelId).toBe("k3")
-    expect(resolved.spec.variant).toBe("max")
+    expect(resolved.spec.variant).toBe("low")
     expect(resolved.modelSelection.matchedFallback).toBe(true)
     expect(resolved.modelSelection.fallbackEntry).toEqual({
       providers: ["kimi-coding", "kimi-for-coding", "moonshotai", "opencode-go"],
       model: "kimi-k3",
-      variant: "max",
+      variant: "low",
     })
   })
 
@@ -302,12 +302,12 @@ describe("resolveCategory", () => {
     const resolved = expectResolved(result)
     expect(resolved.spec.provider).toBe("opencode-go")
     expect(resolved.spec.modelId).toBe("kimi-k3")
-    expect(resolved.spec.variant).toBe("max")
+    expect(resolved.spec.variant).toBe("low")
     expect(resolved.modelSelection.matchedFallback).toBe(true)
     expect(resolved.modelSelection.fallbackEntry).toEqual({
       providers: ["kimi-coding", "kimi-for-coding", "moonshotai", "opencode-go"],
       model: "kimi-k3",
-      variant: "max",
+      variant: "low",
     })
   })
 
@@ -480,19 +480,21 @@ describe("builtin category defaults", () => {
       ["visual-engineering", "anthropic/claude-fable-5-1", "max"],
       ["artistry", "anthropic/claude-fable-5-1", "max"],
       ["ultrabrain", "openai-codex/gpt-6-astra", "max"],
-      ["deep", "openai-codex/gpt-6-astra", "high"],
+      ["deep-low", "openai-codex/gpt-5.6-sol", "medium"],
+      ["deep-high", "openai-codex/gpt-6-astra", "high"],
       ["quick", "kimi-coding/kimi-for-coding-highspeed", undefined],
       ["unspecified-low", "xai/grok-4.6", "xhigh"],
       ["unspecified-high", "openai-codex/gpt-6-astra", "high"],
       ["architect", "anthropic/claude-fable-5-1", "max"],
-      ["writing", "anthropic/claude-fable-5-1", "medium"],
+      ["writing", "anthropic/claude-fable-5-1", "low"],
     ])
 
     // then: availability gating applies only to the model-gated builtins; any listed id opens the gate
     expect(BUILTIN_CATEGORY_REQUIRES_MODEL).toEqual({
       architect: ["claude-fable-5-1"],
       ultrabrain: ["gpt-6-astra", "gpt-5.6-sol"],
-      deep: ["gpt-6-astra", "gpt-5.6-sol"],
+      "deep-low": ["gpt-5.6-sol"],
+      "deep-high": ["gpt-6-astra"],
     })
   })
 })

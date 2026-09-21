@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// omo-codex-install:6df5dbbbb7ca9b9dce86fae98a525a9caa7de96caed85a4b77d4e8b4ab4d1501:41cec2417cfee4fcb7879f7b33ba57981e0fff7ee559a0d3a9ab4b334cb865cb
+// omo-codex-install:6df5dbbbb7ca9b9dce86fae98a525a9caa7de96caed85a4b77d4e8b4ab4d1501:61ee7bdde0c75649963d8e405b32027b9697fdcb19cee8dd352aeac2170521d0
 var __esm = (fn, res, err) => () => {
   if (fn)
     try {
@@ -106,37 +106,82 @@ var init_atomic_write = __esm(() => {
   ]);
 });
 
+// packages/telemetry-core/src/day-claim.ts
+import { closeSync as closeSync2, mkdirSync as mkdirSync2, openSync as openSync2, readdirSync, rmSync as rmSync2 } from "node:fs";
+import { join as join33 } from "node:path";
+function getTelemetryDayClaimFilePath(stateDir, dayUTC) {
+  return join33(stateDir, `${CLAIM_PREFIX}${dayUTC}${CLAIM_SUFFIX}`);
+}
+function claimUtcDay(stateDir, dayUTC) {
+  try {
+    mkdirSync2(stateDir, { recursive: true });
+    closeSync2(openSync2(getTelemetryDayClaimFilePath(stateDir, dayUTC), "wx"));
+  } catch (error) {
+    return error.code === "EEXIST" ? "already-claimed" : "unavailable";
+  }
+  pruneSupersededClaims(stateDir, dayUTC);
+  return "claimed";
+}
+function pruneSupersededClaims(stateDir, dayUTC) {
+  const currentClaim = `${CLAIM_PREFIX}${dayUTC}${CLAIM_SUFFIX}`;
+  let entries;
+  try {
+    entries = readdirSync(stateDir);
+  } catch {
+    return;
+  }
+  for (const entry of entries) {
+    if (entry === currentClaim)
+      continue;
+    if (!entry.startsWith(CLAIM_PREFIX) || !entry.endsWith(CLAIM_SUFFIX))
+      continue;
+    try {
+      rmSync2(join33(stateDir, entry), { force: true });
+    } catch {}
+  }
+}
+var CLAIM_PREFIX = "daily-active.", CLAIM_SUFFIX = ".claim";
+var init_day_claim = () => {};
+
 // packages/telemetry-core/src/activity-state.ts
-import { existsSync as existsSync5, mkdirSync as mkdirSync2, readFileSync as readFileSync3 } from "node:fs";
-import { basename as basename6, join as join33 } from "node:path";
+import { existsSync as existsSync5, mkdirSync as mkdirSync3, readFileSync as readFileSync3 } from "node:fs";
+import { basename as basename6, join as join34 } from "node:path";
 function resolveTelemetryStateDir(product, options = {}) {
   const dataDir = resolveXdgDataDir(product.cacheDirName, {
     env: options.env,
     osProvider: options.osProvider
   });
-  const xdgStateDir = options.env?.XDG_DATA_HOME === undefined ? undefined : join33(options.env.XDG_DATA_HOME, product.cacheDirName);
+  const xdgStateDir = options.env?.XDG_DATA_HOME === undefined ? undefined : join34(options.env.XDG_DATA_HOME, product.cacheDirName);
   if (dataDir === xdgStateDir || xdgStateDir === undefined && basename6(dataDir) === product.cacheDirName) {
     return dataDir;
   }
-  return join33(dataDir, product.cacheDirName);
+  return join34(dataDir, product.cacheDirName);
 }
 function getTelemetryActivityStateFilePath(stateDir) {
-  return join33(stateDir, POSTHOG_ACTIVITY_STATE_FILE);
+  return join34(stateDir, POSTHOG_ACTIVITY_STATE_FILE);
 }
 function getDailyActiveCaptureState(input) {
-  const state = readPostHogActivityState(input.stateDir, input.diagnostics);
   const dayUTC = getUtcDayString(input.now ?? new Date);
-  const captureDaily = state.lastActiveDayUTC !== dayUTC;
-  if (captureDaily) {
+  if (capturedDaysByStateDir.get(input.stateDir) === dayUTC) {
+    return { dayUTC, captureDaily: false };
+  }
+  const state = readPostHogActivityState(input.stateDir, input.diagnostics);
+  if (state.lastActiveDayUTC === dayUTC) {
+    capturedDaysByStateDir.set(input.stateDir, dayUTC);
+    return { dayUTC, captureDaily: false };
+  }
+  const claim = claimUtcDay(input.stateDir, dayUTC);
+  capturedDaysByStateDir.set(input.stateDir, dayUTC);
+  if (claim === "already-claimed") {
+    return { dayUTC, captureDaily: false };
+  }
+  if (claim === "claimed") {
     writePostHogActivityState(input.stateDir, {
       ...state,
       lastActiveDayUTC: dayUTC
     }, input.diagnostics);
   }
-  return {
-    dayUTC,
-    captureDaily
-  };
+  return { dayUTC, captureDaily: true };
 }
 function getUtcDayString(date) {
   return date.toISOString().slice(0, 10);
@@ -169,7 +214,7 @@ function readPostHogActivityState(stateDir, diagnostics) {
 function writePostHogActivityState(stateDir, nextState, diagnostics) {
   const stateFilePath = getTelemetryActivityStateFilePath(stateDir);
   try {
-    mkdirSync2(stateDir, { recursive: true });
+    mkdirSync3(stateDir, { recursive: true });
     writeFileAtomically(stateFilePath, `${JSON.stringify(nextState, null, 2)}
 `);
   } catch (error) {
@@ -181,26 +226,28 @@ function writePostHogActivityState(stateDir, nextState, diagnostics) {
     });
   }
 }
-var POSTHOG_ACTIVITY_STATE_FILE = "posthog-activity.json";
+var POSTHOG_ACTIVITY_STATE_FILE = "posthog-activity.json", capturedDaysByStateDir;
 var init_activity_state = __esm(() => {
   init_atomic_write();
   init_xdg_data_dir();
+  init_day_claim();
+  capturedDaysByStateDir = new Map;
 });
 
 // packages/telemetry-core/src/constants.ts
 var DEFAULT_POSTHOG_HOST = "https://us.i.posthog.com", DEFAULT_POSTHOG_API_KEY = "phc_CFJhj5HyvA62QPhvyaUCtaq23aUfznnijg5VaaGkNk74", UNCONFIGURED_POSTHOG_API_KEY = "phc_REPLACE_ME_OMO_NATIVE";
 
 // packages/telemetry-core/src/diagnostics.ts
-import { appendFileSync, existsSync as existsSync6, mkdirSync as mkdirSync3, readFileSync as readFileSync4 } from "node:fs";
-import { join as join34 } from "node:path";
+import { appendFileSync, existsSync as existsSync6, mkdirSync as mkdirSync4, readFileSync as readFileSync4 } from "node:fs";
+import { join as join35 } from "node:path";
 function getTelemetryDiagnosticsFilePath(diagnosticsDir) {
-  return join34(diagnosticsDir, DIAGNOSTICS_FILE_NAME);
+  return join35(diagnosticsDir, DIAGNOSTICS_FILE_NAME);
 }
 function writeTelemetryDiagnostic(input, options) {
   const now = options.now ?? new Date;
   try {
     cleanupTelemetryDiagnostics({ diagnosticsDir: options.diagnosticsDir, now });
-    mkdirSync3(options.diagnosticsDir, { recursive: true });
+    mkdirSync4(options.diagnosticsDir, { recursive: true });
     appendFileSync(getTelemetryDiagnosticsFilePath(options.diagnosticsDir), `${JSON.stringify(toDiagnosticRecord(input, now))}
 `, "utf-8");
   } catch (error) {
@@ -269,7 +316,7 @@ function shouldRetainLine(line, cutoffMs) {
 function parseDiagnosticLine(line) {
   try {
     const parsed = JSON.parse(line);
-    if (!isRecord8(parsed)) {
+    if (!isRecord9(parsed)) {
       return null;
     }
     return parsed;
@@ -280,7 +327,7 @@ function parseDiagnosticLine(line) {
     throw error;
   }
 }
-function isRecord8(value) {
+function isRecord9(value) {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 function trimToMaxBytes(lines) {
@@ -7769,7 +7816,7 @@ function coerceBool(value) {
 function coerceString(value) {
   return typeof value == "string" ? value : undefined;
 }
-function isRecord9(value) {
+function isRecord10(value) {
   return typeof value == "object" && value !== null && !Array.isArray(value);
 }
 function toRfc3339(timestamp) {
@@ -7791,7 +7838,7 @@ function relocateInto(properties, key, value) {
     properties[key] = value;
 }
 function buildV1Event(message) {
-  const sourceProperties = isRecord9(message.properties) ? message.properties : {};
+  const sourceProperties = isRecord10(message.properties) ? message.properties : {};
   const properties = {
     ...sourceProperties
   };
@@ -9936,7 +9983,7 @@ var package_default;
 var init_package = __esm(() => {
   package_default = {
     name: "@oh-my-opencode/omo-codex",
-    version: "5.0.0-beta.79",
+    version: "5.0.0-beta.80",
     type: "module",
     private: true,
     description: "Codex harness adapter for oh-my-openagent. Vendored Codex plugin namespace (omo) + TypeScript installer + telemetry.",
@@ -10128,7 +10175,7 @@ var init_telemetry = __esm(() => {
 
 // packages/omo-codex/src/install/install-local-cli.ts
 import { readFile as readFile24 } from "node:fs/promises";
-import { dirname as dirname13, join as join39, resolve as resolve11 } from "node:path";
+import { dirname as dirname13, join as join40, resolve as resolve11 } from "node:path";
 import { fileURLToPath as fileURLToPath2 } from "node:url";
 
 // packages/utils/src/runtime/spawn.ts
@@ -10396,7 +10443,7 @@ var defaultRunCommand = async (command, args, options) => {
 };
 
 // packages/omo-codex/src/install/install-codex.ts
-import { join as join35, resolve as resolve10 } from "node:path";
+import { join as join36, resolve as resolve10 } from "node:path";
 
 // node_modules/.bun/zod@4.6.5/node_modules/zod/v4/core/util.js
 function getEnumValues(entries) {
@@ -16946,6 +16993,62 @@ var OmoConfigLayerSchema = object({
   legacy_migrations: record(string2(), unknown()).optional()
 }).strict();
 
+// packages/omo-config-core/src/schema/legacy-category-names.ts
+var LEGACY_CATEGORY_NAME_ALIASES = { deep: "deep-low" };
+function canonicalCategoryName(name) {
+  return Object.hasOwn(LEGACY_CATEGORY_NAME_ALIASES, name) ? LEGACY_CATEGORY_NAME_ALIASES[name] : name;
+}
+function isRecord6(value) {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+function joinPath(path, segment) {
+  return [...path, segment].join(".");
+}
+function canonicalizeCategoriesRecord(categories, path, renames) {
+  const result = {};
+  for (const [name, definition] of Object.entries(categories)) {
+    const canonical = canonicalCategoryName(name);
+    if (canonical === name) {
+      result[name] = definition;
+      continue;
+    }
+    const dropped = Object.hasOwn(categories, canonical);
+    renames.push({ canonical, dropped, legacy: name, path: joinPath(path, name) });
+    if (!dropped)
+      result[canonical] = definition;
+  }
+  return result;
+}
+function canonicalizeValue(value, path, renames) {
+  if (Array.isArray(value)) {
+    return value.map((entry, index) => canonicalizeValue(entry, [...path, String(index)], renames));
+  }
+  if (!isRecord6(value))
+    return value;
+  const result = {};
+  for (const [key, entry] of Object.entries(value)) {
+    if (key === "categories" && isRecord6(entry)) {
+      result[key] = canonicalizeCategoriesRecord(entry, [...path, key], renames);
+      continue;
+    }
+    if (key === "category" && typeof entry === "string") {
+      const canonical = canonicalCategoryName(entry);
+      if (canonical !== entry) {
+        renames.push({ canonical, dropped: false, legacy: entry, path: joinPath(path, key) });
+      }
+      result[key] = canonical;
+      continue;
+    }
+    result[key] = canonicalizeValue(entry, [...path, key], renames);
+  }
+  return result;
+}
+function canonicalizeLegacyCategoryNames(document) {
+  const renames = [];
+  const canonicalized = isRecord6(document) ? canonicalizeValue(document, [], renames) : {};
+  return { document: canonicalized, renames };
+}
+
 // node_modules/.bun/jsonc-parser@3.3.1/node_modules/jsonc-parser/lib/esm/impl/scanner.js
 function createScanner(text, ignoreTrivia = false) {
   const len = text.length;
@@ -18026,21 +18129,21 @@ function hasUnsafeUnrecognizedKey(issues) {
 function hasTamperedPrototype(value) {
   if (Array.isArray(value))
     return value.some((entry) => hasTamperedPrototype(entry));
-  if (!isRecord6(value))
+  if (!isRecord7(value))
     return false;
   const prototype = Object.getPrototypeOf(value);
   if (prototype !== Object.prototype && prototype !== null)
     return true;
   return Object.values(value).some((entry) => hasTamperedPrototype(entry));
 }
-function isRecord6(value) {
+function isRecord7(value) {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 function containerAt(record, path) {
   let container = record;
   for (const segment of path) {
     const next = container[segment];
-    if (!isRecord6(next))
+    if (!isRecord7(next))
       return null;
     container = next;
   }
@@ -18142,6 +18245,15 @@ function readConfigSource(path, scope, fileSystem) {
     value: parsedRecord
   };
 }
+function legacyCategoryDiagnostic(path, renames) {
+  const detail = renames.map((rename) => rename.dropped ? `${rename.path} ignored because ${rename.canonical} is also configured` : `${rename.path} renamed to ${rename.canonical}`).join(", ");
+  return {
+    kind: "deprecated-keys",
+    message: `Deprecated category name in ${path}: ${detail}. Rename it; the alias is removed in a future release.`,
+    path,
+    issuePaths: renames.map((rename) => rename.path)
+  };
+}
 function loadOmoConfig(options = {}) {
   const fileSystem = options.fileSystem ?? DEFAULT_READ_FILE_SYSTEM;
   const cwd = options.cwd ?? process.cwd();
@@ -18160,8 +18272,12 @@ function loadOmoConfig(options = {}) {
     if (loaded.diagnostic !== undefined)
       diagnostics.push(loaded.diagnostic);
     if (loaded.value !== undefined) {
-      layers.push({ config: loaded.value, source: loaded.source });
-      merged = mergeOmoConfigRecords(merged, loaded.value);
+      const canonicalized = canonicalizeLegacyCategoryNames(loaded.value);
+      if (canonicalized.renames.length > 0) {
+        diagnostics.push(legacyCategoryDiagnostic(candidate.path, canonicalized.renames));
+      }
+      layers.push({ config: canonicalized.document, source: loaded.source });
+      merged = mergeOmoConfigRecords(merged, canonicalized.document);
     }
   }
   const requestedProfile = resolveOmoProfileName({
@@ -20761,10 +20877,10 @@ function readCatalogMultiAgentVersion(model, cachePath) {
   } catch {
     return null;
   }
-  if (!isRecord7(cache) || !Array.isArray(cache.models))
+  if (!isRecord8(cache) || !Array.isArray(cache.models))
     return null;
   for (const entry of cache.models) {
-    if (!isRecord7(entry))
+    if (!isRecord8(entry))
       continue;
     if (entry.slug !== model && entry.id !== model)
       continue;
@@ -20789,7 +20905,7 @@ function readRootModelCatalogPath(config) {
   const single = config.match(/^\s*model_catalog_json\s*=\s*'([^']+)'/m);
   return single?.[1] ?? null;
 }
-function isRecord7(value) {
+function isRecord8(value) {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 function removeFeatureFlagSetting(config, featureName) {
@@ -22702,7 +22818,7 @@ async function runCodexInstaller(options = {}) {
   const env = options.env ?? process.env;
   const platform = options.platform ?? process.platform;
   const repoRoot = resolve10(options.repoRoot ?? findRepoRoot({ importerDir: import.meta.dir, env }));
-  const codexHome = resolve10(options.codexHome ?? env.CODEX_HOME ?? join35(homedir2(), ".codex"));
+  const codexHome = resolve10(options.codexHome ?? env.CODEX_HOME ?? join36(homedir2(), ".codex"));
   const projectDirectory = resolve10(options.projectDirectory ?? env.OMO_CODEX_PROJECT ?? process.cwd());
   const binDir = resolveCodexInstallerBinDir({ binDir: options.binDir, codexHome, env });
   const runCommand = options.runCommand ?? defaultRunCommand;
@@ -22719,9 +22835,9 @@ async function runCodexInstaller(options = {}) {
   if (!gitBashResolution.found) {
     throw new Error(gitBashResolution.installHint);
   }
-  const codexPackageRoot = join35(repoRoot, "packages", "omo-codex");
+  const codexPackageRoot = join36(repoRoot, "packages", "omo-codex");
   const marketplace = await readMarketplace(repoRoot, {
-    marketplacePath: join35(codexPackageRoot, "marketplace.json")
+    marketplacePath: join36(codexPackageRoot, "marketplace.json")
   });
   const distributionManifest = await readDistributionManifest(repoRoot);
   const installed = [];
@@ -22767,7 +22883,7 @@ async function runCodexInstaller(options = {}) {
       if (runtimeLink !== null)
         log(`Linked ${runtimeLink.name} -> ${runtimeLink.target}`);
       else
-        log(`Warning: skipped the omo-agent-toolkit runtime wrapper because ${join35(repoRoot, "dist", "cli", "index.js")} is missing; omo-agent-toolkit ulw-loop commands will be unavailable until a package shipping dist/cli is installed`);
+        log(`Warning: skipped the omo-agent-toolkit runtime wrapper because ${join36(repoRoot, "dist", "cli", "index.js")} is missing; omo-agent-toolkit ulw-loop commands will be unavailable until a package shipping dist/cli is installed`);
     }
     pluginSources.push({ name: entry.name, sourcePath });
     installed.push(plugin);
@@ -22834,13 +22950,13 @@ async function runCodexInstaller(options = {}) {
       continue;
     log(`Warning: deferred legacy Codex LSP daemon cleanup for v${cleanup.version}: ${cleanup.reason}`);
   }
-  const marketplaceRoot = join35(codexHome, "plugins", "cache", marketplace.name);
+  const marketplaceRoot = join36(codexHome, "plugins", "cache", marketplace.name);
   await writeCachedMarketplaceManifest({
     marketplaceName: marketplace.name,
     marketplaceRoot,
     plugins: installed
   });
-  const configPath = join35(codexHome, "config.toml");
+  const configPath = join36(codexHome, "config.toml");
   await updateCodexConfig({
     configPath,
     repoRoot: codexPackageRoot,
@@ -22899,7 +23015,7 @@ function findRepoRootFromImporter(importerDir) {
   for (let depth = 0;depth <= 7; depth += 1) {
     if (isRepoRootWithCodexPlugin(current))
       return current;
-    for (const wrapperPackageRoot of [join35(current, "node_modules", "oh-my-openagent"), join35(current, "oh-my-openagent")]) {
+    for (const wrapperPackageRoot of [join36(current, "node_modules", "oh-my-openagent"), join36(current, "oh-my-openagent")]) {
       if (isRepoRootWithCodexPlugin(wrapperPackageRoot))
         return wrapperPackageRoot;
     }
@@ -22917,7 +23033,7 @@ function findRepoRoot(input) {
   return findRepoRootFromImporter(input.importerDir);
 }
 function isRepoRootWithCodexPlugin(repoRoot) {
-  return existsSync7(join35(repoRoot, "packages", "omo-codex", "plugin", ".codex-plugin", "plugin.json"));
+  return existsSync7(join36(repoRoot, "packages", "omo-codex", "plugin", ".codex-plugin", "plugin.json"));
 }
 function codexMarketplaceSource(marketplaceRoot) {
   return { sourceType: "local", source: marketplaceRoot };
@@ -23230,12 +23346,12 @@ function shellQuote(value) {
 // packages/omo-codex/src/install/lazycodex-manual-update.ts
 import { spawn as spawn3, spawnSync as spawnSync2 } from "node:child_process";
 import { readFileSync as readFileSync5 } from "node:fs";
-import { dirname as dirname12, join as join37 } from "node:path";
+import { dirname as dirname12, join as join38 } from "node:path";
 import { createInterface as createInterface2 } from "node:readline/promises";
 import { fileURLToPath } from "node:url";
 
 // packages/omo-codex/src/install/lazycodex-bun-global-paths.ts
-import { join as join36 } from "node:path";
+import { join as join37 } from "node:path";
 function isBunGlobalEntrypointPath(invokedPath, env) {
   if (typeof invokedPath !== "string" || invokedPath.trim().length === 0)
     return false;
@@ -23246,8 +23362,8 @@ function resolveBunGlobalRoots(env) {
   const bunInstallRoot = env.BUN_INSTALL?.trim();
   const homeRoot = env.HOME?.trim();
   return [
-    ...bunInstallRoot ? [join36(bunInstallRoot, "bin"), join36(bunInstallRoot, "install", "global", "node_modules")] : [],
-    ...homeRoot ? [join36(homeRoot, ".bun", "bin"), join36(homeRoot, ".bun", "install", "global", "node_modules")] : []
+    ...bunInstallRoot ? [join37(bunInstallRoot, "bin"), join37(bunInstallRoot, "install", "global", "node_modules")] : [],
+    ...homeRoot ? [join37(homeRoot, ".bun", "bin"), join37(homeRoot, ".bun", "install", "global", "node_modules")] : []
   ].map(normalizePathForPrefix);
 }
 function normalizePathForPrefix(path) {
@@ -23340,7 +23456,7 @@ function resolveCurrentVersion(env) {
   if (env.LAZYCODEX_CURRENT_VERSION?.trim())
     return env.LAZYCODEX_CURRENT_VERSION.trim();
   const pluginRoot = dirname12(dirname12(fileURLToPath(import.meta.url)));
-  return readVersionManifest(resolveInstalledVersionPath(env, pluginRoot)) ?? readVersionManifest(join37(pluginRoot, "..", "..", "..", "package.json")) ?? readVersionManifest(join37(pluginRoot, ".codex-plugin", "plugin.json"));
+  return readVersionManifest(resolveInstalledVersionPath(env, pluginRoot)) ?? readVersionManifest(join38(pluginRoot, "..", "..", "..", "package.json")) ?? readVersionManifest(join38(pluginRoot, ".codex-plugin", "plugin.json"));
 }
 function resolveLatestVersion(env) {
   if (env.LAZYCODEX_LATEST_VERSION?.trim())
@@ -23456,7 +23572,7 @@ function compareVersions(left, right) {
 function resolveInstalledVersionPath(env, pluginRoot) {
   if (env.LAZYCODEX_INSTALLED_VERSION_FILE?.trim())
     return env.LAZYCODEX_INSTALLED_VERSION_FILE.trim();
-  return join37(pluginRoot, INSTALLED_VERSION_FILE);
+  return join38(pluginRoot, INSTALLED_VERSION_FILE);
 }
 function readVersionManifest(path) {
   try {
@@ -23473,10 +23589,10 @@ function readVersionManifest(path) {
 }
 // packages/omo-codex/src/install/codex-git-bash-mcp-env.ts
 import { readFile as readFile23, writeFile as writeFile13 } from "node:fs/promises";
-import { join as join38 } from "node:path";
+import { join as join39 } from "node:path";
 var GIT_BASH_ENV_KEY2 = "OMO_CODEX_GIT_BASH_PATH";
 async function stampGitBashMcpEnv(input) {
-  const manifestPath = join38(input.pluginRoot, ".mcp.json");
+  const manifestPath = join39(input.pluginRoot, ".mcp.json");
   if (!await fileExistsStrict(manifestPath))
     return false;
   const parsed = JSON.parse(await readFile23(manifestPath, "utf8"));
@@ -23523,7 +23639,7 @@ async function runLazyCodexInstallLocalCli(input) {
     return 0;
   }
   if (parsed.kind === "version") {
-    const packageJson = JSON.parse(await readFile24(join39(input.defaultRepoRoot, "package.json"), "utf8"));
+    const packageJson = JSON.parse(await readFile24(join40(input.defaultRepoRoot, "package.json"), "utf8"));
     const version = typeof packageJson.version === "string" ? packageJson.version : "unknown";
     input.log(`lazycodex-ai ${version}`);
     return 0;

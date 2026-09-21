@@ -1,3 +1,107 @@
+## The `deep` delegation category splits into `deep-low` and `deep-high`
+
+`deep` opened its description with a bold MANDATORY list of domains (3D, computer and browser use,
+CAPTCHA, multimodal, backend, logic, algorithms). The list routes by domain, which almost every
+coding task matches, so the category's head rung `gpt-6-astra` high served nearly all delegated work
+and the `gpt-5.6-sol` medium rung under it was reachable only by provider absence.
+
+The replacement routes by capability on two axes the caller can rate from the brief: how much context
+the child must hold, and how hard its decisions are. Decision difficulty is the gate. `deep-low`
+(`openai-codex/gpt-5.6-sol` medium) is the default lane; `deep-high` (`openai-codex/gpt-6-astra`
+high) takes a goal whose central decision cannot be settled from evidence. `CATEGORY_FALLBACK_CHAINS`
+gives each lane ONE rung and `requiresModel` gates each on its own model id, so the lanes never
+substitute each other and a registry missing one lane drops it from `availableCategories` instead of
+serving the other model under its name. The provider list inside a rung is unchanged, so a single
+provider outage still fails over across `openai-codex` -> `github-copilot` -> `opencode`.
+
+The domain list now lives only on the caller-facing `deep-low` description. The child appends lost it
+(a child never picks its category) and gained the escalation contract: a `deep-low` child returns
+`ESCALATE: deep-high` as the first line, with what it read and the decision it could not settle,
+instead of guessing. `openai-categories.ts` therefore ships four deep appends (GPT and generic per
+lane) resolved by `resolveDeepLowCategoryPromptAppend` / `resolveDeepHighCategoryPromptAppend`; the
+GPT-5.5-specific deep append is gone, since both lanes ship GPT rungs only and the GPT-5.6 doctrine
+(outcome, success criteria, escalation, stop rule) covers Sol and Astra alike.
+
+`omo-senpi-gate-reviewer` routes `["deep-high", "unspecified-high"]`, `omo-senpi-qa-executor`
+`["deep-low", "unspecified-low"]`. The telemetry `category_config` schema swaps `cat_deep` for
+`cat_deep_low` / `cat_deep_high`; `delegation_completed.category` derives from
+`BUILTIN_CATEGORY_DEFAULTS` and needed no edit. The `deep-work` model profile now deep-equals
+`deep-high ++ deep-low` instead of the single old chain.
+
+## `categories.deep` migrates once, and does nothing to configs that never used it
+
+`omo-config-core` gains `canonicalizeLegacyCategoryNames`, which rewrites a retired category key
+(`categories.deep`) and a retired category VALUE (`teams.*.members[].category`,
+`memory.reflection.category`) through the base block, `[senpi]`/`[opencode]`/`[codex]`, and every
+`profiles.*` and its harness sub-block. The loader runs it per layer before merge and reports a
+`deprecated-keys` diagnostic, which `config-startup` already surfaces as a startup warning. That is
+what keeps an override working when the file rewrite cannot run (locked batch, read-only project
+file). When both `deep` and `deep-low` exist the canonical entry wins and the drop is reported.
+
+The file rewrite is the new `2026-09-category-deep-split` plan in `config-migration`. Because the
+reasoning-unification plan taught us that a `replace-target` plan writes a backup and a `_migrations`
+marker even when the transform is a no-op, `MigrationPlan` gains `shouldRun`, a content gate that
+`batch.ts` evaluates against the parsed target before the journal, the backup and the write. The new
+plan passes `hasLegacyCategoryNames`, so a config that never named `deep` is left byte-identical with
+no marker - asserted in `migration/should-run.test.ts` by `operations` carrying no write or rename.
+
+The name also resolves at runtime: `validateTaskTarget` canonicalizes the spawn boundary (so the task
+record, telemetry and renderers all carry the name that ran), and both edition resolvers accept the
+retired name, so `task(category: "deep")` in a third-party skill or an AGENTS.md keeps working.
+
+## Daemon-host QA gates observe product transitions, not parent timing
+
+The single-parent control keeps its sixteen-session and single-daemon requirements but waits for
+readiness with the loaded-host allowance. Detach/attach uses two release barriers and resumes the
+original parent session; its gate checks child completion, a persisted resume response and no prompt
+replay rather than requiring the resident parent process to exit within an observation window.
+The second barrier keeps children mid-turn until reattachment, and the resumed parent waits for their
+terminal records before ending its own turn.
+
+Team QA follows the member's stored identity, matches its daemon context and checks delivery of the
+specific mailbox message. Parking QA explicitly authorizes its new sender, checks the revival epoch
+and waits for the same child transcript to contain both the message and its completed response.
+Its acceptance evidence is the persisted `revived` tool result, not the sender process's exit timing.
+The zombie scenario runs a finite workload and counts successful, distinct bash receipts from all
+eight children, not how many remain running after the storm ends. Missing work, a dead daemon,
+zombies, wrong identities and replay still fail their gates.
+
+Self-tests cover healthy terminal states and fault controls. State waits subscribe before triggering
+work. QA no longer reads real agent credentials for digest comparisons; child environments remain
+isolated and each scenario records process and sandbox cleanup.
+
+Fan-out fixtures keep the parent turn active until the cohort is observed. A/A1 still reject a
+terminal aborted/error child transcript even if its store incorrectly appears active and the worker
+count is sufficient. A separate diagnostic captures paired store/transcript snapshots and a bounded
+convergence observation for the graceful-shutdown suspension behavior tracked in #8517; this harness
+change does not change that product behavior.
+
+The daemon lane now owns its mock provider. Its step cursor comes from each conversation's tool-call
+receipts and the current script, so eight in-process children cannot consume one another's steps.
+The shared `task-e2e-mock-provider.ts` is unchanged. An interleaved eight-child regression requires
+all 200 steps and verifies that a replacement script starts at its first step.
+
+Failed-task evidence retains the exact record, the last assistant entry, correlated provider abort
+signals, `agent_end` abort fields, session shutdown events and the driver's teardown boundary.
+An observed `toolUse` stop reason alone is not labeled an intrinsic engine failure.
+
+## The fallback-architect nudge arms on any refusal-driven fallback
+
+`detection.ts` no longer exports `isFableFiveModel`. The exact-id equality it provided was the arming gate
+in `index.ts`, so only a session whose refusing model was literally `claude-fable-5` ever received the
+directive, and `claude-fable-5-1` - the id the shipped architect category itself resolves to - missed it.
+The `model_select` handler now arms on the refusal signal alone: `source === "fallback"`, a previous model
+in the payload, and the refusal predicate on the preceding assistant message, behind the unchanged
+architect-category gate and the unchanged `omo-senpi-fallback-architect-disabled` flag. A second refusal on
+the fallback model therefore arms a fresh directive naming the new pair, which is what the reminder must
+say once the session has moved twice.
+
+Two consequences ride along. The active episode used to clear when the newly selected model was fable 5; it
+now clears when the session returns to the selector that was refused, or on `source === "fallback-revert"`.
+And `directive.ts` gained `isFableFiveSelector`, a copy-only predicate: the consultant is Fable 5 whoever
+refused, but "the same model that just refused" holds only for a fable-family refusal, so that clause is
+conditional now and the mirrored tip line no longer names Fable 5 as the refuser.
+
 ## Console-subsystem spawns are hidden on win32, and a gate keeps them that way
 
 `memory-core`'s git exec and its process-start identity probe, plus the adapter's formatter, thread
