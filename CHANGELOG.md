@@ -7,11 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Task child processes are reclaimed on session shutdown even when the closing context no longer exposes its session ID. Cleanup recovers ownership from that engine's resident handles, preserves resumable task records, and leaves sibling sessions alone. ([#8562](https://github.com/code-yeongyu/oh-my-openagent/issues/8562))
+
 ### Changed
+
+**Native launchers no longer keep a redundant runtime alive on POSIX.** The Node-to-Bun handoff, engine launch and compiled runtime relocation now replace the launcher process with `execve`, preserving its PID and stdio. Windows and runtimes where replacement is unavailable or fails keep the existing signal-aware child fallback. `omo daemon attach` remains spawn-based. ([#8560](https://github.com/code-yeongyu/oh-my-openagent/issues/8560))
+
+**Every direct dependency moves to its latest release inside its current major, and the security overrides move with them.**
+
+`bun audit` reports one advisory row where it reported 43. The hono, fast-uri and express-rate-limit overrides now sit past their advisories, and `@hono/node-server` moved to the 2.1.1 the engine already asks for. Nothing in the tree needs a 1.x copy, so the old `^1.19.13` override was itself what held the package below the serve-static path-traversal fix. qs and ip-address gained overrides because the engine pins both to exact versions and no range refresh reaches the fixed releases; brace-expansion and browserslist needed none, since their existing ranges already cover theirs. What remains is one low-severity @babel/core file read, held in place by the exact pin @opentui/solid puts on it.
+
+Then the sweep: vitest 4.1.11, @opencode-ai/plugin and sdk 1.18.31, opentui 0.5.11, zod 4.6.5, typebox 1.3.34, js-yaml 5.4.2, posthog-node 5.52.4, @clack/prompts 1.8.1, terser 5.51.2, puppeteer-core 25.11.0, yaml 2.9.1, @types/node 26.6.2 and biome 2.5.14 wherever they are declared, and in the web package react 19.3.0, three 0.186.0, tailwindcss 4.3.3, wrangler 4.135.0, next-intl 4.14.5 and the rest of its set. next, eslint and the ai SDK keep their majors; those belong to their own change.
+
+Two generated artifacts moved with the versions. zod 4.6.5 writes a boolean-or-string union as a single type array instead of an anyOf pair, so both JSON Schema files were regenerated. And because the Senpi extension inlines zod, js-yaml and posthog-node into one non-split file, its bundle grew from 1,202,188 to 1,260,200 bytes; the size budget moved to 1,300,000 with the measurement written into the test comment.
 
 **The frontend skill now refuses the coloured accent border.**
 
 A selected row no longer earns a `border-l-2 border-primary` stripe, and a focused card no longer gets a primary-tinted outline — the skill names that pattern as the most recognizable AI-generated-UI tell and treats it as a defect, including instances that already exist on a surface it touches. State is expressed the way this repo's design systems already express it: washes of one ink, a check glyph for selection, tonal layering for focus. Keyboard focus rings stay coloured.
+
+### Fixed
+
+**LSP requests stop repeatedly launching daemon candidates when startup is deferred.** Each request makes one startup attempt and only probes on later retries. After a failed startup, the same client process waits five seconds before spawning another candidate for that endpoint; a reachable daemon is still reused immediately. Probes allow two seconds for a busy daemon to answer, and expected deferred startups produce one log line instead of a stack trace. Authentication, ownership and written-request replay rules are unchanged. ([#8561](https://github.com/code-yeongyu/oh-my-openagent/issues/8561))
+
+**A session that reattaches to another host generation keeps its memory.** Your memory identity was derived from the directory the host process happened to be started in, not from the session's own workspace. One shared host serves sessions from many projects, so a host ensured from somewhere else handed its own identity to every session that reattached to it: the session was told `memory identity conflict: session is bound to <workspace>-<hash>, but config resolved server-<hash>`, and its memory tools went away while the workspace had not moved at all. Identity now comes from the session's own working directory, and a reattach that still disagrees rebinds to the identity recorded in the session and notes it in the log instead of stopping. The error is kept for the case it was written for: you pointed `memory.agent` at a different identity yourself. ([#8556](https://github.com/code-yeongyu/oh-my-openagent/issues/8556))
 
 
 ## [5.0.0-beta.80] - 2026-09-20

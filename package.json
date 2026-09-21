@@ -164,11 +164,11 @@
   },
   "homepage": "https://github.com/code-yeongyu/oh-my-openagent#readme",
   "dependencies": {
-    "@ai-sdk/anthropic": "^4.0.54",
-    "@ai-sdk/google": "^4.0.72",
-    "@ai-sdk/openai": "^4.0.67",
-    "@ai-sdk/provider": "^4.0.15",
-    "@ai-sdk/xai": "^5.0.0",
+    "@ai-sdk/anthropic": "^4.0.58",
+    "@ai-sdk/google": "^4.0.76",
+    "@ai-sdk/openai": "^4.0.71",
+    "@ai-sdk/provider": "^4.0.17",
+    "@ai-sdk/xai": "^5.0.4",
     "@clack/prompts": "^1.8.1",
     "@code-yeongyu/comment-checker": "^0.8.0",
     "@modelcontextprotocol/sdk": "^1.30.0",
@@ -184,7 +184,7 @@
     "jsonc-parser": "^3.3.1",
     "picocolors": "^1.1.1",
     "picomatch": "^4.0.7",
-    "posthog-node": "^5.52.4",
+    "posthog-node": "^5.52.5",
     "zod": "^4.6.5"
   },
   "devDependencies": {
@@ -242,15 +242,18 @@
     "oh-my-opencode-windows-x64-baseline": "5.0.0-beta.80"
   },
   "overrides": {
-    "@earendil-works/pi-agent-core": "0.85.1",
-    "@earendil-works/pi-ai": "0.85.1",
-    "@earendil-works/pi-coding-agent": "0.85.1",
-    "@earendil-works/pi-tui": "0.85.1",
+    "@earendil-works/pi-agent-core": "0.86.1",
+    "@earendil-works/pi-ai": "0.86.1",
+    "@earendil-works/pi-coding-agent": "0.86.1",
+    "@earendil-works/pi-tui": "0.86.1",
     "hono": "^4.13.8",
-    "@hono/node-server": "^2.1.1",
+    "@hono/node-server": "2.1.1",
     "express-rate-limit": "^8.7.0",
-    "fast-uri": "^4.1.5",
-    "path-to-regexp": "^8.4.2"
+    "fast-uri": "^4.2.1",
+    "path-to-regexp": "^8.4.2",
+    "qs": "^6.16.0",
+    "ip-address": "^10.7.2",
+    "@types/node": "26.6.2"
   },
   "trustedDependencies": []
 }
