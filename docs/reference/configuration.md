@@ -53,7 +53,7 @@ One unified file configures every omo harness: the OpenCode plugin, Senpi (task,
 Within the merged document each harness resolves its own view VSCode-style, later layers winning:
 
 1. Shared base keys
-2. The `[harness]` block: `[opencode]`, `[senpi]`, or `[codex]`
+2. The `[harness]` block: `[opencode]`, `[native]`, or `[codex]` (`[senpi]` is the accepted legacy spelling of `[native]`)
 3. `profiles.<name>`
 4. `profiles.<name>.[harness]`
 
@@ -76,14 +76,14 @@ A top-level `models` record maps a short name to the canonical shape `{ model, r
 
 #### Model Profiles
 
-Two more shared base keys, read by the Senpi harness, pick the main session model by intent instead of by model id. They live at the top level, inside `[senpi]`, or inside a `profiles.<name>` layer, like any other base key.
+Two more shared base keys, read by the Senpi harness, pick the main session model by intent instead of by model id. They live at the top level, inside `[native]`, or inside a `profiles.<name>` layer, like any other base key.
 
 | Key | Type | Description |
 | --- | --- | --- |
 | `model_profiles` | record<string, `{ display_name?, models? }`> | Named ordered model chains. A name matching a builtin (`capable`, `simple-work`, `deep-work`) replaces it wholesale; any other name adds one. Entries use the same string or object shape as a category chain and may reference `models.<catalog>` entries. |
 | `model_profile` | string | Which chain starts the session: a profile id such as `capable`, or a literal `provider/model` that pins one exact model. Unset means Senpi's own default resolution runs. |
 
-Don't confuse these with `profiles.<name>` above: that key swaps configuration layers via `OMO_PROFILE`, while `model_profile` chooses a model within the loaded configuration. Builtin chains, session-start behavior, and override rules are in the [omo.json reference](./omo-json.md#model-profiles-senpi-harness).
+Don't confuse these with `profiles.<name>` above: that key swaps configuration layers via `OMO_PROFILE`, while `model_profile` chooses a model within the loaded configuration. Builtin chains, session-start behavior, and override rules are in the [omo.json reference](./omo-json.md#model-profiles-native-harness).
 
 #### Security Invariants
 
@@ -106,7 +106,7 @@ Run `bunx oh-my-openagent install` for guided setup. Run `opencode models` to li
 The first time a current harness starts (and again on install or via the CLI), a lock-and-journal migration engine imports the legacy files into the unified file:
 
 - Sources: `oh-my-openagent.json[c]` / `oh-my-opencode.json[c]` in the OpenCode user config directory, in each of its `profiles/<name>/` directories, and in walked project `.opencode/` directories, plus `~/.omo/config.jsonc`.
-- Targets: the legacy user file imports into `~/.omo/omo.jsonc` under `[opencode]`; each legacy profile becomes `profiles.<name>."[opencode]"` holding only the keys that differ from the user file; a project file imports into that project's `.omo/omo.jsonc`. `~/.omo/config.jsonc` imports its `[opencode]` / `[codex]` blocks, and a legacy `[omo]` block maps to `[senpi]`.
+- Targets: the legacy user file imports into `~/.omo/omo.jsonc` under `[opencode]`; each legacy profile becomes `profiles.<name>."[opencode]"` holding only the keys that differ from the user file; a project file imports into that project's `.omo/omo.jsonc`. `~/.omo/config.jsonc` imports its `[opencode]` / `[codex]` blocks, and a legacy `[omo]` block maps to `[native]`.
 - OpenCode legacy files import only model/provider controls (`disabled_providers`, `model_fallback`, `models`, and `omo_agent` renamed to `sisyphus_agent`); agent and category registries, agent disable lists, hooks, and unrelated plugin settings are not imported.
 - Conflict policy: no-clobber. A value already present in the target wins, and every skipped legacy value is reported as a diagnostic instead of overwriting. Prior legacy migration history is preserved under the target's `legacy_migrations` key.
 - Markers: each applied migration records its id in the target's `_migrations` array, so re-runs are no-ops. `2026-07-opencode-config-unification` covers the `oh-my-*` files; `2026-07-codex-config-jsonc` covers `~/.omo/config.jsonc`; `2026-08-reasoning-unification` rewrites persisted model and reasoning fields. Codex startup runs only the second group; OpenCode plugin startup, Senpi startup, install, and the CLI run both groups, so whichever side runs first applies each group exactly once.
@@ -135,13 +135,13 @@ Here's a practical starting `~/.omo/omo.jsonc`. OpenCode plugin settings live in
 
     "categories": {
       // quick - Kimi high-speed by default
-      "quick": { "model": "kimi-for-coding/kimi-for-coding-highspeed" },
+      "quick": { "model": "openai/gpt-5.6-luna-fast", "reasoning": "low" },
 
       // unspecified-low - moderate tasks
       "unspecified-low": { "model": "xai/grok-4.6", "reasoning": "xhigh" },
 
       // unspecified-high - complex work
-      "unspecified-high": { "model": "openai/gpt-6-astra", "reasoning": "high" },
+      "unspecified-high": { "model": "anthropic/claude-opus-5", "reasoning": "xhigh" },
 
       // writing - docs/prose
       "writing": { "model": "anthropic/claude-fable-5-1", "reasoning": "low" },
@@ -345,9 +345,9 @@ Domain-specific model delegation used by the `task()` tool. When the main agent 
 | `deep-low`           | `openai/gpt-5.6-sol` (medium)   | Default deep lane: 3D graphics, computer use, browser use, backend, logic, algorithms, CAPTCHA solving, multimodal, and complex research whose decisions the child can settle from evidence. Single rung, no model fallback. |
 | `deep-high`          | `openai/gpt-6-astra` (high)     | Escalation deep lane for a goal whose central decision cannot be settled from evidence. Single rung, no model fallback. |
 | `artistry`           | `anthropic/claude-fable-5-1` (max) | Creative/unconventional approaches             |
-| `quick`              | `kimi-for-coding/kimi-for-coding-highspeed` | Trivial tasks, typo fixes, single-file changes |
+| `quick`              | `openai/gpt-5.6-luna-fast` (low) | Trivial tasks, typo fixes, single-file changes |
 | `unspecified-low`    | `xai/grok-4.6` (xhigh)          | General tasks, low effort                      |
-| `unspecified-high`   | `openai/gpt-6-astra` (high) | General tasks, high effort                     |
+| `unspecified-high`   | `anthropic/claude-opus-5` (xhigh) | General tasks, high effort                     |
 | `writing`            | `anthropic/claude-fable-5-1` (low)     | Documentation, prose, technical writing        |
 
 > **Note**: Built-in category defaults are available automatically. User-defined category config merges over the built-in defaults or adds custom categories.
@@ -439,7 +439,7 @@ This table mirrors the authoritative hardcoded category fallback chains: the cha
 | **Ultrabrain** | `gpt-6-astra` | `openai\|openai-codex/gpt-6-astra (max)` → `github-copilot/gpt-6-astra (max)` → `openai\|openai-codex\|opencode/gpt-6-astra (max)` → `openai\|openai-codex/gpt-5.6-sol (max)` → `github-copilot/gpt-5.6-sol (max)` → `openai\|openai-codex\|opencode/gpt-5.6-sol (max)` |
 | **Deep** | `gpt-6-astra` | `openai\|openai-codex\|github-copilot\|opencode/gpt-6-astra (high)` → `openai\|openai-codex\|github-copilot\|opencode/gpt-5.6-sol (medium)` |
 | **Artistry** | `claude-fable-5-1` | `anthropic\|anthropic-api\|github-copilot\|opencode/claude-fable-5-1 (max)` → `kimi-for-coding\|moonshotai\|opencode-go\|opencode/kimi-k3 (max)` → `anthropic\|anthropic-api\|github-copilot\|opencode/claude-opus-5 (xhigh)` |
-| **Quick** | `kimi-for-coding-highspeed` | `kimi-for-coding/kimi-for-coding-highspeed` → `openai-codex/gpt-5.6-luna-fast (low)` → `deepseek/deepseek-v4-flash (off)` → `qwen-token-plan\|alibaba-token-plan\|bailian-coding-plan/qwen3.6-flash (low)` → `opencode-go/minimax-m3 (max)` → `opencode-go/minimax-m2.7 (max)` → `xai/grok-4.20-0309-non-reasoning` → `anthropic\|anthropic-api\|github-copilot/claude-haiku-4-5 (off)` |
+| **Quick** | `gpt-5.6-luna-fast` | `openai-codex/gpt-5.6-luna-fast (low)` → `deepseek/deepseek-v4-flash (off)` → `qwen-token-plan\|alibaba-token-plan\|bailian-coding-plan/qwen3.6-flash (low)` → `opencode-go/minimax-m3 (max)` → `opencode-go/minimax-m2.7 (max)` → `xai/grok-4.20-0309-non-reasoning` → `anthropic\|anthropic-api\|github-copilot/claude-haiku-4-5 (off)` |
 | **Unspecified Low** | `grok-4.6` | `xai\|github-copilot\|opencode/grok-4.6 (xhigh)` → `openai\|openai-codex\|github-copilot\|opencode/gpt-5.6-terra (high)` → `anthropic\|anthropic-api\|github-copilot\|opencode/claude-sonnet-5 (low)` → `qwen-token-plan\|alibaba-token-plan\|qwen-token-plan-cn\|alibaba-token-plan-cn/qwen3.8-max-preview (max)` → `deepseek\|opencode-go/deepseek-v4-pro (max)` → `xiaomi\|opencode-go/mimo-v2.5-pro (max)` |
 | **Unspecified High** | `gpt-6-astra` | `openai\|openai-codex\|github-copilot\|opencode/gpt-6-astra (high)` → `anthropic\|anthropic-api\|github-copilot\|opencode/claude-opus-5 (xhigh)` → `zai-coding-plan\|opencode-go/glm-5.3 (max)` → `kimi-for-coding\|moonshotai\|opencode-go\|opencode/kimi-k3 (max)` |
 | **Writing** | `claude-fable-5-1` | `anthropic\|anthropic-api\|github-copilot\|opencode/claude-fable-5-1 (medium)` → `kimi-for-coding\|moonshotai\|opencode-go\|opencode/kimi-k3 (max)` |
@@ -774,7 +774,7 @@ Configure git commit behavior:
 
 `commit_footer` (default `false`) opts in to an "Ultraworked with Sisyphus" footer in the commit body; a string replaces the builtin text. Commits keep your own git author and committer, and omo never adds a `Co-authored-by` trailer; `include_co_authored_by` is a deprecated no-op kept so existing configs still validate.
 
-This key configures the OpenCode plugin inside `[opencode]`. The Senpi harness reads the typed shared `git_master` section instead, documented in the [omo.json reference](./omo-json.md#git_master-senpi-harness).
+This key configures the OpenCode plugin inside `[opencode]`. The Senpi harness reads the typed shared `git_master` section instead, documented in the [omo.json reference](./omo-json.md#git_master-native-harness).
 
 `git_env_prefix` (default `"GIT_MASTER=1"`) is prepended to git commands; set it to `""` to disable.
 

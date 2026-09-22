@@ -4,7 +4,7 @@ oh-my-openagent ships in **three editions** of the same product: two plugins tha
 
 - **Ultimate Edition (omo for [OpenCode](https://opencode.ai))** — the full omo experience. The curated agent roster, 54+ lifecycle hooks, all built-in MCPs, every slash command, Team Mode, ulw-loop, hashline edits, the works.
 - **Light Edition (omo for [OpenAI Codex CLI](https://github.com/openai/codex))** - the portable components that fit Codex's plugin system: `bootstrap`, `comment-checker`, `git-bash`, `lazycodex-executor-verify`, `rules`, `lsp`, `telemetry`, `teammode`, `ulw-execute-continuation`, `ulw-loop`, and `ultrawork`, plus plugin-scoped MCPs for `grep_app`, `context7`, `git_bash`, and `lsp`, and the shared `ast-grep` skill. It has no OpenCode agent registry or `team_*` tool family, but ships Codex-native agent roles and the script-and-skill-driven `teammode` component.
-- **Senpi Edition (standalone, beta)** — the native `omo` command with the OMO extension built in. It installs from `omo-ai@beta` instead of loading as a plugin into OpenCode or Codex.
+- **OmO Native (standalone, beta)** — the `omo` command with the OMO extension built in. It installs from `omo-ai@beta` instead of loading as a plugin into OpenCode or Codex.
 
 Most users want **Ultimate**. Pick **Light** if you are already invested in Codex CLI. Pick **both** if you want OMO available wherever you happen to be working that day.
 
@@ -20,11 +20,11 @@ Both `lazycodex-ai` and `lazycodex` are shipped bin aliases that default to the 
 
 - Already use OpenCode, or want the most-tested path? Choose **Ultimate**: `bunx oh-my-openagent install`.
 - Already use Codex CLI? Choose **Light**: `npx lazycodex-ai install`.
-- Want one command without installing a host first? Choose **Senpi/native (beta)**: `bun add -g omo-ai@beta`.
+- Want one command without installing a host first? Choose **OmO Native (beta)**: `bun add -g omo-ai@beta`.
 
-Ultimate and Light are plugins that load into a host you already run. Senpi is standalone: it ships a pinned Senpi engine with OMO built in.
+Ultimate and Light are plugins that load into a host you already run. OmO Native is standalone: it ships a pinned senpi engine with OMO built in.
 
-For Senpi, the `@beta` tag is required; bare `bun add -g omo-ai` fails by design. Do not install plain `omo` from npm: it is an unrelated package by a different author.
+For OmO Native, the `@beta` tag is required; bare `bun add -g omo-ai` fails by design. Do not install plain `omo` from npm: it is an unrelated package by a different author.
 
 ## For Humans
 
@@ -161,9 +161,9 @@ Do not run a blanket trust command. Trust only packages you recognize from this 
 
 The OpenCode comment-checker hook downloads its pinned binary directly from [GitHub releases](https://github.com/code-yeongyu/go-claude-code-comment-checker/releases) on first use and caches it locally. No comment-checker npm package or lifecycle-script trust is required. If the download fails, comment checking is disabled for that process; allow GitHub access and restart OpenCode to retry.
 
-### Senpi edition (beta): `omo` via `omo-ai`
+### OmO Native (beta): `omo` via `omo-ai`
 
-The senpi-native edition ships as the npm package `omo-ai` and installs a single command, `omo`, which launches the pinned senpi release with the full OMO extension loaded. No settings edits, no plugin registration, no extra setup.
+OmO Native ships as the npm package `omo-ai` and installs a single command, `omo`, which launches the pinned senpi engine with the full OMO extension loaded. No settings edits, no plugin registration, no extra setup.
 
 It is beta-channel only. The tag is mandatory:
 
@@ -174,11 +174,11 @@ omo
 
 A bare `bun add -g omo-ai` fails with ETARGET on purpose; every published version is a prerelease, so the default channel never resolves. See the [omo-ai publishing runbook](../reference/omo-ai-publishing.md) for the mechanism.
 
-**Where omo keeps its state.** The senpi edition stores engine state under `~/.omo/agent`
+**Where omo keeps its state.** OmO Native stores engine state under `~/.omo/agent`
 (`settings.json`, `auth.json`, `models.json`, and friends). A pre-unification flat `~/.omo` layout
 is adopted once into `~/.omo/agent` (marker `.adopted-from-omo-flat`; sessions, caches, and logs
 are not copied). If neither branded layout exists, the engine falls back to `~/.senpi/agent`
-without copying it, so a standalone senpi install keeps working. Set `OMO_CODING_AGENT_DIR` to
+without copying it, so an older standalone install keeps working. Set `OMO_CODING_AGENT_DIR` to
 override the location; the legacy `SENPI_*` and `PI_*` variables are still read when the `OMO_*`
 one is unset.
 
@@ -186,10 +186,10 @@ one is unset.
 
 ### First run: `omo setup`
 
-`omo setup` is the onboarding command for the senpi edition. It replaces the old manual "configure OmO/senpi" guidance; there's nothing to hand-edit anymore. It runs in three stages:
+`omo setup` is the onboarding command for OmO Native. It replaces the old manual configure-by-hand guidance; there's nothing to hand-edit anymore. It runs in three stages:
 
-1. **Detect (read-only).** Scans your other coding-agent installs for provider credentials: senpi's agent dir (`SENPI_CODING_AGENT_DIR`, else `~/.senpi/agent`), opencode (`~/.local/share/opencode/auth.json`, XDG-aware), oh-my-pi (`~/.omp/agent/agent.db`), and gajae-code (`~/.gjc/agent/agent.db`). It reports, per harness, whether it's installed and which provider ids have credentials of which type. Credential values are never printed. The oh-my-pi and gajae-code databases are opened read-only.
-2. **Import (consent-gated).** Only after you confirm (interactively, or with `--yes`; `--dry-run` previews without writing), compatible API-key credentials are imported into senpi's auth store. Existing senpi entries are never overwritten, and only providers senpi actually knows are imported. OAuth entries are reported but never imported. Source stores are never written; imports go to senpi's `auth.json` only, atomically and with a timestamped backup.
+1. **Detect (read-only).** Scans your other coding-agent installs for provider credentials: the senpi engine's agent dir (`SENPI_CODING_AGENT_DIR`, else `~/.senpi/agent`), opencode (`~/.local/share/opencode/auth.json`, XDG-aware), oh-my-pi (`~/.omp/agent/agent.db`), and gajae-code (`~/.gjc/agent/agent.db`). It reports, per harness, whether it's installed and which provider ids have credentials of which type. Credential values are never printed. The oh-my-pi and gajae-code databases are opened read-only.
+2. **Import (consent-gated).** Only after you confirm (interactively, or with `--yes`; `--dry-run` previews without writing), compatible API-key credentials are imported into the engine's auth store. Existing entries are never overwritten, and only providers the engine actually knows are imported. OAuth entries are reported but never imported. Source stores are never written; imports go to the engine's `auth.json` only, atomically and with a timestamped backup.
 3. **Model report.** Prints a provider/model availability summary pointing at the [agent-model matching guide](./agent-model-matching.md), plus a ready-to-paste config snippet for any custom-endpoint providers it found. Report only; setup never writes model config for you.
 
 ## For LLM Agents
@@ -242,7 +242,7 @@ Map their answer to:
    - **no** → `--claude=no`
 
 2. **Do you have an OpenAI/ChatGPT Plus Subscription?**
-   - **yes** → `--openai=yes` (enables OpenAI routes; the `ultrabrain` (max), `deep` (high), and `unspecified-high` (high) categories start on GPT-6 Astra, and the Plan Reviewer starts on GPT-6 Astra (xhigh))
+   - **yes** → `--openai=yes` (enables OpenAI routes; the `ultrabrain` (max) and `deep-high` (high) categories start on GPT-6 Astra, the `quick` category starts on GPT-5.6 Luna Fast (low), and the Plan Reviewer starts on GPT-6 Astra (xhigh))
    - **no** → `--openai=no` (default)
 
 3. **Will you integrate Gemini models?**
@@ -605,7 +605,7 @@ Not all models behave the same way. Understanding "similar" families helps you m
 
 | Model             | Provider(s)                      | Notes                                                                                                       |
 | ----------------- | -------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| **GPT-6 Astra**   | openai, openai-codex, github-copilot, opencode | OpenAI's most capable model and the recommended GPT flagship. Default for the Plan Reviewer (xhigh, high on Copilot), `ultrabrain` (max), `deep` (high), and `unspecified-high` (high). `gpt-6-astra-fast` is the Fast-mode variant. Manual override option for the main agent and the `architect` category. |
+| **GPT-6 Astra**   | openai, openai-codex, github-copilot, opencode | OpenAI's most capable model and the recommended GPT flagship. Default for the Plan Reviewer (xhigh, high on Copilot), `ultrabrain` (max), and `deep-high` (high). `gpt-6-astra-fast` is the Fast-mode variant. Manual override option for the main agent and the `architect` category. |
 | **GPT-5.6 Sol**   | openai, openai-codex, github-copilot, opencode | The GPT model recommended for the main agent at medium effort; the fallback rung under Astra for `ultrabrain` (max) and `deep` (medium). |
 | **GPT-5.6 Terra** | openai, openai-codex, github-copilot | GPT-5.6 mid-tier. No longer a default for any agent; an optional balanced override.                    |
 | **GPT-5.6 Luna**  | openai, openai-codex             | GPT-5.6 light tier. Not the `unspecified-low` default: that category starts at `xai\|github-copilot\|opencode/grok-4.6 (xhigh)`, then `gpt-5.6-terra (high)`. |
@@ -643,7 +643,7 @@ Not all models behave the same way. Understanding "similar" families helps you m
 | ------------------- | ------------------------------------------ | ---------------------------------------------------------------------- |
 | **plan-consultant** | Pre-planning gap analysis for `/ulw-plan`  | anthropic\|github-copilot\|opencode/claude-fable-5-1 (max) → anthropic\|github-copilot\|opencode/claude-opus-5 (max) → opencode-go\|kimi-for-coding\|moonshotai\|opencode/kimi-k3 (max) |
 | **plan-reviewer**   | High-accuracy plan review gate             | openai\|openai-codex/gpt-6-astra (xhigh) → github-copilot/gpt-6-astra (high) → openai\|openai-codex\|opencode/gpt-6-astra (high) → anthropic\|github-copilot\|opencode/claude-opus-5 (max) → … (full chain in source) |
-| **explore**         | Fast codebase grep                         | openai\|openai-codex/gpt-5.6-luna-fast (low) → deepseek/deepseek-v4-flash (max) → opencode-go\|bailian-coding-plan/qwen3.5-plus → … → anthropic\|github-copilot/claude-haiku-4-5 → openai\|openai-codex/gpt-5.4-nano (full chain in source) |
+| **explore**         | Fast codebase grep                         | kimi-coding\|kimi-for-coding/kimi-for-coding-highspeed (off) → openai\|openai-codex/gpt-5.6-luna-fast (low) → deepseek/deepseek-v4-flash (max) → opencode-go\|bailian-coding-plan/qwen3.5-plus → … → anthropic\|github-copilot/claude-haiku-4-5 → openai\|openai-codex/gpt-5.4-nano (full chain in source) |
 | **librarian**       | Docs/code search                           | (same chain as `explore`)                                              |
 
 `explore` and `librarian` trade intelligence for speed. Don't "upgrade" them to Opus; it wastes money without improving results.
@@ -845,7 +845,7 @@ Member eligibility:
 
 - **The lead is the current session.** Don't declare a lead member.
 - **Members** are either `category` members (a resolvable category; `prompt` required) or `subagent_type` members naming a user-defined agent.
-- **Rejected at parse**: the curated read-only agents (`explore`, `librarian`, `plan-consultant`, `plan-reviewer`) and the ulw-loop reviewer trio (`omo-senpi-code-reviewer`, `omo-senpi-qa-executor`, `omo-senpi-gate-reviewer`). Delegate to them through the `task` tool instead.
+- **Rejected at parse**: the curated read-only agents (`explore`, `librarian`, `plan-consultant`, `plan-reviewer`) and the ulw-loop reviewer trio (`omo-native-code-reviewer`, `omo-native-qa-executor`, `omo-native-gate-reviewer`); the pre-rename `omo-senpi-code-reviewer`, `omo-senpi-qa-executor` and `omo-senpi-gate-reviewer` spellings still resolve. Delegate to them through the `task` tool instead.
 
 Two skills already ride on top of Team Mode:
 

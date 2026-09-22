@@ -1,3 +1,59 @@
+## 2026-09-22 - The OmO Native wording guard scans docs, native bins, and runtime notices (#8632)
+
+`native-wording-guard.test.ts` scanned only installer sources, `postinstall.mjs`, the install guide, and the five READMEs, so edition-named-after-engine copy in `docs/reference/**` and in runtime notices could land without failing CI. The guard now also walks `docs/reference/**/*.md`, `docs/guide/*.md`, `docs/legal/*.md`, `packages/omo-native/bin/**/*.js`, `packages/omo-senpi/src/components/**/*.ts` (except `*.test.ts`), and `packages/web/src/**/*.{ts,tsx,astro,md}` when that tree exists.
+
+`BANNED_EDITION_WORDING` and the original `ENGINE_NAME_ALLOWLIST` entries are unchanged. Added allowlist rows name engine-owned leftovers the wider scan meets: the `senpi-telemetry` document, `omo_senpi_*` event names, the `omo-senpi:` machine-id prefix, `WARN senpi:` harness warnings, session-id prefixes, issue refs, the `OMO_SENPI` telemetry env prefix, and compound source identifiers such as `resolveSenpi` and `senpiRoot` (a bare `senpi` is deliberately excluded from that row).
+
+The first attempt at absorbing those leftovers exempted `packages/omo-senpi/src/components/**` and `packages/omo-native/bin/**` from the allowlisted-mention rule outright and added a bare `\bSenpi\b` allowlist row. Both were holes: planting `choose senpi today` in the adapter and `Choose Senpi today.` in `docs/reference/known-issues.md` left the guard at 17 pass / 0 fail, and the guard's own can-fail case kept passing only because it spells the word lowercase while that row was case-sensitive. Both were removed. In their place is one rule — the engine may be NAMED but never OFFERED as something to adopt — expressed as a negative lookbehind on `choose|use|install|try|adopt|switch to|move to|get`, which keeps `the Senpi runtime` and `senpi CLI:` while still reporting `Choose Senpi today.`. Can-fail cases now pin the capital-S spelling beside the lowercase one, and the per-family plant proof runs a rule-2-only phrase in addition to the rule-1 phrase, because planting `Senpi edition (beta)` everywhere exercised rule 1 alone and could never have revealed the disabled rule.
+
+Three edition-named-after-engine sentences were reworded rather than allowlisted (`docs/reference/release-process.md`, `docs/reference/omo-ai-publishing.md`, `docs/guide/senpi-task.md`). Two other docs lines were aligned to the existing `senpi engine` allowlist so the guard would not need a bare-`senpi` hole. Planted-fail proof per new family is in `.omo/evidence/20260922-wording-guard-scope/`.
+
+## 2026-09-22 - Docs and setup output name the standalone edition OmO Native, and the CLI reference recommends bun (#8628)
+
+`docs/reference/cli.md` introduces the `omo` bin as OmO Native and leads with `bun add -g omo-ai@beta`, labelling `npm i -g omo-ai@beta` as the fallback. `docs/guide/overview.md`, `docs/guide/binary-install.md`, the Native-harness annotations in `docs/reference/omo-json.md`, and the opening of `docs/reference/senpi-telemetry.md` stop naming the edition after its engine. Custom-endpoint setup copy points at the engine's `models.json`. The `WARN senpi:` prefix on a malformed `auth.json` stays; it is a harness id in a per-harness table, not the product name. Links that targeted `#model-profiles-senpi-harness` or `#git_master-senpi-harness` now use the Native-harness slugs.
+
+## 2026-09-22 - config.jsonc migration emits [native]; reasoning unification visits it too (#8631)
+
+`transformConfigJsoncSources` still wrote `"[senpi]": senpi ?? omo` after #8623 made `[native]` canonical, so a fresh leftover-file migration produced the retired key. It now writes `[native]`, and the overlap diagnostic names that key. `transformReasoningUnification` walked only `["[senpi]", "[codex]"]`. The harness-rename migration runs after it, so a mid-batch file and a hand-written `[native]` block both need the walk; the loop is now `["[senpi]", "[native]", "[codex]"]`. Tests that pinned the retired output spelling are realigned. RED/GREEN in `.omo/evidence/20260922-migration-native-key/`.
+
+## 2026-09-22 - The standalone edition names itself OmO Native in its own notices (#8629)
+
+The footer badge read `(😺 OmO Native)` and the doctor edition line printed `Edition: Native`, while the notices above them opened with the internal adapter id: `telemetry/omo-native-notice.ts` began `omo-senpi sends anonymous usage telemetry`, `model-profile/index.ts` built every notice as `omo-senpi: model profile ...`, and `config-startup/index.ts` prefixed its five migration and diagnostics messages the same way. One screen carried two names for one product.
+
+Every user-rendered notice in those three components now says `OmO Native`. The engine keeps its name where the sentence is about the engine (`keeping senpi's default model`, `mid-session fallback follows senpi's retry chains`), matching the doctor line's `(engine: senpi X)`. The two `ctx.logger.warn` calls in model-profile that never reach a user were deliberately left alone.
+
+Telemetry identifiers did NOT move, and `telemetry/identity-invariants.test.ts` now pins all four - `omo_senpi_daily_active`, the `omo-senpi:` machine-id prefix, and the product `platform`/`productName` - because the dashboards join on them and a rename would break continuity silently. That test was proven fail-able by temporarily renaming the prefix in the production source and capturing the failure before reverting (`.omo/evidence/20260922-native-notice-wording/MUTATION-telemetry-invariant.txt`). The rendered notices are captured by a committed re-runnable driver rather than quoted from source.
+
+## 2026-09-22 - The ulw-loop spawn guard recognizes the renamed reviewer agents (#8630)
+
+`REVIEWER_ROLES_BY_SURFACE["omo-senpi"]` carried the pre-rename agent names, so `REVIEW_AGENT_TYPE_SET` and `GATE_MESSAGE_PATTERN` in `packages/omo-codex/plugin/components/ulw-loop/src/spawn-guard.ts` never matched the canonical `omo-native-*` names the resolver hands over. `reviewAgentType` returned `null`, and both `missingGateArtifact` and `consumeReviewSpawnBudget` bail on `null`: the gate reviewer could spawn with no `g1-manual-qa.md` on disk and the 3-per-reviewer no-progress cap never incremented. The surface id itself is unchanged - `"omo-senpi"` names the staged-bundle marker, not an agent.
+
+The role table now holds the canonical names and `surface.ts` exports `LEGACY_REVIEWER_AGENT_ALIASES` plus `canonicalReviewerAgentName`, consulted by `activeSurfaceReviewerAlias` and folded into `REVIEW_AGENT_TYPES`, `GATE_REVIEWER_AGENT_NAMES` and `GATE_MESSAGE_PATTERN`. Recognition is additive: a legacy-named spawn resolves to the same reviewer lane it always did. What moves is the reported identity - the denial text and the `review-spawn-counts.json` key now name `omo-native-*`, so the guard stops quoting a retired agent name back to the user. The staged `plugin/runtime/agent-toolkit-sdk/sdk.js` was regenerated with the CI-pinned bun.
+
+Coverage: `test/spawn-guard-native-reviewer.test.ts` is a new cluster (the existing `spawn-guard.test.ts` is 552 pure LOC, past this component's ceiling) pairing each canonical-name denial with its allow control, because unmodified code returned `""` for both and only the denial could fail; it pins the cap at 4/3 under the canonical name, asserts the legacy counter key is absent so no lane double-counts, and keeps a legacy-spelling denial case. `surface.test.ts` gains alias-mapping, identity and gate-name-set cases. Three assertions that pinned the retired identity were realigned and tightened. RED/GREEN captures are in `.omo/evidence/20260922-codex-reviewer-alias/`; the component suite is 66 files / 680 tests green with `tsc --noEmit` clean.
+
+## 2026-09-22 - The OmO Native wording guard is green on dev again (#8636)
+
+`native-wording-guard.test.ts` failed on `dev`, so every PR opened against it inherited a red `test (ubuntu-latest, 1/2)` job. The guard's allowlist recognises a reviewer agent id as `omo-senpi-[a-z-]+`, and `docs/guide/installation.md:848` wrote the same public contract in glob form, `omo-senpi-*`; `*` falls outside `[a-z-]`, so the allowlist did not strip it and the bare engine name survived the scan.
+
+A cross-PR interaction neither side's CI could see: `f006837c1` (#8624) added the guard and its allowlist, `1fc396121` (#8623) added the documentation line, and the two merged three minutes apart, each green against a `dev` that lacked the other.
+
+Fixed by naming the three retired ids literally instead of as a glob, so each matches the existing allowlist entry unchanged. `ENGINE_NAME_ALLOWLIST` and `BANNED_EDITION_WORDING` are untouched - widening a pattern so the gate stops reporting a line is the failure mode the guard exists to prevent, and #8618 set the precedent of rewording the prose instead. The sentence still states that the pre-rename spellings resolve. RED at clean dev and GREEN at the rebased HEAD are in `.omo/evidence/20260922-wording-guard-red-on-dev/`.
+
+## 2026-09-22 - The standalone edition is OmO Native everywhere, and `--platform=native` installs it (#8618)
+
+`packages/omo-opencode/src/cli/native-edition-hint.ts` (was `senpi-edition-hint.ts`) exports `NATIVE_EDITION_HINT_TITLE`, `NATIVE_EDITION_INSTALL_COMMAND`, `NATIVE_EDITION_GUIDE_URL`, `nativeEditionHintLines` and `shouldShowNativeEditionHint`, and the copy names the benefit instead of the engine. `InstallPlatform` becomes `opencode | codex | both | native | native-dev`, and `hasSenpi` splits into `hasNative` (the published edition) and `hasNativeDev` (the in-repo adapter); the hint is suppressed for either. `native` is public — listed in `install --help` and in the interactive picker with no env flag — and `install-native/` performs the real install through an injected spawn: `bun add -g omo-ai@beta` when bun is on PATH, `npm i -g omo-ai@beta` with bun named as the recommended runtime when it is not, then it points at `omo setup`. A non-zero exit or an unspawnable package manager returns the reason and the exact manual command instead of throwing. `install-senpi/` becomes `install-native-dev/`, wrapping the engine installer as `runNativeDevInstaller` behind `OMO_ENABLE_NATIVE_DEV_PLATFORM` with `OMO_ENABLE_SENPI_PLATFORM` still accepted as an alias. `postinstall.mjs`, `docs/guide/installation.md`, `README.md` and the four translated READMEs, and the `omo-ai` description all say OmO Native; `senpi` survives only as the engine name, its env vars, its state directory and internal package paths. `native-wording-guard.test.ts` scans those surfaces, fails on the banned edition wording in all five README languages, and requires every remaining `senpi` mention to match an explicit engine-name allowlist.
+
+## 2026-09-22 - unspecified-high drops Astra; quick drops Kimi HighSpeed and explore/librarian lead with it (#8616)
+
+`unspecified-high` led its chain with `gpt-6-astra (high)` and advertised that model as its builtin default, so the catch-all lane ran the flagship GPT reasoning model on ordinary multi-file work. The astra rung is gone from both chain definitions (`packages/model-core/src/category-model-requirements.ts` source of truth and its senpi mirror `packages/senpi-task/src/category/fallback-chains.ts`) and the chain now starts at `claude-opus-5 (xhigh)` -> `glm-5.3 (max)` -> `kimi-k3 (max)`. Both builtin definitions move with it: `anthropic/claude-opus-5 (xhigh)` in `packages/senpi-task/src/category/openai-categories.ts` and `packages/omo-opencode/src/tools/delegate-task/openai-categories.ts`. The category stays ungated and keeps `resolveUnspecifiedHighCategoryPromptAppend`, so a user override onto a GPT-6 model still gets the Astra-tuned append. `ultrabrain`, `deep-high` and `plan-reviewer` are untouched.
+
+The `quick` chain drops its `kimi-for-coding-highspeed` head rung in both tables and starts at `gpt-5.6-luna-fast (low)`; the builtin default follows (`openai-codex/...` in senpi, `openai/...` in the OpenCode edition). The curated `explore` and `librarian` chains gain that model as their new head at `variant: "off"` in both tables. Senpi's catalog gives `kimi-for-coding-highspeed` `reasoning: true` with `compat.forceAdaptiveThinking` and no `supportsDisabledThinking`, so `disableThinkingForRequest` sends no thinking block and `output_config.effort = "low"` - the minimum-thinking form that endpoint accepts. The senpi agent rung carries both registry ids (`kimi-coding`, `kimi-for-coding`) like the category chains do, so `builtin-agent-chain-parity.test.ts` gained a `kimi-coding` normalization beside its existing `openai` one.
+
+Giving `quick` a variant for the first time has one downstream effect: everything that resolves through that category and declares no reasoning of its own now inherits `low`. That covers a user model pinned at `categories.quick` (the inheritance tracked in #8510) and the memory lane's children — `resolveReflectionModel` and `resolveKibitzerSidecarModel` now return `thinking: "low"` where they previously returned none. The category's primary rung already ran Luna Fast at `low`, so the request the children send now matches the category they run on.
+
+Chain and default assertions moved with the change in `fallback-chains.test.ts` (both packages), `resolve-category.test.ts`, `openai-categories.test.ts`, `openai-lane.test.ts`, `category-routing-policy.test.ts` (senpi + opencode + model-core), `anthropic-lane.test.ts`, `dead-chain.test.ts`, `resolve-category-boundary.test.ts`, `resolve-agent-categories.test.ts`, `model-requirements-{agents,categories}.test.ts`, `luna-deepseek-chain-policy.test.ts` (both) and `gpt-5.6-copilot-resolution.test.ts`, which now pins that `unspecified-high` takes the Copilot Opus 5 rung and falls to the system default on a GPT-only Copilot registry. The two manual QA scripts and the runtime-fallback mock provider were retargeted to the new quick rungs. Docs carrying the shipped chains were updated: `docs/reference/{features,configuration,opencode-config}.md`, `docs/guide/{agent-model-matching,overview,installation}.md`, `docs/manifesto.md`, plus the two package AGENTS.md rows.
+
 ## 2026-09-21 - OpenCode-edition installs point at the standalone Senpi edition (#8593)
 
 `packages/omo-opencode/src/cli/senpi-edition-hint.ts` owns the install command, the guide URL, the hint lines and the `!hasSenpi` gate. `cli-installer.ts` prints the lines after the Magic Word box and `tui-installer.ts` logs them before the star prompt, so the two installers read one source. `postinstall.mjs` prints a one-line notice naming the edition and the command. `docs/guide/installation.md` uses the bun install line throughout, and the README anchor follows the renamed Senpi heading. Coverage: helper unit tests, CLI and TUI installer tests for both the OpenCode and senpi platforms, and the postinstall notice pin. Real-surface runs of the `--no-tui` installer and `node postinstall.mjs` in an isolated HOME are recorded on PR #8538.
@@ -812,3 +868,40 @@ exists to survive a cold Windows process spawn, not to hide a genuine hang.
 ## 2026-09-06 — Keep lead polling alive through runtime access windows
 
 Lead polling now suppresses repeated `EPERM` and `EACCES` runtime-directory errors, reports the first unavailable transition and the subsequent recovery, and leaves mailbox state untouched while the runtime directory cannot be enumerated. Mailbox reads and missing-directory handling remain unchanged.
+
+## 2026-09-22 — omo.json speaks `[native]`, and the ulw-loop reviewers are `omo-native-*`
+
+The standalone edition is branded OmO Native, but its two public identifiers were
+minted from the engine's package name before the edition had a brand: the harness
+block in `omo.json` was `[senpi]`, and the three reviewer agents users delegate to
+by name were `omo-senpi-code-reviewer`, `omo-senpi-qa-executor` and
+`omo-senpi-gate-reviewer`. Both are user-typed, so neither could be renamed outright.
+
+`[native]` is now the canonical harness block in all three config shapes, and
+`OMO_CONFIG_HARNESS_IDS` is `["opencode", "native", "codex"]` with `senpi` kept as an
+exported alias. The loader canonicalizes the legacy block when the config is READ,
+which is what keeps a config the startup migration cannot reach — a locked run, a
+read-only project file — applying every value it sets instead of being silently
+ignored. When a file carries both spellings `[native]` wins and the ignored block is
+named in a `deprecated-keys` diagnostic. A caller still passing `harness: "senpi"`
+resolves the same view, so no consumer had to change. The `git_master` and
+`telemetry` harness key scopes moved to `native` with it.
+
+A first-launch migration (`2026-09-harness-native-rename`) rewrites the key in the
+file once, following the shape `2026-09-category-deep-split` shipped: gated on
+content, so a config that never named `[senpi]` is not rewritten at all — no backup,
+no journal entry, no `_migrations` marker — and the rename surfaces as a startup
+notice naming the key.
+
+The reviewer trio is renamed to `omo-native-*`. The old names keep resolving through
+`LEGACY_AGENT_NAME_ALIASES`, consulted at the resolution site (`resolveAgent`) rather
+than by registering a second definition, so each agent still has exactly one
+definition and `availableAgents` lists only the canonical names. The team member
+validator canonicalizes before its reviewer check, so a team spec naming an old
+reviewer still gets the "delegate via the task tool" refusal instead of an unknown-agent
+error. The ulw-loop quality gate on the `omo-senpi` surface still names the pre-rename
+identities; they reach the renamed agents through that alias, which is the one release
+line of grace the rename gets.
+
+Telemetry identifier VALUES are untouched: the platform string stays `omo-senpi`, and
+so do the machine-id prefix and cache directory, because dashboards key off them.
