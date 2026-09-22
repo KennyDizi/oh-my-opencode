@@ -1,3 +1,33 @@
+## The reflection child uses the agent directory its parent engine resolved
+
+The reflection sandbox granted an agent directory the adapter re-derived through `resolveAgentHome`:
+an environment override, then `~/.omo/agent` behind its `settings.json` sentinel, then the flat
+`~/.omo`, then `~/.senpi/agent`. The engine answers that question differently - the brand's
+environment prefix before the legacy ones, then the nearest parent project config directory walked
+up from the session's cwd, then its own home default - so the two could name different directories.
+The child then locked its credentials outside the grant and the run died with
+`EPERM ... auth.json.lock` followed by `No API key found`, while the parent stayed authenticated
+(omo#8595).
+
+`session-context-resolver.ts` now reads the engine's own answer off the event context
+(`ExtensionContext.agentDir`, accepted only when absolute and non-blank) and `wiring-runtime.ts`
+hands it to the identity runtime; detection remains the fallback for a host that reports none.
+`identity-runtime.ts` resolves that directory once, grants it, and pins it into the reflection
+child's environment under `OMO_CODING_AGENT_DIR`, `SENPI_CODING_AGENT_DIR` and
+`PI_CODING_AGENT_DIR`. The pin matters twice: the child's cwd is the reflection worktree, so without
+it the child walks its own way to a directory nobody granted, and an inherited value under the brand
+prefix would beat a legacy-only pin because the engine takes the first DEFINED name across
+`<brand>`, `SENPI`, `PI`. Grant and pin come from one resolution, so they cannot drift apart.
+
+## The default component logger writes every level to stderr
+
+`extension/compose.ts` `defaultLogger.info` used `console.info` (stdout). A child process's stdout
+is its deliverable - the reflection worker's report is read back from `child-stdout.log` and its
+first three non-empty lines become the "Memory updated" preview - so component info lines
+(`ulw-execute-continuation skipped`, `ulw-loop continuation skipped`) were shown as the report.
+`info` now writes through `console.error` like `warn` and `error`; the argument shape is unchanged
+(no trailing `undefined`). Pinned by `extension/compose.test.ts`. omo#8564.
+
 ## Memory identity comes from the session's workspace, and a reattach rebinds instead of failing closed
 
 `createMemoryComponent` resolved every session's identity from `process.cwd()`, read once at registration and reused for every bind. One shared host serves sessions from many workspaces, so a generation ensured by a process sitting in some other directory handed that directory's identity to every session it picked up: seven sessions reported `memory identity conflict: session is bound to <workspace>-<hash>, but config resolved server-<hash>` inside one second and lost their memory tools, with no workspace change behind it (#8556).
@@ -941,3 +971,52 @@ value, so they all follow the session.
 
 Keep the fallback until the minimum supported Senpi guarantees `cwd`, and keep resolving the cwd
 ONCE at register: re-reading it later would let a session's store move mid-flight.
+
+## Thread tools register unconditionally and gain rename, model, and reasoning control
+
+The `thread` component used to register its tools only when a launch flag said the shared
+multi-session host had been enabled. That flag recorded launch opt-in, not host presence. A session
+hosted by a supervisor that never opted in (the desktop rpc child is the common case) got zero
+`thread_*` tools, even though the socket it needed was right there. The gate is gone: `component.ts`
+registers all nine tools every time, and `src/extension/component-list.ts` lists the component right
+after `task`. Host absence is now a per-call failure, `{ kind: "error", error: { code:
+"host_unavailable", ... } }`, returned as data when the socket path doesn't exist. Nothing throws,
+and the tool surface no longer changes shape based on how the process was started.
+
+Three tools join the family. `thread_rename` sets a peer's display label through
+`set_session_name`; the id stays the address, and a label already used by another visible thread is
+`name_conflict`. `thread_set_model` resolves `provider/id`, an exact id, or a case-insensitive
+fragment against the target's own model catalog (`model_not_found` with the available list,
+`model_ambiguous` with candidates) and applies the single match through `set_model`.
+`thread_set_reasoning` applies one of `off|minimal|low|medium|high|xhigh|max` through
+`set_thinking_level`, with `scope: "turn"` leaving the model's remembered level alone; a level the
+active model rejects comes back as `thinking_level_unsupported` with the supported list and the
+thread untouched. All three require a live owner and go through the same receipt admission as
+`thread_send`.
+
+Every tool now reads the caller's id per call from the execution context's
+`sessionManager.getSessionId()`. Two addresses reach the caller's own thread: the literal `"self"`
+and the caller's explicit durable id. Fuzzy resolution in `thread_handoff` excludes the caller's
+entry before scoring, so a near-miss on your own name can't hand work back to yourself. Keep the
+`host_unavailable` mapping in the tool wrapper rather than reintroducing a registration gate; the
+tools must exist whenever the extension does.
+
+The socket client under all of this (`live-surface.ts` `request()`) also stopped taking the first
+JSONL line as the response. A multi-session host writes other lines on the same connection before
+the reply: the `open_session` admission notice `{ type: "queued", for_request: <id> }`, which the
+engine deliberately tags with the request id under `for_request` rather than the response id, and
+connection-wide broadcasts such as `agent_start` and `session_opened`. Any of those used to fail
+the pending call with "thread RPC request failed" before the real reply arrived. The client now
+settles only on the frame whose `id` matches the request it sent and skips everything else; a
+connection that closes first is a named error. Correlate by id, never by position.
+
+Two more things had to be true before a created thread was usable at all. `open_session` answers
+with the ROUTING id and a state carrying neither the durable id nor a name, while the address book
+keys every entry by the DURABLE id - so `thread_create` returned an id that resolved to `not_found`
+on the very next call, and its `name` parameter was silently dropped because the wire has no name
+field on open. And `open_session.retain_on_disconnect` defaults to false: this client is one-shot,
+so the connection that opens a session drops at once and the host moved the new session straight to
+`closing`, answering `session_closing` from then on. `openSession` now applies the name through
+`set_session_name`, sends `retain_on_disconnect: true`, and merges the entry the host reports in
+`list_sessions` before returning. When QA'ing this surface, run the host from the engine this repo
+pins: `retain_on_disconnect` landed in senpi 2026.9.20, and an older host ignores it in silence.

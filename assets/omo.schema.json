@@ -827,6 +827,64 @@
     "task": {
       "type": "object",
       "properties": {
+        "isolation": {
+          "default": {
+            "enabled": false,
+            "backend": "auto",
+            "apply": true,
+            "merge": "patch",
+            "commits": "generic"
+          },
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": false,
+              "type": "boolean"
+            },
+            "backend": {
+              "default": "auto",
+              "type": "string",
+              "enum": [
+                "auto",
+                "apfs",
+                "btrfs",
+                "zfs",
+                "reflink",
+                "overlayfs",
+                "block-clone",
+                "rcopy"
+              ]
+            },
+            "apply": {
+              "default": true,
+              "type": "boolean"
+            },
+            "merge": {
+              "default": "patch",
+              "type": "string",
+              "enum": [
+                "patch",
+                "branch"
+              ]
+            },
+            "commits": {
+              "default": "generic",
+              "type": "string",
+              "enum": [
+                "generic",
+                "ai"
+              ]
+            }
+          },
+          "required": [
+            "enabled",
+            "backend",
+            "apply",
+            "merge",
+            "commits"
+          ],
+          "additionalProperties": false
+        },
         "default_execution_mode": {
           "default": "auto",
           "type": "string",
@@ -1083,6 +1141,7 @@
         }
       },
       "required": [
+        "isolation",
         "default_execution_mode",
         "process_runner",
         "host_engine_policy",
@@ -13980,6 +14039,45 @@
         "task": {
           "type": "object",
           "properties": {
+            "isolation": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "backend": {
+                  "type": "string",
+                  "enum": [
+                    "auto",
+                    "apfs",
+                    "btrfs",
+                    "zfs",
+                    "reflink",
+                    "overlayfs",
+                    "block-clone",
+                    "rcopy"
+                  ]
+                },
+                "apply": {
+                  "type": "boolean"
+                },
+                "merge": {
+                  "type": "string",
+                  "enum": [
+                    "patch",
+                    "branch"
+                  ]
+                },
+                "commits": {
+                  "type": "string",
+                  "enum": [
+                    "generic",
+                    "ai"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            },
             "default_execution_mode": {
               "type": "string",
               "enum": [
@@ -15859,6 +15957,45 @@
         "task": {
           "type": "object",
           "properties": {
+            "isolation": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "backend": {
+                  "type": "string",
+                  "enum": [
+                    "auto",
+                    "apfs",
+                    "btrfs",
+                    "zfs",
+                    "reflink",
+                    "overlayfs",
+                    "block-clone",
+                    "rcopy"
+                  ]
+                },
+                "apply": {
+                  "type": "boolean"
+                },
+                "merge": {
+                  "type": "string",
+                  "enum": [
+                    "patch",
+                    "branch"
+                  ]
+                },
+                "commits": {
+                  "type": "string",
+                  "enum": [
+                    "generic",
+                    "ai"
+                  ]
+                }
+              },
+              "additionalProperties": false
+            },
             "default_execution_mode": {
               "type": "string",
               "enum": [
@@ -17744,6 +17881,45 @@
           "task": {
             "type": "object",
             "properties": {
+              "isolation": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "backend": {
+                    "type": "string",
+                    "enum": [
+                      "auto",
+                      "apfs",
+                      "btrfs",
+                      "zfs",
+                      "reflink",
+                      "overlayfs",
+                      "block-clone",
+                      "rcopy"
+                    ]
+                  },
+                  "apply": {
+                    "type": "boolean"
+                  },
+                  "merge": {
+                    "type": "string",
+                    "enum": [
+                      "patch",
+                      "branch"
+                    ]
+                  },
+                  "commits": {
+                    "type": "string",
+                    "enum": [
+                      "generic",
+                      "ai"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              },
               "default_execution_mode": {
                 "type": "string",
                 "enum": [
@@ -30628,6 +30804,45 @@
               "task": {
                 "type": "object",
                 "properties": {
+                  "isolation": {
+                    "type": "object",
+                    "properties": {
+                      "enabled": {
+                        "type": "boolean"
+                      },
+                      "backend": {
+                        "type": "string",
+                        "enum": [
+                          "auto",
+                          "apfs",
+                          "btrfs",
+                          "zfs",
+                          "reflink",
+                          "overlayfs",
+                          "block-clone",
+                          "rcopy"
+                        ]
+                      },
+                      "apply": {
+                        "type": "boolean"
+                      },
+                      "merge": {
+                        "type": "string",
+                        "enum": [
+                          "patch",
+                          "branch"
+                        ]
+                      },
+                      "commits": {
+                        "type": "string",
+                        "enum": [
+                          "generic",
+                          "ai"
+                        ]
+                      }
+                    },
+                    "additionalProperties": false
+                  },
                   "default_execution_mode": {
                     "type": "string",
                     "enum": [
@@ -32507,6 +32722,45 @@
               "task": {
                 "type": "object",
                 "properties": {
+                  "isolation": {
+                    "type": "object",
+                    "properties": {
+                      "enabled": {
+                        "type": "boolean"
+                      },
+                      "backend": {
+                        "type": "string",
+                        "enum": [
+                          "auto",
+                          "apfs",
+                          "btrfs",
+                          "zfs",
+                          "reflink",
+                          "overlayfs",
+                          "block-clone",
+                          "rcopy"
+                        ]
+                      },
+                      "apply": {
+                        "type": "boolean"
+                      },
+                      "merge": {
+                        "type": "string",
+                        "enum": [
+                          "patch",
+                          "branch"
+                        ]
+                      },
+                      "commits": {
+                        "type": "string",
+                        "enum": [
+                          "generic",
+                          "ai"
+                        ]
+                      }
+                    },
+                    "additionalProperties": false
+                  },
                   "default_execution_mode": {
                     "type": "string",
                     "enum": [

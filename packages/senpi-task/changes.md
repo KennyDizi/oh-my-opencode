@@ -1,3 +1,75 @@
+## The fake host rebinds a fresh pipe when it restarts
+
+`fake-host-transport.ts` derives the win32 named pipe from the logical socket path plus a random
+secret and publishes the secret at `<path>.secret` for connecting clients. The fake host's
+`restart()` closed the server and rebound the SAME pipe name, but Windows keeps a pipe name
+reserved while any handle is open - including a reconnecting client still holding the old pipe -
+so the rebind raced the dying handles and failed with `EADDRINUSE`. The transport now exposes a
+`rotate()` that mints a fresh secret (and with it a fresh pipe name) and republishes it where
+clients read it, and `restart()` rebinds through it; a restarted generation answering the same
+logical path as a new pipe instance is exactly the story the recovery suites pin. POSIX keeps
+rebinding the same socket path, as before. omo#8604 (same dev full-matrix shard).
+
+## Isolated children run in a copy-on-write clone and merge back when they settle
+
+`isolation/` wraps `@oh-my-opencode/isolation-core` as an injectable port (`runtime.ts`
+`createIsolationRuntime`, seven backends, `~/.omo/wt` sweep roots). `prepare.ts` resolves the repo
+root, captures the baseline and clones BEFORE the record is committed to a launch, so a repository
+that cannot be cloned refuses the spawn `isolation_unavailable` instead of quietly running the child
+against the real checkout. `settle.ts` runs before the terminal record is written - every result
+surface therefore reports one merge outcome - and only a completed child merges: anything else keeps
+the delta as a patch plus a summary under `<stateDir>/isolation/<taskId>/`, and a `not-applied` or
+`branch-merge-failed` replay renames the clone aside as `<base>.retained-<ts>` with a
+`git apply --3way` manual command rather than deleting the user's only copy of that work.
+`salvage.ts` reclaims a crashed host's clones at session start by salvaging the delta before the
+sweep. An isolated record is never revived: `reviveClaimed`, `revive-detached` and the legacy
+respawn path all answer `isolated_not_revivable`.
+
+The manager takes the port as `TaskManagerOptions.isolation` and the lifecycle as `isolation` +
+`isolationProbe` (defaulting to `processOwnerProbe`); `manager/isolation-wiring.ts` owns the binding
+map, the post-spawn owner re-stamp and the settle. `createIsolationRuntime` is exported from the
+package barrel so the omo-senpi adapter can build ONE runtime per engine and hand the same object to
+both seams - an adapter that supplies neither refuses every isolated spawn, which is what
+`packages/omo-senpi/scripts/qa/isolation-e2e.mjs` pins against the real senpi binary. omo#8574.
+
+## A foreground wait parks the parent's lane lease
+
+`manager/concurrency.ts` keeps parked leases in `#parked`, a per-lane map of `(taskId, runEpoch)`
+entries held outside `#counts` and outside the FIFO. `park()` drops the lease and dispatches, so a
+child is admitted while its parent waits; `unpark(token, signal, { overflow })` resumes that exact
+entry and is a no-op for a stale token, so a released task cannot be resurrected and an earlier
+token cannot resume a later parking of the same epoch. The drain prefers a resumable parked owner
+over the queue head, which is what re-admits the parent ahead of everything that queued while it
+waited; `overflow: true` (promotion to background) re-counts the parent immediately, bounded to one
+overflow per parked lease, and an abort while parked releases instead of resuming. `tryAcquire`
+refuses an epoch whose `leaseState()` is anything but `undefined` and `releaseLease` drops the held
+lease AND any parked entry for that key, so a parked epoch is neither re-acquired nor double-released.
+
+`tools/task/execute-single.ts` and `tools/task/execute-batch.ts` park the live caller - resolved
+through `manager.findTaskByChildSession(sessionId)` plus live ownership rather than a new context
+field - and unpark in `finally`. `tools/output` reports `lease: "held" | "parked"` on the snapshot
+(`OutputManager` now also picks `concurrency`). Residency and TTL policy are untouched. Pinned by
+`manager/concurrency.test.ts` and `tools/task/lease-parking.test.ts`, the latter driving the real
+in-process runner through two- and three-level spawn trees at cap 1. omo#8575.
+
+## Host-session children reattach after a lost transport and wait out host memory pressure
+
+`runners/rpc-host/handle.ts` takes an optional `reattach` port (`runners/rpc-host/reattach.ts`). A
+`transportGone` under a live child (intent running, not parked/detached/exited) no longer ends it:
+`runners/rpc-host/handle-reattach.ts` `recoverLostTransport` calls the port, adopts the new
+`HostSessionPort` + identity it returns, and re-prompts a continuation only when a turn was in
+flight AND the reopened session is not streaming (`get_state.isStreaming`) - a cut connection to a
+host that kept the session needs no prompt; a host that reopened the session from JSONL does.
+Commands issued during recovery wait on the reattach promise and retry once on the new port;
+`HostSessionLiveness` carries `isStreaming`; `hostSession` is a getter over the live identity.
+`runners/rpc-host.ts` supplies the port: `reattachDelaysMs` backoff (500 ms .. 8 s) over
+`ensureDaemon` -> `openAdmitted(sameSessionPath)`. `openAdmitted` waits out senpi#1905's
+`host_memory_pressure` refusal (`HostSessionOpenError.retryAfterMs`, bounded by `admissionWaitMs`,
+warned once) and never reaches the fallback runner. `session-wire.ts` `HostSessionOpenError`
+carries `retryAfterMs`. Fixture: `fake-host` gained `cutConnections()` and per-session
+`streaming` state. Pinned by `runners/rpc-host/handle-reattach.test.ts` and
+`runners/rpc-host-recovery.test.ts`. omo#8563.
+
 ## Detached host sessions cannot crash heartbeat or teardown
 
 The host-session heartbeat catches an in-place `HostSessionDetachedError` as well as a rejected

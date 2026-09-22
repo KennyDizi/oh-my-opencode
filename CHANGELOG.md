@@ -7,9 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.0-beta.82] - 2026-09-21
+
+### Added
+
+- The OpenCode edition now tells you the standalone Senpi edition exists. Finishing `oh-my-openagent install` — the interactive setup or `--no-tui` — prints a short pointer: omo also ships as a standalone Senpi edition with one `omo` command and no OpenCode host, installed with `bun add -g omo-ai@beta`, with a link to the installation guide. The package postinstall prints the same one-line notice. Installs that target the senpi platform itself do not get the pointer. ([#8593](https://github.com/code-yeongyu/oh-my-openagent/issues/8593))
+- `@oh-my-opencode/isolation-core`, a copy-on-write task isolation PAL with baseline capture and merge-back. Filesystem backends — APFS clonefile, btrfs and ZFS reflink clones, fuse-overlayfs, ReFS block clone, and a git-worktree rcopy fallback — write only inside the supplied context base directory; an unavailable backend surfaces as a typed `IsolationUnavailableError` and falls through to the next candidate. Baselines capture staged, unstaged and untracked work under a per-repository budget, and merge-back replays it as a patch or a task branch without ever committing the user's overlapping WIP: a failed replay retains the isolated tree with a manual recovery command. A new Linux CI job exercises publication, copy-on-write and teardown on real loopback btrfs and ZFS. ([#8573](https://github.com/code-yeongyu/oh-my-openagent/issues/8573))
+
+- **A delegated task can now run in a copy-on-write clone of your checkout.** Pass `isolated: true` to the task tool (or turn on `task.isolation.enabled`) and the child works in a clone instead of your working tree, so its edits cannot collide with what you are doing. When the child completes, its changes are merged back and the clone is removed; any other ending merges nothing and keeps the delta as a patch and a summary you can read. A merge that cannot apply cleanly leaves your files untouched, reports the conflict, and parks the clone beside its original with the exact `git apply --3way` command to finish by hand. A repository that cannot be cloned refuses the spawn instead of quietly using the real checkout, and if the host dies mid-run the next session salvages the clone's delta before reclaiming it. ([#8574](https://github.com/code-yeongyu/oh-my-openagent/issues/8574))
+
+### Fixed
+
+**A task that waits on the child it just spawned no longer deadlocks at the concurrency cap.** A task held its lane slot for its entire run, so spawning a child with `run_in_background: false` on a full lane left the child queued behind the very parent that was waiting for it, and the whole spawn tree stopped. The parent's slot is now parked for the length of the wait - outside lane and global room - so the child is admitted immediately, and the parent is re-admitted ahead of anything that queued while it waited. Promoting the child to the background re-counts the parent right away instead of making promotion wait, cancelling a parked parent releases its slot, and `task_output` reports whether a task currently holds or has parked its lease. ([#8575](https://github.com/code-yeongyu/oh-my-openagent/issues/8575))
+
+**A sandboxed memory reflection now reads the same credentials as the session that started it.** The reflection sandbox granted the agent directory the adapter detected on its own, while the child asked the engine where its agent directory was - and the two answers differ whenever a project-local config directory, a brand prefix, or a second layout on the same machine is involved. The child then locked `auth.json` outside the grant, so a reflection died with `EPERM` on the credential lock and `No API key found`, while the parent stayed authenticated. The child now inherits the directory the engine resolved for the session: it is granted to the sandbox and pinned in the child's environment, so the reflection worktree it runs in cannot send it looking somewhere else. ([#8595](https://github.com/code-yeongyu/oh-my-openagent/issues/8595))
+
+## [5.0.0-beta.81] - 2026-09-21
+
 ### Fixed
 
 - Task child processes are reclaimed on session shutdown even when the closing context no longer exposes its session ID. Cleanup recovers ownership from that engine's resident handles, preserves resumable task records, and leaves sibling sessions alone. ([#8562](https://github.com/code-yeongyu/oh-my-openagent/issues/8562))
+
+**A task child survives its daemon dying or dropping the connection.** A lost connection to the shared session daemon used to end every delegated child at once as `crashed (transport_gone)`, even though the child's session went on running on the daemon - or sat complete in its transcript after the daemon process itself died. The child now reconnects: it re-ensures the daemon, reopens the same session, and when the daemon still had the session the running turn simply continues over the new connection; when the daemon had to reopen the session from its transcript, the interrupted turn is re-prompted once to continue from where the transcript ends. Commands sent while the reconnect is in flight wait for it instead of failing. Only a daemon that never comes back ends the child as before. A daemon that refuses a new child because it is above its memory watermark (`host_memory_pressure`) is now a bounded wait for the retry hint it sends, never a reason to start a separate process. ([#8563](https://github.com/code-yeongyu/oh-my-openagent/issues/8563))
+
+**The "Memory updated" notice shows the reflection report again.** The omo-senpi component logger wrote its info lines to stdout, and a reflection worker's stdout is the report, so the notice previewed `omo-senpi ulw-execute-continuation skipped { reason: "not-continuable" }` in place of the first lines of the report. Component diagnostics now go to stderr on every level. ([#8564](https://github.com/code-yeongyu/oh-my-openagent/issues/8564))
 
 ### Changed
 
