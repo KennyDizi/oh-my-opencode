@@ -1,3 +1,24 @@
+## A crashed reclaimer's stale sentinel cannot wedge DAG lock acquisition on Windows
+
+Clearing a stale `.reclaim` sentinel renames and unlinks files that the host's antivirus or
+search indexer can briefly hold open; on win32 that surfaces as EPERM/EBUSY sharing violations
+POSIX rename does not have. The quarantining rename threw the refusal raw, and the stall budget -
+which resets only when the canonical holder changes - charged the reclaim's own I/O until
+`withLock` timed out behind an unchanged dead holder, exactly the intermittent windows-latest
+failure of "the sentinel cannot wedge acquisition". The rename now retries transient refusals
+like the final unlink already did, clearing a stale sentinel republishes the reclaim mutex in
+place instead of handing a wasted poll back to the waiter, and a pass that cleared a sentinel
+resets the stall budget: the loop observes the sentinel's disappearance, not the clock.
+omo#8671.
+
+## unspecified-low leads with MiMo V2.6 Pro; the Grok rung moves to 4.7
+
+`CATEGORY_FALLBACK_CHAINS["unspecified-low"]` and the builtin category config now lead with
+`xiaomi|mimo-v2.6-pro (max)`. The Grok rung is `grok-4.7 (xhigh)` on `xai|github-copilot|opencode-go`:
+`opencode` does not serve 4.7 (models.dev, measured), `opencode-go` does. The `mimo-v2.5-pro` rung
+stays last. Chain order is proven by resolving against a registry that serves every rung at once,
+so the winner demonstrates order rather than availability. omo#8652.
+
 ## The persisted run stats keep their failure count
 
 `store/run-stats-parse.ts` parses the persisted `run_stats` block field by field, and it had no

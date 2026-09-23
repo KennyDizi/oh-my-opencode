@@ -189,14 +189,14 @@ export const OPENAI_CATEGORIES: BuiltinCategoryDefinition[] = [
   },
   {
     name: "unspecified-low",
-    config: { model: "xai/grok-4.6", variant: "xhigh" },
+    config: { model: "xiaomi/mimo-v2.6-pro", variant: "max" },
     description: "Tasks that don't fit other categories, low effort required",
     callerGuidance: UNSPECIFIED_LOW_CATEGORY_CALLER_GUIDANCE,
     promptAppend: UNSPECIFIED_LOW_CATEGORY_PROMPT_APPEND,
   },
   {
     name: "unspecified-high",
-    config: { model: "anthropic/claude-opus-5", variant: "xhigh" },
+    config: { model: "anthropic/claude-opus-5-5", variant: "max" },
     description: "Tasks that don't fit other categories, high effort required",
     callerGuidance: UNSPECIFIED_HIGH_CATEGORY_CALLER_GUIDANCE,
     promptAppend: UNSPECIFIED_HIGH_CATEGORY_PROMPT_APPEND,

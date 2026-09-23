@@ -10,7 +10,7 @@ export const CATEGORY_MODEL_REQUIREMENTS: Record<string, ModelRequirement> = {
       },
       {
         providers: ["anthropic", "anthropic-api", "github-copilot", "opencode"],
-        model: "claude-opus-5",
+        model: "claude-opus-5-5",
         variant: "max",
       },
       {
@@ -22,18 +22,18 @@ export const CATEGORY_MODEL_REQUIREMENTS: Record<string, ModelRequirement> = {
   },
   ultrabrain: {
     fallbackChain: [
-      { providers: ["openai", "openai-codex"], model: "gpt-6-astra", variant: "max" },
+      { providers: ["openai", "chatgpt-subscription"], model: "gpt-6-astra", variant: "max" },
       { providers: ["github-copilot"], model: "gpt-6-astra", variant: "max" },
-      { providers: ["openai", "openai-codex", "opencode"], model: "gpt-6-astra", variant: "max" },
-      { providers: ["openai", "openai-codex"], model: "gpt-5.6-sol", variant: "max" },
+      { providers: ["openai", "chatgpt-subscription", "opencode"], model: "gpt-6-astra", variant: "max" },
+      { providers: ["openai", "chatgpt-subscription"], model: "gpt-5.6-sol", variant: "max" },
       { providers: ["github-copilot"], model: "gpt-5.6-sol", variant: "max" },
-      { providers: ["openai", "openai-codex", "opencode"], model: "gpt-5.6-sol", variant: "max" }
+      { providers: ["openai", "chatgpt-subscription", "opencode"], model: "gpt-5.6-sol", variant: "max" }
     ],
   },
   "deep-low": {
     fallbackChain: [
       {
-        providers: ["openai", "openai-codex", "github-copilot", "opencode"],
+        providers: ["openai", "chatgpt-subscription", "github-copilot", "opencode"],
         model: "gpt-5.6-sol",
         variant: "medium",
       }
@@ -42,7 +42,7 @@ export const CATEGORY_MODEL_REQUIREMENTS: Record<string, ModelRequirement> = {
   "deep-high": {
     fallbackChain: [
       {
-        providers: ["openai", "openai-codex", "github-copilot", "opencode"],
+        providers: ["openai", "chatgpt-subscription", "github-copilot", "opencode"],
         model: "gpt-6-astra",
         variant: "high",
       }
@@ -62,14 +62,14 @@ export const CATEGORY_MODEL_REQUIREMENTS: Record<string, ModelRequirement> = {
       },
       {
         providers: ["anthropic", "anthropic-api", "github-copilot", "opencode"],
-        model: "claude-opus-5",
-        variant: "xhigh",
+        model: "claude-opus-5-5",
+        variant: "max",
       }
     ],
   },
   quick: {
     fallbackChain: [
-      { providers: ["openai-codex"], model: "gpt-5.6-luna-fast", variant: "low" },
+      { providers: ["chatgpt-subscription"], model: "gpt-5.6-luna-fast", variant: "low" },
       { providers: ["deepseek"], model: "deepseek-v4-flash", variant: "off" },
       {
         providers: ["qwen-token-plan", "alibaba-token-plan", "bailian-coding-plan"],
@@ -88,9 +88,10 @@ export const CATEGORY_MODEL_REQUIREMENTS: Record<string, ModelRequirement> = {
   },
   "unspecified-low": {
     fallbackChain: [
-      { providers: ["xai", "github-copilot", "opencode"], model: "grok-4.6", variant: "xhigh" },
+      { providers: ["xiaomi", "opencode-go"], model: "mimo-v2.6-pro", variant: "max" },
+      { providers: ["xai", "github-copilot", "opencode-go"], model: "grok-4.7", variant: "xhigh" },
       {
-        providers: ["openai", "openai-codex", "github-copilot", "opencode"],
+        providers: ["openai", "chatgpt-subscription", "github-copilot", "opencode"],
         model: "gpt-5.6-terra",
         variant: "high",
       },
@@ -112,8 +113,8 @@ export const CATEGORY_MODEL_REQUIREMENTS: Record<string, ModelRequirement> = {
     fallbackChain: [
       {
         providers: ["anthropic", "anthropic-api", "github-copilot", "opencode"],
-        model: "claude-opus-5",
-        variant: "xhigh",
+        model: "claude-opus-5-5",
+        variant: "max",
       },
       { providers: ["zai-coding-plan", "opencode-go"], model: "glm-5.3", variant: "max" },
       {
@@ -131,14 +132,14 @@ export const CATEGORY_MODEL_REQUIREMENTS: Record<string, ModelRequirement> = {
         variant: "low",
       },
       {
-        providers: ["kimi-for-coding", "moonshotai", "opencode-go", "opencode"],
-        model: "kimi-k3",
+        providers: ["anthropic", "anthropic-api", "github-copilot", "opencode"],
+        model: "claude-opus-5-5",
         variant: "low",
       },
       {
         providers: ["anthropic", "anthropic-api", "github-copilot", "opencode"],
         model: "claude-opus-4-6",
-        variant: "low",
+        variant: "max",
       }
     ],
   },

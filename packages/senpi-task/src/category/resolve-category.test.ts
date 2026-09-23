@@ -47,7 +47,7 @@ const gpt56CategoryCases = [
     mixedWinner: { provider: "github-copilot", modelId: "gpt-5.6-sol", variant: "medium" },
     copilotVariant: "medium",
     copilotFallbackEntry: {
-      providers: ["openai-codex", "github-copilot", "opencode"] as string[],
+      providers: ["chatgpt-subscription", "github-copilot", "opencode"] as string[],
       model: "gpt-5.6-sol",
       variant: "medium",
     },
@@ -59,7 +59,7 @@ const gpt56CategoryCases = [
     mixedWinner: { provider: "github-copilot", modelId: "gpt-5.6-terra", variant: "high" },
     copilotVariant: "high",
     copilotFallbackEntry: {
-      providers: ["openai-codex", "github-copilot", "opencode"] as string[],
+      providers: ["chatgpt-subscription", "github-copilot", "opencode"] as string[],
       model: "gpt-5.6-terra",
       variant: "high",
     },
@@ -271,43 +271,43 @@ describe("resolveCategory", () => {
     })
   })
 
-  test("#given writing's Fable 5.1 default is unavailable and Kimi K3 is available #when resolved #then the K3 fallback is selected", () => {
+  test("#given writing's Fable 5.1 default is unavailable and Opus 5.5 is available #when resolved #then the Opus 5.5 rung is selected at low", () => {
     // given
-    const models = registry([model("kimi-coding", "k3")])
+    const models = registry([model("anthropic", "claude-opus-5-5")])
 
     // when
     const result = resolveCategory("writing", {}, models)
 
     // then
     const resolved = expectResolved(result)
-    expect(resolved.spec.provider).toBe("kimi-coding")
-    expect(resolved.spec.modelId).toBe("k3")
+    expect(resolved.spec.provider).toBe("anthropic")
+    expect(resolved.spec.modelId).toBe("claude-opus-5-5")
     expect(resolved.spec.variant).toBe("low")
     expect(resolved.modelSelection.matchedFallback).toBe(true)
     expect(resolved.modelSelection.fallbackEntry).toEqual({
-      providers: ["kimi-coding", "kimi-for-coding", "moonshotai", "opencode-go"],
-      model: "kimi-k3",
+      providers: ["anthropic-subscription", "anthropic", "anthropic-api", "github-copilot", "opencode"],
+      model: "claude-opus-5-5",
       variant: "low",
     })
   })
 
-  test("#given writing's provider default is unavailable and Kimi K3 is available #when resolved #then the K3 fallback is selected", () => {
+  test("#given only writing's last rung is available #when resolved #then Opus 4.6 is selected at max", () => {
     // given
-    const models = registry([model("opencode-go", "kimi-k3")])
+    const models = registry([model("anthropic", "claude-opus-4-6")])
 
     // when
     const result = resolveCategory("writing", {}, models)
 
     // then
     const resolved = expectResolved(result)
-    expect(resolved.spec.provider).toBe("opencode-go")
-    expect(resolved.spec.modelId).toBe("kimi-k3")
-    expect(resolved.spec.variant).toBe("low")
+    expect(resolved.spec.provider).toBe("anthropic")
+    expect(resolved.spec.modelId).toBe("claude-opus-4-6")
+    expect(resolved.spec.variant).toBe("max")
     expect(resolved.modelSelection.matchedFallback).toBe(true)
     expect(resolved.modelSelection.fallbackEntry).toEqual({
-      providers: ["kimi-coding", "kimi-for-coding", "moonshotai", "opencode-go"],
-      model: "kimi-k3",
-      variant: "low",
+      providers: ["anthropic-subscription", "anthropic", "anthropic-api", "github-copilot", "opencode"],
+      model: "claude-opus-4-6",
+      variant: "max",
     })
   })
 
@@ -413,7 +413,7 @@ describe("resolveCategory", () => {
 
   test("#given category params in omo overlay #when resolved #then child spec carries generation params and prompt append", () => {
     // given
-    const models = registry([model("openai-codex", "gpt-5.6-luna-fast")])
+    const models = registry([model("chatgpt-subscription", "gpt-5.6-luna-fast")])
 
     // when
     const result = resolveCategory(
@@ -479,12 +479,12 @@ describe("builtin category defaults", () => {
     expect(defaults.map(({ config, name }) => [name, config.model, config.variant])).toEqual([
       ["visual-engineering", "anthropic/claude-fable-5-1", "max"],
       ["artistry", "anthropic/claude-fable-5-1", "max"],
-      ["ultrabrain", "openai-codex/gpt-6-astra", "max"],
-      ["deep-low", "openai-codex/gpt-5.6-sol", "medium"],
-      ["deep-high", "openai-codex/gpt-6-astra", "high"],
-      ["quick", "openai-codex/gpt-5.6-luna-fast", "low"],
-      ["unspecified-low", "xai/grok-4.6", "xhigh"],
-      ["unspecified-high", "anthropic/claude-opus-5", "xhigh"],
+      ["ultrabrain", "chatgpt-subscription/gpt-6-astra", "max"],
+      ["deep-low", "chatgpt-subscription/gpt-5.6-sol", "medium"],
+      ["deep-high", "chatgpt-subscription/gpt-6-astra", "high"],
+      ["quick", "chatgpt-subscription/gpt-5.6-luna-fast", "low"],
+      ["unspecified-low", "xiaomi/mimo-v2.6-pro", "max"],
+      ["unspecified-high", "anthropic/claude-opus-5-5", "max"],
       ["architect", "anthropic/claude-fable-5-1", "max"],
       ["writing", "anthropic/claude-fable-5-1", "low"],
     ])
