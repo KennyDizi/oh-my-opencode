@@ -7,6 +7,66 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+**`writing` is unavailable when none of its Claude models is connected, instead of running on another model.** ([#8723](https://github.com/code-yeongyu/oh-my-openagent/issues/8723)) The `writing` chain is Claude Fable 5.1, then Claude Opus 5.5, then Claude Opus 4.6. In the OpenCode edition, a machine without any of them still accepted `task(category: "writing")` and ran it on the session's default model. The installer went further: on an OpenAI-only setup it wrote `writing` as GPT-5.6 Sol, and on a setup with no matching provider it wrote the `opencode/gpt-5-nano` last resort. Now the OpenCode runtime refuses the lane with `Category "writing" has no available model`, and the installer leaves `writing` out of the generated config. OmO Native already treated the lane as unavailable. An explicit `categories.writing` model in `omo.json` still opens it.
+
+## [5.0.0-beta.86] - 2026-09-23
+
+### Changed
+
+**ultrawork and the bundled skills verify behavior instead of mandating TDD.** ([#8719](https://github.com/code-yeongyu/oh-my-openagent/issues/8719))
+
+The ultrawork directive (OmO Native, Codex, and every OpenCode variant), `programming`, `debugging`, `ulw-execute`, `ulw-loop`'s goal reference, the Hephaestus GPT-6 rule, and the root protocol no longer demand a failing test before every change. They read the tests that already cover the area as the behavior of record, reproduce a bug before fixing it, let the run on the real surface prove the change, and add a test only where the repository keeps tests for that behavior and a regression would otherwise pass unnoticed. Sessions stop producing tests that only restate a small change, and every rewritten surface is shorter than before.
+
+**`deep-high` runs GPT-6 Astra at `xhigh`, and `deep-low` leads with GPT-6 Sol Fast.** ([#8714](https://github.com/code-yeongyu/oh-my-openagent/issues/8714))
+
+The escalation lane `deep-high` still has one rung, GPT-6 Astra, and now runs it at `xhigh` instead of `high`. The default deep lane `deep-low` starts on `gpt-6-sol-fast`, GPT-6 Sol's Fast (priority) tier, at `medium`, on the OpenAI and ChatGPT subscription providers that serve that tier. It then falls back to plain `gpt-6-sol` at `medium`, so GitHub Copilot and OpenCode Zen, which do not offer the Fast tier, keep the lane. GPT-5.6 Sol is no longer a `deep-low` model: a setup that serves only GPT-5.6 Sol now reports `deep-low` as unavailable instead of running it there ([#8718](https://github.com/code-yeongyu/oh-my-openagent/issues/8718)). `ultrabrain` stays on GPT-6 Astra at `max`, and `unspecified-high` stays on Claude Opus 5.5 at `max` first. The configuration reference's provider-chain table, which still listed GPT-6 Astra as the first `unspecified-high` rung, now matches the shipped chain.
+
+**`explore` and `librarian` run a six-rung chain, and every DeepSeek Flash rung is DeepSeek V4.1 Flash.** ([#8115](https://github.com/code-yeongyu/oh-my-openagent/issues/8115))
+
+Both agents now fall back in this order: `kimi-for-coding-highspeed` (off), `gpt-6-luna-fast` (low), `deepseek-flash` (max), `qwen3.7-plus`, `minimax-m2.7`, `claude-haiku-4-5`. The two M3 rungs (OpenCode Go and the Coding Plan) and `gpt-5.4-nano` are gone, so an install whose only provider is that Coding Plan no longer gets a generated `explore`/`librarian` model from it. DeepSeek renamed its API model to `deepseek-flash` when V4.1 Flash shipped on 2026-09-10 and only routes the retired `deepseek-v4-flash` name to it temporarily; the pinned engine's `deepseek` catalog already lists `deepseek-flash` and no longer lists `deepseek-v4-flash`, so the old rung could not resolve on OmO Native. `explore`, `librarian` and the `quick` category now name `deepseek/deepseek-flash`, and the telemetry vocabulary reads the new id while still recognizing the old one.
+
+### Fixed
+
+**Claude subscription sessions run and advertise Claude Code 2.1.280 on every install.** ([#8713](https://github.com/code-yeongyu/oh-my-openagent/issues/8713))
+
+Beta.85 still shipped Claude Agent SDK 0.3.278, whose bundled Claude Code 2.1.278 is older than the 2.1.280 that Claude Opus 5.5 requires. Installs made with `ignore-scripts=true` in `~/.npmrc`, or through a Bun install that blocked the package's postinstall, also skipped the step that raises the advertised version, so they kept sending `claude-cli/2.1.251`. The engine now pins the SDK at 0.3.280 and declares 2.1.280 itself. The first `omo` launch prepares an engine that install scripts never touched and records it in the engine directory, so later launches skip the work. If that preparation fails, `omo` prints the reinstall command and starts anyway. A newer Claude Code on your PATH (after `claude update`, for example) now runs instead of the bundled copy, and `CLAUDE_CODE_EXECUTABLE` still overrides both.
+
+**`omob` can build an engine version before its workspace packages reach npm.** The development build now uses the dependencies already packed into its local engine tarball instead of asking Bun to resolve their unpublished versions from the registry. Platform-specific optional packages still install normally, and an incomplete bundle fails explicitly rather than fetching a replacement.
+
+**CI update-checker tests no longer depend on sibling test order.** An unnecessary module mock leaked a fixed version into the registry-channel tests, failing all five assertions when the hook tests ran first. The hook now uses only its existing injected stub; runtime update behavior is unchanged. ([#8678](https://github.com/code-yeongyu/oh-my-openagent/issues/8678))
+
+## [5.0.0-beta.85] - 2026-09-23
+
+### Added
+
+**GPT-6 Sol and GPT-6 Luna are supported models, and Hephaestus now runs on GPT-6 Sol.** Both tiers are registered with their published capabilities: a 1.05M context window, a 128K output limit, text and image input, no temperature, and a reasoning ladder of `none` through `max`. Hephaestus leads with `gpt-6-sol` at medium effort across OpenAI, OpenAI Codex, GitHub Copilot and OpenCode Zen, and keeps its previous `gpt-5.6-sol` medium rung as a fallback, so the agent still resolves on a provider that has not shipped GPT-6 Sol yet. The Fast service-tier ids `gpt-6-sol-fast` and `gpt-6-luna-fast` canonicalize to their base models the same way `gpt-6-astra-fast` already did. GPT-6 Luna is not a default for any agent or category and is available as a manual override.
+
+### Changed
+
+**The model profiles are now Capable and Deep work; Simple work is removed.** ([#8704](https://github.com/code-yeongyu/oh-my-openagent/issues/8704))
+
+The profile picker lists `capable`, then `deep-work`. Capable starts on Claude Fable 5.1 at `xhigh` instead of `max`, then Claude Opus 5.5, Kimi K3 and GLM 5.3 at `max` as before. Deep work is GPT-6 Astra at `high`, then GPT-6 Sol at `medium`, and stops there instead of continuing to GPT-5.6 Sol. The `simple-work` profile no longer ships: a configuration that still sets `"model_profile": "simple-work"` shows the unknown-profile notice listing the remaining profiles and keeps the default model, and a `model_profiles.simple-work` entry you wrote yourself keeps working as your own profile.
+
+**`deep-low` runs on GPT-6 Sol, and every Luna rung is GPT-6 Luna Fast.** ([#8701](https://github.com/code-yeongyu/oh-my-openagent/issues/8701))
+
+The default deep lane leads with `gpt-6-sol` at `medium` across OpenAI, ChatGPT Subscription, GitHub Copilot and OpenCode Zen and keeps `gpt-5.6-sol` at `medium` as its fallback rung, so a registry that has not picked up GPT-6 Sol yet still opens the lane; `deep-high` stays Astra-only. Wherever a builtin chain, default or profile named `gpt-5.6-luna-fast` it now names `gpt-6-luna-fast` at the same `low` effort: the `quick` category, the `explore` and `librarian` agents, the OpenAI-only installer catalog and the installer's explore default. The `deep-work` profile picks up the new Sol rung, `gpt-6-luna` and `gpt-6-luna-fast` join the telemetry vocabulary, the post-compaction budget knows the GPT-6 Sol (400k) and Luna (922k) prompt budgets, and `gpt-6-luna-fast` has a capability entry so the model-capability guardrail no longer reports a built-in model missing from the snapshot. The docs, shipped example configs and the generated telemetry schema follow.
+
+**Fable 5.1 chains step down to Claude Opus 5.5 before Kimi.** ([#8701](https://github.com/code-yeongyu/oh-my-openagent/issues/8701))
+
+The `artistry` category and the `prometheus` agent, both led by `claude-fable-5-1`, now carry `claude-opus-5-5` at `max` as their second rung ahead of `kimi-k3`, matching senpi's own Fable 5.1 fallback ladder. `architect` is unchanged: it is hard-gated on Fable 5.1 and never falls back.
+
+### Fixed
+
+**Claude Opus 5.5 works on a fresh OmO Native install with a Claude subscription.** ([#8705](https://github.com/code-yeongyu/oh-my-openagent/pull/8705))
+
+Every request to `claude-opus-5-5` on a subscription login was rejected with `400 claude_code_version_too_old` (`Claude Code 2.1.251 does not support this model; version 2.1.280 or newer is required`) and the turn fell back to Claude Opus 5, so the recommended Anthropic model never answered. The postinstall step that raises the advertised Claude Code version only rewrote the pi-ai module, while the launcher runs the engine's pre-linked `dist/bundle`, which carries its own copy of the version. The floor is now `2.1.280` and postinstall applies it to every declaration under `dist/bundle` as well, rewriting only the version string and never lowering one that is already higher. Thanks to youngminsw for the diagnosis and the fix.
+
+**The Capable model profile no longer bills a Claude subscription user through OpenCode Zen.** ([#8704](https://github.com/code-yeongyu/oh-my-openagent/issues/8704)) On a machine logged in to a Claude subscription that also held an OpenCode Zen key, the Capable profile picked the metered `opencode` copy of Claude Fable 5.1, because the profile's Claude rungs never listed the subscription lane. Every Claude rung in the builtin profiles now tries the subscription first, the same order the delegation categories already use.
+
+**A reasoning effort of `none` is no longer silently raised to `low` on GPT-6 models that support it.** Every model id containing `gpt-6` shared one capability rule, which was written for GPT-6 Astra and therefore mapped `none` onto `low`. GPT-6 Sol and GPT-6 Luna both document `none` as a supported effort, so anyone who configured the cheapest tier on those models was quietly billed and throttled at `low` instead, with the change recorded as `unsupported-by-model-family`. The Astra rule is now matched on its own id and keeps its documented clamp, while the rest of the GPT-6 family accepts `none`. A per-model capability override could not have fixed this, because family effort aliases are applied before capability metadata.
+
 ## [5.0.0-beta.84] - 2026-09-22
 
 ### Changed

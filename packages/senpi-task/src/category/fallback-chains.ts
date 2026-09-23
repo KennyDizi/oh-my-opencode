@@ -50,9 +50,12 @@ export const CATEGORY_FALLBACK_CHAINS: Readonly<Record<string, readonly Delegate
     { providers: ["chatgpt-subscription", "opencode"], model: "gpt-5.6-sol", variant: "max" }
   ],
   "deep-low": [
+    // The Fast (priority) tier exists only on the ChatGPT subscription lane; Copilot and OpenCode Zen
+    // serve plain gpt-6-sol, so the next rung keeps the lane open there at the same effort.
+    { providers: ["chatgpt-subscription"], model: "gpt-6-sol-fast", variant: "medium" },
     {
       providers: ["chatgpt-subscription", "github-copilot", "opencode"],
-      model: "gpt-5.6-sol",
+      model: "gpt-6-sol",
       variant: "medium",
     }
   ],
@@ -60,7 +63,7 @@ export const CATEGORY_FALLBACK_CHAINS: Readonly<Record<string, readonly Delegate
     {
       providers: ["chatgpt-subscription", "github-copilot", "opencode"],
       model: "gpt-6-astra",
-      variant: "high",
+      variant: "xhigh",
     }
   ],
   artistry: [
@@ -70,19 +73,19 @@ export const CATEGORY_FALLBACK_CHAINS: Readonly<Record<string, readonly Delegate
       variant: "max",
     },
     {
-      providers: ["kimi-coding", "kimi-for-coding", "moonshotai", "opencode-go"],
-      model: "kimi-k3",
+      providers: ["anthropic-subscription", "anthropic", "anthropic-api", "github-copilot", "opencode"],
+      model: "claude-opus-5-5",
       variant: "max",
     },
     {
-      providers: ["anthropic-subscription", "anthropic", "anthropic-api", "github-copilot", "opencode"],
-      model: "claude-opus-5-5",
+      providers: ["kimi-coding", "kimi-for-coding", "moonshotai", "opencode-go"],
+      model: "kimi-k3",
       variant: "max",
     }
   ],
   quick: [
-    { providers: ["chatgpt-subscription"], model: "gpt-5.6-luna-fast", variant: "low" },
-    { providers: ["deepseek"], model: "deepseek-v4-flash", variant: "off" },
+    { providers: ["chatgpt-subscription"], model: "gpt-6-luna-fast", variant: "low" },
+    { providers: ["deepseek"], model: "deepseek-flash", variant: "off" },
     {
       providers: ["qwen-token-plan", "alibaba-token-plan", "bailian-coding-plan"],
       model: "qwen3.6-flash",

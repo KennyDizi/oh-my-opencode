@@ -74,6 +74,18 @@ describe("category activation gating", () => {
       expect(result.availableCategories).toContain("architect")
     })
 
+    test("#when the registry offers gpt-5.6-sol alone #then deep-low is unavailable, because GPT-5.6 Sol is not a deep-low model", () => {
+      // given
+      const models = registry([model("openai", "gpt-5.6-sol")])
+
+      // when
+      const result = resolveCategory("deep-low", {}, models)
+
+      // then
+      expect(result.kind).toBe("model_unavailable")
+      expect(result.availableCategories).not.toContain("deep-low")
+    })
+
     test("#when the gate model is absent but omo.json configures the category #then the explicit entry bypasses the gate", () => {
       // given
       const models = registry([model("kimi-coding", "k3")])
@@ -184,7 +196,7 @@ describe("category activation gating", () => {
       expect(low.availableCategories).not.toContain("deep-high")
     })
 
-    test("#when the registry offers gpt-6-astra alone #then deep-high resolves at high and deep-low stays unavailable", () => {
+    test("#when the registry offers gpt-6-astra alone #then deep-high resolves at xhigh and deep-low stays unavailable", () => {
       // given
       const models = registry([model("openai", "gpt-6-astra")])
 
@@ -196,15 +208,15 @@ describe("category activation gating", () => {
       if (result.kind !== "resolved") throw new Error("Expected resolved")
       expect(result.spec.provider).toBe("openai")
       expect(result.spec.modelId).toBe("gpt-6-astra")
-      expect(result.spec.variant).toBe("high")
+      expect(result.spec.variant).toBe("xhigh")
       expect(result.availableCategories).toContain("deep-high")
       expect(result.availableCategories).not.toContain("deep-low")
       expect(resolveCategory("deep-low", {}, models).kind).toBe("model_unavailable")
     })
 
-    test("#when the registry offers gpt-5.6-sol alone #then deep-low resolves at medium and deep-high stays unavailable", () => {
+    test("#when the registry offers gpt-6-sol alone #then deep-low resolves at medium and deep-high stays unavailable", () => {
       // given
-      const models = registry([model("openai", "gpt-5.6-sol")])
+      const models = registry([model("openai", "gpt-6-sol")])
 
       // when
       const result = resolveCategory("deep-low", {}, models)
@@ -213,7 +225,7 @@ describe("category activation gating", () => {
       expect(result.kind).toBe("resolved")
       if (result.kind !== "resolved") throw new Error("Expected resolved")
       expect(result.spec.provider).toBe("openai")
-      expect(result.spec.modelId).toBe("gpt-5.6-sol")
+      expect(result.spec.modelId).toBe("gpt-6-sol")
       expect(result.spec.variant).toBe("medium")
       expect(result.availableCategories).toContain("deep-low")
       expect(result.availableCategories).not.toContain("deep-high")
@@ -320,7 +332,7 @@ describe("category activation gating", () => {
   describe("#given an ungated builtin category", () => {
     test("#when the registry offers only a chain rung #then the pre-gating fallback behavior is unchanged", () => {
       // given
-      const models = registry([model("chatgpt-subscription", "gpt-5.6-luna-fast")])
+      const models = registry([model("chatgpt-subscription", "gpt-6-luna-fast")])
 
       // when
       const result = resolveCategory("quick", {}, models)
@@ -328,13 +340,13 @@ describe("category activation gating", () => {
       // then
       expect(result.kind).toBe("resolved")
       if (result.kind !== "resolved") throw new Error("Expected resolved")
-      expect(result.spec.modelId).toBe("gpt-5.6-luna-fast")
+      expect(result.spec.modelId).toBe("gpt-6-luna-fast")
       expect(result.availableCategories).toContain("quick")
     })
 
     test("#when a gated category is unmet #then other categories stay listed as available", () => {
       // given
-      const models = registry([model("chatgpt-subscription", "gpt-5.6-luna-fast")])
+      const models = registry([model("chatgpt-subscription", "gpt-6-luna-fast")])
 
       // when
       const result = resolveCategory("quick", {}, models)

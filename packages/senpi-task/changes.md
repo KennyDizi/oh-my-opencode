@@ -1,3 +1,33 @@
+## deep-low drops its GPT-5.6 Sol rung and gate
+
+`category/fallback-chains.ts` removes the trailing `gpt-5.6-sol` medium rung from `deep-low`, leaving
+`chatgpt-subscription/gpt-6-sol-fast` medium -> `gpt-6-sol` medium. `category/openai-categories.ts`
+narrows `DEEP_LOW_GATE_MODELS` to `gpt-6-sol-fast`, `gpt-6-sol`, so the task tool's category listing
+reads `(requires gpt-6-sol-fast or gpt-6-sol)` and a GPT-5.6-Sol-only registry leaves `deep-low`
+unavailable. `ultrabrain` keeps its GPT-5.6 Sol max fallback. omo#8718.
+
+## deep-high runs GPT-6 Astra at xhigh; deep-low leads with GPT-6 Sol Fast medium
+
+`category/fallback-chains.ts` mirrors the model-core table: `deep-high`'s single Astra rung moves
+from `high` to `xhigh`, and `deep-low` gains a `chatgpt-subscription/gpt-6-sol-fast` medium head
+rung ahead of the existing `gpt-6-sol` and `gpt-5.6-sol` medium rungs. The Fast (priority) tier is
+published only on the ChatGPT subscription lane, so Copilot and OpenCode Zen keep resolving the
+lane through plain `gpt-6-sol`. `category/openai-categories.ts` routes the `deep-low` default
+through `chatgpt-subscription/gpt-6-sol-fast` and adds it to `DEEP_LOW_GATE_MODELS`, and the
+`deep-high` default runs at `xhigh`. `ultrabrain` (Astra max) and `unspecified-high` (Opus 5.5 max
+first) are unchanged. omo#8714.
+
+## deep-low leads with GPT-6 Sol; every Luna rung is GPT-6 Luna Fast; Fable chains step down to Opus 5.5
+
+`category/fallback-chains.ts` mirrors the model-core table: `deep-low` gains a `gpt-6-sol` medium
+rung ahead of the existing `gpt-5.6-sol` medium rung (deep-high stays Astra-only), `quick`'s first
+rung and the `explore` / `librarian` OpenAI rung in `agents/builtin/fallback-chains.ts` become
+`gpt-6-luna-fast` low, and `artistry` moves `claude-opus-5-5` max ahead of `kimi-k3`.
+`category/openai-categories.ts` routes the `deep-low` default through `chatgpt-subscription/gpt-6-sol`
+and gates the lane on either Sol tier (`DEEP_LOW_GATE_MODELS`), and `quick`'s default through
+`gpt-6-luna-fast`. `architect` is untouched: it is hard-gated on Fable 5.1 and never falls back.
+The manual QA scripts under `scripts/` follow the new quick rung. omo#8701.
+
 ## A crashed reclaimer's stale sentinel cannot wedge DAG lock acquisition on Windows
 
 Clearing a stale `.reclaim` sentinel renames and unlinks files that the host's antivirus or

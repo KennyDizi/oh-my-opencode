@@ -30,7 +30,7 @@ describe("category routing policy", () => {
     ])
   })
 
-  test("each deep lane is a single rung, so the lanes never substitute each other", () => {
+  test("deep-high is a single Astra rung and deep-low a Sol ladder, so the lanes never substitute each other", () => {
     // given
     const low = CATEGORY_MODEL_REQUIREMENTS["deep-low"]
     const high = CATEGORY_MODEL_REQUIREMENTS["deep-high"]
@@ -40,13 +40,14 @@ describe("category routing policy", () => {
       {
         providers: ["openai", "chatgpt-subscription", "github-copilot", "opencode"],
         model: "gpt-6-astra",
-        variant: "high",
+        variant: "xhigh",
       },
     ])
     expect(low.fallbackChain).toEqual([
+      { providers: ["openai", "chatgpt-subscription"], model: "gpt-6-sol-fast", variant: "medium" },
       {
         providers: ["openai", "chatgpt-subscription", "github-copilot", "opencode"],
-        model: "gpt-5.6-sol",
+        model: "gpt-6-sol",
         variant: "medium",
       }
     ])
@@ -63,12 +64,12 @@ describe("category routing policy", () => {
     expect(leadingChain).toEqual([
       {
         providers: ["chatgpt-subscription"],
-        model: "gpt-5.6-luna-fast",
+        model: "gpt-6-luna-fast",
         variant: "low",
       },
       {
         providers: ["deepseek"],
-        model: "deepseek-v4-flash",
+        model: "deepseek-flash",
         variant: "off",
       },
       {
@@ -182,13 +183,13 @@ describe("category routing policy", () => {
         variant: "max",
       },
       {
-        providers: ["kimi-for-coding", "moonshotai", "opencode-go", "opencode"],
-        model: "kimi-k3",
+        providers: ["anthropic", "anthropic-api", "github-copilot", "opencode"],
+        model: "claude-opus-5-5",
         variant: "max",
       },
       {
-        providers: ["anthropic", "anthropic-api", "github-copilot", "opencode"],
-        model: "claude-opus-5-5",
+        providers: ["kimi-for-coding", "moonshotai", "opencode-go", "opencode"],
+        model: "kimi-k3",
         variant: "max",
       }
     ])
