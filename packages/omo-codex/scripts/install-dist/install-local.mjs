@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// omo-codex-install:a828b9248b81641c1a04d1a216485054625a2759b78c233d3d2d05b362ff662d:80f568e665f8f89928d2954847389c266d182cb48e5a9cb3e4817f3fab0d60ee
+// omo-codex-install:e7f8b8a7af0a5bc6257d28f1ef9ead291ad7ea22515c64d7fd93951afa62eab8:bb43ab8551adfe424b83b245e7665fee8bf83ade3aef32dad1d3eccb7399a6e9
 var __esm = (fn, res, err) => () => {
   if (fn)
     try {
@@ -10014,7 +10014,7 @@ var package_default;
 var init_package = __esm(() => {
   package_default = {
     name: "@oh-my-opencode/omo-codex",
-    version: "5.0.0-beta.86",
+    version: "5.0.0-beta.87",
     type: "module",
     private: true,
     description: "Codex harness adapter for oh-my-openagent. Vendored Codex plugin namespace (omo) + TypeScript installer + telemetry.",
@@ -16765,6 +16765,8 @@ function isRecord5(value) {
 }
 var OmoModelProfileInputSchema = object({
   display_name: string2().optional(),
+  family: _enum(["daily", "geeky"]).optional(),
+  tier: _enum(["normal", "heavy"]).optional(),
   models: array(union([string2(), OmoFallbackModelObjectSchema])).optional()
 }).strict();
 var OmoModelProfileSchema = preprocess((value) => isRecord5(value) ? normalizeLegacyModelFields(value) : value, OmoModelProfileInputSchema);

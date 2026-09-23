@@ -76,12 +76,12 @@ A top-level `models` record maps a short name to the canonical shape `{ model, r
 
 #### Model Profiles
 
-Two more shared base keys, read by the Senpi harness, pick the main session model by intent instead of by model id. They live at the top level, inside `[native]`, or inside a `profiles.<name>` layer, like any other base key.
+Two more shared base keys, read by the Senpi harness, pick the main session model by lane instead of by model id. They live at the top level, inside `[native]`, or inside a `profiles.<name>` layer, like any other base key.
 
 | Key | Type | Description |
 | --- | --- | --- |
-| `model_profiles` | record<string, `{ display_name?, models? }`> | Named ordered model chains. A name matching a builtin (`capable`, `deep-work`) replaces it wholesale; any other name adds one. Entries use the same string or object shape as a category chain and may reference `models.<catalog>` entries. |
-| `model_profile` | string | Which chain starts the session: a profile id such as `capable`, or a literal `provider/model` that pins one exact model. Unset means Senpi's own default resolution runs. |
+| `model_profiles` | record<string, `{ display_name?, family?, tier?, models? }`> | Named ordered model chains. A name matching a builtin (`daily-normal`, `daily-heavy`, `geeky-normal`, `geeky-heavy`) replaces it wholesale; any other name adds one. Entries use the same string or object shape as a category chain and may reference `models.<catalog>` entries. |
+| `model_profile` | string | Which chain starts the session: a lane id such as `daily-normal`, or a literal `provider/model` that pins one exact model. Unset applies Daily · Normal on a fresh session. |
 
 Don't confuse these with `profiles.<name>` above: that key swaps configuration layers via `OMO_PROFILE`, while `model_profile` chooses a model within the loaded configuration. Builtin chains, session-start behavior, and override rules are in the [omo.json reference](./omo-json.md#model-profiles-native-harness).
 
@@ -141,7 +141,7 @@ Here's a practical starting `~/.omo/omo.jsonc`. OpenCode plugin settings live in
       "unspecified-low": { "model": "xiaomi/mimo-v2.6-pro", "reasoning": "max" },
 
       // unspecified-high - complex work
-      "unspecified-high": { "model": "anthropic/claude-opus-5-5", "reasoning": "max" },
+      "unspecified-high": { "model": "anthropic/claude-opus-5-5", "reasoning": "medium" },
 
       // writing - docs/prose
       "writing": { "model": "anthropic/claude-fable-5-1", "reasoning": "low" },
@@ -347,7 +347,7 @@ Domain-specific model delegation used by the `task()` tool. When the main agent 
 | `artistry`           | `anthropic/claude-fable-5-1` (max) | Creative/unconventional approaches             |
 | `quick`              | `openai/gpt-6-luna-fast` (low) | Trivial tasks, typo fixes, single-file changes |
 | `unspecified-low`    | `xiaomi/mimo-v2.6-pro` (max)     | General tasks, low effort                      |
-| `unspecified-high`   | `anthropic/claude-opus-5-5` (max) | General tasks, high effort                     |
+| `unspecified-high`   | `anthropic/claude-opus-5-5` (medium) | General tasks, high effort                     |
 | `writing`            | `anthropic/claude-fable-5-1` (low)     | Documentation, prose, technical writing. Unavailable when none of its Claude models (`claude-fable-5-1`, `claude-opus-5-5`, `claude-opus-4-6`) is connected; it never falls back to another family, and the installer leaves it out. |
 
 > **Note**: Built-in category defaults are available automatically. User-defined category config merges over the built-in defaults or adds custom categories.
@@ -392,7 +392,7 @@ Runtime priority:
 
 The same resolved chain drives spawn-time selection and runtime retry fallback, so a recovered task stays on the same category chain.
 
-In the Senpi harness, the main session model has its own ordering, separate from the delegated-child chain above: a `--model` flag or scoped model, then `model_profile` as a literal `provider/model` pin, then `model_profile` as a profile id (first rung the live registry serves), then Senpi's default resolution. `categories.*` and `agents.*` overrides are never consulted for the main session, and `model_profile` is never consulted for a delegated child. See [Model Profiles](#model-profiles).
+In the Senpi harness, `model_profile` applies to OmO Desktop and headless sessions; the interactive TUI keeps the model it started with. An explicit `--model`, scoped model or resumed session is preserved. A fresh session otherwise uses `model_profile` as a literal pin or a named chain; unset config selects Daily · Normal. If no candidate is available, a notice explains the unavailable profile and the current model stays. `categories.*` and `agents.*` overrides do not select the main session model, and `model_profile` does not select delegated children. See [Model Profiles](#model-profiles).
 
 In the OpenCode plugin, every merged category appears in `availableCategories`; hiding categories with a dead fallback chain is not implemented here. That dead-chain filtering, the `model_unavailable` spawn failure, and the `task.warnings.unavailable_categories` flag belong to the Senpi/core `task` system, documented in the [omo.json reference](./omo-json.md).
 
@@ -442,7 +442,7 @@ This table mirrors the authoritative hardcoded category fallback chains: the cha
 | **Artistry** | `claude-fable-5-1` | `anthropic\|anthropic-api\|github-copilot\|opencode/claude-fable-5-1 (max)` → `kimi-for-coding\|moonshotai\|opencode-go\|opencode/kimi-k3 (max)` → `anthropic\|anthropic-api\|github-copilot\|opencode/claude-opus-5-5 (max)` |
 | **Quick** | `gpt-6-luna-fast` | `chatgpt-subscription/gpt-6-luna-fast (low)` → `deepseek/deepseek-flash (off)` → `qwen-token-plan\|alibaba-token-plan\|bailian-coding-plan/qwen3.6-flash (low)` → `opencode-go/minimax-m3 (max)` → `opencode-go/minimax-m2.7 (max)` → `xai/grok-4.20-0309-non-reasoning` → `anthropic\|anthropic-api\|github-copilot/claude-haiku-4-5 (off)` |
 | **Unspecified Low** | `mimo-v2.6-pro` | `xiaomi\|opencode-go/mimo-v2.6-pro (max)` → `xai\|github-copilot\|opencode-go/grok-4.7 (xhigh)` → `openai\|chatgpt-subscription\|github-copilot\|opencode/gpt-5.6-terra (high)` → `anthropic\|anthropic-api\|github-copilot\|opencode/claude-sonnet-5 (low)` → `qwen-token-plan\|alibaba-token-plan\|qwen-token-plan-cn\|alibaba-token-plan-cn/qwen3.8-max-preview (max)` → `deepseek\|opencode-go/deepseek-v4-pro (max)` → `xiaomi\|opencode-go/mimo-v2.5-pro (max)` |
-| **Unspecified High** | `claude-opus-5-5` | `anthropic\|anthropic-api\|github-copilot\|opencode/claude-opus-5-5 (max)` → `zai-coding-plan\|opencode-go/glm-5.3 (max)` → `kimi-for-coding\|moonshotai\|opencode-go\|opencode/kimi-k3 (max)` |
+| **Unspecified High** | `claude-opus-5-5` | `anthropic\|anthropic-api\|github-copilot\|opencode/claude-opus-5-5 (medium)` → `zai-coding-plan\|opencode-go/glm-5.3 (max)` → `kimi-for-coding\|moonshotai\|opencode-go\|opencode/kimi-k3 (max)` |
 | **Writing** | `claude-fable-5-1` | `anthropic\|anthropic-api\|github-copilot\|opencode/claude-fable-5-1 (low)` → `anthropic\|anthropic-api\|github-copilot\|opencode/claude-opus-5-5 (low)` → `anthropic\|anthropic-api\|github-copilot\|opencode/claude-opus-4-6 (max)` |
 
 Run `bunx oh-my-openagent doctor --verbose` to see effective model resolution for your config.

@@ -116,7 +116,7 @@ describe("CATEGORY_MODEL_REQUIREMENTS", () => {
     // then
     expect(chain).toEqual([
       {
-        providers: ["chatgpt-subscription"],
+        providers: ["openai", "chatgpt-subscription"],
         model: "gpt-6-luna-fast",
         variant: "low",
       },
@@ -211,7 +211,7 @@ describe("CATEGORY_MODEL_REQUIREMENTS", () => {
       {
         providers: ["anthropic", "anthropic-api", "github-copilot", "opencode"],
         model: "claude-opus-5-5",
-        variant: "max",
+        variant: "medium",
       },
       {
         providers: ["zai-coding-plan", "opencode-go"],

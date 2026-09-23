@@ -72,7 +72,7 @@ export const CATEGORY_MODEL_REQUIREMENTS: Record<string, ModelRequirement> = {
   },
   quick: {
     fallbackChain: [
-      { providers: ["chatgpt-subscription"], model: "gpt-6-luna-fast", variant: "low" },
+      { providers: ["openai", "chatgpt-subscription"], model: "gpt-6-luna-fast", variant: "low" },
       { providers: ["deepseek"], model: "deepseek-flash", variant: "off" },
       {
         providers: ["qwen-token-plan", "alibaba-token-plan", "bailian-coding-plan"],
@@ -117,7 +117,7 @@ export const CATEGORY_MODEL_REQUIREMENTS: Record<string, ModelRequirement> = {
       {
         providers: ["anthropic", "anthropic-api", "github-copilot", "opencode"],
         model: "claude-opus-5-5",
-        variant: "max",
+        variant: "medium",
       },
       { providers: ["zai-coding-plan", "opencode-go"], model: "glm-5.3", variant: "max" },
       {

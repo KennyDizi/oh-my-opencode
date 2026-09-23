@@ -1,3 +1,71 @@
+## model profiles: the interactive TUI no longer applies `model_profile`
+
+`components/model-profile/index.ts`: `session_start` returns before any resolution when the event
+context reports `mode === "tui"` (`isTuiSession`), for a set or an unset `model_profile` alike. The
+TUI shows neither the lane nor its reasoning, so the unset Daily · Normal default replaced the
+model a user had chosen in `settings.json` (for example Fable xhigh) with Opus medium and gave them
+no way to see or change the lane. OmO Desktop (`rpc`) and headless (`json`/`print`) sessions keep
+the previous behavior. Test: `index.test.ts` "#given a TUI session ..." covers unset, a lane id and
+a literal pin; removing the guard fails it (1 fail / 55 pass), restoring it passes 56/0.
+
+## comment-checker: a native install obtains the checker without the npm payload, and Bun 1.3.x's ResolveMessage no longer escapes
+
+`components/comment-checker/resolver.ts`: `resolvePackageApiBinary` treats the value Bun 1.3.x throws
+for a missing module - a `ResolveMessage` carrying `MODULE_NOT_FOUND` that is not an `Error` instance
+(Bun 1.4.0 made it one) - as "package absent" through `utils.ts` `isMissingModuleValue`; unrelated
+thrown values still propagate. Before this, a native install without `@code-yeongyu/comment-checker`
+running on a 1.3.x bun surfaced `Extension error (.../omo.js): ResolveMessage: Cannot find module
+'@code-yeongyu/comment-checker'` after every successful `write`/`edit`/`apply_patch`. The resolver
+gains a fourth step after env, package API and PATH: the shared binary cache
+(`defaultCommentCheckerCacheDir`, `COMMENT_CHECKER_CACHE_DIR_NAME = "oh-my-opencode"`, pinned equal to
+the OpenCode edition's `CACHE_DIR_NAME` so one download serves both editions). `downloader.ts` (new)
+`downloadSenpiCommentCheckerBinary` fetches the release the shared descriptor in
+`@oh-my-opencode/comment-checker-core` pins (v0.8.0, per-platform asset) through
+`@oh-my-opencode/omo-opencode/binary-downloader` (a new narrow package export of the shared
+primitives: `downloadArchive`, `extractTarGz`, `extractZipArchive`, `ensureExecutable`, archive-entry
+validation), logs through the component logger, and returns null on an unsupported platform or a
+failed download. `component.ts`: `ensureBinaryPath` is async - sync resolution, then one download per
+session memoized in a single in-flight promise, then the existing one-time "binary unavailable"
+warning and session-inert state; `CommentCheckerComponentOptions.downloadBinary` injects it for tests.
+The native manifest keeps NOT declaring `@code-yeongyu/comment-checker` (267,670,796 bytes unpacked,
+every platform's binary), matching the OpenCode edition after #8256. The main bundle grows
+1,270,564 -> 1,284,797 bytes under the unchanged 1,300,000 budget. Tests: `comment-checker.missing-package.test.ts`
+(real module resolution, PATH fallback, Bun's non-Error value, once-only disable, unrelated values
+propagate; the first four adapted from #8248 by gunggme), `comment-checker.downloader.test.ts` (local
+HTTP server, cache hit, 503, unsupported platform, cache-dir equality with the OpenCode edition),
+resolver cache step, component download-once and in-flight coalescing. omo#8247.
+
+## Memory changes read as one "Remembered" notice; reflection lifecycle rows are gone
+
+`worker/completion-renderers.ts` registers a renderer for `senpi-memory.reflection-completion`
+only, and it draws only `merged` records. `reflection-launched`, `reflection-summary` and every
+non-merged completion (no changes, failed, timed out, merge conflict, parent dirty, dirty worktree)
+are still appended (the data and their RPC `entry_appended` events are unchanged) but have no
+renderer, so neither new rows nor rows persisted in older sessions draw. `completion-delivery.ts`
+no longer calls `ui.notify` for a delivered completion or a drain, which also removes the warning
+rows the Desktop derived from those toasts; health and park alerts keep their notices.
+`memory-notice-spec.ts` (new) is the one vocabulary: a memory tool write is
+`● Remembered · Nth entry today` (`● Let go · …` / `Cleared X. One less thing to carry.` for delete, `Moved a to b.` for rename), a
+merged reflection is `● Remembered · on reflection` with the first sentence of the report's
+Summary item and `N files changed · commit abc1234`, the soul notice is
+`● Remembered · about myself`, all in the accent tone. A refusal renders a dim
+`○ Not remembered` / `○ Couldn't let go` with a plain sentence and the raw engine text only
+expanded; the pending call line is `◌ Remembering · <path>` and disappears when the notice lands.
+The model-facing tool text is unchanged, and with `memory.write_notice.enabled: false` the row
+keeps the plain call line and message. `memory-write-render.ts` keeps only the Box framing.
+omo#8733.
+
+## Model profiles: Daily/Geeky × Normal/Heavy lanes, no capable/deep-work alias
+
+`model-profile/builtin-profiles.ts`: the builtin table is `daily-normal`, `daily-heavy`,
+`geeky-normal`, `geeky-heavy`, each with `family`/`tier`/`displayName`/`description`.
+`daily-normal` is opus 5.5 medium -> kimi-k3 max -> glm-5.3 max; `daily-heavy` is fable 5.1
+xhigh; `geeky-normal` is chatgpt-subscription gpt-6-sol-fast medium then Copilot/OpenCode
+gpt-6-sol medium; `geeky-heavy` is gpt-6-astra xhigh. `capable` / `deep-work` are removed with
+no alias map. Unset `model_profile` applies `daily-normal` on a fresh session (session-only).
+Notices include displayName + reasoning; unavailable copy names the session registry rather
+than inferring disconnected auth. omo#8735.
+
 ## Model profiles: Capable then Deep work, Simple work removed, subscription lane first
 
 `model-profile/builtin-profiles.ts`: the builtin table is `capable` then `deep-work`, and
@@ -1061,3 +1129,19 @@ so the connection that opens a session drops at once and the host moved the new 
 `set_session_name`, sends `retain_on_disconnect: true`, and merges the entry the host reports in
 `list_sessions` before returning. When QA'ing this surface, run the host from the engine this repo
 pins: `retain_on_disconnect` landed in senpi 2026.9.20, and an older host ignores it in silence.
+## 2026-09-23 — Four-profile provider coverage follows task routing
+
+Geeky profiles keep the #8737 provider ranking: ChatGPT subscription first,
+then `openai`, then other providers serving the non-fast Sol or Astra rung.
+An explicit provider in a user profile remains scoped; it does not silently
+switch to a different provider when unavailable. Real-runtime QA observes the
+engine thinking state and the provider stream input, not only the notice.
+
+## 2026-09-23 — A customized builtin model profile keeps its lane name
+
+A user `model_profiles.<id>` entry for a builtin lane that sets no
+`display_name` now keeps the builtin's name (`Daily · Normal`) instead of
+showing the raw id. The session notice reads `model profile "daily-normal"
+(Daily · Normal) selected …` for a customized lane too. An explicit
+`display_name` still wins. The e2e gains the exact chain the desktop Settings
+editor saves and checks the notice names the lane.
