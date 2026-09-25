@@ -14,11 +14,18 @@ import { getUnsupportedOpenCodeVersionMessage } from "./minimum-opencode-version
 import { promptInstallConfig, promptInstallPlatform } from "./tui-install-prompts"
 import { detectCodexInstallation, formatCodexInstallationWarning, runCodexInstaller } from "./install-codex"
 import { runNativeDevInstaller } from "./install-native-dev"
-import { nativeInstallFailureLines, nativeInstallSuccessLine, runNativeInstall } from "./install-native"
+import {
+  nativeInstallFailureLines,
+  nativeInstallSuccessLine,
+  nativeSetupFollowUpLine,
+  offerNativeSetup,
+  runNativeInstall,
+} from "./install-native"
 import { NATIVE_EDITION_HINT_TITLE, nativeEditionHintLines, shouldShowNativeEditionHint } from "./native-edition-hint"
 import { starGitHubRepositories } from "./star-request"
 import { getNoModelProvidersWarning, hasAnyConfiguredProvider } from "./provider-availability"
 import { ensureTuiPluginEntry } from "./config-manager/add-tui-plugin-to-tui-config"
+import { refreshOpenCodePluginSandboxes } from "./config-manager/refresh-opencode-plugin-sandbox"
 import * as astGrepInstall from "./install-ast-grep-sg"
 
 export async function runTuiInstaller(args: InstallArgs, version: string): Promise<number> {
@@ -100,6 +107,24 @@ export async function runTuiInstaller(args: InstallArgs, version: string): Promi
       const message = error instanceof Error ? error.message : String(error)
       p.log.warn(`Could not update OpenCode TUI config: ${message}`)
     }
+    // See cli-installer.ts: clear OpenCode's per-spec plugin sandboxes for the
+    // spec(s) just written so the next OpenCode start loads this version
+    // instead of the cached one (#5367).
+    try {
+      const { removed, deferred, failed } = refreshOpenCodePluginSandboxes()
+      if (removed.length > 0) {
+        p.log.info("Refreshed the OpenCode plugin cache; the next OpenCode start loads the installed version.")
+      }
+      if (deferred.length > 0) {
+        p.log.info("OpenCode is running from its plugin cache; it refreshes when the last OpenCode window closes. Restart OpenCode to load the installed version.")
+      }
+      for (const { dir, message } of failed) {
+        p.log.warn(`Could not refresh the OpenCode plugin cache at ${dir} (${message}). Close OpenCode and delete that directory, or OpenCode keeps loading the previous version.`)
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      p.log.warn(`Could not refresh the OpenCode plugin cache: ${message}`)
+    }
 
     spinner.start(`Writing ${PLUGIN_NAME} configuration`)
     const omoResult = writeOmoConfig(config)
@@ -164,6 +189,15 @@ export async function runTuiInstaller(args: InstallArgs, version: string): Promi
     spinner.stop(nativeInstallSuccessLine(outcome.verified))
     for (const note of outcome.notes) p.log.info(note)
     for (const warning of outcome.warnings) p.log.warn(warning)
+    const setup = await offerNativeSetup(outcome, {
+      confirm: async (message) => {
+        const answer = await p.confirm({ message, initialValue: true })
+        return !p.isCancel(answer) && answer
+      },
+      onStart: (line) => p.log.step(line),
+    })
+    const followUp = nativeSetupFollowUpLine(setup)
+    if (followUp !== null) p.log.warn(followUp)
   }
 
   if (config.hasNativeDev) {

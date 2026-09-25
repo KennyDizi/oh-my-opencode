@@ -2,12 +2,14 @@ import { spawnSync } from "node:child_process"
 import { existsSync } from "node:fs"
 import { delimiter, join } from "node:path"
 import { spawnNode } from "./child-process.js"
+import { doctorCoverageLines } from "./category-coverage.js"
 import { runDaemonCommand } from "./daemon.js"
 import { runDoctor } from "./doctor.js"
 import { ensureEnginePrepared } from "./engine-prepare.js"
 import { migrateLegacyBunGlobalManifest } from "./legacy-bun-global-migration.js"
 import { adoptLegacyFlatState, canonicalAgentDir } from "./agent-dir.js"
 import { nearestNodeBin, packageManifest, packageRoot, readJson, resolveSenpi, updateTarget } from "./package-paths.js"
+import { runSelfUpdate } from "./self-update.js"
 import { detectHarnesses } from "./setup-detect.js"
 import { readSetupSuggestionCache, spawnSetupSuggestionRefresh } from "./setup-detect-cache.js"
 import { printSetupReport } from "./setup-report.js"
@@ -218,7 +220,8 @@ export async function runLauncher(args = process.argv.slice(2)) {
     return
   }
   if (command === "doctor") {
-    runDoctor(await detectHarnesses(), args.slice(1), { daemonEngine: { run: engineHostCall } })
+    const categoryCoverage = args[1] === "--reap" ? [] : await doctorCoverageLines({ agentDir: canonicalAgentDir() })
+    runDoctor(await detectHarnesses(), args.slice(1), { daemonEngine: { run: engineHostCall }, categoryCoverage })
     return
   }
   if (command === "setup") {
@@ -232,11 +235,9 @@ export async function runLauncher(args = process.argv.slice(2)) {
     return
   }
   // The engine is pinned by this package, so a self-update would break the pairing; every
-  // self-update spelling is answered with the command that actually updates the product.
+  // self-update spelling runs the product command instead of asking senpi to move the pin.
   if (isSelfUpdate(args)) {
-    const update = updateTarget()
-    console.log(`omo is updated via ${update.manager}: ${update.command}`)
-    process.exitCode = 0
+    process.exitCode = await runSelfUpdate(args)
     return
   }
   if (earlyCommands.has(command) || command === "update") {
