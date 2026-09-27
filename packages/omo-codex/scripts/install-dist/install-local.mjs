@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// omo-codex-install:cf5a89b3eed10326f90d8a72b6f8cbce5e75da7812a5d6483320ae4783e8b221:c11f2595cf01643af27e43367c2eaf9166b3fddca8886c07763b590b053b7d8c
+// omo-codex-install:ef5d219cf082ecf69c39a20e65382313d3dcd918a838405f034fd955a2705cc4:ed713a708adb80be6a81a797a08c88a18ee620a82b7196541a1f6618a7289296
 var __esm = (fn, res, err) => () => {
   if (fn)
     try {
@@ -405,7 +405,7 @@ var init_env = __esm(() => {
   SEND_OPT_OUT_VALUES = ["0", "false", "no", "yes"];
 });
 
-// node_modules/.bun/posthog-node@5.53.0/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/module.node.mjs
+// node_modules/.bun/posthog-node@5.54.1/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/module.node.mjs
 import { dirname as dirname11, posix as posix3, sep as sep7 } from "node:path";
 function createModulerModifier() {
   const getModuleFromFileName = createGetModuleFromFilename();
@@ -6506,7 +6506,7 @@ var init_dist = __esm(() => {
   init_types();
 });
 
-// node_modules/.bun/posthog-node@5.53.0/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/context-lines.node.mjs
+// node_modules/.bun/posthog-node@5.54.1/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/context-lines.node.mjs
 import { constants as constants2 } from "node:fs";
 import { open as promises_open } from "node:fs/promises";
 import { isAbsolute as isAbsolute7 } from "node:path";
@@ -6793,7 +6793,7 @@ var init_context_lines_node = __esm(() => {
   LRU_FILE_CONTENTS_FS_READ_FAILED = new ReduceableCache(20);
 });
 
-// node_modules/.bun/posthog-node@5.53.0/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/relative-path.node.mjs
+// node_modules/.bun/posthog-node@5.54.1/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/relative-path.node.mjs
 import { isAbsolute as isAbsolute8, relative as relative4, sep as sep8 } from "node:path";
 function createRelativePathModifier(basePath = process.cwd()) {
   const isWindows = sep8 === "\\";
@@ -6810,11 +6810,11 @@ function createRelativePathModifier(basePath = process.cwd()) {
 }
 var init_relative_path_node = () => {};
 
-// node_modules/.bun/posthog-node@5.53.0/node_modules/posthog-node/dist/version.mjs
-var version2 = "5.53.0";
+// node_modules/.bun/posthog-node@5.54.1/node_modules/posthog-node/dist/version.mjs
+var version2 = "5.54.1";
 var init_version = () => {};
 
-// node_modules/.bun/posthog-node@5.53.0/node_modules/posthog-node/dist/types.mjs
+// node_modules/.bun/posthog-node@5.54.1/node_modules/posthog-node/dist/types.mjs
 var FeatureFlagError2;
 var init_types3 = __esm(() => {
   FeatureFlagError2 = {
@@ -6825,7 +6825,7 @@ var init_types3 = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.53.0/node_modules/posthog-node/dist/feature-flag-evaluations.mjs
+// node_modules/.bun/posthog-node@5.54.1/node_modules/posthog-node/dist/feature-flag-evaluations.mjs
 class FeatureFlagEvaluations {
   constructor(init) {
     this._host = init.host;
@@ -6961,7 +6961,7 @@ var init_feature_flag_evaluations = __esm(() => {
   init_types3();
 });
 
-// node_modules/.bun/posthog-node@5.53.0/node_modules/posthog-node/dist/extensions/feature-flags/feature-flags.mjs
+// node_modules/.bun/posthog-node@5.54.1/node_modules/posthog-node/dist/extensions/feature-flags/feature-flags.mjs
 function normalizeEvaluationRuntime(value) {
   return value === "client" || value === "server" ? value : "all";
 }
@@ -7309,11 +7309,11 @@ class FeatureFlagsPoller {
     this.featureFlagsByKey = flags.reduce((acc, curr) => (acc[curr.key] = curr, acc), {});
     const keptKeys = new Set(flags.map((flag) => flag.key));
     this.filteredOutFlagKeys = new Set(flagData.flags.filter((flag) => !keptKeys.has(flag.key)).map((flag) => flag.key));
-    this.groupTypeMapping = flagData.groupTypeMapping;
+    this.groupTypeMapping = flagData.group_type_mapping ?? flagData.groupTypeMapping ?? {};
     this.cohorts = flagData.cohorts;
-    this.propertyMatchingVersion = flagData.propertyMatchingVersion;
+    this.propertyMatchingVersion = flagData.property_matching_version ?? flagData.propertyMatchingVersion;
     this.loadedSuccessfullyOnce = true;
-    this.onMinimalFlagCalledEvents?.(flagData.minimalFlagCalledEvents === true);
+    this.onMinimalFlagCalledEvents?.((flagData.minimal_flag_called_events ?? flagData.minimalFlagCalledEvents) === true);
   }
   warnAboutExperienceContinuityFlags(flags) {
     if (this.strictLocalEvaluation)
@@ -7426,12 +7426,17 @@ class FeatureFlagsPoller {
           if (!("flags" in responseJson))
             return void this.onError?.(new Error(`Invalid response when getting feature flags: ${JSON.stringify(responseJson)}`));
           this.flagsEtag = res.headers?.get("ETag") ?? undefined;
+          const groupTypeMapping = responseJson.group_type_mapping || {};
+          const minimalFlagCalledEvents = responseJson.minimal_flag_called_events === true;
           const flagData = {
             flags: responseJson.flags ?? [],
-            groupTypeMapping: responseJson.group_type_mapping || {},
+            group_type_mapping: groupTypeMapping,
             cohorts: responseJson.cohorts || {},
-            minimalFlagCalledEvents: responseJson.minimal_flag_called_events === true,
-            propertyMatchingVersion: responseJson.property_matching_version
+            minimal_flag_called_events: minimalFlagCalledEvents,
+            property_matching_version: responseJson.property_matching_version,
+            propertyMatchingVersion: responseJson.property_matching_version,
+            groupTypeMapping,
+            minimalFlagCalledEvents
           };
           this.updateFlagState(flagData);
           this.flagDefinitionsLoadedAt = Date.now();
@@ -7633,7 +7638,7 @@ var init_feature_flags = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.53.0/node_modules/posthog-node/dist/extensions/error-tracking/autocapture.mjs
+// node_modules/.bun/posthog-node@5.54.1/node_modules/posthog-node/dist/extensions/error-tracking/autocapture.mjs
 function splitNodeOptions(nodeOptions) {
   const args = [];
   let current = "";
@@ -7734,7 +7739,7 @@ var init_autocapture = __esm(() => {
   STARTUP_UNHANDLED_REJECTION_MODE = getUnhandledRejectionMode();
 });
 
-// node_modules/.bun/posthog-node@5.53.0/node_modules/posthog-node/dist/extensions/error-tracking/index.mjs
+// node_modules/.bun/posthog-node@5.54.1/node_modules/posthog-node/dist/extensions/error-tracking/index.mjs
 class error_tracking_ErrorTracking {
   constructor(client, options, _logger) {
     this.client = client;
@@ -7809,7 +7814,7 @@ var init_error_tracking2 = __esm(() => {
   error_tracking_default = error_tracking_ErrorTracking;
 });
 
-// node_modules/.bun/posthog-node@5.53.0/node_modules/posthog-node/dist/storage-memory.mjs
+// node_modules/.bun/posthog-node@5.54.1/node_modules/posthog-node/dist/storage-memory.mjs
 class PostHogMemoryStorage {
   getProperty(key) {
     return this._memoryStorage[key];
@@ -7823,7 +7828,7 @@ class PostHogMemoryStorage {
 }
 var init_storage_memory = () => {};
 
-// node_modules/.bun/posthog-node@5.53.0/node_modules/posthog-node/dist/capture-v1/config.mjs
+// node_modules/.bun/posthog-node@5.54.1/node_modules/posthog-node/dist/capture-v1/config.mjs
 function isCaptureMode(value) {
   return value === "v0" || value === "v1";
 }
@@ -7833,14 +7838,14 @@ function resolveCaptureMode() {
 }
 var init_config3 = () => {};
 
-// node_modules/.bun/posthog-node@5.53.0/node_modules/posthog-node/dist/capture-v1/routing.mjs
+// node_modules/.bun/posthog-node@5.54.1/node_modules/posthog-node/dist/capture-v1/routing.mjs
 function isLegacyOnlyEvent(message) {
   return typeof message.event == "string" && message.event.startsWith(AI_EVENT_PREFIX);
 }
 var AI_EVENT_PREFIX = "$ai_", ANALYTICS_ROUTE = "analytics", AI_ROUTE = "ai";
 var init_routing = () => {};
 
-// node_modules/.bun/posthog-node@5.53.0/node_modules/posthog-node/dist/capture-v1/errors.mjs
+// node_modules/.bun/posthog-node@5.54.1/node_modules/posthog-node/dist/capture-v1/errors.mjs
 var CaptureV1Error;
 var init_errors = __esm(() => {
   CaptureV1Error = class CaptureV1Error extends Error {
@@ -7860,7 +7865,7 @@ var init_errors = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.53.0/node_modules/posthog-node/dist/capture-v1/transform.mjs
+// node_modules/.bun/posthog-node@5.54.1/node_modules/posthog-node/dist/capture-v1/transform.mjs
 function coerceBool(value) {
   if (typeof value == "boolean")
     return value;
@@ -7978,7 +7983,7 @@ var init_transform = __esm(() => {
   ];
 });
 
-// node_modules/.bun/posthog-node@5.53.0/node_modules/posthog-node/dist/capture-v1/sender.mjs
+// node_modules/.bun/posthog-node@5.54.1/node_modules/posthog-node/dist/capture-v1/sender.mjs
 class V1CaptureSender {
   constructor(config, hooks) {
     this.config = config;
@@ -8234,11 +8239,11 @@ var init_sender = __esm(() => {
   ]);
 });
 
-// node_modules/.bun/posthog-node@5.53.0/node_modules/posthog-node/dist/ai-capture/routing.mjs
+// node_modules/.bun/posthog-node@5.54.1/node_modules/posthog-node/dist/ai-capture/routing.mjs
 var AI_CAPTURE_ROUTE = "ai-capture", AI_CAPTURE_ENDPOINT_PATH = "/i/v0/ai/batch/", AI_MAX_EVENT_BYTES = 8388608, AI_BATCH_TARGET_BYTES = 5242880;
 var init_routing2 = () => {};
 
-// node_modules/.bun/posthog-node@5.53.0/node_modules/posthog-node/dist/ai-capture/batching.mjs
+// node_modules/.bun/posthog-node@5.54.1/node_modules/posthog-node/dist/ai-capture/batching.mjs
 function eventByteSize(message) {
   return encoder.encode(safeJsonStringify(message)).length;
 }
@@ -8280,7 +8285,7 @@ var init_batching = __esm(() => {
   encoder = new TextEncoder;
 });
 
-// node_modules/.bun/posthog-node@5.53.0/node_modules/posthog-node/dist/client.mjs
+// node_modules/.bun/posthog-node@5.54.1/node_modules/posthog-node/dist/client.mjs
 function emitDeprecationWarningOnce(id, message) {
   if (_emittedDeprecations.has(id))
     return;
@@ -8861,7 +8866,9 @@ var init_client = __esm(() => {
                 key,
                 enabled: value !== false,
                 variant: typeof value == "string" ? value : undefined,
-                payload: localResult.payload ?? undefined
+                payload: localResult.payload ?? undefined,
+                reason: flagReason,
+                reasonCode: flag.active === false ? "flag_disabled" : undefined
               };
             }
           } catch (e) {
@@ -8905,7 +8912,9 @@ var init_client = __esm(() => {
               key,
               enabled: flagDetail.enabled,
               variant: flagDetail.variant ?? undefined,
-              payload: parsedPayload
+              payload: parsedPayload,
+              reason: flagReason,
+              reasonCode: flagDetail.reason?.code
             };
           }
           if (errors.length > 0)
@@ -9617,7 +9626,7 @@ var init_client = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.53.0/node_modules/posthog-node/dist/extensions/context/context.mjs
+// node_modules/.bun/posthog-node@5.54.1/node_modules/posthog-node/dist/extensions/context/context.mjs
 import { AsyncLocalStorage } from "node:async_hooks";
 
 class PostHogContext {
@@ -9649,7 +9658,7 @@ class PostHogContext {
 }
 var init_context2 = () => {};
 
-// node_modules/.bun/posthog-node@5.53.0/node_modules/posthog-node/dist/extensions/context/span-context.node.mjs
+// node_modules/.bun/posthog-node@5.54.1/node_modules/posthog-node/dist/extensions/context/span-context.node.mjs
 import { AsyncLocalStorage as AsyncLocalStorage2 } from "node:async_hooks";
 
 class AsyncLocalStorageSpanContextManager {
@@ -9665,7 +9674,7 @@ class AsyncLocalStorageSpanContextManager {
 }
 var init_span_context_node = () => {};
 
-// node_modules/.bun/posthog-node@5.53.0/node_modules/posthog-node/dist/gzip.node.mjs
+// node_modules/.bun/posthog-node@5.54.1/node_modules/posthog-node/dist/gzip.node.mjs
 import { gzip } from "node:zlib";
 import { promisify } from "node:util";
 async function gzipCompress2(input, isDebug = true) {
@@ -9683,7 +9692,7 @@ var init_gzip_node = __esm(() => {
   gzipAsync = promisify(gzip);
 });
 
-// node_modules/.bun/posthog-node@5.53.0/node_modules/posthog-node/dist/host-os.node.mjs
+// node_modules/.bun/posthog-node@5.54.1/node_modules/posthog-node/dist/host-os.node.mjs
 import { platform, release as release2 } from "node:os";
 function hostOsResourceAttributes() {
   let osName;
@@ -9698,7 +9707,7 @@ var init_host_os_node = __esm(() => {
   init_dist();
 });
 
-// node_modules/.bun/posthog-node@5.53.0/node_modules/posthog-node/dist/extensions/sentry-integration.mjs
+// node_modules/.bun/posthog-node@5.54.1/node_modules/posthog-node/dist/extensions/sentry-integration.mjs
 function createEventProcessor(_posthog, { organization, projectId, prefix, severityAllowList = [
   "error"
 ], sendExceptionsToPostHog = true } = {}) {
@@ -9775,22 +9784,22 @@ var init_sentry_integration = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.53.0/node_modules/posthog-node/dist/extensions/tracing-headers.mjs
+// node_modules/.bun/posthog-node@5.54.1/node_modules/posthog-node/dist/extensions/tracing-headers.mjs
 var init_tracing_headers2 = () => {};
 
-// node_modules/.bun/posthog-node@5.53.0/node_modules/posthog-node/dist/extensions/url-utils.mjs
+// node_modules/.bun/posthog-node@5.54.1/node_modules/posthog-node/dist/extensions/url-utils.mjs
 var init_url_utils = __esm(() => {
   init_dist();
 });
 
-// node_modules/.bun/posthog-node@5.53.0/node_modules/posthog-node/dist/extensions/express.mjs
+// node_modules/.bun/posthog-node@5.54.1/node_modules/posthog-node/dist/extensions/express.mjs
 var init_express = __esm(() => {
   init_error_tracking2();
   init_tracing_headers2();
   init_url_utils();
 });
 
-// node_modules/.bun/posthog-node@5.53.0/node_modules/posthog-node/dist/exports.mjs
+// node_modules/.bun/posthog-node@5.54.1/node_modules/posthog-node/dist/exports.mjs
 var init_exports = __esm(() => {
   init_feature_flag_evaluations();
   init_dist();
@@ -9799,7 +9808,7 @@ var init_exports = __esm(() => {
   init_types3();
 });
 
-// node_modules/.bun/posthog-node@5.53.0/node_modules/posthog-node/dist/entrypoints/index.node.mjs
+// node_modules/.bun/posthog-node@5.54.1/node_modules/posthog-node/dist/entrypoints/index.node.mjs
 var PostHog;
 var init_index_node = __esm(() => {
   init_module_node();
@@ -10050,7 +10059,7 @@ var package_default;
 var init_package = __esm(() => {
   package_default = {
     name: "@oh-my-opencode/omo-codex",
-    version: "5.0.0-beta.90",
+    version: "5.0.0",
     type: "module",
     private: true,
     description: "Codex harness adapter for oh-my-openagent. Vendored Codex plugin namespace (omo) + TypeScript installer + telemetry.",
