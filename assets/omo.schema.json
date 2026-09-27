@@ -2231,6 +2231,83 @@
       ],
       "additionalProperties": false
     },
+    "computer": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "display": {
+          "type": "string",
+          "minLength": 1
+        },
+        "max_width": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "max_height": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "screenshot_max_bytes": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "stop_hotkey": {
+          "type": "string",
+          "minLength": 1
+        },
+        "allow_host_relay_only_stop": {
+          "type": "boolean"
+        },
+        "macos_canary": {
+          "type": "string",
+          "enum": [
+            "session",
+            "off"
+          ]
+        },
+        "audit_log": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "screenshot_gc": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "stale_ms": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "scan_interval_ms": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "additionalProperties": false
+        },
+        "engine_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cua_adapter": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
     "disabled_skills": {
       "type": "array",
       "items": {
@@ -15168,6 +15245,83 @@
           },
           "additionalProperties": false
         },
+        "computer": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "display": {
+              "type": "string",
+              "minLength": 1
+            },
+            "max_width": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            "max_height": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            "screenshot_max_bytes": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            "stop_hotkey": {
+              "type": "string",
+              "minLength": 1
+            },
+            "allow_host_relay_only_stop": {
+              "type": "boolean"
+            },
+            "macos_canary": {
+              "type": "string",
+              "enum": [
+                "session",
+                "off"
+              ]
+            },
+            "audit_log": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            },
+            "screenshot_gc": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "stale_ms": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "scan_interval_ms": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "additionalProperties": false
+            },
+            "engine_path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "cua_adapter": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
         "disabled_skills": {
           "type": "array",
           "items": {
@@ -17100,6 +17254,83 @@
           },
           "additionalProperties": false
         },
+        "computer": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "display": {
+              "type": "string",
+              "minLength": 1
+            },
+            "max_width": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            "max_height": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            "screenshot_max_bytes": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            "stop_hotkey": {
+              "type": "string",
+              "minLength": 1
+            },
+            "allow_host_relay_only_stop": {
+              "type": "boolean"
+            },
+            "macos_canary": {
+              "type": "string",
+              "enum": [
+                "session",
+                "off"
+              ]
+            },
+            "audit_log": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            },
+            "screenshot_gc": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "stale_ms": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "scan_interval_ms": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "additionalProperties": false
+            },
+            "engine_path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "cua_adapter": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
         "disabled_skills": {
           "type": "array",
           "items": {
@@ -19027,6 +19258,83 @@
           "type": "object",
           "properties": {
             "enabled": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "computer": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "display": {
+              "type": "string",
+              "minLength": 1
+            },
+            "max_width": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            "max_height": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            "screenshot_max_bytes": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            "stop_hotkey": {
+              "type": "string",
+              "minLength": 1
+            },
+            "allow_host_relay_only_stop": {
+              "type": "boolean"
+            },
+            "macos_canary": {
+              "type": "string",
+              "enum": [
+                "session",
+                "off"
+              ]
+            },
+            "audit_log": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            },
+            "screenshot_gc": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "stale_ms": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "scan_interval_ms": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "additionalProperties": false
+            },
+            "engine_path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "cua_adapter": {
               "type": "boolean"
             }
           },
@@ -20965,6 +21273,83 @@
             "type": "object",
             "properties": {
               "enabled": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          },
+          "computer": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "display": {
+                "type": "string",
+                "minLength": 1
+              },
+              "max_width": {
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991
+              },
+              "max_height": {
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991
+              },
+              "screenshot_max_bytes": {
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991
+              },
+              "stop_hotkey": {
+                "type": "string",
+                "minLength": 1
+              },
+              "allow_host_relay_only_stop": {
+                "type": "boolean"
+              },
+              "macos_canary": {
+                "type": "string",
+                "enum": [
+                  "session",
+                  "off"
+                ]
+              },
+              "audit_log": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "screenshot_gc": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "stale_ms": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "scan_interval_ms": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "additionalProperties": false
+              },
+              "engine_path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "cua_adapter": {
                 "type": "boolean"
               }
             },
@@ -33907,6 +34292,83 @@
                 },
                 "additionalProperties": false
               },
+              "computer": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "display": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "max_width": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "max_height": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "screenshot_max_bytes": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "stop_hotkey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "allow_host_relay_only_stop": {
+                    "type": "boolean"
+                  },
+                  "macos_canary": {
+                    "type": "string",
+                    "enum": [
+                      "session",
+                      "off"
+                    ]
+                  },
+                  "audit_log": {
+                    "type": "object",
+                    "properties": {
+                      "enabled": {
+                        "type": "boolean"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "screenshot_gc": {
+                    "type": "object",
+                    "properties": {
+                      "enabled": {
+                        "type": "boolean"
+                      },
+                      "stale_ms": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "scan_interval_ms": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "engine_path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "cua_adapter": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              },
               "disabled_skills": {
                 "type": "array",
                 "items": {
@@ -35839,6 +36301,83 @@
                 },
                 "additionalProperties": false
               },
+              "computer": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "display": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "max_width": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "max_height": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "screenshot_max_bytes": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "stop_hotkey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "allow_host_relay_only_stop": {
+                    "type": "boolean"
+                  },
+                  "macos_canary": {
+                    "type": "string",
+                    "enum": [
+                      "session",
+                      "off"
+                    ]
+                  },
+                  "audit_log": {
+                    "type": "object",
+                    "properties": {
+                      "enabled": {
+                        "type": "boolean"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "screenshot_gc": {
+                    "type": "object",
+                    "properties": {
+                      "enabled": {
+                        "type": "boolean"
+                      },
+                      "stale_ms": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "scan_interval_ms": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "engine_path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "cua_adapter": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              },
               "disabled_skills": {
                 "type": "array",
                 "items": {
@@ -37766,6 +38305,83 @@
                 "type": "object",
                 "properties": {
                   "enabled": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "computer": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "display": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "max_width": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "max_height": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "screenshot_max_bytes": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "stop_hotkey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "allow_host_relay_only_stop": {
+                    "type": "boolean"
+                  },
+                  "macos_canary": {
+                    "type": "string",
+                    "enum": [
+                      "session",
+                      "off"
+                    ]
+                  },
+                  "audit_log": {
+                    "type": "object",
+                    "properties": {
+                      "enabled": {
+                        "type": "boolean"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "screenshot_gc": {
+                    "type": "object",
+                    "properties": {
+                      "enabled": {
+                        "type": "boolean"
+                      },
+                      "stale_ms": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "scan_interval_ms": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "engine_path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "cua_adapter": {
                     "type": "boolean"
                   }
                 },

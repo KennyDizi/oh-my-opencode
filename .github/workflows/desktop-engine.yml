@@ -5,17 +5,33 @@ on:
     branches: [master, dev]
     paths:
       - "crates/**"
+      - "packages/senpi-desktop-*/**"
       - "Cargo.toml"
       - "Cargo.lock"
       - "rust-toolchain.toml"
+      - "script/build-omo-binary.ts"
+      - "script/desktop-engine-*.ts"
+      - "script/release-desktop-engine-target.ts"
+      - "script/desktop-engine-ci-proof.ts"
+      - "script/release-desktop-engine-fixture.json"
+      - ".github/workflows/publish-platform.yml"
+      - ".github/workflows/publish.yml"
       - ".github/workflows/desktop-engine.yml"
   pull_request:
     branches: [master, dev]
     paths:
       - "crates/**"
+      - "packages/senpi-desktop-*/**"
       - "Cargo.toml"
       - "Cargo.lock"
       - "rust-toolchain.toml"
+      - "script/build-omo-binary.ts"
+      - "script/desktop-engine-*.ts"
+      - "script/release-desktop-engine-target.ts"
+      - "script/desktop-engine-ci-proof.ts"
+      - "script/release-desktop-engine-fixture.json"
+      - ".github/workflows/publish-platform.yml"
+      - ".github/workflows/publish.yml"
       - ".github/workflows/desktop-engine.yml"
 
 concurrency:
@@ -28,11 +44,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-14, ubuntu-22.04, windows-latest]
+        include:
+          - { os: macos-14, rust_target: aarch64-apple-darwin }
+          - { os: ubuntu-22.04, rust_target: x86_64-unknown-linux-gnu }
+          - { os: windows-latest, rust_target: x86_64-pc-windows-msvc }
     runs-on: ${{ matrix.os }}
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v7
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.2"
 
       - name: Install display test dependencies
         if: runner.os == 'Linux'
@@ -47,6 +70,7 @@ jobs:
           toolchain=$(sed -n 's/^channel *= *"\(.*\)"/\1/p' rust-toolchain.toml)
           rustup toolchain install "$toolchain" --profile minimal --component clippy
           rustup default "$toolchain"
+          rustup target add "${{ matrix.rust_target }}"
 
       - uses: Swatinem/rust-cache@v2
 
@@ -57,7 +81,23 @@ jobs:
         run: cargo test --workspace --locked
 
       - name: Build desktop engine
-        run: cargo build --release -p senpi-desktop-engine --locked
+        run: cargo build --release -p senpi-desktop-engine --locked --target "${{ matrix.rust_target }}"
+
+      - name: Install JavaScript dependencies
+        run: bun install --frozen-lockfile --ignore-scripts
+
+      - name: Prove staged desktop engine resolution and selftest
+        env:
+          OMO_DESKTOP_CI_STAGE_DIR: ${{ runner.temp }}/omo-desktop-ci-engine
+        run: bun script/desktop-engine-ci-proof.ts
+
+      - name: Verify release asset assembly without publishing
+        run: bun test script/desktop-engine-release.test.ts script/release-desktop-engine-target.test.ts script/publish-release-platform-workflow.test.ts
+
+      - name: Desktop package tests
+        env:
+          OMO_PACKAGE_DIR: ${{ runner.temp }}/omo-desktop-ci-engine
+        run: bun run test:desktop
 
       # Each #[ignore]d display test runs in the environment its module docs name. The X11 input tests need a
       # window manager and QA windows, so they run in the Linux QA driver instead.
@@ -84,7 +124,7 @@ jobs:
           JOB_SUMMARY_STATUS: ${{ job.status }}
           JOB_SUMMARY_DETAILS: |
             - Clippy (-D warnings) and tests across the crates/senpi-desktop-* workspace.
-            - Release build of senpi-desktop-engine.
+            - Release build of senpi-desktop-engine, then the packages/senpi-desktop-* vitest suites against it.
             - Linux: X11 and AT-SPI display tests under Xvfb and per-test session buses.
           JOB_SUMMARY_NEXT: Start with the first clippy or test failure; a backend crate failing on one OS is usually a cfg-gated path.
         run: GITHUB_STEP_SUMMARY="$GITHUB_STEP_SUMMARY" bash .github/scripts/write-job-summary.sh
