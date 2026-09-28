@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// omo-codex-install:4a9ae103659984de257ed432b198e976be11c3745a40de12ea10d69a2bdcdf41:cd1868b48572264f4be7d01fa8c24f4ae2edafa09e41faaeda69b4cac40abef0
+// omo-codex-install:4736ea222523dcceaed325b2a48519945caf4c1d8ebcb1e977ea02c28da47f90:4367394049cbf8dbc3d5ea2cdf646068815044f0a437ff196dde3a31c66c0245
 var __esm = (fn, res, err) => () => {
   if (fn)
     try {
@@ -16841,7 +16841,7 @@ var OmoModelProfilesLayerSchema = record(string2(), OmoModelProfileLayerSchema);
 
 // packages/omo-config-core/src/schema/task.ts
 import { availableParallelism } from "node:os";
-var DEFAULT_RESIDENCY_MAX_CHILDREN = 16;
+var DEFAULT_RESIDENCY_MAX_CHILDREN = "unlimited";
 var ResidencyMaxChildrenInputSchema = union([number2().int().nonnegative(), literal("unlimited")]);
 var OmoTaskWaitSchema = object({
   min_ms: number2().int().positive().default(5000),
@@ -16902,7 +16902,7 @@ var OmoTaskSettingsSchema = object({
   provider_concurrency: record(string2(), number2().int().nonnegative()).optional(),
   model_concurrency: record(string2(), number2().int().nonnegative()).optional(),
   max_depth: number2().int().nonnegative().default(1),
-  residency_max_children: ResidencyMaxChildrenInputSchema.default(8),
+  residency_max_children: ResidencyMaxChildrenInputSchema.default(DEFAULT_RESIDENCY_MAX_CHILDREN),
   resident_idle_timeout_ms: number2().int().positive().max(Number.MAX_SAFE_INTEGER).default(900000),
   ttl_ms: number2().int().positive().default(86400000),
   state_dir: string2().optional(),
@@ -16966,7 +16966,7 @@ function resolveOmoTaskSettings(input, resolveParallelism = availableParallelism
   const record2 = record(string2(), unknown()).parse(input);
   return OmoTaskSettingsSchema.parse({
     ...record2,
-    residency_max_children: record2["residency_max_children"] ?? Math.min(DEFAULT_RESIDENCY_MAX_CHILDREN, Math.max(8, resolveParallelism() * 2)),
+    residency_max_children: record2["residency_max_children"] ?? DEFAULT_RESIDENCY_MAX_CHILDREN,
     global_concurrency: record2["global_concurrency"] ?? Math.max(8, resolveParallelism() * 2)
   });
 }

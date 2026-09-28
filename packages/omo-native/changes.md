@@ -1,3 +1,27 @@
+## 2026-09-28 - The doctor recognizes a Bun-installed omo on Windows (#8909)
+
+### What changed
+
+- `bin/lib/doctor-migration.js`: Bun's Windows global bin is a copied `omo.exe` plus an `omo.bunx` sidecar. The owner resolver now reads that sidecar (UTF-16LE, target up to `"` + NUL) and resolves the target against the bin dir's parent, the way Bun's shim does (`install\global\node_modules\omo-ai\bin\omo.js` from `~/.bun`, `..\node_modules\...` for a home-root install). Ownership still requires that file to exist inside an installed package, so the omo.exe is `native` and the "another omo precedes omo-ai on PATH" warning no longer fires for omo-ai's own launcher.
+- `bin/lib/package-paths.js` `updateTarget()`: a legacy Bun home-root install (`<home>/node_modules/omo-ai` next to `<home>/bun.lock` or `bun.lockb`) is updated with `bun add -g` under the user's own Bun configuration. The default `install/global` layout keeps its `BUN_INSTALL` overlay; every other layout still gets the npm command.
+- The native installer's PATH check (`packages/omo-opencode/src/cli/install-native/legacy-omo-bin.ts`) reads the same sidecar, so `install --platform=native` on Windows verifies the Bun-installed omo instead of reporting that no omo-ai command exists.
+
+### Tests
+
+`test/doctor-migration.test.ts` writes the sidecar bytes a real `bun add -g omo-ai` produced on a windows-latest runner (default layout behind a legacy `omo.cmd`, and a home-root install reached through `..\node_modules`) and covers the home-root update target with and without a Bun lockfile. `legacy-omo-bin.test.ts` covers the installer scan over the same bytes.
+
+## 2026-09-27 - Native doctor reports computer-use readiness (#8939)
+
+### What changed
+
+- `computer-use-doctor-runtime.ts` is bundled into the existing Native doctor runtime. It loads the effective `[native]` computer config, honors `computer.engine_path`, otherwise follows the desktop locator and versioned release acquisition path, and preserves `native-unavailable`, `quarantined`, and ABI/handshake diagnostics with every attempted path.
+- The probe starts the engine under a five-second bound and sends only `engine.hello` and `capabilities`. It never sends `session.open`, so it does not create a desktop session, arm input, or trigger an OS permission request.
+- `bin/lib/computer-use-doctor.js` renders enabled/supported state, engine path plus version/ABI/protocol, backend and capture/input/accessibility permissions, display count and lock state, and stop-path availability as `INFO` / `PASS` / `WARN` / `FAIL` lines. `launcher.js` computes those lines alongside task-category coverage and `doctor.js` includes them in its existing exit status.
+
+### Tests
+
+`test/computer-use-doctor.test.ts` covers the healthy output, degraded permission/display/stop-path warnings, quarantined paths, disabled config, explicit engine-path precedence, and the exact prompt-free request sequence (`engine.hello`, `capabilities`, no `session.open`).
+
 ## 2026-09-24 - omo doctor and omo setup report task-category coverage (#8858)
 
 ### What changed
