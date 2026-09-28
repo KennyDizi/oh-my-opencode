@@ -6,6 +6,7 @@ import type {
   RpcSwitchSessionResult,
   RpcTerminalAssistantMessage,
 } from "../types"
+import type { HostShardEvents } from "./handle-reattach"
 import type { HostSessionReattach } from "./reattach"
 import type { HostSessionClosed, HostSessionCommand, HostSessionParked } from "./session-client"
 
@@ -18,6 +19,10 @@ import type { HostSessionClosed, HostSessionCommand, HostSessionParked } from ".
 export interface HostSessionLiveness {
   readonly sessionId: string
   readonly isStreaming?: boolean
+  readonly isCompacting?: boolean
+  readonly steering?: readonly unknown[]
+  readonly followUp?: readonly unknown[]
+  readonly pendingMessageCount?: number
 }
 
 /** `HostSessionClient` satisfies this structurally. The transport error itself is never read. */
@@ -63,6 +68,8 @@ export type HostSessionHandleOptions = {
   readonly openDisposition: HostSessionOpenDisposition
   /** Transport recovery. Absent: a lost transport ends the child as crashed(transport_gone). */
   readonly reattach?: HostSessionReattach
+  /** Told when a transport recovery starts and how it ended (the parent's crash notice). */
+  readonly shardEvents?: HostShardEvents
 }
 
 export type HostSessionChildHandle = RpcChildHandle & {
@@ -81,6 +88,10 @@ export type HostSessionChildHandle = RpcChildHandle & {
   close(): Promise<void>
   /** The daemon suspended the session: no exit, no status change - the record parks. */
   onParked(listener: (event: HostSessionParked) => void): () => void
+  /** A reattach left a turn that was in flight at the loss running on the new port. */
+  onTurnResumed(listener: () => void): () => void
+  onSelfResumed(listener: () => void): () => void
+  adoptFinishedTurn(finalResponse: string): Promise<void>
   startInitialPrompt(text: string): Promise<void>
   waitForOutcome(): Promise<RunnerOutcome>
   hasExited(): boolean

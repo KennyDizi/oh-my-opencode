@@ -1,3 +1,52 @@
+## 2026-09-28 - The compiled binary enters a shard supervisor without the engine CLI graph
+
+`compile-entry.ts` routes an `--internal-rpc-host-supervisor` launch through `supervisor-fast-path.ts`, which applies
+the engine CLI's pre-`main()` process setup (deleted-cwd guard, process title, agent markers, silenced warnings) and
+imports the engine's own `modes/rpc/supervisor-route.js` instead of `dist/cli.js`. The supervisor of every task shard
+and Desktop thread host therefore no longer evaluates the engine's `main.js` graph. An argv the engine declines falls
+through to the full CLI as before. Measured on the compiled binary (1 parent x 4 children): supervisor physical
+footprint 70.7 -> 49.4 MB, RSS 123.3 -> 102.9 MB; children, host and topology unchanged.
+
+## 2026-09-28 - `omo daemon run --foreground` exits 2; `--persistent` is accepted and ignored
+
+`bin/lib/daemon.js`: `--foreground` on any `omo daemon` subcommand exits 2 with "the engine host always
+detaches", before the engine is called. `--persistent` is still accepted but no longer passed to the engine; the
+launch spec's `coldStart` tunable decides. `docs/reference/omo-daemon.md` documents both, lists the exit-3 cases of
+`stop --all`, `handoff` and `rollback-prepare`, and carries the rollback runbook built on `stop --drain --all --wait`
+and `rollback-prepare`.
+
+## 2026-09-28 - Native daemon commands cover every session host
+
+`omo daemon status` and `omo doctor` now enumerate the operator daemon, task
+shards, Desktop thread hosts, and other discovered endpoints in one read-only
+engine sweep. Text output joins shard owner sidecars, reports concurrent
+generations, memory, descriptors and crash counts, and ends with a machine
+aggregate; JSON preserves the engine rows and adds owner and aggregate fields.
+
+`omo daemon gc` reaps only endpoint state the engine proves dead, `handoff` walks
+every live endpoint through the engine's upgrade gate, and `stop --all` applies
+the existing refusal and drain rules per endpoint. `stop --drain --all --wait`
+waits for both generation pids and live session-path claims before authorizing a
+downgrade. `rollback-prepare` discovers every durable task store, refuses partial
+coverage or a live endpoint, and migrates retained host-session records back to
+`rpc.sock` through the locked task-store mutation path.
+
+The focused Native and senpi-task suites cover endpoint rendering and JSON
+preservation, gc sidecar ownership, upgrade/refusal fan-out, drain completion and
+timeout, rollback preflight and record events, plus shard naming parity with the
+adopted engine.
+
+## 2026-09-28 - omo app-server loads the OmO plugin (#9117)
+
+### What changed
+
+- `bin/lib/launcher.js`: `omo app-server ...` (server and every `daemon` verb) appends `--extension <package>/plugin` after the subcommand instead of passing through bare. The engine's app-server reads `--extension` only there (senpi #2313); a leading flag never reaches its dispatch. `--no-extensions` still leaves the list to the caller.
+- `compile-entry.ts` `buildSenpiArgs`: the same placement for the compiled binary.
+
+### Tests
+
+`test/launcher.test.ts` asserts the server and `daemon start` argv end with the plugin extension and that `--no-extensions` passes through; `app-server` left the early-command passthrough table. `test/compile-entry.test.ts` covers the compiled path.
+
 ## 2026-09-28 - The doctor recognizes a Bun-installed omo on Windows (#8909)
 
 ### What changed
@@ -329,3 +378,57 @@ This is a source cleanup in the compiled launcher, before extension loading.
 ### Expected merge conflict zones
 
 The import list in `compile-entry.ts`. No runtime behavior or Windows paths changed.
+
+## 2026-09-28 - compiled omo update resolves channel, flavor and destination
+
+### What changed
+
+`omo update` on a compiled release binary now asks GitHub for the newest release on the build's
+own channel (stable builds only move to stable releases, betas follow the newest release of either
+kind), picks the asset the binary was built as, and prints a version-pinned command that downloads
+beside the running executable and swaps it in (`mv` on POSIX, `Move-Item` on Windows, no
+`chmod` there). An up-to-date binary says so; a failed lookup exits 1 with the releases page.
+`script/build-omo-binary.ts` stamps `releaseTarget` (for example `linux-x64-musl`) into the
+embedded runtime-manifest.json, outside the payload digest. The TUI update notice of a compiled
+release build now says `omo update`. Logic lives in `compiled-update.ts`.
+
+### Why
+
+The old line always fetched `releases/latest/download/omo-<os>-<arch>` into the current
+directory: musl and baseline builds got the glibc / AVX2 asset, the running binary was never
+replaced, the GitHub Latest badge (which betas also receive) moved stable users to betas, and the
+Windows line ended in `chmod`.
+
+### Why an extension could not handle it
+
+`omo update` is answered by the compiled entry before any extension loads.
+
+### Expected merge conflict zones
+
+`updateHint` / the `main()` fast path in `compile-entry.ts`, and the manifest write in
+`script/build-omo-binary.ts`.
+
+## 2026-09-28 - doctor recognizes a standalone omo binary
+
+### What changed
+
+`omo doctor` classifies an `omo` on PATH as a standalone OmO binary when it resolves to
+`~/.omo/binary-runtime/<version>/omo` or is byte-identical to that provisioned copy (size plus a
+64 KiB head and tail sample; the binaries are ~100 MB). Standalone binaries and omo-ai are both
+OmO installs: when both are on PATH one warning names the one that runs, the one that never runs,
+and how to keep one. Legacy or foreign `omo` files ahead of the first OmO install keep their
+warning, now naming that install. The compiled binary's `omo doctor` prints the same migration
+section, without the npm restore note. Detection lives in `bin/lib/standalone-binary.js`.
+
+### Why
+
+A curl-installed release binary had no npm owner, so the npm doctor called it an "unknown owner"
+file to delete, and the compiled doctor never reported an omo-ai install shadowed by it.
+
+### Why an extension could not handle it
+
+Doctor runs from the launcher and the compiled entry, before extensions load.
+
+### Expected merge conflict zones
+
+`runCompiledDoctor` in `compile-entry.ts` and `formatMigrationLines` in `bin/lib/doctor-migration.js`.

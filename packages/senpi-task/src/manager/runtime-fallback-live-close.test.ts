@@ -9,6 +9,7 @@ import { adaptRpcHandle, type ManagedChildHandle } from "./child-handle"
 import { baseSpec, cleanupProjects, settings, tempProject } from "./__fixtures__/manager-fakes"
 import { createTaskManager } from "./manager"
 import type { ManagedRunner } from "./types"
+import { NO_HOST_ENDPOINT } from "../lifecycle/host-session"
 
 // The failed rung's live handle closes its daemon session best-effort and gives up after a bounded
 // wait. Runtime fallback must not take that as proof the session is gone: the next model starts only
@@ -51,6 +52,7 @@ describe("runtime fallback over a live daemon session", () => {
         destruction: { destroyResidentTask: (taskId, cause) => lifecycle.destroyResidentTask(taskId, cause) },
       })
       const lifecycle = createTaskLifecycle({
+        hostEndpoint: NO_HOST_ENDPOINT,
         store,
         config,
         registry: createManagerResidencyRegistry(() => manager),
@@ -68,6 +70,7 @@ describe("runtime fallback over a live daemon session", () => {
         // when
         host.emitRecord(original.routingId, { type: "message_end", message: { role: "assistant", content: [], stopReason: "error", errorMessage: "provider failed" } })
         host.emitRecord(original.routingId, { type: "agent_end", willRetry: false, messages: [] })
+        host.emitRecord(original.routingId, { type: "agent_idle" })
 
         // then
         if (acknowledged) {
