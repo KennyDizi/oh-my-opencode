@@ -1,3 +1,35 @@
+## 2026-09-28 - `omo doctor` no longer fails or downloads for users who never started computer use (#9059)
+
+Computer use is on by default, so `omo doctor` probed its engine for every user. When no engine was installed it downloaded one from GitHub releases, even in offline mode, and when that failed it printed `FAIL computer use engine` and exited 1, although the same doctor exited 0 before computer use existed. Doctor no longer installs anything: with no engine located and no `computer.engine_path`, it reports that the engine is downloaded the first time computer use starts, lists the paths it checked, and leaves the exit code alone. A configured `engine_path` that is missing or not executable, a quarantined binary, and a located engine that fails its handshake still fail doctor.
+
+## 2026-09-28 - `omob` builds the desktop engine it embeds (#9063)
+
+Since compiled binaries embed the Rust desktop engine, `omob` failed at its last step with `missing required desktop engine for <target>`: `build-omo-binary.ts` stages `target/<triple>/release/senpi-desktop-engine`, but only the release workflows ran cargo. `build-omob.ts` now builds it in the omo cache clone with the release flags (`cargo build --release -p senpi-desktop-engine --locked --target <triple>`, output pinned to the clone's `target/` whatever `CARGO_TARGET_DIR` says) when the binary is missing or `crates/`, `Cargo.toml`, `Cargo.lock` or `rust-toolchain.toml` changed since the last engine build. A stamp beside the binary records that tree fingerprint and the binary's size and mtime, so a rebuild with no engine change skips cargo. Without cargo the build stops with one line naming the missing Rust toolchain. Targets that ship no engine, and omo refs that predate it, skip the step. Feature builds (`--name`) take the same path.
+
+## 2026-09-28 - macOS computer use keeps the user's newer front app (#9056)
+
+After a background `type` or `press`, the macOS engine handed key focus back to the application that was front before the action, even when the user had switched to another application in the meantime. It read the front application from `NSWorkspace.frontmostApplication`, which in the engine (no AppKit run loop) can keep reporting an application the user already left. The front application now comes from WindowServer (`_SLPSGetFrontProcess`), with AppKit only as a fallback, and the hand-back leaves the front alone when a third application is front: the user's newer choice wins, as on X11 and Windows. Without a user switch the previous application is still restored.
+
+## 2026-09-28 - Computer use reads and writes the clipboard (#9009)
+
+The `clipboard.read` and `clipboard.write` engine methods were advertised by the SDK and the schema but answered "not implemented". They now reach the session: reading is a read-only request, writing goes through the same gate and single input transaction as other input (suspension, a live stop path, input permission, cancellation) and emits one audit record carrying only the text's length and digest, never the text. The macOS, X11, Wayland and Windows backends share one UTF-8 text clipboard in `senpi-desktop-core` (feature `system-clipboard`); on Linux one clipboard handle lives for the process so the text stays served after the write returns. A clipboard holding no text reads as the empty string. The desktop contract CI runs a live round-trip on the hosted macOS, Windows and Linux (Xvfb) runners.
+
+## 2026-09-28 - `computer_actions` activates with `computer` (#9048)
+
+With `computer.cua_adapter: true`, activating computer use (`/computer on`, a by-name call or a `tool_search` promotion) added only `computer` to the active tool set, and `/computer off` removed only `computer`. A provider without native deferred-tool search declares only active tools in its request, so an OpenAI computer-use model could find `computer_actions` through `tool_search` but never call it. Both tools now join and leave the active set together; without the adapter only `computer` moves, as before. The computer-use QA driver gained a scenario that records the tools each request declares and checks that the request after activation carries `computer_actions`.
+
+## 2026-09-28 - X11 computer use keeps offscreen frames and newer user state (#8974)
+
+Partially offscreen X11 windows now keep a full-size capture frame with transparent pixels for the off-root area, so an unchanged window remains targetable from its screenshot instead of being misclassified as resized. Keyboard text, chords and XTEST modifiers read the current server keymap once per operation, so runtime layout changes no longer require reconnecting.
+
+Foreground delivery now confirms core X focus as well as EWMH active-window state. On a non-EWMH server it uses a core-focus fallback, delivers to the requested window, and restores the previous focus. Both the input-local guard and the shared session restore hooks preserve a newer user focus or pointer choice instead of replaying an older snapshot over it.
+
+Filtering toolkits still receive a truthful background-unavailable refusal. The supported Linux QA stack exposes XInput and XTEST but has no writable `/dev/uinput`, and a bounded Xvfb hierarchy probe did not establish an isolated real-input route; MPX support therefore remains a separate real-Xorg/uinput feature rather than an inferred fallback.
+
+## 2026-09-28 - Computer tools publish a root object schema (#9047)
+
+The `computer` and `computer_actions` tools used to publish a root-union JSON schema. Anthropic native tool search sends a deferred tool's schema as-is, so every request with the `computer` tool deferred failed with `400 tools.N.custom.input_schema.type: Field required` (senpi #2252). OpenAI strict function schemas and Gemini also reject a root union. Both tools now publish one root object with an `action` enum and every action's fields as optional, and each field's description names the actions that take it. `execute` still checks the exact per-action shape, including every batch item, and refuses a missing, extra or mistyped field with `COMPUTER_INVALID_ARGUMENTS`, naming the action and the field, before any engine starts. Valid calls behave as before.
+
 ## 2026-09-28 - Boulder plan progress counts every task format and stops on 0/0 (#9019, #6233)
 
 The plan parser in `packages/boulder-state/src/plan-checklist.ts` now counts `T1.2`, `T6.3a`, `F1` and `H1` task IDs written with a `.`, space, `-` or em-dash separator. When the canonical `## TODOs` / `## Final Verification Wave` sections hold no task rows but checkboxes sit under another heading, it falls back to every top-level checkbox. A `- [~]` row, which the continuation directive uses for a task blocked on the user, counts toward the total as in-progress: it is neither completed nor remaining. Progress no longer reads `1/1` when one of two tasks is blocked, and a plan whose open work is all blocked still ends continuation.
