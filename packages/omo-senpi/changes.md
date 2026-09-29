@@ -1,3 +1,84 @@
+## 2026-09-30 - lsp: post-edit install nudges stay inside projects and appear once per server (#9223)
+
+- `components/lsp/post-edit-outcome.ts` (moved out of `index.ts`) turns a daemon `not_installed` availability into the structured post-edit outcome, carrying `serverId`, `installDecisionTool` and a recorded decision.
+- `components/lsp/index.ts` `handlePostEditDiagnosticsToolResult` classifies each edited file against the session cwd and the engine-resolved agent dir (`resolveSessionAgentDir`, else `resolveAgentHome`): files outside a project, in the agent dir, or in a temp dir get no nudge, and each server is nudged once per session (reset on compaction).
+- `plugin/extensions/omo.js` regenerated on linux for the change above.
+
+## 2026-09-30 - memory/kibitzer: connected-first sidecar model order (#9216)
+
+- `components/memory/kibitzer/sidecar-connected-order.ts` (new) `orderKibitzerCandidatesByConnection`: with a known, non-empty availability list the first connected candidate leads and unconnected ones trail; none connected returns the providers to connect.
+- `components/memory/kibitzer/sidecar-model.ts` `resolveKibitzerSidecarModel` applies it to category-sourced resolutions and returns `category_unavailable` when nothing is connected. The `task` tool path is untouched.
+- `plugin/extensions/omo.js` regenerated on linux/amd64 (node 24, bun 1.4.2) for the change above; `build-extension.mjs --check` and `build-install.mjs --check` pass on the regenerated tree.
+
+## 2026-09-30 - model-profile: Geeky · Normal leads with gpt-6.1-sol medium; telemetry knows the 6.1 Sol ids (#9214)
+
+- `src/components/model-profile/builtin-profiles.ts`: `geeky-normal` is `gpt-6.1-sol` (medium) on `chatgpt-subscription|openai`
+  (the new `GPT_6_1_PROVIDERS`: Copilot and OpenCode Zen do not serve 6.1 Sol, and every builtin rung must name a pair the
+  product knows), then `gpt-5.6-sol` (medium) on the shared `GPT_PROVIDERS` ranking. The `recommended` row and every other
+  profile are unchanged.
+- `src/components/telemetry/model-vocabulary.ts`: `gpt-6.1-sol` and `gpt-6.1-sol-fast` join the `chatgpt-subscription`,
+  `openai` and `openai-codex` vocabularies and `gpt-6.1-sol` the `vercel` one, so the new deep-low rungs export as themselves
+  instead of `custom`; `docs/reference/senpi-telemetry.md` is regenerated from the schemas.
+- Tests: `builtin-profiles.test.ts` pins the two-rung chain, `resolve.test.ts` resolves `chatgpt-subscription/gpt-6.1-sol`
+  medium when the subscription serves both, and `index.test.ts` applies it at session start; the Copilot-only and GPT-6-only
+  cases still resolve 5.6 Sol and report unavailable. `scripts/qa/model-profile-e2e-scenarios.mjs` `geeky-normal-sol` serves
+  `gpt-6.1-sol` next to `gpt-5.6-sol` and expects 6.1 Sol.
+- `plugin/extensions/omo.js`, `omo-task.js`, `omo-init-deep-advisor.js` regenerated on linux/amd64 (node 24, bun 1.4.2) for
+  the chain, profile and vocabulary changes; `omo-member.js`, `memory-run-supervisor.mjs` and `omo-computer-use.js` rebuilt
+  byte-identical, so they are unchanged.
+
+## 2026-09-29 - plugin bundles carry the typed launch_spec_insecure start failure (#9208)
+
+- `plugin/extensions/omo-task.js`, `omo-member.js`, `omo.js` (source-digest marker only) and `plugin/runtime/rollback-migrate.js`
+  regenerated on linux/amd64 (node 24, bun 1.4.2) for the senpi-task change: a task host that refuses a group- or
+  world-writable launch spec now fails the start typed `launch_spec_insecure` with the spec path and `chmod 644 <path>`,
+  and rollback strips the new reason like every post-R0 reason. No adapter source changed.
+
+## memory, telemetry: Kibitzer recall runs on a Z.ai-only or Xiaomi-only machine (#9202)
+
+- `memory/kibitzer/sidecar-model.test.ts`: with only `zai` or only `xiaomi` logged in and no quick config, the sidecar
+  resolves `zai/glm-5.3-flash` or `xiaomi/mimo-v2.6-flash` at `low`. On dev both refused with `beyond_category`,
+  because the quick chain had no rung for them. The chain change is in senpi-task.
+- `telemetry/model-vocabulary.ts`: adds `glm-5.3-flash` under `zai` and `zai-coding-cn`, and `mimo-v2.6-flash` under
+  `xiaomi`, so the new rungs export by name. `docs/reference/senpi-telemetry.md` is regenerated.
+
+## thread, task: agent state stays out of the user's repository (#9201, DESKTOP-31)
+
+- `components/thread/live-surface.ts` `defaultThreadStateDirectory`: the thread tools' mailbox and receipts move from
+  `<project>/.omo/thread-tools` to the same per-project folder as the task state
+  (`@oh-my-opencode/senpi-task` `resolveProjectStateDirectory`); a pre-existing in-project folder keeps being used.
+- `components/task/engine-state-dir.test.ts`: a fresh project stays empty after the engine persists task state, a
+  pre-existing `.omo/senpi-task` is kept, and `task.state_dir` wins.
+- Root `test-setup.ts` drops an inherited `OMO_`/`SENPI_`/`PI_CODING_AGENT_DIR`, so a test run started inside a live
+  session resolves agent-dir state under the hermetic HOME, as in CI.
+
+## skill-commands, skills: argument-taking skills wait for their arguments in the slash picker (#9168)
+
+- `skills/{hyperplan,init-deep,mass-ulw,ulw-loop,ulw-plan,ulw-research}/SKILL.md` and the shared-pool
+  `ulw-execute`, `refactor` and `remove-ai-slops` declare `argument-hint`. From senpi#2258 on, the picker reads it
+  (`Skill.argumentHint`) and Enter on a `skill:<name>` row fills `/skill:<name> ` and waits instead of submitting the
+  skill empty. Skills that take no arguments stay hint-less and still submit on one Enter.
+- `components/skill-commands/autocomplete.ts`: a bare alias row mirrors its own `skill:<name>` row on the same page,
+  taking its description (which carries the hint) and `awaitsArguments`, so `/ulw-execute` waits exactly when
+  `/skill:ulw-execute` does. `pi.getCommands()` carries no hint, so the page row is the source. Without the skill row
+  the alias falls back to the command description and submits as before.
+- `components/skill-commands/argument-hints.test.ts` parses every shipped SKILL.md with the engine's own
+  `parseFrontmatter` (native copy over the shared one, as `sync-skills.mjs` ships them) and pins the set of hinted
+  skills.
+
+## computer-use, x-search: a feature skill yields to a loaded same-name skill and honors disabled_skills (#9160)
+
+- `components/bundled-skills/contributed-skill.ts`: `resolveContributedSkill` decides one `resources_discover` pass for a
+  skill a component contributes on its own. `disabled_skills` hides it (`readDisabledSkills`, now shared with the
+  bundled-skills component). A `skill:<name>` entry in `pi.getCommands()` whose `sourceInfo.path` is not ours means
+  senpi already loaded a same-name skill, which wins first-path either way, so ours is withheld instead of becoming a
+  "Skill conflicts" collision. Our own path left over from an earlier pass still contributes.
+- `components/computer-use/index.ts`: the `computer-use` skill goes through it; `/computer status` adds
+  `skill: your own computer-use skill is active in place of the built-in guide (<path>)` when it yielded. New `env`
+  option for the config read.
+- `components/x-search/index.ts`: the conditional `x-search` skill goes through it. Both tools stay registered.
+- `extension/types.ts`: `getCommands()` entries carry the optional `sourceInfo.path` senpi already reports.
+
 ## memory: a late Kibitzer verdict no longer steers an extra turn after the final answer
 
 - `components/memory/kibitzer/delivery.ts`: an accepted verdict steers at once only while the running session has a
