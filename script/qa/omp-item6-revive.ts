@@ -1,8 +1,8 @@
 import assert from "node:assert/strict"
 
-import type { AgentToolResult, ToolDefinition } from "@code-yeongyu/senpi"
+import type { AgentToolResult } from "@code-yeongyu/senpi"
 import { createKernelToolBindings } from "../../packages/senpi-task/src/kernel-tools/bindings"
-import { InProcessRunner } from "../../packages/senpi-task/src/runners/in-process"
+import { InProcessRunner, type CreateChildSession } from "../../packages/senpi-task/src/runners/in-process"
 import { runTaskSend } from "../../packages/senpi-task/src/tools/control/send"
 import type { TaskToolDetails } from "../../packages/senpi-task/src/tools/task/types"
 import { definedKernel } from "./omp-item6-kernel-cell"
@@ -103,7 +103,7 @@ export async function runRevivedChildStaleKernel(): Promise<Record<string, unkno
 
     // A new host process has no binding at all: only a typed stub is restored from the transcript.
     const sessionPath = `${env.store.stateDir}/children/${taskId}/sessions/${taskId}/${(await import("node:fs")).readdirSync(`${env.store.stateDir}/children/${taskId}/sessions/${taskId}`)[0]}`
-    const restartedTools: ToolDefinition[] = []
+    const restartedTools: NonNullable<Parameters<CreateChildSession>[0]["customTools"]> = []
     const restarted = new InProcessRunner({ kernelToolBindings: createKernelToolBindings(), createSession: async (options) => {
       restartedTools.push(...(options.customTools ?? []))
       return { sessionId: "restarted", prompt: async () => undefined, steer: async () => undefined, followUp: async () => undefined, abort: async () => undefined, subscribe: () => () => undefined, getLastAssistantText: () => undefined, dispose: () => undefined }
