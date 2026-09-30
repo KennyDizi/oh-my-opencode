@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+**Big thanks to [@ashmoonori-afk](https://github.com/ashmoonori-afk), whose [#9209](https://github.com/code-yeongyu/oh-my-openagent/pull/9209) teaches memory recall to find Korean, Japanese and Chinese notes and to pick the right note out of a big memory.**
+
+**Hotfix: `eval` works again in the standalone `omo` binary.** ([#9248](https://github.com/code-yeongyu/oh-my-openagent/issues/9248), [#9250](https://github.com/code-yeongyu/oh-my-openagent/pull/9250)) The 5.1.3 and 5.1.4 binaries from GitHub Releases and get.omo.dev left out `@babel/parser`, which the `eval` tool loads, so JavaScript and Python `eval` were missing on every OS; npm and bun installs were fine. Each release now refuses a binary in which `eval` does not register and run.
+
+### Added
+
+Memory recall finds Korean, Japanese and Chinese notes and picks the right note out of a large memory with nothing to configure, while an English phrase that matches a note word for word still comes first. ([#9209](https://github.com/code-yeongyu/oh-my-openagent/pull/9209))
+
+The Recommended profile tries GPT-6.1 Sol (medium) before GPT-6 Sol on your ChatGPT subscription or the OpenAI API, and GitHub Copilot and OpenCode Zen keep GPT-6 Sol. ([#9237](https://github.com/code-yeongyu/oh-my-openagent/pull/9237))
+
+In the standalone binary, `omo setup` now imports your settings, `omo doctor` prints the same sections as an npm install, and `omo doctor --reap` cleans up the binary's own stale engines. ([#9252](https://github.com/code-yeongyu/oh-my-openagent/issues/9252), [#9253](https://github.com/code-yeongyu/oh-my-openagent/pull/9253), [#9265](https://github.com/code-yeongyu/oh-my-openagent/pull/9265))
+
+omo.dev has guide pages on mass ulw runs, agents, keywords, telemetry and desktop updates under `/docs/`. ([#9261](https://github.com/code-yeongyu/oh-my-openagent/pull/9261), [#9264](https://github.com/code-yeongyu/oh-my-openagent/pull/9264))
+
+### Fixed
+
+OmO no longer slows your machine down with many sessions open, because memory recall reads the memory repository with one git batch per reload instead of one git process per note. ([#9251](https://github.com/code-yeongyu/oh-my-openagent/issues/9251), [#9254](https://github.com/code-yeongyu/oh-my-openagent/pull/9254))
+
+The Windows release `.exe` runs from the folder you downloaded it to instead of failing at startup. ([#7485](https://github.com/code-yeongyu/oh-my-openagent/issues/7485), [#9255](https://github.com/code-yeongyu/oh-my-openagent/pull/9255))
+
+The standalone binary downloads the Claude Code version it is pinned to on your first Claude subscription turn, checks its hash and caches it, so you no longer need `claude` installed yourself, and `omo doctor` shows it. ([#9262](https://github.com/code-yeongyu/oh-my-openagent/issues/9262), [#9266](https://github.com/code-yeongyu/oh-my-openagent/pull/9266))
+
+One invalid value in `omo.jsonc` no longer switches off the whole file: only that key is ignored, `omo doctor` prints one warning naming it, and an unsafe key like `__proto__` is dropped without losing its valid neighbors. Thanks to @mooire733. ([#7676](https://github.com/code-yeongyu/oh-my-openagent/pull/7676), [#9249](https://github.com/code-yeongyu/oh-my-openagent/pull/9249))
+
+On Windows those config warnings name the file as `~/.omo/omo.jsonc`. ([#9244](https://github.com/code-yeongyu/oh-my-openagent/pull/9244))
+
+`omo daemon` reads its settings from `~/.omo/omo.jsonc` like the rest of OmO, and a setting left in the old `~/.omo/agent/omo.json` still applies with a warning in `omo doctor`. ([#9192](https://github.com/code-yeongyu/oh-my-openagent/issues/9192), [#9199](https://github.com/code-yeongyu/oh-my-openagent/pull/9199))
+
+A foreground subagent waits at most 15 minutes before it moves to the background, even when a long prompt-cache window would allow an hour. ([#9236](https://github.com/code-yeongyu/oh-my-openagent/pull/9236))
+
 ## [5.1.4] - 2026-09-29
 
 ### Changed
