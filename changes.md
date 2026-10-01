@@ -1,3 +1,29 @@
+## 2026-10-01 - A PR's Windows and macOS legs never report green without running their tests (#9245)
+
+On a pull request the Windows and macOS legs of `test`, `codex-compatibility` and `senpi-compatibility` skipped every install and test step unless a changed path looked platform-sensitive or the PR carried `ci:full-matrix`, and the job still concluded success, because GitHub counts a step skipped by its `if` as passing. That let #7676, #9329 and #9243 merge with green Windows checks and turn `dev` red. Two changes close it. `script/ci-fast-path.mjs` now marks a change runtime-touching unless every changed path matches an explicit allowlist of web, prose (top-level Markdown, README/CHANGELOG/AGENTS-style docs outside `packages/*/src`) and repository metadata (other workflows, issue templates, `.github/assets`); anything else, including a new folder or an unknown extension, counts as runtime, and a runtime-touching PR runs every OS leg by itself, with no label and no write token, so fork PRs get it too. Each OS leg also ends with a guard step, `script/ci-leg-tests-guard.mjs`, that always runs and reads the real outcomes of that leg's test steps: if they were all skipped while the change needed them, the check fails with `tests not run: add ci:full-matrix`; if the skip was intended (a docs or metadata change), the leg passes with a `tests intentionally not run` notice and says so in its job summary. The `dev` push still runs the full matrix.
+
+## 2026-10-01 - The copy-tree self-destination test uses the OS temp dir on Windows
+
+`packages/isolation-core/src/backends/copy-tree.test.ts` built its scratch root from `process.env.TMPDIR ?? "/tmp"`, a POSIX-only fallback. Windows runners do not set `TMPDIR`, so the path became `\tmp\self-copy-XXXXXX` and `mkdtemp` failed with `ENOENT`, which turned the required `test (windows-latest, 2/2)` job red on `dev` after #9388 changed which files share that shard's workers. The test passed before only when an earlier test in the same worker had left `TMPDIR` set. It now uses `os.tmpdir()`, which resolves on every platform. Test-only; no product change. The worker env leak that made it pass is tracked separately.
+
+## 2026-10-01 - A Bun crash in the Windows rpc-host tests is contained and retried once (#9219)
+
+Bun 1.4.2 intermittently segfaults a Windows test worker while it runs `packages/senpi-task/src/runners/rpc-host`, and 1.4.3-canary.1 still does (oven-sh/bun#44390). Each crash turned the required `test (windows-latest, 2/2)` job red. That job now runs the rpc-host suite in its own `bun test --parallel` invocation, between the serial quarantine and the remainder, through `script/bun-panic-retry.ts`: when the output carries Bun's crash markers (`Bun has crashed`, `worker crashed: exit code 3`) and nothing else failed, the invocation runs once more and the crash lines are logged as a warning annotation. A second crash fails the job. A real test failure (a `(fail)` line, an unhandled error, or more failures than crashed workers) is never retried, even when the same run also crashed. The suite stays in the required job with no `continue-on-error`. The Windows remainder reads the new `bunfig.win2.parallel.windows.toml`, which adds the directory to `bunfig.win2.parallel.toml`'s ignores so no file runs twice, and the flake soak's `full-shard-2` target follows the same shape without the retry. `script/bun-panic-retry.test.ts` drives the runner against a scripted fake `bun test` and proves that one crash is retried once, a second crash fails, and an assertion failure is not retried.
+
+## 2026-10-01 - Builtin category chains only name thinking levels their models accept (#9378)
+
+Reported by @markshikada, whose byte-compare of 5.1.6 against 5.1.7 and reflection timeline pinned it down. Five Senpi builtin category rungs named a thinking level senpi's model catalog rejects for that model, so every child session start logged a `validation_warning` to `fallback.log` (hundreds of lines in a live session) and the engine then silently clamped the rung to `high`. The entries were never skipped: they ran, just not at the declared level. In `packages/senpi-task/src/category/fallback-chains.ts`, the `quick` lane's opencode-go `minimax-m3` and `minimax-m2.7` rungs now carry no variant, so they run at the `quick` lane's own `low` instead of a clamped `high`. `unspecified-low`'s `mimo-v2.6-pro`, `qwen3.8-max-preview` and `mimo-v2.5-pro` say `high`, the level they already ran at, so their runtime behavior is unchanged and the warning stops. A level the user sets in `omo.json` is untouched: it still warns once, naming the level and the model, and still runs at a level the model accepts. The OpenCode edition's table in `model-core` keeps `max`, because OpenCode derives its own variants. The regression drives a real senpi session over the real model catalog. On the pre-fix chains, the `quick` child started at `high` instead of `low`, and two loads per category on an opencode-go plus xiaomi machine logged four warnings; after the fix it logs none.
+
+## 2026-10-01 - The fake clock no longer calls the deprecated `AtomicU64::fetch_update` (#9383)
+
+Rust 1.99 deprecates `fetch_update` in favour of `try_update`, and `rust-toolchain.toml` follows `stable`, so the desktop engine workflow's `clippy -D warnings` failed on every pull request at `crates/senpi-desktop-backend-fake/src/clock.rs`. `FakeClock::advance` now uses an explicit `compare_exchange_weak` loop with the same saturating result, which compiles without deprecation on older and current stable alike. The existing saturation tests in `tests/scenario.rs` cover it.
+
+`rust-toolchain.toml` now pins `channel = "1.99.0"` instead of `stable`, which every Rust workflow reads, so a new stable release can no longer change the lints that every pull request is checked against. Toolchain upgrades now come as their own pull request, with clippy run on the new version.
+
+## 2026-10-01 - Preserve Windows killed-task classification across repeated Bun advisories (#9228)
+
+Windows RPC exits now accept any positive number of Bun's known child-reaper startup advisory lines as advisory-only stderr. An empty stderr remains an external termination, while any other stderr line still proves a crash. This preserves `status: error` with `killed: true` for externally terminated code-1/no-signal children without weakening crash diagnostics.
+
 ## 2026-10-01 - Adopt senpi 2026.10.1-2
 
 Every `@code-yeongyu/senpi` pin moves from 2026.9.30 to 2026.10.1-2: the root devDependency, `omo-native`, the `omo-senpi`
@@ -6,6 +32,12 @@ tests, `provider-map.json` and the engine named in `senpi-task`'s category cover
 v0.99.1 sync, so `provider-map.json` gains the new builtin providers `meta` (OAuth login) and `typesafe`, and the
 `senpi-task` runners follow the upstream disposition and `TranscriptContext` API. It also brings the compiled-engine
 `bun` phantom-turn fix (#9362, senpi#2494) and per-session permission presets (senpi#2461).
+
+
+## 2026-10-01 - Repeat macOS permission denials name the earlier pane (omo-desktop-app#1437)
+
+macOS permission guidance now says the privacy pane has been opened only when the current denial opened it. Repeat denials refer to the pane opened earlier, or tell the user to open it when the initial attempt failed, while retaining the turn-on and fully quit/relaunch instructions and the responsible-process TCC identity.
+
 
 ## 2026-10-01 - Keep child tool parity stable on Windows (#9274, #6709)
 

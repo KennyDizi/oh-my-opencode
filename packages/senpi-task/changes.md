@@ -1,3 +1,28 @@
+## 2026-10-01 - Builtin chain rungs name thinking levels their models accept (#9378)
+
+- `category/fallback-chains.ts`: `quick` opencode-go `minimax-m3` / `minimax-m2.7` drop `variant: "max"` (the child now inherits the
+  `quick` lane's `low`); `unspecified-low` `mimo-v2.6-pro`, `qwen3.8-max-preview` and `mimo-v2.5-pro` go from `max` to `high`, the level
+  senpi already clamped them to. Every other rung in this file and in `agents/builtin/fallback-chains.ts` names a level its catalog model
+  accepts. A new header bullet records the deliberate divergence from `model-core`, which keeps `max` for OpenCode.
+- `runners/builtin-chain-thinking-level.test.ts` drives `resolveCategory` -> the child's thinking level and child-local
+  `retry.fallbackChains` into a real senpi `AgentSession` over the real catalog, faking only the logged-in providers: the `quick` child runs
+  `minimax-m3` at `low` (was a silent clamp to `high`); repeated loads of every category an opencode-go plus xiaomi machine serves leave
+  `fallback.log` free of `validation_warning` (four on the pre-fix chains); a user `models[]` entry with an unsupported level still warns once
+  and still runs at an accepted level. The fixture's `assistant`/`streamMessage` helpers are exported for that last case.
+- Pins updated to the new variants: `fallback-chains`, `category-routing-policy`, `unspecified-low-chain`,
+  `in-process-runtime-fallback`, `manager-runtime-fallback`.
+
+## 2026-10-01 - In-process task children honor the caller's settings (#9353)
+
+- `runners/in-process/runtime-fallback-settings.ts` `createRuntimeFallbackSettings` now takes the caller's settings source (`cwd`, `agentDir`, `projectTrusted`) and gives the child a private in-memory copy of the caller's global and project settings, replacing only the fallback policy: `retry.modelFallback`, `retry.fallbackChains` and `retry.fallbackRevertPolicy` come from the child's own chain, and the child's `maxRetries`/`baseDelayMs` override wins over both caller scopes. Before, the child got an in-memory manager holding only that policy (#6478), so `retry.provider.streamStartTimeoutMs`, `retry.provider.timeoutMs`, `httpIdleTimeoutMs`, `compaction.*` and `thinkingBudgets` fell back to the engine defaults (a 300 s first-event guard and a 300 s request idle timeout). Children now also honor the caller's compaction and thinking settings, matching process children.
+- The project layer reaches the child only when the parent session trusted the project: `ChildSpec.projectTrusted` comes from the parent's `ctx.isProjectTrusted()` through `InProcessSessionContext`; an unknown decision counts as untrusted. Child writes stay in the in-memory copy, so the caller's settings files are never written.
+- `in-process-caller-settings.test.ts` drives a real child through `InProcessRunner`: a caller `streamStartTimeoutMs` of 150 ms cuts a silent provider at 150 ms (on the base the guard never fired within 10 s), the request carries the caller's `httpIdleTimeoutMs` (base: 300000), a caller fallback chain is never used by a child without its own chain, a child with its own chain falls back only to it, and the caller's settings file stays byte-identical.
+
+## 2026-10-01 - Repeated Bun Windows advisories remain external termination output (#9228)
+
+- `runners/rpc/exit-mapping.ts` accepts any positive number of known Bun child-reaper startup advisory lines in the Windows exit-code-1/no-signal case. A different stderr line still classifies the child as crashed.
+- Focused cases pin N advisory-only lines to `killed: true` and advisory lines plus one real error to `crashed`.
+
 ## 2026-10-01 - Windows child parity regression (#9274, #6709)
 
 - `builtin-tool-parity.integration.test.ts` reloads the in-process child loader beside the `DefaultResourceLoader` policy used by process children and compares their builtin registrations directly. This removes both Windows CLI cold starts while pinning equal platform-specific builtin counts, exact names, and `web_search`; shared parent and session-default tool policy remains covered by the existing surface tests.
