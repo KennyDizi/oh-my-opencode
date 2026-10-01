@@ -196,8 +196,8 @@
   },
   "devDependencies": {
     "@clack/prompts": "^1.8.1",
-    "@code-yeongyu/senpi": "2026.9.30",
-    "@modelcontextprotocol/sdk": "^1.31.0",
+    "@code-yeongyu/senpi": "2026.10.1-2",
+    "@modelcontextprotocol/sdk": "^1.30.0",
     "@oh-my-opencode/agents-md-core": "workspace:*",
     "@oh-my-opencode/ast-grep-mcp": "workspace:*",
     "@oh-my-opencode/boulder-state": "workspace:*",
