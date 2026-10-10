@@ -1,3 +1,54 @@
+## 2026-10-09 - Warn on logout unless the server revoked the device (#9833)
+
+A refresh refusal during logout suppresses the unconfirmed-revocation warning only when the service guarantees the device is already revoked: `account_deleted`, and `reauth_required`, which the service returns on refresh only after revoking the device for token reuse. `unauthorized` and `invalid_grant` leave the device's slot held, so logout clears locally, makes no revoke attempt, and points to the account's Devices page.
+
+## 2026-10-09 - Finish logout after refresh refusal or interruption (#9833)
+
+Logout uses the normal journal-before-send refresh path. An explicit terminal refresh refusal means the session is already ended: local credentials are cleared without a revoke request, and the unconfirmed-revocation warning is shown unless the refusal is `account_deleted` or `reauth_required` (see the entry above). Other refresh failures and a previously uncertain record clear the complete local item, exit successfully, and warn that server revocation was not confirmed. An uncertain record is cleared without another network attempt.
+
+A real-child crash regression kills the owned logout process while its journaled refresh response is held, then proves fresh logout clears without replay and fresh whoami reports signed out.
+
+## 2026-10-09 - Recover sign-in safely after TLS and browser-launch failures (#9831 follow-up)
+
+Certificate verification failures and explicitly identified connection/handshake failures now preserve a retryable sign-in, since no HTTP credentials were sent. Generic resets and timeouts remain fenced when the send outcome is unknown. Logout refreshes an expired access token only for a non-uncertain record, persists the rotation before revoking the device, and still clears locally on every exit.
+
+A valid loopback callback is no longer discarded when the browser opener subsequently fails. Chooser labels use a directly tested sanitizer mapping. Regression coverage includes real local self-signed TLS, both terminal-refusal message arms, refresh 429 recovery, C1 terminal controls, and deterministic first/last-byte and length-mismatch callback rejection.
+
+If the OS credential store cannot restore a record after a proven not-sent failure, the durable safety marker remains: the client cannot safely tell another process to replay the token without persisting that knowledge. No disk fallback or process-local bypass was added.
+
+## 2026-10-09 - Preserve offline sign-in and prevent uncertain refresh replay (#9831)
+
+Refresh now journals an in-flight rotation in the OS credential record before sending it. Proven connection failures preserve a retryable sign-in. A timeout, lost response, 5xx, invalid reply, or failed rotated-token save retains credentials and device keys but requires a new sign-in instead of resending the possibly consumed refresh token. Reuse has no grace period and can revoke the device, so a later process also honors the journal. Only explicit terminal refusals clear the stored sign-in.
+
+Loopback state comparisons are constant-time. Device polling follows RFC 8628 without the off-contract 401 continuation, strips terminal controls from displayed server strings, and handles 429 with bounded Retry-After backoff until expiry. Logout attempts access-authenticated device revocation and always clears locally, warning when server revocation could not be confirmed. Error objects no longer serialize management credentials or arbitrary server error codes.
+
+Regression coverage includes actual listener binding, ephemeral ports, callback reuse, HTTPS guards, per-failure refresh outcomes, native CLI error output, terminal injection, and offline logout. The native authentication bundle is regenerated from the same source.
+
+## 2026-10-09 - CLI sign-in with OS credential storage (#9829, #9811)
+
+`omo login` supports browser loopback PKCE and headless device authorization (`--device` or `--no-browser`), production origins by default, and explicit API/accounts overrides. Device sign-in shows the verification URI, user code, and matching code, observes the server's expiry and polling interval, and backs off on `slow_down`. At the device limit, interactive users can choose and confirm one device to revoke before retrying; declining changes nothing.
+
+Tokens and Ed25519/X25519 private keys live only in Bun's OS credential store: Keychain on macOS, Secret Service on Linux, and Credential Manager on Windows. Missing or locked stores fail without a plaintext fallback. Refresh reads, rotation, atomic credential replacement, and logout share a cross-process lock; terminal refresh refusals clear credentials. `omo logout` clears the stored sign-in; `omo whoami` reports the device after refreshing if necessary. Default device names strip format/control/separator characters and Hangul fillers before applying the 64-character limit.
+
+The toolkit CLI, native launcher, and compiled native entry share the commands. Native's checked-in command bundle is regenerated by `bun script/build-service-auth.ts` and guarded by a freshness test.
+
+## 2026-10-09 - Adopt senpi 2026.10.10-11
+
+Every `@code-yeongyu/senpi` pin moves from 2026.10.10-10 to 2026.10.10-11: the root devDependency, `omo-native` and its provider map comment, the `omo-senpi` and `senpi-task` peer and dev pins (with their `senpi-tui` and `senpi-ai` aliases), the pin tests and the engine named in `senpi-task`'s coverage test. `tool_schema("eval:environments")` documents `packages.install` and `environment_install_timeout` in JavaScript and Python cells, while the default eval description and parameters stay byte-identical. Julia, Ruby and Python cells do less fixed work per cell: no globals walk below the memory thresholds, no awaited cwd stat, and leaner Python queue and capture bookkeeping. The lockfile is refreshed with `bun install --no-cache`, the provider map is checked against the pinned engine's `builtinProviders()`, and the generated plugin bundle is regenerated for it.
+
+## 2026-10-09 - Default lineups use Claude Haiku 5.5, right after Luna
+
+Every default chain that used `claude-haiku-4-5` now uses `claude-haiku-5-5` at `medium`, moved up to sit right after `gpt-6-luna-fast`:
+- `quick` (`packages/senpi-task/src/category/fallback-chains.ts`, mirror `packages/model-core/src/category-model-requirements.ts`): Luna (low) -> Haiku 5.5 (medium) -> DeepSeek Flash (off) -> ...; the trailing Haiku 4.5 (off) rung is gone.
+- `explore` and `librarian` (`packages/senpi-task/src/agents/builtin/fallback-chains.ts`, mirror `packages/model-core/src/agent-model-requirements.ts`, parity #8259): Kimi HighSpeed (off) -> Luna (low) -> Haiku 5.5 (medium) -> DeepSeek Flash (max) -> ...; the trailing Haiku 4.5 rung is gone.
+- The Claude Code `haiku` alias maps to `claude-haiku-5-5`; the OpenCode installer's Claude-only `explore` default is `anthropic/claude-haiku-5-5` (medium); the agent-category migration maps both ids to `quick`; telemetry adds the 5.5 id and keeps 4.5.
+
+Providers are the 4.5 rung's, all of which serve the model in the pinned senpi catalog: `anthropic` and `anthropic-subscription` (`claude-haiku-5-5`), `anthropic-api` (an `anthropic` alias), `github-copilot` (`claude-haiku-5.5`, reached by `transformModelForProvider`). The variant is `medium` because Haiku 5.5 has no `off`, and in our evaluation `low` stopped early. The bundled capability snapshot gains the nine `claude-haiku-5-5` entries these rungs need, picked from a fresh models.dev fetch like the Opus 5.5 entries were; the full refresh is the scheduled workflow's job. `.github/workflows/sisyphus-agent.yml` keeps its `claude-haiku-4-5` entry: it is that workflow's own pinned provider definition for its CI agent, not a routing default.
+
+## 2026-10-09 - Adopt senpi 2026.10.10-10
+
+Every `@code-yeongyu/senpi` pin moves from 2026.10.10-9 to 2026.10.10-10: the root devDependency, `omo-native` and its provider map comment, the `omo-senpi` and `senpi-task` peer and dev pins (with their `senpi-tui` and `senpi-ai` aliases), the pin tests and the engine named in `senpi-task`'s coverage test. The engine keeps a session on one Anthropic Subscription account across transient errors (senpi#2891), stops re-writing the whole conversation to the prompt cache with resume off (senpi#2982), waits for the reader instead of failing a long streamed tool call (senpi#2822), and serves `gpt-6.1-sol-ultrafast` without a local extension (senpi#2975). The generated plugin bundle is regenerated for it on Linux.
+
 ## 2026-10-08 - Config migrations edit omo.jsonc only where a value changes (#9777)
 
 The first engine start against an existing `~/.omo/omo.jsonc` runs the `2026-08-reasoning-unification` migration (replace-target, no `shouldRun`). It reformatted every top-level value: nested line and block comments, trailing commas, inline objects and custom indentation were lost. A `.bak` was written first, so nothing was unrecoverable. There were two causes:
