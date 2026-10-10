@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// omo-codex-install:83c45a1c78073f1bfdb31c0a25d9fea733aa0d90e789d9e378db864df0e4a431:572351d66f672348ca4493fd8de97faeea513215ff8e4cb0e76cd8edb5419ed8
+// omo-codex-install:17c062cf01b3751860ba096e47888ae5fd4fd09df22b1b2a75e9d91a4dc286b1:4c92c56828bb42a14c6b154b0b7ea9c06400dcf53a71a3d52900d95e52866ba7
 var __esm = (fn, res, err) => () => {
   if (fn)
     try {
@@ -10369,6 +10369,9 @@ function resolveStdio(options) {
   }
   return [options.stdin ?? "ignore", options.stdout ?? "pipe", options.stderr ?? "inherit"];
 }
+function createBunSpawnOptions(options) {
+  return { ...options, windowsHide: true };
+}
 function createNodeSpawnOptions(options, platform = process.platform) {
   const nodeOptions = {
     stdio: resolveStdio(options),
@@ -10457,7 +10460,7 @@ function spawn(cmdOrOpts, opts) {
   const { cmd, opts: options } = resolveCommand(cmdOrOpts, opts);
   const bun = getBunRuntime();
   if (bun)
-    return wrapBunProcess(bun.spawn(cmd, options));
+    return wrapBunProcess(bun.spawn(cmd, createBunSpawnOptions(options)));
   const [bin, ...args] = cmd;
   if (!bin)
     throw new Error("spawn requires a command");
@@ -10539,7 +10542,7 @@ function isKnownNonGitBashLauncher(path) {
 }
 function whereCommand(command) {
   try {
-    return execFileSync("where", [command], { encoding: "utf8" }).split(/\r?\n/).map((line) => line.trim()).filter((line) => line.length > 0);
+    return execFileSync("where", [command], { encoding: "utf8", windowsHide: true }).split(/\r?\n/).map((line) => line.trim()).filter((line) => line.length > 0);
   } catch (error) {
     if (error instanceof Error)
       return [];

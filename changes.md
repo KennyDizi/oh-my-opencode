@@ -1,3 +1,21 @@
+## 2026-10-10 - unspecified-low runs GPT-6.1 Sol on the OpenAI lanes (#9844)
+
+`unspecified-low` had no GPT-6.1 Sol rung, so an OpenAI-only machine (ChatGPT subscription or OpenAI API) ran `gpt-5.6-terra (high)`. `packages/model-core/src/category-model-requirements.ts` and the Senpi mirror in `packages/senpi-task/src/category/fallback-chains.ts` add `gpt-6.1-sol (medium)` on `openai|chatgpt-subscription` directly before the second GPT rung, the effort every other 6.1 Sol default uses. GPT-5.6 Terra leaves the chain entirely (owner direction, 2026-10-10): the second GPT rung is now `gpt-5.6-sol (medium)` on `openai|chatgpt-subscription|github-copilot|opencode`, the same model the deep-low and ultrabrain lanes already use for Copilot and OpenCode Zen, so those setups keep a valid GPT rung and a registry without 6.1 Sol still resolves the lane. The the model 5.5 head (#9144) is unchanged.ged. No other category had a stale GPT-5.6 lead: `quick` leads with GPT-6 Luna Fast, `deep-low` with GPT-6.1 Sol, `deep-high`/`ultrabrain` with GPT-6 Astra. The four chain-pin tests and the docs rows follow; the Senpi extension bundles are regenerated (`build-extension.mjs --check` current).
+
+## 2026-10-10 - Hide console windows on the Bun spawn path (#9840)
+
+`@oh-my-opencode/utils/runtime` `spawn()` / `spawnSync()` prefer `Bun.spawn` / `Bun.spawnSync` under Bun and passed no `windowsHide` there, while the Node fallback already set it on win32. Both Bun calls now go through `createBunSpawnOptions`, which adds `windowsHide: true` (Bun applies it only on Windows). The utils `windows-console-hide` gate now also audits `Bun.spawn*` and runtime-handle `bun.spawn*` calls. An allowlisted call must pass through the options helper its entry names, and the gate asserts that each helper sets the flag.
+
+## 2026-10-10 - Run hook commands without a console window on Windows (#7144)
+
+`executeHookCommand` now spawns every Claude-compatible hook command with `windowsHide: true`, matching the `taskkill` spawn beside it. A console-less host (an IDE- or GUI-launched `opencode serve`) used to get a fresh console per hook: a conhost flash echoing the hook JSON, or, with Windows Terminal as the default terminal, a full terminal window that took focus on every prompt and tool event. The `sg --version` probe in `ast-grep/sg-resolver.ts` and the `where bash` lookup in `runtime/git-bash.ts` had the same gap and now pass the flag too.
+
+`packages/utils/src/windows-console-hide.test.ts` walks the whole utils source tree like the #8501 gates do and fails on any `node:child_process` spawn, exec, execFile or fork call without `windowsHide: true`, unless an allowlist entry names its reason (the `runtime/spawn.ts` Node fallback, whose options helpers set the flag on win32; the gate asserts that too). The flag is inert on posix.
+
+## 2026-10-10 - lazycodex plugin scripts no longer open console windows on Windows (#9838)
+
+Every `node:child_process` call in `packages/omo-codex/plugin/scripts/` now passes `windowsHide: true`. The worst offender was the background auto-update in `auto-update.mjs`, which ran `cmd.exe /c npm.cmd` detached from a Codex hook and so got its own console window on every update. The `auto-update-plan.mjs` version probe and manual-update runner, and the plugin build scripts, had the same gap. `plugin/test/windows-console-hide.test.mjs` walks every plugin script and fails on any spawn, exec, execFile or fork call without the flag (allowlist with a reason per entry, empty today), and refuses namespace, default or `require` imports of `child_process` that it could not audit.
+
 ## 2026-10-09 - Warn on logout unless the server revoked the device (#9833)
 
 A refresh refusal during logout suppresses the unconfirmed-revocation warning only when the service guarantees the device is already revoked: `account_deleted`, and `reauth_required`, which the service returns on refresh only after revoking the device for token reuse. `unauthorized` and `invalid_grant` leave the device's slot held, so logout clears locally, makes no revoke attempt, and points to the account's Devices page.
