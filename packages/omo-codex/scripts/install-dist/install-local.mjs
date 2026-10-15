@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// omo-codex-install:4db5a98bf382e58a89b56055512793d4bc6f240d8cbbc9ef5b5436489c7806c3:9b73739fb5cb3edd8d591eb471f1f67235d5058e1a5eb4e8782186d5c84d489c
+// omo-codex-install:e72d2a139e538765786dcf85abdecb54063c27ce56474b8bc7415555ddc08e40:5bd9a78cbef030a65dfe11f2afc400aebe34be40d8883c026c40924c65e7ea2f
 var __esm = (fn, res, err) => () => {
   if (fn)
     try {
@@ -19602,6 +19602,7 @@ var nonNegativeInteger = number2().int().nonnegative();
 var OmoComputerSettingsLayerSchema = object({
   enabled: boolean2().describe("Experimental: register the computer tool in OmO Native sessions (default: on where the host is supported; false leaves it unregistered)"),
   display: string2().min(1),
+  showCursor: boolean2().describe("Show the display-only macOS cursor overlay (default: true; false hides it)"),
   max_width: positiveInteger,
   max_height: positiveInteger,
   screenshot_max_bytes: positiveInteger,
