@@ -1,5 +1,38 @@
 #!/usr/bin/env node
-// omo-codex-install:e72d2a139e538765786dcf85abdecb54063c27ce56474b8bc7415555ddc08e40:5bd9a78cbef030a65dfe11f2afc400aebe34be40d8883c026c40924c65e7ea2f
+// omo-codex-install:e72d2a139e538765786dcf85abdecb54063c27ce56474b8bc7415555ddc08e40:c6a262081f1dcf0a45df7e820e38ab58ccb38085a86eefbc6a165784218bab33
+var __create = Object.create;
+var __getProtoOf = Object.getPrototypeOf;
+var __defProp = Object.defineProperty;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+function __accessProp(key) {
+  return this[key];
+}
+var __toESMCache_node;
+var __toESMCache_esm;
+var __toESM = (mod, isNodeMode, target) => {
+  var canCache = mod != null && typeof mod === "object";
+  if (canCache) {
+    var cache = isNodeMode ? __toESMCache_node ??= new WeakMap : __toESMCache_esm ??= new WeakMap;
+    var cached = cache.get(mod);
+    if (cached)
+      return cached;
+  }
+  target = mod != null ? __create(__getProtoOf(mod)) : {};
+  const to = isNodeMode || !mod || !mod.__esModule || !__hasOwnProp.call(mod, "default") ? __defProp(target, "default", { value: mod, enumerable: true }) : target;
+  if (mod && typeof mod === "object" || typeof mod === "function") {
+    for (let key of __getOwnPropNames(mod))
+      if (!__hasOwnProp.call(to, key))
+        __defProp(to, key, {
+          get: __accessProp.bind(mod, key),
+          enumerable: true
+        });
+  }
+  if (canCache)
+    cache.set(mod, to);
+  return to;
+};
+var __commonJS = (cb, mod) => () => (mod || cb((mod = { exports: {} }).exports, mod), mod.exports);
 var __esm = (fn, res, err) => () => {
   if (fn)
     try {
@@ -405,7 +438,7 @@ var init_env = __esm(() => {
   SEND_OPT_OUT_VALUES = ["0", "false", "no", "yes"];
 });
 
-// node_modules/.bun/posthog-node@5.56.0/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/module.node.mjs
+// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/module.node.mjs
 import { dirname as dirname11, posix as posix3, sep as sep7 } from "node:path";
 function createModulerModifier() {
   const getModuleFromFileName = createGetModuleFromFilename();
@@ -442,7 +475,7 @@ function normalizeWindowsPath(path) {
 }
 var init_module_node = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/types.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/types.mjs
 var types_PostHogPersistedProperty;
 var init_types = __esm(() => {
   types_PostHogPersistedProperty = /* @__PURE__ */ function(PostHogPersistedProperty) {
@@ -484,7 +517,7 @@ var init_types = __esm(() => {
   }({});
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/utils/string-utils.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/utils/string-utils.mjs
 function safeJsonStringify(value) {
   const ancestors = [];
   return JSON.stringify(value, function(_key, replacementValue) {
@@ -510,7 +543,7 @@ function safeJsonStringify(value) {
 }
 var init_string_utils = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/utils/type-utils.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/utils/type-utils.mjs
 function isPrimitive(value) {
   return value === null || typeof value != "object";
 }
@@ -555,7 +588,7 @@ var init_type_utils = __esm(() => {
   };
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/utils/bot-detection.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/utils/bot-detection.mjs
 function buildCacheKey(ua, custom) {
   let customEncoded = "";
   for (let i = 0;i < custom.length; i++) {
@@ -661,12 +694,12 @@ var init_bot_detection = __esm(() => {
   UA_CACHE = new Map;
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/utils/browser-utils.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/utils/browser-utils.mjs
 var init_browser_utils = __esm(() => {
   init_string_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/utils/number-utils.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/utils/number-utils.mjs
 function clampToRange(value, min, max, logger, fallbackValue) {
   if (min > max) {
     logger.warn("min cannot be greater than max.");
@@ -689,7 +722,7 @@ var init_number_utils = __esm(() => {
   init_type_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/utils/bucketed-rate-limiter.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/utils/bucketed-rate-limiter.mjs
 function resolveExceptionRateLimiterConfig(config = {}) {
   return {
     refillRate: config.exceptionRateLimiterRefillRate ?? config.__exceptionRateLimiterRefillRate ?? DEFAULT_EXCEPTION_RATE_LIMITER_REFILL_RATE,
@@ -743,7 +776,7 @@ var init_bucketed_rate_limiter = __esm(() => {
   init_number_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/vendor/uuidv7.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/vendor/uuidv7.mjs
 class UUID {
   constructor(bytes) {
     this.bytes = bytes;
@@ -918,7 +951,7 @@ var init_uuidv7 = __esm(() => {
   /*! LICENSE: uuidv7.mjs.LICENSE.txt */
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/utils/promise-queue.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/utils/promise-queue.mjs
 class PromiseQueue {
   add(promise) {
     const promiseUUID = uuidv7();
@@ -960,7 +993,7 @@ var init_promise_queue = __esm(() => {
   init_uuidv7();
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/utils/logger.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/utils/logger.mjs
 function createConsole(consoleLike = console) {
   const lockedMethods = {
     log: consoleLike.log.bind(consoleLike),
@@ -1002,7 +1035,7 @@ var _createLogger = (prefix, maybeCall, consoleLike) => {
 }, passThrough = (fn) => fn();
 var init_logger = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/utils/user-agent-utils.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/utils/user-agent-utils.mjs
 var MOBILE = "Mobile", IOS = "iOS", ANDROID = "Android", TABLET = "Tablet", ANDROID_TABLET, APPLE = "Apple", APPLE_WATCH, SAFARI = "Safari", BLACKBERRY = "BlackBerry", SAMSUNG = "Samsung", SAMSUNG_BROWSER, SAMSUNG_INTERNET, CHROME = "Chrome", CHROME_OS, CHROME_IOS, INTERNET_EXPLORER = "Internet Explorer", INTERNET_EXPLORER_MOBILE, OPERA = "Opera", OPERA_MINI, EDGE = "Edge", MICROSOFT_EDGE, FIREFOX = "Firefox", FIREFOX_IOS, NINTENDO = "Nintendo", PLAYSTATION = "PlayStation", XBOX = "Xbox", ANDROID_MOBILE, MOBILE_SAFARI, WINDOWS = "Windows", WINDOWS_PHONE, GENERIC = "Generic", GENERIC_MOBILE, GENERIC_TABLET, KONQUEROR = "Konqueror", OCULUS_BROWSER = "Oculus Browser", VIVALDI = "Vivaldi", YANDEX = "Yandex", WHALE = "Whale", DUCKDUCKGO = "DuckDuckGo", PALE_MOON = "Pale Moon", WATERFOX = "Waterfox", BRAVE = "Brave", CLAUDE = "Claude", CODEX = "Codex", CHATGPT = "ChatGPT", GOOGLE_SEARCH_APP = "Google Search App", BROWSER_VERSION_REGEX_SUFFIX = "(\\d+(\\.\\d+)?)", DEFAULT_BROWSER_VERSION_REGEX, AI_APP_VERSION_REGEX, XBOX_REGEX, PLAYSTATION_REGEX, NINTENDO_REGEX, BLACKBERRY_REGEX, windowsVersionMap, versionRegexes, osMatchers;
 var init_user_agent_utils = __esm(() => {
   init_string_utils();
@@ -1281,10 +1314,10 @@ var init_user_agent_utils = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/utils/webview-app-utils.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/utils/webview-app-utils.mjs
 var init_webview_app_utils = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/utils/json-utils.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/utils/json-utils.mjs
 function sanitizeString(value) {
   let output = "";
   for (let index = 0;index < value.length; index++) {
@@ -1332,7 +1365,7 @@ var init_json_utils = __esm(() => {
   dateToISOString = Date.prototype.toISOString;
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/utils/retry-after.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/utils/retry-after.mjs
 function parseRetryAfterMs(value, now = Date.now()) {
   if (typeof value != "string" || !value)
     return;
@@ -1395,7 +1428,7 @@ class RetryAfterWindow {
 var MAX_RETRY_AFTER_MS = 300000, CLOCK_STEP_TOLERANCE_MS = 5000;
 var init_retry_after = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/utils/index.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/utils/index.mjs
 function isValidUUID(value) {
   return typeof value == "string" && UUID_REGEX.test(value);
 }
@@ -1488,7 +1521,7 @@ var init_utils = __esm(() => {
   UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/error-tracking/chunk-ids.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/error-tracking/chunk-ids.mjs
 function getFilenameToChunkIdMap(stackParser) {
   const posthogChunkIds = globalThis._posthogChunkIds;
   const nativeDebugIds = globalThis._debugIds;
@@ -1541,7 +1574,7 @@ function matchesSnapshot(chunkIds, keys, snapshot) {
 var parsedStackResults, lastPostHogChunkIds, lastNativeDebugIds, cachedFilenameChunkIds;
 var init_chunk_ids = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/error-tracking/error-properties-builder.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/error-tracking/error-properties-builder.mjs
 class ErrorPropertiesBuilder {
   constructor(coercers, stackParser, modifiers = []) {
     this.coercers = coercers;
@@ -1771,7 +1804,7 @@ var init_error_properties_builder = __esm(() => {
   init_chunk_ids();
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/error-tracking/parsers/base.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/error-tracking/parsers/base.mjs
 function isAppFilename(filename) {
   if (!filename || filename === ANONYMOUS_FILENAME)
     return false;
@@ -1809,7 +1842,7 @@ var init_base = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/error-tracking/parsers/safari.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/error-tracking/parsers/safari.mjs
 var extractSafariExtensionDetails = (func, filename) => {
   const isSafariExtension = func.indexOf("safari-extension") !== -1;
   const isSafariWebExtension = func.indexOf("safari-web-extension") !== -1;
@@ -1825,7 +1858,7 @@ var init_safari = __esm(() => {
   init_base();
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/error-tracking/parsers/chrome.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/error-tracking/parsers/chrome.mjs
 var chromeRegexNoFnName, chromeRegex, chromeEvalRegex, chromeStackLineParser = (line, platform) => {
   const noFnParts = chromeRegexNoFnName.exec(line);
   if (noFnParts) {
@@ -1855,7 +1888,7 @@ var init_chrome = __esm(() => {
   chromeEvalRegex = /\((\S*)(?::(\d+))(?::(\d+))\)/;
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/error-tracking/parsers/gecko.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/error-tracking/parsers/gecko.mjs
 var geckoREgex, geckoEvalRegex, geckoStackLineParser = (line, platform) => {
   const parts = geckoREgex.exec(line);
   if (parts) {
@@ -1882,17 +1915,17 @@ var init_gecko = __esm(() => {
   geckoEvalRegex = /(\S+) line (\d+)(?: > eval line \d+)* > eval/i;
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/error-tracking/parsers/winjs.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/error-tracking/parsers/winjs.mjs
 var init_winjs = __esm(() => {
   init_base();
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/error-tracking/parsers/opera.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/error-tracking/parsers/opera.mjs
 var init_opera = __esm(() => {
   init_base();
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/error-tracking/parsers/node.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/error-tracking/parsers/node.mjs
 function filenameIsInApp(filename, isNative = false) {
   const isInternal = isNative || filename && !filename.startsWith("/") && !filename.match(/^[A-Z]:/) && !filename.startsWith(".") && !filename.match(/^[a-zA-Z]([a-zA-Z0-9.\-+])*:\/\//);
   return !isInternal && filename !== undefined && !filename.includes("node_modules/");
@@ -1968,7 +2001,7 @@ var init_node = __esm(() => {
   PROMISE_INDEX = /^index \d+$/;
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/error-tracking/parsers/index.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/error-tracking/parsers/index.mjs
 function isSameFrame(a, b) {
   return a.filename === b.filename && a.function === b.function && a.module === b.module && a.lineno === b.lineno && a.colno === b.colno;
 }
@@ -2118,12 +2151,12 @@ var init_parsers = __esm(() => {
   WEBPACK_ERROR_REGEXP = /\(error: (.*)\)/;
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/error-tracking/coercers/dom-exception-coercer.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/error-tracking/coercers/dom-exception-coercer.mjs
 var init_dom_exception_coercer = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/error-tracking/coercers/error-coercer.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/error-tracking/coercers/error-coercer.mjs
 class ErrorCoercer {
   match(err) {
     return isError(err);
@@ -2165,12 +2198,12 @@ var init_error_coercer = __esm(() => {
   init_type_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/error-tracking/coercers/error-event-coercer.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/error-tracking/coercers/error-event-coercer.mjs
 var init_error_event_coercer = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/error-tracking/coercers/string-coercer.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/error-tracking/coercers/string-coercer.mjs
 class StringCoercer {
   match(input) {
     return typeof input == "string";
@@ -2203,7 +2236,7 @@ var init_string_coercer = __esm(() => {
   ERROR_TYPES_PATTERN = /^(?:[Uu]ncaught (?:exception: )?)?(?:((?:Eval|Internal|Range|Reference|Syntax|Type|URI|)Error): )?(.*)$/i;
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/error-tracking/types.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/error-tracking/types.mjs
 var severityLevels;
 var init_types2 = __esm(() => {
   severityLevels = [
@@ -2216,7 +2249,7 @@ var init_types2 = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/error-tracking/coercers/utils.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/error-tracking/coercers/utils.mjs
 function extractExceptionKeysForMessage(err, maxLength = 40) {
   const keys = Object.keys(err);
   keys.sort();
@@ -2234,7 +2267,7 @@ function extractExceptionKeysForMessage(err, maxLength = 40) {
 }
 var init_utils2 = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/error-tracking/coercers/object-coercer.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/error-tracking/coercers/object-coercer.mjs
 class ObjectCoercer {
   match(candidate) {
     return typeof candidate == "object" && candidate !== null;
@@ -2305,7 +2338,7 @@ var init_object_coercer = __esm(() => {
   init_utils2();
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/error-tracking/coercers/event-coercer.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/error-tracking/coercers/event-coercer.mjs
 class EventCoercer {
   match(err) {
     return isEvent(err);
@@ -2325,7 +2358,7 @@ var init_event_coercer = __esm(() => {
   init_utils2();
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/error-tracking/coercers/primitive-coercer.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/error-tracking/coercers/primitive-coercer.mjs
 class PrimitiveCoercer {
   match(candidate) {
     return isPrimitive(candidate);
@@ -2343,12 +2376,12 @@ var init_primitive_coercer = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/error-tracking/coercers/promise-rejection-event.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/error-tracking/coercers/promise-rejection-event.mjs
 var init_promise_rejection_event = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/error-tracking/coercers/index.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/error-tracking/coercers/index.mjs
 var init_coercers = __esm(() => {
   init_dom_exception_coercer();
   init_error_coercer();
@@ -2360,7 +2393,7 @@ var init_coercers = __esm(() => {
   init_promise_rejection_event();
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/error-tracking/utils.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/error-tracking/utils.mjs
 class ReduceableCache {
   constructor(_maxSize) {
     this._maxSize = _maxSize;
@@ -2387,7 +2420,7 @@ class ReduceableCache {
 }
 var init_utils3 = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/error-tracking/exception-steps.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/error-tracking/exception-steps.mjs
 var EXCEPTION_STEP_INTERNAL_FIELDS, RESERVED_EXCEPTION_STEP_KEYS;
 var init_exception_steps = __esm(() => {
   init_utils();
@@ -2401,7 +2434,7 @@ var init_exception_steps = __esm(() => {
   ]);
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/error-tracking/release.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/error-tracking/release.mjs
 function getInjectedReleaseId() {
   if ("u" > typeof process) {
     const fromEnvironment = process.env.POSTHOG_RELEASE_ID?.trim();
@@ -2413,7 +2446,7 @@ function getInjectedReleaseId() {
 }
 var init_release = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/error-tracking/index.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/error-tracking/index.mjs
 var init_error_tracking = __esm(() => {
   init_error_properties_builder();
   init_parsers();
@@ -2423,13 +2456,13 @@ var init_error_tracking = __esm(() => {
   init_release();
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/cookie.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/cookie.mjs
 var init_cookie = __esm(() => {
   init_utils();
   init_uuidv7();
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/featureFlagUtils.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/featureFlagUtils.mjs
 function getFlagDetailFromFlagAndPayload(key, value, payload) {
   return {
     key,
@@ -2529,6 +2562,7 @@ var init_featureFlagUtils = __esm(() => {
     "qclid",
     "sccid",
     "oppref",
+    "bfcid",
     "irclid",
     "_kx"
   ];
@@ -2559,7 +2593,7 @@ var init_featureFlagUtils = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/eventemitter.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/eventemitter.mjs
 class SimpleEventEmitter {
   constructor() {
     this.events = {};
@@ -2582,7 +2616,7 @@ class SimpleEventEmitter {
 }
 var init_eventemitter = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/gzip.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/gzip.mjs
 function isGzipSupported() {
   return "CompressionStream" in globalThis && "TextEncoder" in globalThis && "Response" in globalThis && typeof Response.prototype.blob == "function";
 }
@@ -2649,7 +2683,7 @@ var init_gzip = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/posthog-core-stateless.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/posthog-core-stateless.mjs
 async function logFlushError(err) {
   if (err instanceof PostHogFetchHttpError) {
     let text = "";
@@ -3785,7 +3819,7 @@ var init_posthog_core_stateless = __esm(() => {
   };
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/posthog-core.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/posthog-core.mjs
 var init_posthog_core = __esm(() => {
   init_featureFlagUtils();
   init_types();
@@ -3794,7 +3828,7 @@ var init_posthog_core = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/privacy.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/privacy.mjs
 var URL_PATTERN, URL_PATTERN_ONCE, URL_AUTHORITY_SEARCH, URL_AUTHORITY_PATTERN, URL_AUTHORITY_SEARCH_ALL;
 var init_privacy = __esm(() => {
   URL_PATTERN = /[a-z][a-z0-9+.-]{0,63}:[^\s<>"]+/gi;
@@ -3804,12 +3838,12 @@ var init_privacy = __esm(() => {
   URL_AUTHORITY_SEARCH_ALL = new RegExp(URL_AUTHORITY_SEARCH.source, "gi");
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/tracing-headers.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/tracing-headers.mjs
 var init_tracing_headers = __esm(() => {
   init_type_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/featureFlagLocalEvaluation.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/featureFlagLocalEvaluation.mjs
 function isTruthyOrFalsyPropertyValue(value) {
   if (typeof value == "boolean")
     return true;
@@ -4314,7 +4348,7 @@ var init_featureFlagLocalEvaluation = __esm(() => {
   };
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/utils/otlp-any-value.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/utils/otlp-any-value.mjs
 function newState() {
   return {
     ancestors: new WeakSet,
@@ -4495,7 +4529,7 @@ var init_otlp_any_value = __esm(() => {
   propertyIsEnumerable = Object.prototype.propertyIsEnumerable;
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/utils/otlp-resource.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/utils/otlp-resource.mjs
 function buildOtlpResourceAttributes(config, sdkName, sdkVersion) {
   return {
     ...assignUserAttributes({}, config.resourceAttributes),
@@ -4566,7 +4600,7 @@ var init_otlp_resource = __esm(() => {
   };
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/logs/logs-utils.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/logs/logs-utils.mjs
 var OTLP_SEVERITY_MAP, DEFAULT_OTLP_SEVERITY;
 var init_logs_utils = __esm(() => {
   init_utils();
@@ -4602,7 +4636,7 @@ var init_logs_utils = __esm(() => {
   DEFAULT_OTLP_SEVERITY = OTLP_SEVERITY_MAP.info;
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/utils/flush-timer.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/utils/flush-timer.mjs
 class FlushTimer {
   constructor(_onFire) {
     this._onFire = _onFire;
@@ -4635,7 +4669,7 @@ var init_flush_timer = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/utils/backoff.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/utils/backoff.mjs
 function drawJitter() {
   return 1 - JITTER + Math.random() * JITTER * 2;
 }
@@ -4648,7 +4682,7 @@ function backoffDelayMs(baseMs, failures, jitter, maxMs) {
 var MAX_FLUSH_BACKOFF_EXPONENT = 6, MAX_FLUSH_BACKOFF_MS = 30000, JITTER = 0.25, NO_JITTER = 1;
 var init_backoff = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/logs/index.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/logs/index.mjs
 var init_logs = __esm(() => {
   init_logs_utils();
   init_types();
@@ -4658,7 +4692,7 @@ var init_logs = __esm(() => {
   init_backoff();
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/traces/ids.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/traces/ids.mjs
 function getRandomBytes(byteLength) {
   const bytes = new Uint8Array(byteLength);
   const cryptoLike = globalThis.crypto;
@@ -4704,7 +4738,7 @@ var init_ids = __esm(() => {
   HEX_RE = /^[0-9a-f]+$/;
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/traces/traceparent.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/traces/traceparent.mjs
 function parseTraceparent(value) {
   const fields = matchTraceparent(value);
   return fields && {
@@ -4781,7 +4815,7 @@ var init_traceparent = __esm(() => {
   TRACEPARENT_RE = /^([0-9a-f]{2})-([0-9a-f]{32})-([0-9a-f]{16})-([0-9a-f]{2})(-.*)?$/;
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/metrics/metrics-utils.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/metrics/metrics-utils.mjs
 function msToUnixNano(ms) {
   return String(ms) + "000000";
 }
@@ -4844,7 +4878,7 @@ var init_metrics_utils = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/metrics/config.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/metrics/config.mjs
 function resolveMetricsConfig(config) {
   const resourceAttributes = config?.resourceAttributes;
   return {
@@ -4860,7 +4894,7 @@ function resolveMetricsConfig(config) {
 var DEFAULT_FLUSH_INTERVAL_MS = 1e4, DEFAULT_MAX_SERIES_PER_FLUSH = 1000;
 var init_config = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/metrics/index.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/metrics/index.mjs
 class PostHogMetrics {
   constructor(_instance, _config, _logger) {
     this._instance = _instance;
@@ -4923,12 +4957,12 @@ class PostHogMetrics {
   drainWindow() {
     if (this._series.size === 0)
       return null;
-    const window = this._series;
+    const window2 = this._series;
     this._series = new Map;
     this._seriesCapWarned = false;
     this._typeByName = new Map;
     this._typeCollisionWarned = new Set;
-    return this._buildPayload(window);
+    return this._buildPayload(window2);
   }
   reset() {
     this._generation++;
@@ -5075,13 +5109,13 @@ class PostHogMetrics {
     this._flushTimer.clear();
     if (this._series.size === 0)
       return;
-    const window = this._series;
+    const window2 = this._series;
     this._series = new Map;
     this._seriesCapWarned = false;
     this._typeByName = new Map;
     this._typeCollisionWarned = new Set;
     const generation = this._generation;
-    const outcome = await this._instance._sendMetricsBatch(this._buildPayload(window));
+    const outcome = await this._instance._sendMetricsBatch(this._buildPayload(window2));
     if (generation !== this._generation)
       return;
     this._retryAfter.record(outcome);
@@ -5098,7 +5132,7 @@ class PostHogMetrics {
       case "ok":
         return;
       case "retry-later":
-        this._mergeWindowBack(window);
+        this._mergeWindowBack(window2);
         this._flushTimer.armNoEarlierThan(this._nextFlushDelay());
         return;
       case "too-large":
@@ -5109,13 +5143,13 @@ class PostHogMetrics {
         return;
     }
   }
-  _buildPayload(window) {
-    return buildOtlpMetricsPayload(this._buildMetrics(window), buildMetricsResourceAttributes(this._config, this._instance.getLibraryId(), this._instance.getLibraryVersion()), this._instance.getLibraryId(), this._instance.getLibraryVersion());
+  _buildPayload(window2) {
+    return buildOtlpMetricsPayload(this._buildMetrics(window2), buildMetricsResourceAttributes(this._config, this._instance.getLibraryId(), this._instance.getLibraryVersion()), this._instance.getLibraryId(), this._instance.getLibraryVersion());
   }
-  _buildMetrics(window) {
+  _buildMetrics(window2) {
     const nowNano = msToUnixNano(Date.now());
     const byMetric = new Map;
-    for (const state of window.values()) {
+    for (const state of window2.values()) {
       const metricKey = seriesKey(state.type, state.name, state.unit, undefined);
       let metric = byMetric.get(metricKey);
       if (!metric) {
@@ -5180,8 +5214,8 @@ class PostHogMetrics {
     }
     return Array.from(byMetric.values());
   }
-  _mergeWindowBack(window) {
-    for (const [key, old] of window) {
+  _mergeWindowBack(window2) {
+    for (const [key, old] of window2) {
       const current = this._series.get(key);
       if (!current) {
         if (this._admitNewSeries())
@@ -5239,7 +5273,7 @@ var init_metrics = __esm(() => {
   init_config();
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/traces/sanitize.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/traces/sanitize.mjs
 function sanitizeName(name, label, maxLength, logger) {
   if (typeof name == "string" && name.trim())
     return name.length > maxLength ? name.slice(0, maxLength) : name;
@@ -5290,7 +5324,7 @@ function resolveSuppliedTime(value, derived, label, logger) {
 var FALLBACK_SPAN_NAME = "unknown", MAX_TIMESTAMP_MS = 9223372036854, MIN_TIMESTAMP_MS = 0, DEEP_BACKDATE_WARNING_MS = 86400000;
 var init_sanitize = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/traces/span.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/traces/span.mjs
 function monotonicNow() {
   const perf = globalThis.performance;
   return typeof perf?.now == "function" ? perf.now() : undefined;
@@ -5793,7 +5827,7 @@ var init_span = __esm(() => {
   };
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/traces/otlp.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/traces/otlp.mjs
 function spanFlags(record) {
   const traceFlags = parseInt(record.traceFlags, 16);
   const w3c = Number.isFinite(traceFlags) ? 255 & traceFlags : TRACE_FLAGS_SAMPLED2;
@@ -5913,7 +5947,7 @@ var init_otlp = __esm(() => {
   };
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/traces/index.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/traces/index.mjs
 function clockNow() {
   return monotonicNow() ?? Date.now();
 }
@@ -6480,7 +6514,7 @@ var init_traces = __esm(() => {
   init_backoff();
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/traces/context.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/traces/context.mjs
 class SyncSpanContextManager {
   active() {
     return this._active;
@@ -6497,7 +6531,7 @@ class SyncSpanContextManager {
 }
 var init_context = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/traces/config.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/traces/config.mjs
 function positiveInteger2(value, fallback) {
   return typeof value == "number" && Number.isInteger(value) && value >= 1 ? value : fallback;
 }
@@ -6561,12 +6595,12 @@ var init_config2 = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/surveys/validation.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/surveys/validation.mjs
 var init_validation = __esm(() => {
   init_types();
 });
 
-// node_modules/.bun/@posthog+core@1.59.0/node_modules/@posthog/core/dist/index.mjs
+// node_modules/.bun/@posthog+core@1.59.1/node_modules/@posthog/core/dist/index.mjs
 var init_dist = __esm(() => {
   init_error_tracking();
   init_featureFlagUtils();
@@ -6592,7 +6626,7 @@ var init_dist = __esm(() => {
   init_types();
 });
 
-// node_modules/.bun/posthog-node@5.56.0/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/context-lines.node.mjs
+// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/context-lines.node.mjs
 import { constants as constants2 } from "node:fs";
 import { open as promises_open } from "node:fs/promises";
 import { isAbsolute as isAbsolute7 } from "node:path";
@@ -6879,7 +6913,7 @@ var init_context_lines_node = __esm(() => {
   LRU_FILE_CONTENTS_FS_READ_FAILED = new ReduceableCache(20);
 });
 
-// node_modules/.bun/posthog-node@5.56.0/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/relative-path.node.mjs
+// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/relative-path.node.mjs
 import { isAbsolute as isAbsolute8, relative as relative4, sep as sep8 } from "node:path";
 function createRelativePathModifier(basePath = process.cwd()) {
   const isWindows = sep8 === "\\";
@@ -6896,11 +6930,11 @@ function createRelativePathModifier(basePath = process.cwd()) {
 }
 var init_relative_path_node = () => {};
 
-// node_modules/.bun/posthog-node@5.56.0/node_modules/posthog-node/dist/version.mjs
-var version2 = "5.56.0";
+// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/version.mjs
+var version2 = "5.56.1";
 var init_version = () => {};
 
-// node_modules/.bun/posthog-node@5.56.0/node_modules/posthog-node/dist/types.mjs
+// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/types.mjs
 var FeatureFlagError2;
 var init_types3 = __esm(() => {
   FeatureFlagError2 = {
@@ -6911,7 +6945,7 @@ var init_types3 = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.56.0/node_modules/posthog-node/dist/feature-flag-evaluations.mjs
+// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/feature-flag-evaluations.mjs
 class FeatureFlagEvaluations {
   constructor(init) {
     this._host = init.host;
@@ -7047,7 +7081,7 @@ var init_feature_flag_evaluations = __esm(() => {
   init_types3();
 });
 
-// node_modules/.bun/posthog-node@5.56.0/node_modules/posthog-node/dist/extensions/feature-flags/feature-flags.mjs
+// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/extensions/feature-flags/feature-flags.mjs
 function normalizeEvaluationRuntime(value) {
   return value === "client" || value === "server" ? value : "all";
 }
@@ -7725,7 +7759,7 @@ var init_feature_flags = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.56.0/node_modules/posthog-node/dist/extensions/error-tracking/autocapture.mjs
+// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/extensions/error-tracking/autocapture.mjs
 function splitNodeOptions(nodeOptions) {
   const args = [];
   let current = "";
@@ -7826,7 +7860,7 @@ var init_autocapture = __esm(() => {
   STARTUP_UNHANDLED_REJECTION_MODE = getUnhandledRejectionMode();
 });
 
-// node_modules/.bun/posthog-node@5.56.0/node_modules/posthog-node/dist/extensions/error-tracking/index.mjs
+// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/extensions/error-tracking/index.mjs
 class error_tracking_ErrorTracking {
   constructor(client, options, _logger) {
     this.client = client;
@@ -7901,7 +7935,1508 @@ var init_error_tracking2 = __esm(() => {
   error_tracking_default = error_tracking_ErrorTracking;
 });
 
-// node_modules/.bun/posthog-node@5.56.0/node_modules/posthog-node/dist/storage-memory.mjs
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/version.js
+var require_version = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.VERSION = undefined;
+  exports.VERSION = "1.9.1";
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/internal/semver.js
+var require_semver = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.isCompatible = exports._makeCompatibilityCheck = undefined;
+  var version_1 = require_version();
+  var re = /^(\d+)\.(\d+)\.(\d+)(-(.+))?$/;
+  function _makeCompatibilityCheck(ownVersion) {
+    const acceptedVersions = new Set([ownVersion]);
+    const rejectedVersions = new Set;
+    const myVersionMatch = ownVersion.match(re);
+    if (!myVersionMatch) {
+      return () => false;
+    }
+    const ownVersionParsed = {
+      major: +myVersionMatch[1],
+      minor: +myVersionMatch[2],
+      patch: +myVersionMatch[3],
+      prerelease: myVersionMatch[4]
+    };
+    if (ownVersionParsed.prerelease != null) {
+      return function isExactmatch(globalVersion) {
+        return globalVersion === ownVersion;
+      };
+    }
+    function _reject(v) {
+      rejectedVersions.add(v);
+      return false;
+    }
+    function _accept(v) {
+      acceptedVersions.add(v);
+      return true;
+    }
+    return function isCompatible(globalVersion) {
+      if (acceptedVersions.has(globalVersion)) {
+        return true;
+      }
+      if (rejectedVersions.has(globalVersion)) {
+        return false;
+      }
+      const globalVersionMatch = globalVersion.match(re);
+      if (!globalVersionMatch) {
+        return _reject(globalVersion);
+      }
+      const globalVersionParsed = {
+        major: +globalVersionMatch[1],
+        minor: +globalVersionMatch[2],
+        patch: +globalVersionMatch[3],
+        prerelease: globalVersionMatch[4]
+      };
+      if (globalVersionParsed.prerelease != null) {
+        return _reject(globalVersion);
+      }
+      if (ownVersionParsed.major !== globalVersionParsed.major) {
+        return _reject(globalVersion);
+      }
+      if (ownVersionParsed.major === 0) {
+        if (ownVersionParsed.minor === globalVersionParsed.minor && ownVersionParsed.patch <= globalVersionParsed.patch) {
+          return _accept(globalVersion);
+        }
+        return _reject(globalVersion);
+      }
+      if (ownVersionParsed.minor <= globalVersionParsed.minor) {
+        return _accept(globalVersion);
+      }
+      return _reject(globalVersion);
+    };
+  }
+  exports._makeCompatibilityCheck = _makeCompatibilityCheck;
+  exports.isCompatible = _makeCompatibilityCheck(version_1.VERSION);
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/internal/global-utils.js
+var require_global_utils = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.unregisterGlobal = exports.getGlobal = exports.registerGlobal = undefined;
+  var version_1 = require_version();
+  var semver_1 = require_semver();
+  var major = version_1.VERSION.split(".")[0];
+  var GLOBAL_OPENTELEMETRY_API_KEY = Symbol.for(`opentelemetry.js.api.${major}`);
+  var _global = typeof globalThis === "object" ? globalThis : typeof self === "object" ? self : typeof window === "object" ? window : typeof global === "object" ? global : {};
+  function registerGlobal(type, instance, diag, allowOverride = false) {
+    var _a;
+    const api = _global[GLOBAL_OPENTELEMETRY_API_KEY] = (_a = _global[GLOBAL_OPENTELEMETRY_API_KEY]) !== null && _a !== undefined ? _a : {
+      version: version_1.VERSION
+    };
+    if (!allowOverride && api[type]) {
+      const err = new Error(`@opentelemetry/api: Attempted duplicate registration of API: ${type}`);
+      diag.error(err.stack || err.message);
+      return false;
+    }
+    if (api.version !== version_1.VERSION) {
+      const err = new Error(`@opentelemetry/api: Registration of version v${api.version} for ${type} does not match previously registered API v${version_1.VERSION}`);
+      diag.error(err.stack || err.message);
+      return false;
+    }
+    api[type] = instance;
+    diag.debug(`@opentelemetry/api: Registered a global for ${type} v${version_1.VERSION}.`);
+    return true;
+  }
+  exports.registerGlobal = registerGlobal;
+  function getGlobal(type) {
+    var _a, _b;
+    const globalVersion = (_a = _global[GLOBAL_OPENTELEMETRY_API_KEY]) === null || _a === undefined ? undefined : _a.version;
+    if (!globalVersion || !(0, semver_1.isCompatible)(globalVersion)) {
+      return;
+    }
+    return (_b = _global[GLOBAL_OPENTELEMETRY_API_KEY]) === null || _b === undefined ? undefined : _b[type];
+  }
+  exports.getGlobal = getGlobal;
+  function unregisterGlobal(type, diag) {
+    diag.debug(`@opentelemetry/api: Unregistering a global for ${type} v${version_1.VERSION}.`);
+    const api = _global[GLOBAL_OPENTELEMETRY_API_KEY];
+    if (api) {
+      delete api[type];
+    }
+  }
+  exports.unregisterGlobal = unregisterGlobal;
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/diag/ComponentLogger.js
+var require_ComponentLogger = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.DiagComponentLogger = undefined;
+  var global_utils_1 = require_global_utils();
+
+  class DiagComponentLogger {
+    constructor(props) {
+      this._namespace = props.namespace || "DiagComponentLogger";
+    }
+    debug(...args) {
+      return logProxy("debug", this._namespace, args);
+    }
+    error(...args) {
+      return logProxy("error", this._namespace, args);
+    }
+    info(...args) {
+      return logProxy("info", this._namespace, args);
+    }
+    warn(...args) {
+      return logProxy("warn", this._namespace, args);
+    }
+    verbose(...args) {
+      return logProxy("verbose", this._namespace, args);
+    }
+  }
+  exports.DiagComponentLogger = DiagComponentLogger;
+  function logProxy(funcName, namespace, args) {
+    const logger = (0, global_utils_1.getGlobal)("diag");
+    if (!logger) {
+      return;
+    }
+    return logger[funcName](namespace, ...args);
+  }
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/diag/types.js
+var require_types = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.DiagLogLevel = undefined;
+  var DiagLogLevel;
+  (function(DiagLogLevel) {
+    DiagLogLevel[DiagLogLevel["NONE"] = 0] = "NONE";
+    DiagLogLevel[DiagLogLevel["ERROR"] = 30] = "ERROR";
+    DiagLogLevel[DiagLogLevel["WARN"] = 50] = "WARN";
+    DiagLogLevel[DiagLogLevel["INFO"] = 60] = "INFO";
+    DiagLogLevel[DiagLogLevel["DEBUG"] = 70] = "DEBUG";
+    DiagLogLevel[DiagLogLevel["VERBOSE"] = 80] = "VERBOSE";
+    DiagLogLevel[DiagLogLevel["ALL"] = 9999] = "ALL";
+  })(DiagLogLevel = exports.DiagLogLevel || (exports.DiagLogLevel = {}));
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/diag/internal/logLevelLogger.js
+var require_logLevelLogger = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.createLogLevelDiagLogger = undefined;
+  var types_1 = require_types();
+  function createLogLevelDiagLogger(maxLevel, logger) {
+    if (maxLevel < types_1.DiagLogLevel.NONE) {
+      maxLevel = types_1.DiagLogLevel.NONE;
+    } else if (maxLevel > types_1.DiagLogLevel.ALL) {
+      maxLevel = types_1.DiagLogLevel.ALL;
+    }
+    logger = logger || {};
+    function _filterFunc(funcName, theLevel) {
+      const theFunc = logger[funcName];
+      if (typeof theFunc === "function" && maxLevel >= theLevel) {
+        return theFunc.bind(logger);
+      }
+      return function() {};
+    }
+    return {
+      error: _filterFunc("error", types_1.DiagLogLevel.ERROR),
+      warn: _filterFunc("warn", types_1.DiagLogLevel.WARN),
+      info: _filterFunc("info", types_1.DiagLogLevel.INFO),
+      debug: _filterFunc("debug", types_1.DiagLogLevel.DEBUG),
+      verbose: _filterFunc("verbose", types_1.DiagLogLevel.VERBOSE)
+    };
+  }
+  exports.createLogLevelDiagLogger = createLogLevelDiagLogger;
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/api/diag.js
+var require_diag = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.DiagAPI = undefined;
+  var ComponentLogger_1 = require_ComponentLogger();
+  var logLevelLogger_1 = require_logLevelLogger();
+  var types_1 = require_types();
+  var global_utils_1 = require_global_utils();
+  var API_NAME = "diag";
+
+  class DiagAPI {
+    static instance() {
+      if (!this._instance) {
+        this._instance = new DiagAPI;
+      }
+      return this._instance;
+    }
+    constructor() {
+      function _logProxy(funcName) {
+        return function(...args) {
+          const logger = (0, global_utils_1.getGlobal)("diag");
+          if (!logger)
+            return;
+          return logger[funcName](...args);
+        };
+      }
+      const self2 = this;
+      const setLogger = (logger, optionsOrLogLevel = { logLevel: types_1.DiagLogLevel.INFO }) => {
+        var _a, _b, _c;
+        if (logger === self2) {
+          const err = new Error("Cannot use diag as the logger for itself. Please use a DiagLogger implementation like ConsoleDiagLogger or a custom implementation");
+          self2.error((_a = err.stack) !== null && _a !== undefined ? _a : err.message);
+          return false;
+        }
+        if (typeof optionsOrLogLevel === "number") {
+          optionsOrLogLevel = {
+            logLevel: optionsOrLogLevel
+          };
+        }
+        const oldLogger = (0, global_utils_1.getGlobal)("diag");
+        const newLogger = (0, logLevelLogger_1.createLogLevelDiagLogger)((_b = optionsOrLogLevel.logLevel) !== null && _b !== undefined ? _b : types_1.DiagLogLevel.INFO, logger);
+        if (oldLogger && !optionsOrLogLevel.suppressOverrideMessage) {
+          const stack = (_c = new Error().stack) !== null && _c !== undefined ? _c : "<failed to generate stacktrace>";
+          oldLogger.warn(`Current logger will be overwritten from ${stack}`);
+          newLogger.warn(`Current logger will overwrite one already registered from ${stack}`);
+        }
+        return (0, global_utils_1.registerGlobal)("diag", newLogger, self2, true);
+      };
+      self2.setLogger = setLogger;
+      self2.disable = () => {
+        (0, global_utils_1.unregisterGlobal)(API_NAME, self2);
+      };
+      self2.createComponentLogger = (options) => {
+        return new ComponentLogger_1.DiagComponentLogger(options);
+      };
+      self2.verbose = _logProxy("verbose");
+      self2.debug = _logProxy("debug");
+      self2.info = _logProxy("info");
+      self2.warn = _logProxy("warn");
+      self2.error = _logProxy("error");
+    }
+  }
+  exports.DiagAPI = DiagAPI;
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/baggage/internal/baggage-impl.js
+var require_baggage_impl = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.BaggageImpl = undefined;
+
+  class BaggageImpl {
+    constructor(entries) {
+      this._entries = entries ? new Map(entries) : new Map;
+    }
+    getEntry(key) {
+      const entry = this._entries.get(key);
+      if (!entry) {
+        return;
+      }
+      return Object.assign({}, entry);
+    }
+    getAllEntries() {
+      return Array.from(this._entries.entries());
+    }
+    setEntry(key, entry) {
+      const newBaggage = new BaggageImpl(this._entries);
+      newBaggage._entries.set(key, entry);
+      return newBaggage;
+    }
+    removeEntry(key) {
+      const newBaggage = new BaggageImpl(this._entries);
+      newBaggage._entries.delete(key);
+      return newBaggage;
+    }
+    removeEntries(...keys) {
+      const newBaggage = new BaggageImpl(this._entries);
+      for (const key of keys) {
+        newBaggage._entries.delete(key);
+      }
+      return newBaggage;
+    }
+    clear() {
+      return new BaggageImpl;
+    }
+  }
+  exports.BaggageImpl = BaggageImpl;
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/baggage/internal/symbol.js
+var require_symbol = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.baggageEntryMetadataSymbol = undefined;
+  exports.baggageEntryMetadataSymbol = Symbol("BaggageEntryMetadata");
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/baggage/utils.js
+var require_utils = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.baggageEntryMetadataFromString = exports.createBaggage = undefined;
+  var diag_1 = require_diag();
+  var baggage_impl_1 = require_baggage_impl();
+  var symbol_1 = require_symbol();
+  var diag = diag_1.DiagAPI.instance();
+  function createBaggage(entries = {}) {
+    return new baggage_impl_1.BaggageImpl(new Map(Object.entries(entries)));
+  }
+  exports.createBaggage = createBaggage;
+  function baggageEntryMetadataFromString(str) {
+    if (typeof str !== "string") {
+      diag.error(`Cannot create baggage metadata from unknown type: ${typeof str}`);
+      str = "";
+    }
+    return {
+      __TYPE__: symbol_1.baggageEntryMetadataSymbol,
+      toString() {
+        return str;
+      }
+    };
+  }
+  exports.baggageEntryMetadataFromString = baggageEntryMetadataFromString;
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/context/context.js
+var require_context = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.ROOT_CONTEXT = exports.createContextKey = undefined;
+  function createContextKey(description) {
+    return Symbol.for(description);
+  }
+  exports.createContextKey = createContextKey;
+
+  class BaseContext {
+    constructor(parentContext) {
+      const self2 = this;
+      self2._currentContext = parentContext ? new Map(parentContext) : new Map;
+      self2.getValue = (key) => self2._currentContext.get(key);
+      self2.setValue = (key, value) => {
+        const context = new BaseContext(self2._currentContext);
+        context._currentContext.set(key, value);
+        return context;
+      };
+      self2.deleteValue = (key) => {
+        const context = new BaseContext(self2._currentContext);
+        context._currentContext.delete(key);
+        return context;
+      };
+    }
+  }
+  exports.ROOT_CONTEXT = new BaseContext;
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/diag/consoleLogger.js
+var require_consoleLogger = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.DiagConsoleLogger = exports._originalConsoleMethods = undefined;
+  var consoleMap = [
+    { n: "error", c: "error" },
+    { n: "warn", c: "warn" },
+    { n: "info", c: "info" },
+    { n: "debug", c: "debug" },
+    { n: "verbose", c: "trace" }
+  ];
+  exports._originalConsoleMethods = {};
+  if (typeof console !== "undefined") {
+    const keys = [
+      "error",
+      "warn",
+      "info",
+      "debug",
+      "trace",
+      "log"
+    ];
+    for (const key of keys) {
+      if (typeof console[key] === "function") {
+        exports._originalConsoleMethods[key] = console[key];
+      }
+    }
+  }
+
+  class DiagConsoleLogger {
+    constructor() {
+      function _consoleFunc(funcName) {
+        return function(...args) {
+          let theFunc = exports._originalConsoleMethods[funcName];
+          if (typeof theFunc !== "function") {
+            theFunc = exports._originalConsoleMethods["log"];
+          }
+          if (typeof theFunc !== "function" && console) {
+            theFunc = console[funcName];
+            if (typeof theFunc !== "function") {
+              theFunc = console.log;
+            }
+          }
+          if (typeof theFunc === "function") {
+            return theFunc.apply(console, args);
+          }
+        };
+      }
+      for (let i = 0;i < consoleMap.length; i++) {
+        this[consoleMap[i].n] = _consoleFunc(consoleMap[i].c);
+      }
+    }
+  }
+  exports.DiagConsoleLogger = DiagConsoleLogger;
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/metrics/NoopMeter.js
+var require_NoopMeter = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.createNoopMeter = exports.NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC = exports.NOOP_OBSERVABLE_GAUGE_METRIC = exports.NOOP_OBSERVABLE_COUNTER_METRIC = exports.NOOP_UP_DOWN_COUNTER_METRIC = exports.NOOP_HISTOGRAM_METRIC = exports.NOOP_GAUGE_METRIC = exports.NOOP_COUNTER_METRIC = exports.NOOP_METER = exports.NoopObservableUpDownCounterMetric = exports.NoopObservableGaugeMetric = exports.NoopObservableCounterMetric = exports.NoopObservableMetric = exports.NoopHistogramMetric = exports.NoopGaugeMetric = exports.NoopUpDownCounterMetric = exports.NoopCounterMetric = exports.NoopMetric = exports.NoopMeter = undefined;
+
+  class NoopMeter {
+    constructor() {}
+    createGauge(_name, _options) {
+      return exports.NOOP_GAUGE_METRIC;
+    }
+    createHistogram(_name, _options) {
+      return exports.NOOP_HISTOGRAM_METRIC;
+    }
+    createCounter(_name, _options) {
+      return exports.NOOP_COUNTER_METRIC;
+    }
+    createUpDownCounter(_name, _options) {
+      return exports.NOOP_UP_DOWN_COUNTER_METRIC;
+    }
+    createObservableGauge(_name, _options) {
+      return exports.NOOP_OBSERVABLE_GAUGE_METRIC;
+    }
+    createObservableCounter(_name, _options) {
+      return exports.NOOP_OBSERVABLE_COUNTER_METRIC;
+    }
+    createObservableUpDownCounter(_name, _options) {
+      return exports.NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC;
+    }
+    addBatchObservableCallback(_callback, _observables) {}
+    removeBatchObservableCallback(_callback) {}
+  }
+  exports.NoopMeter = NoopMeter;
+
+  class NoopMetric {
+  }
+  exports.NoopMetric = NoopMetric;
+
+  class NoopCounterMetric extends NoopMetric {
+    add(_value, _attributes) {}
+  }
+  exports.NoopCounterMetric = NoopCounterMetric;
+
+  class NoopUpDownCounterMetric extends NoopMetric {
+    add(_value, _attributes) {}
+  }
+  exports.NoopUpDownCounterMetric = NoopUpDownCounterMetric;
+
+  class NoopGaugeMetric extends NoopMetric {
+    record(_value, _attributes) {}
+  }
+  exports.NoopGaugeMetric = NoopGaugeMetric;
+
+  class NoopHistogramMetric extends NoopMetric {
+    record(_value, _attributes) {}
+  }
+  exports.NoopHistogramMetric = NoopHistogramMetric;
+
+  class NoopObservableMetric {
+    addCallback(_callback) {}
+    removeCallback(_callback) {}
+  }
+  exports.NoopObservableMetric = NoopObservableMetric;
+
+  class NoopObservableCounterMetric extends NoopObservableMetric {
+  }
+  exports.NoopObservableCounterMetric = NoopObservableCounterMetric;
+
+  class NoopObservableGaugeMetric extends NoopObservableMetric {
+  }
+  exports.NoopObservableGaugeMetric = NoopObservableGaugeMetric;
+
+  class NoopObservableUpDownCounterMetric extends NoopObservableMetric {
+  }
+  exports.NoopObservableUpDownCounterMetric = NoopObservableUpDownCounterMetric;
+  exports.NOOP_METER = new NoopMeter;
+  exports.NOOP_COUNTER_METRIC = new NoopCounterMetric;
+  exports.NOOP_GAUGE_METRIC = new NoopGaugeMetric;
+  exports.NOOP_HISTOGRAM_METRIC = new NoopHistogramMetric;
+  exports.NOOP_UP_DOWN_COUNTER_METRIC = new NoopUpDownCounterMetric;
+  exports.NOOP_OBSERVABLE_COUNTER_METRIC = new NoopObservableCounterMetric;
+  exports.NOOP_OBSERVABLE_GAUGE_METRIC = new NoopObservableGaugeMetric;
+  exports.NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC = new NoopObservableUpDownCounterMetric;
+  function createNoopMeter() {
+    return exports.NOOP_METER;
+  }
+  exports.createNoopMeter = createNoopMeter;
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/metrics/Metric.js
+var require_Metric = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.ValueType = undefined;
+  var ValueType;
+  (function(ValueType) {
+    ValueType[ValueType["INT"] = 0] = "INT";
+    ValueType[ValueType["DOUBLE"] = 1] = "DOUBLE";
+  })(ValueType = exports.ValueType || (exports.ValueType = {}));
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/propagation/TextMapPropagator.js
+var require_TextMapPropagator = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.defaultTextMapSetter = exports.defaultTextMapGetter = undefined;
+  exports.defaultTextMapGetter = {
+    get(carrier, key) {
+      if (carrier == null) {
+        return;
+      }
+      return carrier[key];
+    },
+    keys(carrier) {
+      if (carrier == null) {
+        return [];
+      }
+      return Object.keys(carrier);
+    }
+  };
+  exports.defaultTextMapSetter = {
+    set(carrier, key, value) {
+      if (carrier == null) {
+        return;
+      }
+      carrier[key] = value;
+    }
+  };
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js
+var require_NoopContextManager = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.NoopContextManager = undefined;
+  var context_1 = require_context();
+
+  class NoopContextManager {
+    active() {
+      return context_1.ROOT_CONTEXT;
+    }
+    with(_context, fn, thisArg, ...args) {
+      return fn.call(thisArg, ...args);
+    }
+    bind(_context, target) {
+      return target;
+    }
+    enable() {
+      return this;
+    }
+    disable() {
+      return this;
+    }
+  }
+  exports.NoopContextManager = NoopContextManager;
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/api/context.js
+var require_context2 = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.ContextAPI = undefined;
+  var NoopContextManager_1 = require_NoopContextManager();
+  var global_utils_1 = require_global_utils();
+  var diag_1 = require_diag();
+  var API_NAME = "context";
+  var NOOP_CONTEXT_MANAGER = new NoopContextManager_1.NoopContextManager;
+
+  class ContextAPI {
+    constructor() {}
+    static getInstance() {
+      if (!this._instance) {
+        this._instance = new ContextAPI;
+      }
+      return this._instance;
+    }
+    setGlobalContextManager(contextManager) {
+      return (0, global_utils_1.registerGlobal)(API_NAME, contextManager, diag_1.DiagAPI.instance());
+    }
+    active() {
+      return this._getContextManager().active();
+    }
+    with(context, fn, thisArg, ...args) {
+      return this._getContextManager().with(context, fn, thisArg, ...args);
+    }
+    bind(context, target) {
+      return this._getContextManager().bind(context, target);
+    }
+    _getContextManager() {
+      return (0, global_utils_1.getGlobal)(API_NAME) || NOOP_CONTEXT_MANAGER;
+    }
+    disable() {
+      this._getContextManager().disable();
+      (0, global_utils_1.unregisterGlobal)(API_NAME, diag_1.DiagAPI.instance());
+    }
+  }
+  exports.ContextAPI = ContextAPI;
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/trace_flags.js
+var require_trace_flags = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.TraceFlags = undefined;
+  var TraceFlags;
+  (function(TraceFlags) {
+    TraceFlags[TraceFlags["NONE"] = 0] = "NONE";
+    TraceFlags[TraceFlags["SAMPLED"] = 1] = "SAMPLED";
+  })(TraceFlags = exports.TraceFlags || (exports.TraceFlags = {}));
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/invalid-span-constants.js
+var require_invalid_span_constants = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.INVALID_SPAN_CONTEXT = exports.INVALID_TRACEID = exports.INVALID_SPANID = undefined;
+  var trace_flags_1 = require_trace_flags();
+  exports.INVALID_SPANID = "0000000000000000";
+  exports.INVALID_TRACEID = "00000000000000000000000000000000";
+  exports.INVALID_SPAN_CONTEXT = {
+    traceId: exports.INVALID_TRACEID,
+    spanId: exports.INVALID_SPANID,
+    traceFlags: trace_flags_1.TraceFlags.NONE
+  };
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/NonRecordingSpan.js
+var require_NonRecordingSpan = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.NonRecordingSpan = undefined;
+  var invalid_span_constants_1 = require_invalid_span_constants();
+
+  class NonRecordingSpan {
+    constructor(spanContext = invalid_span_constants_1.INVALID_SPAN_CONTEXT) {
+      this._spanContext = spanContext;
+    }
+    spanContext() {
+      return this._spanContext;
+    }
+    setAttribute(_key, _value) {
+      return this;
+    }
+    setAttributes(_attributes) {
+      return this;
+    }
+    addEvent(_name, _attributes) {
+      return this;
+    }
+    addLink(_link) {
+      return this;
+    }
+    addLinks(_links) {
+      return this;
+    }
+    setStatus(_status) {
+      return this;
+    }
+    updateName(_name) {
+      return this;
+    }
+    end(_endTime) {}
+    isRecording() {
+      return false;
+    }
+    recordException(_exception, _time) {}
+  }
+  exports.NonRecordingSpan = NonRecordingSpan;
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/context-utils.js
+var require_context_utils = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.getSpanContext = exports.setSpanContext = exports.deleteSpan = exports.setSpan = exports.getActiveSpan = exports.getSpan = undefined;
+  var context_1 = require_context();
+  var NonRecordingSpan_1 = require_NonRecordingSpan();
+  var context_2 = require_context2();
+  var SPAN_KEY = (0, context_1.createContextKey)("OpenTelemetry Context Key SPAN");
+  function getSpan(context) {
+    return context.getValue(SPAN_KEY) || undefined;
+  }
+  exports.getSpan = getSpan;
+  function getActiveSpan() {
+    return getSpan(context_2.ContextAPI.getInstance().active());
+  }
+  exports.getActiveSpan = getActiveSpan;
+  function setSpan(context, span) {
+    return context.setValue(SPAN_KEY, span);
+  }
+  exports.setSpan = setSpan;
+  function deleteSpan(context) {
+    return context.deleteValue(SPAN_KEY);
+  }
+  exports.deleteSpan = deleteSpan;
+  function setSpanContext(context, spanContext) {
+    return setSpan(context, new NonRecordingSpan_1.NonRecordingSpan(spanContext));
+  }
+  exports.setSpanContext = setSpanContext;
+  function getSpanContext(context) {
+    var _a;
+    return (_a = getSpan(context)) === null || _a === undefined ? undefined : _a.spanContext();
+  }
+  exports.getSpanContext = getSpanContext;
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/spancontext-utils.js
+var require_spancontext_utils = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.wrapSpanContext = exports.isSpanContextValid = exports.isValidSpanId = exports.isValidTraceId = undefined;
+  var invalid_span_constants_1 = require_invalid_span_constants();
+  var NonRecordingSpan_1 = require_NonRecordingSpan();
+  var isHex = new Uint8Array([
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ]);
+  function isValidHex(id, length) {
+    if (typeof id !== "string" || id.length !== length)
+      return false;
+    let r = 0;
+    for (let i = 0;i < id.length; i += 4) {
+      r += (isHex[id.charCodeAt(i)] | 0) + (isHex[id.charCodeAt(i + 1)] | 0) + (isHex[id.charCodeAt(i + 2)] | 0) + (isHex[id.charCodeAt(i + 3)] | 0);
+    }
+    return r === length;
+  }
+  function isValidTraceId(traceId) {
+    return isValidHex(traceId, 32) && traceId !== invalid_span_constants_1.INVALID_TRACEID;
+  }
+  exports.isValidTraceId = isValidTraceId;
+  function isValidSpanId(spanId) {
+    return isValidHex(spanId, 16) && spanId !== invalid_span_constants_1.INVALID_SPANID;
+  }
+  exports.isValidSpanId = isValidSpanId;
+  function isSpanContextValid(spanContext) {
+    return isValidTraceId(spanContext.traceId) && isValidSpanId(spanContext.spanId);
+  }
+  exports.isSpanContextValid = isSpanContextValid;
+  function wrapSpanContext(spanContext) {
+    return new NonRecordingSpan_1.NonRecordingSpan(spanContext);
+  }
+  exports.wrapSpanContext = wrapSpanContext;
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js
+var require_NoopTracer = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.NoopTracer = undefined;
+  var context_1 = require_context2();
+  var context_utils_1 = require_context_utils();
+  var NonRecordingSpan_1 = require_NonRecordingSpan();
+  var spancontext_utils_1 = require_spancontext_utils();
+  var contextApi = context_1.ContextAPI.getInstance();
+
+  class NoopTracer {
+    startSpan(name, options, context = contextApi.active()) {
+      const root = Boolean(options === null || options === undefined ? undefined : options.root);
+      if (root) {
+        return new NonRecordingSpan_1.NonRecordingSpan;
+      }
+      const parentFromContext = context && (0, context_utils_1.getSpanContext)(context);
+      if (isSpanContext(parentFromContext) && (0, spancontext_utils_1.isSpanContextValid)(parentFromContext)) {
+        return new NonRecordingSpan_1.NonRecordingSpan(parentFromContext);
+      } else {
+        return new NonRecordingSpan_1.NonRecordingSpan;
+      }
+    }
+    startActiveSpan(name, arg2, arg3, arg4) {
+      let opts;
+      let ctx;
+      let fn;
+      if (arguments.length < 2) {
+        return;
+      } else if (arguments.length === 2) {
+        fn = arg2;
+      } else if (arguments.length === 3) {
+        opts = arg2;
+        fn = arg3;
+      } else {
+        opts = arg2;
+        ctx = arg3;
+        fn = arg4;
+      }
+      const parentContext = ctx !== null && ctx !== undefined ? ctx : contextApi.active();
+      const span = this.startSpan(name, opts, parentContext);
+      const contextWithSpanSet = (0, context_utils_1.setSpan)(parentContext, span);
+      return contextApi.with(contextWithSpanSet, fn, undefined, span);
+    }
+  }
+  exports.NoopTracer = NoopTracer;
+  function isSpanContext(spanContext) {
+    return spanContext !== null && typeof spanContext === "object" && "spanId" in spanContext && typeof spanContext["spanId"] === "string" && "traceId" in spanContext && typeof spanContext["traceId"] === "string" && "traceFlags" in spanContext && typeof spanContext["traceFlags"] === "number";
+  }
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js
+var require_ProxyTracer = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.ProxyTracer = undefined;
+  var NoopTracer_1 = require_NoopTracer();
+  var NOOP_TRACER = new NoopTracer_1.NoopTracer;
+
+  class ProxyTracer {
+    constructor(provider, name, version, options) {
+      this._provider = provider;
+      this.name = name;
+      this.version = version;
+      this.options = options;
+    }
+    startSpan(name, options, context) {
+      return this._getTracer().startSpan(name, options, context);
+    }
+    startActiveSpan(_name, _options, _context, _fn) {
+      const tracer = this._getTracer();
+      return Reflect.apply(tracer.startActiveSpan, tracer, arguments);
+    }
+    _getTracer() {
+      if (this._delegate) {
+        return this._delegate;
+      }
+      const tracer = this._provider.getDelegateTracer(this.name, this.version, this.options);
+      if (!tracer) {
+        return NOOP_TRACER;
+      }
+      this._delegate = tracer;
+      return this._delegate;
+    }
+  }
+  exports.ProxyTracer = ProxyTracer;
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/NoopTracerProvider.js
+var require_NoopTracerProvider = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.NoopTracerProvider = undefined;
+  var NoopTracer_1 = require_NoopTracer();
+
+  class NoopTracerProvider {
+    getTracer(_name, _version, _options) {
+      return new NoopTracer_1.NoopTracer;
+    }
+  }
+  exports.NoopTracerProvider = NoopTracerProvider;
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/ProxyTracerProvider.js
+var require_ProxyTracerProvider = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.ProxyTracerProvider = undefined;
+  var ProxyTracer_1 = require_ProxyTracer();
+  var NoopTracerProvider_1 = require_NoopTracerProvider();
+  var NOOP_TRACER_PROVIDER = new NoopTracerProvider_1.NoopTracerProvider;
+
+  class ProxyTracerProvider {
+    getTracer(name, version, options) {
+      var _a;
+      return (_a = this.getDelegateTracer(name, version, options)) !== null && _a !== undefined ? _a : new ProxyTracer_1.ProxyTracer(this, name, version, options);
+    }
+    getDelegate() {
+      var _a;
+      return (_a = this._delegate) !== null && _a !== undefined ? _a : NOOP_TRACER_PROVIDER;
+    }
+    setDelegate(delegate) {
+      this._delegate = delegate;
+    }
+    getDelegateTracer(name, version, options) {
+      var _a;
+      return (_a = this._delegate) === null || _a === undefined ? undefined : _a.getTracer(name, version, options);
+    }
+  }
+  exports.ProxyTracerProvider = ProxyTracerProvider;
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/SamplingResult.js
+var require_SamplingResult = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.SamplingDecision = undefined;
+  var SamplingDecision;
+  (function(SamplingDecision) {
+    SamplingDecision[SamplingDecision["NOT_RECORD"] = 0] = "NOT_RECORD";
+    SamplingDecision[SamplingDecision["RECORD"] = 1] = "RECORD";
+    SamplingDecision[SamplingDecision["RECORD_AND_SAMPLED"] = 2] = "RECORD_AND_SAMPLED";
+  })(SamplingDecision = exports.SamplingDecision || (exports.SamplingDecision = {}));
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/span_kind.js
+var require_span_kind = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.SpanKind = undefined;
+  var SpanKind;
+  (function(SpanKind) {
+    SpanKind[SpanKind["INTERNAL"] = 0] = "INTERNAL";
+    SpanKind[SpanKind["SERVER"] = 1] = "SERVER";
+    SpanKind[SpanKind["CLIENT"] = 2] = "CLIENT";
+    SpanKind[SpanKind["PRODUCER"] = 3] = "PRODUCER";
+    SpanKind[SpanKind["CONSUMER"] = 4] = "CONSUMER";
+  })(SpanKind = exports.SpanKind || (exports.SpanKind = {}));
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/status.js
+var require_status = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.SpanStatusCode = undefined;
+  var SpanStatusCode;
+  (function(SpanStatusCode) {
+    SpanStatusCode[SpanStatusCode["UNSET"] = 0] = "UNSET";
+    SpanStatusCode[SpanStatusCode["OK"] = 1] = "OK";
+    SpanStatusCode[SpanStatusCode["ERROR"] = 2] = "ERROR";
+  })(SpanStatusCode = exports.SpanStatusCode || (exports.SpanStatusCode = {}));
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/internal/tracestate-validators.js
+var require_tracestate_validators = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.validateValue = exports.validateKey = undefined;
+  var VALID_KEY_CHAR_RANGE = "[_0-9a-z-*/]";
+  var VALID_KEY = `[a-z]${VALID_KEY_CHAR_RANGE}{0,255}`;
+  var VALID_VENDOR_KEY = `[a-z0-9]${VALID_KEY_CHAR_RANGE}{0,240}@[a-z]${VALID_KEY_CHAR_RANGE}{0,13}`;
+  var VALID_KEY_REGEX = new RegExp(`^(?:${VALID_KEY}|${VALID_VENDOR_KEY})$`);
+  var VALID_VALUE_BASE_REGEX = /^[ -~]{0,255}[!-~]$/;
+  var INVALID_VALUE_COMMA_EQUAL_REGEX = /,|=/;
+  function validateKey(key) {
+    return VALID_KEY_REGEX.test(key);
+  }
+  exports.validateKey = validateKey;
+  function validateValue(value) {
+    return VALID_VALUE_BASE_REGEX.test(value) && !INVALID_VALUE_COMMA_EQUAL_REGEX.test(value);
+  }
+  exports.validateValue = validateValue;
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/internal/tracestate-impl.js
+var require_tracestate_impl = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.TraceStateImpl = undefined;
+  var tracestate_validators_1 = require_tracestate_validators();
+  var MAX_TRACE_STATE_ITEMS = 32;
+  var MAX_TRACE_STATE_LEN = 512;
+  var LIST_MEMBERS_SEPARATOR = ",";
+  var LIST_MEMBER_KEY_VALUE_SPLITTER = "=";
+
+  class TraceStateImpl {
+    constructor(rawTraceState) {
+      this._internalState = new Map;
+      if (rawTraceState)
+        this._parse(rawTraceState);
+    }
+    set(key, value) {
+      const traceState = this._clone();
+      if (traceState._internalState.has(key)) {
+        traceState._internalState.delete(key);
+      }
+      traceState._internalState.set(key, value);
+      return traceState;
+    }
+    unset(key) {
+      const traceState = this._clone();
+      traceState._internalState.delete(key);
+      return traceState;
+    }
+    get(key) {
+      return this._internalState.get(key);
+    }
+    serialize() {
+      return Array.from(this._internalState.keys()).reduceRight((agg, key) => {
+        agg.push(key + LIST_MEMBER_KEY_VALUE_SPLITTER + this.get(key));
+        return agg;
+      }, []).join(LIST_MEMBERS_SEPARATOR);
+    }
+    _parse(rawTraceState) {
+      if (rawTraceState.length > MAX_TRACE_STATE_LEN)
+        return;
+      this._internalState = rawTraceState.split(LIST_MEMBERS_SEPARATOR).reduceRight((agg, part) => {
+        const listMember = part.trim();
+        const i = listMember.indexOf(LIST_MEMBER_KEY_VALUE_SPLITTER);
+        if (i !== -1) {
+          const key = listMember.slice(0, i);
+          const value = listMember.slice(i + 1, part.length);
+          if ((0, tracestate_validators_1.validateKey)(key) && (0, tracestate_validators_1.validateValue)(value)) {
+            agg.set(key, value);
+          }
+        }
+        return agg;
+      }, new Map);
+      if (this._internalState.size > MAX_TRACE_STATE_ITEMS) {
+        this._internalState = new Map(Array.from(this._internalState.entries()).reverse().slice(0, MAX_TRACE_STATE_ITEMS));
+      }
+    }
+    _keys() {
+      return Array.from(this._internalState.keys()).reverse();
+    }
+    _clone() {
+      const traceState = new TraceStateImpl;
+      traceState._internalState = new Map(this._internalState);
+      return traceState;
+    }
+  }
+  exports.TraceStateImpl = TraceStateImpl;
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/internal/utils.js
+var require_utils2 = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.createTraceState = undefined;
+  var tracestate_impl_1 = require_tracestate_impl();
+  function createTraceState(rawTraceState) {
+    return new tracestate_impl_1.TraceStateImpl(rawTraceState);
+  }
+  exports.createTraceState = createTraceState;
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/context-api.js
+var require_context_api = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.context = undefined;
+  var context_1 = require_context2();
+  exports.context = context_1.ContextAPI.getInstance();
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/diag-api.js
+var require_diag_api = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.diag = undefined;
+  var diag_1 = require_diag();
+  exports.diag = diag_1.DiagAPI.instance();
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/metrics/NoopMeterProvider.js
+var require_NoopMeterProvider = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.NOOP_METER_PROVIDER = exports.NoopMeterProvider = undefined;
+  var NoopMeter_1 = require_NoopMeter();
+
+  class NoopMeterProvider {
+    getMeter(_name, _version, _options) {
+      return NoopMeter_1.NOOP_METER;
+    }
+  }
+  exports.NoopMeterProvider = NoopMeterProvider;
+  exports.NOOP_METER_PROVIDER = new NoopMeterProvider;
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/api/metrics.js
+var require_metrics = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.MetricsAPI = undefined;
+  var NoopMeterProvider_1 = require_NoopMeterProvider();
+  var global_utils_1 = require_global_utils();
+  var diag_1 = require_diag();
+  var API_NAME = "metrics";
+
+  class MetricsAPI {
+    constructor() {}
+    static getInstance() {
+      if (!this._instance) {
+        this._instance = new MetricsAPI;
+      }
+      return this._instance;
+    }
+    setGlobalMeterProvider(provider) {
+      return (0, global_utils_1.registerGlobal)(API_NAME, provider, diag_1.DiagAPI.instance());
+    }
+    getMeterProvider() {
+      return (0, global_utils_1.getGlobal)(API_NAME) || NoopMeterProvider_1.NOOP_METER_PROVIDER;
+    }
+    getMeter(name, version, options) {
+      return this.getMeterProvider().getMeter(name, version, options);
+    }
+    disable() {
+      (0, global_utils_1.unregisterGlobal)(API_NAME, diag_1.DiagAPI.instance());
+    }
+  }
+  exports.MetricsAPI = MetricsAPI;
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/metrics-api.js
+var require_metrics_api = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.metrics = undefined;
+  var metrics_1 = require_metrics();
+  exports.metrics = metrics_1.MetricsAPI.getInstance();
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/propagation/NoopTextMapPropagator.js
+var require_NoopTextMapPropagator = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.NoopTextMapPropagator = undefined;
+
+  class NoopTextMapPropagator {
+    inject(_context, _carrier) {}
+    extract(context, _carrier) {
+      return context;
+    }
+    fields() {
+      return [];
+    }
+  }
+  exports.NoopTextMapPropagator = NoopTextMapPropagator;
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/baggage/context-helpers.js
+var require_context_helpers = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.deleteBaggage = exports.setBaggage = exports.getActiveBaggage = exports.getBaggage = undefined;
+  var context_1 = require_context2();
+  var context_2 = require_context();
+  var BAGGAGE_KEY = (0, context_2.createContextKey)("OpenTelemetry Baggage Key");
+  function getBaggage(context) {
+    return context.getValue(BAGGAGE_KEY) || undefined;
+  }
+  exports.getBaggage = getBaggage;
+  function getActiveBaggage() {
+    return getBaggage(context_1.ContextAPI.getInstance().active());
+  }
+  exports.getActiveBaggage = getActiveBaggage;
+  function setBaggage(context, baggage) {
+    return context.setValue(BAGGAGE_KEY, baggage);
+  }
+  exports.setBaggage = setBaggage;
+  function deleteBaggage(context) {
+    return context.deleteValue(BAGGAGE_KEY);
+  }
+  exports.deleteBaggage = deleteBaggage;
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/api/propagation.js
+var require_propagation = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.PropagationAPI = undefined;
+  var global_utils_1 = require_global_utils();
+  var NoopTextMapPropagator_1 = require_NoopTextMapPropagator();
+  var TextMapPropagator_1 = require_TextMapPropagator();
+  var context_helpers_1 = require_context_helpers();
+  var utils_1 = require_utils();
+  var diag_1 = require_diag();
+  var API_NAME = "propagation";
+  var NOOP_TEXT_MAP_PROPAGATOR = new NoopTextMapPropagator_1.NoopTextMapPropagator;
+
+  class PropagationAPI {
+    constructor() {
+      this.createBaggage = utils_1.createBaggage;
+      this.getBaggage = context_helpers_1.getBaggage;
+      this.getActiveBaggage = context_helpers_1.getActiveBaggage;
+      this.setBaggage = context_helpers_1.setBaggage;
+      this.deleteBaggage = context_helpers_1.deleteBaggage;
+    }
+    static getInstance() {
+      if (!this._instance) {
+        this._instance = new PropagationAPI;
+      }
+      return this._instance;
+    }
+    setGlobalPropagator(propagator) {
+      return (0, global_utils_1.registerGlobal)(API_NAME, propagator, diag_1.DiagAPI.instance());
+    }
+    inject(context, carrier, setter = TextMapPropagator_1.defaultTextMapSetter) {
+      return this._getGlobalPropagator().inject(context, carrier, setter);
+    }
+    extract(context, carrier, getter = TextMapPropagator_1.defaultTextMapGetter) {
+      return this._getGlobalPropagator().extract(context, carrier, getter);
+    }
+    fields() {
+      return this._getGlobalPropagator().fields();
+    }
+    disable() {
+      (0, global_utils_1.unregisterGlobal)(API_NAME, diag_1.DiagAPI.instance());
+    }
+    _getGlobalPropagator() {
+      return (0, global_utils_1.getGlobal)(API_NAME) || NOOP_TEXT_MAP_PROPAGATOR;
+    }
+  }
+  exports.PropagationAPI = PropagationAPI;
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/propagation-api.js
+var require_propagation_api = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.propagation = undefined;
+  var propagation_1 = require_propagation();
+  exports.propagation = propagation_1.PropagationAPI.getInstance();
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/api/trace.js
+var require_trace = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.TraceAPI = undefined;
+  var global_utils_1 = require_global_utils();
+  var ProxyTracerProvider_1 = require_ProxyTracerProvider();
+  var spancontext_utils_1 = require_spancontext_utils();
+  var context_utils_1 = require_context_utils();
+  var diag_1 = require_diag();
+  var API_NAME = "trace";
+
+  class TraceAPI {
+    constructor() {
+      this._proxyTracerProvider = new ProxyTracerProvider_1.ProxyTracerProvider;
+      this.wrapSpanContext = spancontext_utils_1.wrapSpanContext;
+      this.isSpanContextValid = spancontext_utils_1.isSpanContextValid;
+      this.deleteSpan = context_utils_1.deleteSpan;
+      this.getSpan = context_utils_1.getSpan;
+      this.getActiveSpan = context_utils_1.getActiveSpan;
+      this.getSpanContext = context_utils_1.getSpanContext;
+      this.setSpan = context_utils_1.setSpan;
+      this.setSpanContext = context_utils_1.setSpanContext;
+    }
+    static getInstance() {
+      if (!this._instance) {
+        this._instance = new TraceAPI;
+      }
+      return this._instance;
+    }
+    setGlobalTracerProvider(provider) {
+      const success = (0, global_utils_1.registerGlobal)(API_NAME, this._proxyTracerProvider, diag_1.DiagAPI.instance());
+      if (success) {
+        this._proxyTracerProvider.setDelegate(provider);
+      }
+      return success;
+    }
+    getTracerProvider() {
+      return (0, global_utils_1.getGlobal)(API_NAME) || this._proxyTracerProvider;
+    }
+    getTracer(name, version) {
+      return this.getTracerProvider().getTracer(name, version);
+    }
+    disable() {
+      (0, global_utils_1.unregisterGlobal)(API_NAME, diag_1.DiagAPI.instance());
+      this._proxyTracerProvider = new ProxyTracerProvider_1.ProxyTracerProvider;
+    }
+  }
+  exports.TraceAPI = TraceAPI;
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace-api.js
+var require_trace_api = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.trace = undefined;
+  var trace_1 = require_trace();
+  exports.trace = trace_1.TraceAPI.getInstance();
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/index.js
+var require_src = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.trace = exports.propagation = exports.metrics = exports.diag = exports.context = exports.INVALID_SPAN_CONTEXT = exports.INVALID_TRACEID = exports.INVALID_SPANID = exports.isValidSpanId = exports.isValidTraceId = exports.isSpanContextValid = exports.createTraceState = exports.TraceFlags = exports.SpanStatusCode = exports.SpanKind = exports.SamplingDecision = exports.ProxyTracerProvider = exports.ProxyTracer = exports.defaultTextMapSetter = exports.defaultTextMapGetter = exports.ValueType = exports.createNoopMeter = exports.DiagLogLevel = exports.DiagConsoleLogger = exports.ROOT_CONTEXT = exports.createContextKey = exports.baggageEntryMetadataFromString = undefined;
+  var utils_1 = require_utils();
+  Object.defineProperty(exports, "baggageEntryMetadataFromString", { enumerable: true, get: function() {
+    return utils_1.baggageEntryMetadataFromString;
+  } });
+  var context_1 = require_context();
+  Object.defineProperty(exports, "createContextKey", { enumerable: true, get: function() {
+    return context_1.createContextKey;
+  } });
+  Object.defineProperty(exports, "ROOT_CONTEXT", { enumerable: true, get: function() {
+    return context_1.ROOT_CONTEXT;
+  } });
+  var consoleLogger_1 = require_consoleLogger();
+  Object.defineProperty(exports, "DiagConsoleLogger", { enumerable: true, get: function() {
+    return consoleLogger_1.DiagConsoleLogger;
+  } });
+  var types_1 = require_types();
+  Object.defineProperty(exports, "DiagLogLevel", { enumerable: true, get: function() {
+    return types_1.DiagLogLevel;
+  } });
+  var NoopMeter_1 = require_NoopMeter();
+  Object.defineProperty(exports, "createNoopMeter", { enumerable: true, get: function() {
+    return NoopMeter_1.createNoopMeter;
+  } });
+  var Metric_1 = require_Metric();
+  Object.defineProperty(exports, "ValueType", { enumerable: true, get: function() {
+    return Metric_1.ValueType;
+  } });
+  var TextMapPropagator_1 = require_TextMapPropagator();
+  Object.defineProperty(exports, "defaultTextMapGetter", { enumerable: true, get: function() {
+    return TextMapPropagator_1.defaultTextMapGetter;
+  } });
+  Object.defineProperty(exports, "defaultTextMapSetter", { enumerable: true, get: function() {
+    return TextMapPropagator_1.defaultTextMapSetter;
+  } });
+  var ProxyTracer_1 = require_ProxyTracer();
+  Object.defineProperty(exports, "ProxyTracer", { enumerable: true, get: function() {
+    return ProxyTracer_1.ProxyTracer;
+  } });
+  var ProxyTracerProvider_1 = require_ProxyTracerProvider();
+  Object.defineProperty(exports, "ProxyTracerProvider", { enumerable: true, get: function() {
+    return ProxyTracerProvider_1.ProxyTracerProvider;
+  } });
+  var SamplingResult_1 = require_SamplingResult();
+  Object.defineProperty(exports, "SamplingDecision", { enumerable: true, get: function() {
+    return SamplingResult_1.SamplingDecision;
+  } });
+  var span_kind_1 = require_span_kind();
+  Object.defineProperty(exports, "SpanKind", { enumerable: true, get: function() {
+    return span_kind_1.SpanKind;
+  } });
+  var status_1 = require_status();
+  Object.defineProperty(exports, "SpanStatusCode", { enumerable: true, get: function() {
+    return status_1.SpanStatusCode;
+  } });
+  var trace_flags_1 = require_trace_flags();
+  Object.defineProperty(exports, "TraceFlags", { enumerable: true, get: function() {
+    return trace_flags_1.TraceFlags;
+  } });
+  var utils_2 = require_utils2();
+  Object.defineProperty(exports, "createTraceState", { enumerable: true, get: function() {
+    return utils_2.createTraceState;
+  } });
+  var spancontext_utils_1 = require_spancontext_utils();
+  Object.defineProperty(exports, "isSpanContextValid", { enumerable: true, get: function() {
+    return spancontext_utils_1.isSpanContextValid;
+  } });
+  Object.defineProperty(exports, "isValidTraceId", { enumerable: true, get: function() {
+    return spancontext_utils_1.isValidTraceId;
+  } });
+  Object.defineProperty(exports, "isValidSpanId", { enumerable: true, get: function() {
+    return spancontext_utils_1.isValidSpanId;
+  } });
+  var invalid_span_constants_1 = require_invalid_span_constants();
+  Object.defineProperty(exports, "INVALID_SPANID", { enumerable: true, get: function() {
+    return invalid_span_constants_1.INVALID_SPANID;
+  } });
+  Object.defineProperty(exports, "INVALID_TRACEID", { enumerable: true, get: function() {
+    return invalid_span_constants_1.INVALID_TRACEID;
+  } });
+  Object.defineProperty(exports, "INVALID_SPAN_CONTEXT", { enumerable: true, get: function() {
+    return invalid_span_constants_1.INVALID_SPAN_CONTEXT;
+  } });
+  var context_api_1 = require_context_api();
+  Object.defineProperty(exports, "context", { enumerable: true, get: function() {
+    return context_api_1.context;
+  } });
+  var diag_api_1 = require_diag_api();
+  Object.defineProperty(exports, "diag", { enumerable: true, get: function() {
+    return diag_api_1.diag;
+  } });
+  var metrics_api_1 = require_metrics_api();
+  Object.defineProperty(exports, "metrics", { enumerable: true, get: function() {
+    return metrics_api_1.metrics;
+  } });
+  var propagation_api_1 = require_propagation_api();
+  Object.defineProperty(exports, "propagation", { enumerable: true, get: function() {
+    return propagation_api_1.propagation;
+  } });
+  var trace_api_1 = require_trace_api();
+  Object.defineProperty(exports, "trace", { enumerable: true, get: function() {
+    return trace_api_1.trace;
+  } });
+  exports.default = {
+    context: context_api_1.context,
+    diag: diag_api_1.diag,
+    metrics: metrics_api_1.metrics,
+    propagation: propagation_api_1.propagation,
+    trace: trace_api_1.trace
+  };
+});
+
+// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/extensions/error-tracking/trace-context.mjs
+async function getActiveTraceProperties() {
+  try {
+    const api = await (otelApi ??= Promise.resolve().then(() => __toESM(require_src(), 1)));
+    const spanContext = api.trace.getActiveSpan()?.spanContext();
+    const traceId = spanContext?.traceId;
+    const spanId = spanContext?.spanId;
+    if (typeof traceId == "string" && typeof spanId == "string" && TRACE_ID_PATTERN.test(traceId) && SPAN_ID_PATTERN.test(spanId) && !/^0+$/.test(traceId) && !/^0+$/.test(spanId))
+      return {
+        $trace_id: traceId.toLowerCase(),
+        $span_id: spanId.toLowerCase()
+      };
+  } catch {}
+  return {};
+}
+var TRACE_ID_PATTERN, SPAN_ID_PATTERN, otelApi;
+var init_trace_context = __esm(() => {
+  TRACE_ID_PATTERN = /^[0-9a-f]{32}$/i;
+  SPAN_ID_PATTERN = /^[0-9a-f]{16}$/i;
+});
+
+// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/storage-memory.mjs
 class PostHogMemoryStorage {
   getProperty(key) {
     return this._memoryStorage[key];
@@ -7915,7 +9450,7 @@ class PostHogMemoryStorage {
 }
 var init_storage_memory = () => {};
 
-// node_modules/.bun/posthog-node@5.56.0/node_modules/posthog-node/dist/capture-v1/config.mjs
+// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/capture-v1/config.mjs
 function isCaptureMode(value) {
   return value === "v0" || value === "v1";
 }
@@ -7925,14 +9460,14 @@ function resolveCaptureMode() {
 }
 var init_config3 = () => {};
 
-// node_modules/.bun/posthog-node@5.56.0/node_modules/posthog-node/dist/capture-v1/routing.mjs
+// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/capture-v1/routing.mjs
 function isLegacyOnlyEvent(message) {
   return typeof message.event == "string" && message.event.startsWith(AI_EVENT_PREFIX);
 }
 var AI_EVENT_PREFIX = "$ai_", ANALYTICS_ROUTE = "analytics", AI_ROUTE = "ai";
 var init_routing = () => {};
 
-// node_modules/.bun/posthog-node@5.56.0/node_modules/posthog-node/dist/capture-v1/errors.mjs
+// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/capture-v1/errors.mjs
 var CaptureV1Error;
 var init_errors = __esm(() => {
   CaptureV1Error = class CaptureV1Error extends Error {
@@ -7952,7 +9487,7 @@ var init_errors = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.56.0/node_modules/posthog-node/dist/capture-v1/transform.mjs
+// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/capture-v1/transform.mjs
 function coerceBool(value) {
   if (typeof value == "boolean")
     return value;
@@ -8070,7 +9605,7 @@ var init_transform = __esm(() => {
   ];
 });
 
-// node_modules/.bun/posthog-node@5.56.0/node_modules/posthog-node/dist/capture-v1/sender.mjs
+// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/capture-v1/sender.mjs
 class V1CaptureSender {
   constructor(config, hooks) {
     this.config = config;
@@ -8326,11 +9861,11 @@ var init_sender = __esm(() => {
   ]);
 });
 
-// node_modules/.bun/posthog-node@5.56.0/node_modules/posthog-node/dist/ai-capture/routing.mjs
+// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/ai-capture/routing.mjs
 var AI_CAPTURE_ROUTE = "ai-capture", AI_CAPTURE_ENDPOINT_PATH = "/i/v0/ai/batch/", AI_MAX_EVENT_BYTES = 8388608, AI_BATCH_TARGET_BYTES = 5242880;
 var init_routing2 = () => {};
 
-// node_modules/.bun/posthog-node@5.56.0/node_modules/posthog-node/dist/ai-capture/batching.mjs
+// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/ai-capture/batching.mjs
 function eventByteSize(message) {
   return encoder.encode(safeJsonStringify(message)).length;
 }
@@ -8372,7 +9907,7 @@ var init_batching = __esm(() => {
   encoder = new TextEncoder;
 });
 
-// node_modules/.bun/posthog-node@5.56.0/node_modules/posthog-node/dist/client.mjs
+// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/client.mjs
 function emitDeprecationWarningOnce(id, message) {
   if (_emittedDeprecations.has(id))
     return;
@@ -8415,6 +9950,7 @@ var init_client = __esm(() => {
   init_feature_flag_evaluations();
   init_feature_flags();
   init_error_tracking2();
+  init_trace_context();
   init_storage_memory();
   init_config3();
   init_routing();
@@ -9633,6 +11169,8 @@ var init_client = __esm(() => {
       } : {
         ...properties || {}
       };
+      if (event === "$exception" && !(("$trace_id" in mergedProperties) || ("$span_id" in mergedProperties)))
+        Object.assign(mergedProperties, await getActiveTraceProperties());
       if (!mergedDistinctId) {
         mergedDistinctId = uuidv7();
         mergedProperties.$process_person_profile = false;
@@ -9721,7 +11259,7 @@ var init_client = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.56.0/node_modules/posthog-node/dist/extensions/context/context.mjs
+// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/extensions/context/context.mjs
 import { AsyncLocalStorage } from "node:async_hooks";
 
 class PostHogContext {
@@ -9753,7 +11291,7 @@ class PostHogContext {
 }
 var init_context2 = () => {};
 
-// node_modules/.bun/posthog-node@5.56.0/node_modules/posthog-node/dist/extensions/context/span-context.node.mjs
+// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/extensions/context/span-context.node.mjs
 import { AsyncLocalStorage as AsyncLocalStorage2 } from "node:async_hooks";
 
 class AsyncLocalStorageSpanContextManager {
@@ -9769,7 +11307,7 @@ class AsyncLocalStorageSpanContextManager {
 }
 var init_span_context_node = () => {};
 
-// node_modules/.bun/posthog-node@5.56.0/node_modules/posthog-node/dist/gzip.node.mjs
+// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/gzip.node.mjs
 import { gzip } from "node:zlib";
 import { promisify } from "node:util";
 async function gzipCompress2(input, isDebug = true) {
@@ -9787,7 +11325,7 @@ var init_gzip_node = __esm(() => {
   gzipAsync = promisify(gzip);
 });
 
-// node_modules/.bun/posthog-node@5.56.0/node_modules/posthog-node/dist/host-os.node.mjs
+// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/host-os.node.mjs
 import { platform, release as release2 } from "node:os";
 function hostOsResourceAttributes() {
   let osName;
@@ -9802,7 +11340,7 @@ var init_host_os_node = __esm(() => {
   init_dist();
 });
 
-// node_modules/.bun/posthog-node@5.56.0/node_modules/posthog-node/dist/extensions/sentry-integration.mjs
+// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/extensions/sentry-integration.mjs
 function createEventProcessor(_posthog, { organization, projectId, prefix, severityAllowList = [
   "error"
 ], sendExceptionsToPostHog = true } = {}) {
@@ -9879,22 +11417,22 @@ var init_sentry_integration = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.56.0/node_modules/posthog-node/dist/extensions/tracing-headers.mjs
+// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/extensions/tracing-headers.mjs
 var init_tracing_headers2 = () => {};
 
-// node_modules/.bun/posthog-node@5.56.0/node_modules/posthog-node/dist/extensions/url-utils.mjs
+// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/extensions/url-utils.mjs
 var init_url_utils = __esm(() => {
   init_dist();
 });
 
-// node_modules/.bun/posthog-node@5.56.0/node_modules/posthog-node/dist/extensions/express.mjs
+// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/extensions/express.mjs
 var init_express = __esm(() => {
   init_error_tracking2();
   init_tracing_headers2();
   init_url_utils();
 });
 
-// node_modules/.bun/posthog-node@5.56.0/node_modules/posthog-node/dist/exports.mjs
+// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/exports.mjs
 var init_exports = __esm(() => {
   init_feature_flag_evaluations();
   init_dist();
@@ -9903,7 +11441,7 @@ var init_exports = __esm(() => {
   init_types3();
 });
 
-// node_modules/.bun/posthog-node@5.56.0/node_modules/posthog-node/dist/entrypoints/index.node.mjs
+// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/entrypoints/index.node.mjs
 var PostHog;
 var init_index_node = __esm(() => {
   init_module_node();
@@ -18439,15 +19977,15 @@ var initializer2 = (inst, issues) => {
   if (_installedErrorProtos.has(proto))
     return;
   _installedErrorProtos.add(proto);
-  _lazyMethod(proto, "format", (self) => (mapper) => formatError(self, mapper));
-  _lazyMethod(proto, "flatten", (self) => (mapper) => flattenError(self, mapper));
-  _lazyMethod(proto, "addIssue", (self) => (issue) => {
-    self.issues.push(issue);
-    self.message = JSON.stringify(self.issues, jsonStringifyReplacer, 2);
+  _lazyMethod(proto, "format", (self2) => (mapper) => formatError(self2, mapper));
+  _lazyMethod(proto, "flatten", (self2) => (mapper) => flattenError(self2, mapper));
+  _lazyMethod(proto, "addIssue", (self2) => (issue) => {
+    self2.issues.push(issue);
+    self2.message = JSON.stringify(self2.issues, jsonStringifyReplacer, 2);
   });
-  _lazyMethod(proto, "addIssues", (self) => (issues) => {
-    self.issues.push(...issues);
-    self.message = JSON.stringify(self.issues, jsonStringifyReplacer, 2);
+  _lazyMethod(proto, "addIssues", (self2) => (issues) => {
+    self2.issues.push(...issues);
+    self2.message = JSON.stringify(self2.issues, jsonStringifyReplacer, 2);
   });
   Object.defineProperty(proto, "isEmpty", {
     configurable: true,
@@ -19023,7 +20561,7 @@ var ZodObject = /* @__PURE__ */ $constructor("ZodObject", (inst, def) => {
   $ZodObjectJIT.init(inst, def);
   ZodType.init(inst, def);
   inst._zod.processJSONSchema = (ctx, json, params) => objectProcessor(inst, ctx, json, params);
-  installLazyProp(inst, "shape", (self) => self._zod.def.shape, false);
+  installLazyProp(inst, "shape", (self2) => self2._zod.def.shape, false);
 }, {
   keyof() {
     return _enum(Object.keys(this._zod.def.shape));
