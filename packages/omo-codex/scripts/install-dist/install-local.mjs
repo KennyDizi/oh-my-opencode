@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// omo-codex-install:514fc40172f940764ac855efabb7ca823e26934b5971d91584ab388939e7cc2d:a35b9b3bf65cbc43019d5025f6a6ee3707654d71ead2066fe8a07eec5a0ab2a4
+// omo-codex-install:b3c6cbba0b639b3c2628b46616e9e3c281aa0d76e712d1b1259a451e8155aab8:2c5747397928ef0c6ce06655d712d62bb78fe80bc8f30fc9fea41ace67f2125d
 var __create = Object.create;
 var __getProtoOf = Object.getPrototypeOf;
 var __defProp = Object.defineProperty;
@@ -483,7 +483,7 @@ var init_event_id = __esm(() => {
   fallbackEventId = createUuidV7Generator();
 });
 
-// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/module.node.mjs
+// node_modules/.bun/posthog-node@5.56.2+460773ef8ff1e07c/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/module.node.mjs
 import { dirname as dirname11, posix as posix3, sep as sep7 } from "node:path";
 function createModulerModifier() {
   const getModuleFromFileName = createGetModuleFromFilename();
@@ -5002,12 +5002,12 @@ class PostHogMetrics {
   drainWindow() {
     if (this._series.size === 0)
       return null;
-    const window2 = this._series;
+    const window = this._series;
     this._series = new Map;
     this._seriesCapWarned = false;
     this._typeByName = new Map;
     this._typeCollisionWarned = new Set;
-    return this._buildPayload(window2);
+    return this._buildPayload(window);
   }
   reset() {
     this._generation++;
@@ -5154,13 +5154,13 @@ class PostHogMetrics {
     this._flushTimer.clear();
     if (this._series.size === 0)
       return;
-    const window2 = this._series;
+    const window = this._series;
     this._series = new Map;
     this._seriesCapWarned = false;
     this._typeByName = new Map;
     this._typeCollisionWarned = new Set;
     const generation = this._generation;
-    const outcome = await this._instance._sendMetricsBatch(this._buildPayload(window2));
+    const outcome = await this._instance._sendMetricsBatch(this._buildPayload(window));
     if (generation !== this._generation)
       return;
     this._retryAfter.record(outcome);
@@ -5177,7 +5177,7 @@ class PostHogMetrics {
       case "ok":
         return;
       case "retry-later":
-        this._mergeWindowBack(window2);
+        this._mergeWindowBack(window);
         this._flushTimer.armNoEarlierThan(this._nextFlushDelay());
         return;
       case "too-large":
@@ -5188,13 +5188,13 @@ class PostHogMetrics {
         return;
     }
   }
-  _buildPayload(window2) {
-    return buildOtlpMetricsPayload(this._buildMetrics(window2), buildMetricsResourceAttributes(this._config, this._instance.getLibraryId(), this._instance.getLibraryVersion()), this._instance.getLibraryId(), this._instance.getLibraryVersion());
+  _buildPayload(window) {
+    return buildOtlpMetricsPayload(this._buildMetrics(window), buildMetricsResourceAttributes(this._config, this._instance.getLibraryId(), this._instance.getLibraryVersion()), this._instance.getLibraryId(), this._instance.getLibraryVersion());
   }
-  _buildMetrics(window2) {
+  _buildMetrics(window) {
     const nowNano = msToUnixNano(Date.now());
     const byMetric = new Map;
-    for (const state of window2.values()) {
+    for (const state of window.values()) {
       const metricKey = seriesKey(state.type, state.name, state.unit, undefined);
       let metric = byMetric.get(metricKey);
       if (!metric) {
@@ -5259,8 +5259,8 @@ class PostHogMetrics {
     }
     return Array.from(byMetric.values());
   }
-  _mergeWindowBack(window2) {
-    for (const [key, old] of window2) {
+  _mergeWindowBack(window) {
+    for (const [key, old] of window) {
       const current = this._series.get(key);
       if (!current) {
         if (this._admitNewSeries())
@@ -6671,7 +6671,7 @@ var init_dist = __esm(() => {
   init_types();
 });
 
-// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/context-lines.node.mjs
+// node_modules/.bun/posthog-node@5.56.2+460773ef8ff1e07c/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/context-lines.node.mjs
 import { constants as constants2 } from "node:fs";
 import { open as promises_open } from "node:fs/promises";
 import { isAbsolute as isAbsolute7 } from "node:path";
@@ -6958,7 +6958,7 @@ var init_context_lines_node = __esm(() => {
   LRU_FILE_CONTENTS_FS_READ_FAILED = new ReduceableCache(20);
 });
 
-// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/relative-path.node.mjs
+// node_modules/.bun/posthog-node@5.56.2+460773ef8ff1e07c/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/relative-path.node.mjs
 import { isAbsolute as isAbsolute8, relative as relative4, sep as sep8 } from "node:path";
 function createRelativePathModifier(basePath = process.cwd()) {
   const isWindows = sep8 === "\\";
@@ -6975,11 +6975,11 @@ function createRelativePathModifier(basePath = process.cwd()) {
 }
 var init_relative_path_node = () => {};
 
-// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/version.mjs
-var version2 = "5.56.1";
+// node_modules/.bun/posthog-node@5.56.2+460773ef8ff1e07c/node_modules/posthog-node/dist/version.mjs
+var version2 = "5.56.2";
 var init_version = () => {};
 
-// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/types.mjs
+// node_modules/.bun/posthog-node@5.56.2+460773ef8ff1e07c/node_modules/posthog-node/dist/types.mjs
 var FeatureFlagError2;
 var init_types3 = __esm(() => {
   FeatureFlagError2 = {
@@ -6990,7 +6990,7 @@ var init_types3 = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/feature-flag-evaluations.mjs
+// node_modules/.bun/posthog-node@5.56.2+460773ef8ff1e07c/node_modules/posthog-node/dist/feature-flag-evaluations.mjs
 class FeatureFlagEvaluations {
   constructor(init) {
     this._host = init.host;
@@ -7126,7 +7126,7 @@ var init_feature_flag_evaluations = __esm(() => {
   init_types3();
 });
 
-// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/extensions/feature-flags/feature-flags.mjs
+// node_modules/.bun/posthog-node@5.56.2+460773ef8ff1e07c/node_modules/posthog-node/dist/extensions/feature-flags/feature-flags.mjs
 function normalizeEvaluationRuntime(value) {
   return value === "client" || value === "server" ? value : "all";
 }
@@ -7470,10 +7470,12 @@ class FeatureFlagsPoller {
   }
   updateFlagState(flagData) {
     const flags = this.filterFlagsByEvaluationContexts(flagData.flags);
-    this.featureFlags = flags;
-    this.featureFlagsByKey = flags.reduce((acc, curr) => (acc[curr.key] = curr, acc), {});
+    const featureFlagsByKey = flags.reduce((acc, curr) => (acc[curr.key] = curr, acc), {});
     const keptKeys = new Set(flags.map((flag) => flag.key));
-    this.filteredOutFlagKeys = new Set(flagData.flags.filter((flag) => !keptKeys.has(flag.key)).map((flag) => flag.key));
+    const filteredOutFlagKeys = new Set(flagData.flags.filter((flag) => !keptKeys.has(flag.key)).map((flag) => flag.key));
+    this.featureFlags = flags;
+    this.featureFlagsByKey = featureFlagsByKey;
+    this.filteredOutFlagKeys = filteredOutFlagKeys;
     this.groupTypeMapping = flagData.group_type_mapping ?? flagData.groupTypeMapping ?? {};
     this.cohorts = flagData.cohorts;
     this.propertyMatchingVersion = flagData.property_matching_version ?? flagData.propertyMatchingVersion;
@@ -7544,6 +7546,8 @@ class FeatureFlagsPoller {
       this.poller = undefined;
     }
     try {
+      if (this.cacheProvider && !this.personalApiKey)
+        return void await this.loadFromCache("Loaded flags from cache (cache-only reader)");
       let shouldFetch = true;
       if (this.cacheProvider)
         try {
@@ -7642,6 +7646,8 @@ class FeatureFlagsPoller {
     };
   }
   async _requestFeatureFlagDefinitions() {
+    if (!this.personalApiKey)
+      throw new ClientError("A secretKey or personalApiKey is required to fetch feature flag definitions from PostHog.");
     const url = `${this.host}/flags/definitions?token=${this.projectApiKey}&send_cohorts`;
     const options = this.getPersonalApiKeyRequestOptions("GET", this.flagsEtag);
     let abortTimeout = null;
@@ -7804,7 +7810,7 @@ var init_feature_flags = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/extensions/error-tracking/autocapture.mjs
+// node_modules/.bun/posthog-node@5.56.2+460773ef8ff1e07c/node_modules/posthog-node/dist/extensions/error-tracking/autocapture.mjs
 function splitNodeOptions(nodeOptions) {
   const args = [];
   let current = "";
@@ -7905,7 +7911,7 @@ var init_autocapture = __esm(() => {
   STARTUP_UNHANDLED_REJECTION_MODE = getUnhandledRejectionMode();
 });
 
-// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/extensions/error-tracking/index.mjs
+// node_modules/.bun/posthog-node@5.56.2+460773ef8ff1e07c/node_modules/posthog-node/dist/extensions/error-tracking/index.mjs
 class error_tracking_ErrorTracking {
   constructor(client, options, _logger) {
     this.client = client;
@@ -7980,14 +7986,65 @@ var init_error_tracking2 = __esm(() => {
   error_tracking_default = error_tracking_ErrorTracking;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/version.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/platform/node/globalThis.js
+var require_globalThis = __commonJS(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports._globalThis = undefined;
+  exports._globalThis = typeof globalThis === "object" ? globalThis : global;
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/platform/node/index.js
+var require_node = __commonJS(function(exports) {
+  var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
+    if (k2 === undefined)
+      k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() {
+      return m[k];
+    } });
+  } : function(o, m, k, k2) {
+    if (k2 === undefined)
+      k2 = k;
+    o[k2] = m[k];
+  });
+  var __exportStar = exports && exports.__exportStar || function(m, exports2) {
+    for (var p in m)
+      if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports2, p))
+        __createBinding(exports2, m, p);
+  };
+  Object.defineProperty(exports, "__esModule", { value: true });
+  __exportStar(require_globalThis(), exports);
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/platform/index.js
+var require_platform = __commonJS(function(exports) {
+  var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
+    if (k2 === undefined)
+      k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() {
+      return m[k];
+    } });
+  } : function(o, m, k, k2) {
+    if (k2 === undefined)
+      k2 = k;
+    o[k2] = m[k];
+  });
+  var __exportStar = exports && exports.__exportStar || function(m, exports2) {
+    for (var p in m)
+      if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports2, p))
+        __createBinding(exports2, m, p);
+  };
+  Object.defineProperty(exports, "__esModule", { value: true });
+  __exportStar(require_node(), exports);
+});
+
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/version.js
 var require_version = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.VERSION = undefined;
-  exports.VERSION = "1.9.1";
+  exports.VERSION = "1.9.0";
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/internal/semver.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/internal/semver.js
 var require_semver = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.isCompatible = exports._makeCompatibilityCheck = undefined;
@@ -8058,15 +8115,16 @@ var require_semver = __commonJS(function(exports) {
   exports.isCompatible = _makeCompatibilityCheck(version_1.VERSION);
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/internal/global-utils.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/internal/global-utils.js
 var require_global_utils = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.unregisterGlobal = exports.getGlobal = exports.registerGlobal = undefined;
+  var platform_1 = require_platform();
   var version_1 = require_version();
   var semver_1 = require_semver();
   var major = version_1.VERSION.split(".")[0];
   var GLOBAL_OPENTELEMETRY_API_KEY = Symbol.for(`opentelemetry.js.api.${major}`);
-  var _global = typeof globalThis === "object" ? globalThis : typeof self === "object" ? self : typeof window === "object" ? window : typeof global === "object" ? global : {};
+  var _global = platform_1._globalThis;
   function registerGlobal(type, instance, diag, allowOverride = false) {
     var _a;
     const api = _global[GLOBAL_OPENTELEMETRY_API_KEY] = (_a = _global[GLOBAL_OPENTELEMETRY_API_KEY]) !== null && _a !== undefined ? _a : {
@@ -8106,7 +8164,7 @@ var require_global_utils = __commonJS(function(exports) {
   exports.unregisterGlobal = unregisterGlobal;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/diag/ComponentLogger.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/diag/ComponentLogger.js
 var require_ComponentLogger = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.DiagComponentLogger = undefined;
@@ -8138,11 +8196,12 @@ var require_ComponentLogger = __commonJS(function(exports) {
     if (!logger) {
       return;
     }
-    return logger[funcName](namespace, ...args);
+    args.unshift(namespace);
+    return logger[funcName](...args);
   }
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/diag/types.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/diag/types.js
 var require_types = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.DiagLogLevel = undefined;
@@ -8158,7 +8217,7 @@ var require_types = __commonJS(function(exports) {
   })(DiagLogLevel = exports.DiagLogLevel || (exports.DiagLogLevel = {}));
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/diag/internal/logLevelLogger.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/diag/internal/logLevelLogger.js
 var require_logLevelLogger = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.createLogLevelDiagLogger = undefined;
@@ -8188,7 +8247,7 @@ var require_logLevelLogger = __commonJS(function(exports) {
   exports.createLogLevelDiagLogger = createLogLevelDiagLogger;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/api/diag.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/api/diag.js
 var require_diag = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.DiagAPI = undefined;
@@ -8199,12 +8258,6 @@ var require_diag = __commonJS(function(exports) {
   var API_NAME = "diag";
 
   class DiagAPI {
-    static instance() {
-      if (!this._instance) {
-        this._instance = new DiagAPI;
-      }
-      return this._instance;
-    }
     constructor() {
       function _logProxy(funcName) {
         return function(...args) {
@@ -8214,12 +8267,12 @@ var require_diag = __commonJS(function(exports) {
           return logger[funcName](...args);
         };
       }
-      const self2 = this;
+      const self = this;
       const setLogger = (logger, optionsOrLogLevel = { logLevel: types_1.DiagLogLevel.INFO }) => {
         var _a, _b, _c;
-        if (logger === self2) {
+        if (logger === self) {
           const err = new Error("Cannot use diag as the logger for itself. Please use a DiagLogger implementation like ConsoleDiagLogger or a custom implementation");
-          self2.error((_a = err.stack) !== null && _a !== undefined ? _a : err.message);
+          self.error((_a = err.stack) !== null && _a !== undefined ? _a : err.message);
           return false;
         }
         if (typeof optionsOrLogLevel === "number") {
@@ -8234,26 +8287,32 @@ var require_diag = __commonJS(function(exports) {
           oldLogger.warn(`Current logger will be overwritten from ${stack}`);
           newLogger.warn(`Current logger will overwrite one already registered from ${stack}`);
         }
-        return (0, global_utils_1.registerGlobal)("diag", newLogger, self2, true);
+        return (0, global_utils_1.registerGlobal)("diag", newLogger, self, true);
       };
-      self2.setLogger = setLogger;
-      self2.disable = () => {
-        (0, global_utils_1.unregisterGlobal)(API_NAME, self2);
+      self.setLogger = setLogger;
+      self.disable = () => {
+        (0, global_utils_1.unregisterGlobal)(API_NAME, self);
       };
-      self2.createComponentLogger = (options) => {
+      self.createComponentLogger = (options) => {
         return new ComponentLogger_1.DiagComponentLogger(options);
       };
-      self2.verbose = _logProxy("verbose");
-      self2.debug = _logProxy("debug");
-      self2.info = _logProxy("info");
-      self2.warn = _logProxy("warn");
-      self2.error = _logProxy("error");
+      self.verbose = _logProxy("verbose");
+      self.debug = _logProxy("debug");
+      self.info = _logProxy("info");
+      self.warn = _logProxy("warn");
+      self.error = _logProxy("error");
+    }
+    static instance() {
+      if (!this._instance) {
+        this._instance = new DiagAPI;
+      }
+      return this._instance;
     }
   }
   exports.DiagAPI = DiagAPI;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/baggage/internal/baggage-impl.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/baggage/internal/baggage-impl.js
 var require_baggage_impl = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.BaggageImpl = undefined;
@@ -8270,7 +8329,7 @@ var require_baggage_impl = __commonJS(function(exports) {
       return Object.assign({}, entry);
     }
     getAllEntries() {
-      return Array.from(this._entries.entries());
+      return Array.from(this._entries.entries()).map(([k, v]) => [k, v]);
     }
     setEntry(key, entry) {
       const newBaggage = new BaggageImpl(this._entries);
@@ -8296,14 +8355,14 @@ var require_baggage_impl = __commonJS(function(exports) {
   exports.BaggageImpl = BaggageImpl;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/baggage/internal/symbol.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/baggage/internal/symbol.js
 var require_symbol = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.baggageEntryMetadataSymbol = undefined;
   exports.baggageEntryMetadataSymbol = Symbol("BaggageEntryMetadata");
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/baggage/utils.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/baggage/utils.js
 var require_utils = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.baggageEntryMetadataFromString = exports.createBaggage = undefined;
@@ -8330,7 +8389,7 @@ var require_utils = __commonJS(function(exports) {
   exports.baggageEntryMetadataFromString = baggageEntryMetadataFromString;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/context/context.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/context/context.js
 var require_context = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.ROOT_CONTEXT = exports.createContextKey = undefined;
@@ -8341,16 +8400,16 @@ var require_context = __commonJS(function(exports) {
 
   class BaseContext {
     constructor(parentContext) {
-      const self2 = this;
-      self2._currentContext = parentContext ? new Map(parentContext) : new Map;
-      self2.getValue = (key) => self2._currentContext.get(key);
-      self2.setValue = (key, value) => {
-        const context = new BaseContext(self2._currentContext);
+      const self = this;
+      self._currentContext = parentContext ? new Map(parentContext) : new Map;
+      self.getValue = (key) => self._currentContext.get(key);
+      self.setValue = (key, value) => {
+        const context = new BaseContext(self._currentContext);
         context._currentContext.set(key, value);
         return context;
       };
-      self2.deleteValue = (key) => {
-        const context = new BaseContext(self2._currentContext);
+      self.deleteValue = (key) => {
+        const context = new BaseContext(self._currentContext);
         context._currentContext.delete(key);
         return context;
       };
@@ -8359,10 +8418,10 @@ var require_context = __commonJS(function(exports) {
   exports.ROOT_CONTEXT = new BaseContext;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/diag/consoleLogger.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/diag/consoleLogger.js
 var require_consoleLogger = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
-  exports.DiagConsoleLogger = exports._originalConsoleMethods = undefined;
+  exports.DiagConsoleLogger = undefined;
   var consoleMap = [
     { n: "error", c: "error" },
     { n: "warn", c: "warn" },
@@ -8370,39 +8429,19 @@ var require_consoleLogger = __commonJS(function(exports) {
     { n: "debug", c: "debug" },
     { n: "verbose", c: "trace" }
   ];
-  exports._originalConsoleMethods = {};
-  if (typeof console !== "undefined") {
-    const keys = [
-      "error",
-      "warn",
-      "info",
-      "debug",
-      "trace",
-      "log"
-    ];
-    for (const key of keys) {
-      if (typeof console[key] === "function") {
-        exports._originalConsoleMethods[key] = console[key];
-      }
-    }
-  }
 
   class DiagConsoleLogger {
     constructor() {
       function _consoleFunc(funcName) {
         return function(...args) {
-          let theFunc = exports._originalConsoleMethods[funcName];
-          if (typeof theFunc !== "function") {
-            theFunc = exports._originalConsoleMethods["log"];
-          }
-          if (typeof theFunc !== "function" && console) {
-            theFunc = console[funcName];
+          if (console) {
+            let theFunc = console[funcName];
             if (typeof theFunc !== "function") {
               theFunc = console.log;
             }
-          }
-          if (typeof theFunc === "function") {
-            return theFunc.apply(console, args);
+            if (typeof theFunc === "function") {
+              return theFunc.apply(console, args);
+            }
           }
         };
       }
@@ -8414,7 +8453,7 @@ var require_consoleLogger = __commonJS(function(exports) {
   exports.DiagConsoleLogger = DiagConsoleLogger;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/metrics/NoopMeter.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/metrics/NoopMeter.js
 var require_NoopMeter = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.createNoopMeter = exports.NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC = exports.NOOP_OBSERVABLE_GAUGE_METRIC = exports.NOOP_OBSERVABLE_COUNTER_METRIC = exports.NOOP_UP_DOWN_COUNTER_METRIC = exports.NOOP_HISTOGRAM_METRIC = exports.NOOP_GAUGE_METRIC = exports.NOOP_COUNTER_METRIC = exports.NOOP_METER = exports.NoopObservableUpDownCounterMetric = exports.NoopObservableGaugeMetric = exports.NoopObservableCounterMetric = exports.NoopObservableMetric = exports.NoopHistogramMetric = exports.NoopGaugeMetric = exports.NoopUpDownCounterMetric = exports.NoopCounterMetric = exports.NoopMetric = exports.NoopMeter = undefined;
@@ -8502,7 +8541,7 @@ var require_NoopMeter = __commonJS(function(exports) {
   exports.createNoopMeter = createNoopMeter;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/metrics/Metric.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/metrics/Metric.js
 var require_Metric = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.ValueType = undefined;
@@ -8513,7 +8552,7 @@ var require_Metric = __commonJS(function(exports) {
   })(ValueType = exports.ValueType || (exports.ValueType = {}));
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/propagation/TextMapPropagator.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/propagation/TextMapPropagator.js
 var require_TextMapPropagator = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.defaultTextMapSetter = exports.defaultTextMapGetter = undefined;
@@ -8541,7 +8580,7 @@ var require_TextMapPropagator = __commonJS(function(exports) {
   };
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js
 var require_NoopContextManager = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.NoopContextManager = undefined;
@@ -8567,7 +8606,7 @@ var require_NoopContextManager = __commonJS(function(exports) {
   exports.NoopContextManager = NoopContextManager;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/api/context.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/api/context.js
 var require_context2 = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.ContextAPI = undefined;
@@ -8608,7 +8647,7 @@ var require_context2 = __commonJS(function(exports) {
   exports.ContextAPI = ContextAPI;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/trace_flags.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace/trace_flags.js
 var require_trace_flags = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.TraceFlags = undefined;
@@ -8619,7 +8658,7 @@ var require_trace_flags = __commonJS(function(exports) {
   })(TraceFlags = exports.TraceFlags || (exports.TraceFlags = {}));
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/invalid-span-constants.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace/invalid-span-constants.js
 var require_invalid_span_constants = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.INVALID_SPAN_CONTEXT = exports.INVALID_TRACEID = exports.INVALID_SPANID = undefined;
@@ -8633,15 +8672,15 @@ var require_invalid_span_constants = __commonJS(function(exports) {
   };
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/NonRecordingSpan.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace/NonRecordingSpan.js
 var require_NonRecordingSpan = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.NonRecordingSpan = undefined;
   var invalid_span_constants_1 = require_invalid_span_constants();
 
   class NonRecordingSpan {
-    constructor(spanContext = invalid_span_constants_1.INVALID_SPAN_CONTEXT) {
-      this._spanContext = spanContext;
+    constructor(_spanContext = invalid_span_constants_1.INVALID_SPAN_CONTEXT) {
+      this._spanContext = _spanContext;
     }
     spanContext() {
       return this._spanContext;
@@ -8676,7 +8715,7 @@ var require_NonRecordingSpan = __commonJS(function(exports) {
   exports.NonRecordingSpan = NonRecordingSpan;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/context-utils.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace/context-utils.js
 var require_context_utils = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.getSpanContext = exports.setSpanContext = exports.deleteSpan = exports.setSpan = exports.getActiveSpan = exports.getSpan = undefined;
@@ -8711,132 +8750,20 @@ var require_context_utils = __commonJS(function(exports) {
   exports.getSpanContext = getSpanContext;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/spancontext-utils.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace/spancontext-utils.js
 var require_spancontext_utils = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.wrapSpanContext = exports.isSpanContextValid = exports.isValidSpanId = exports.isValidTraceId = undefined;
   var invalid_span_constants_1 = require_invalid_span_constants();
   var NonRecordingSpan_1 = require_NonRecordingSpan();
-  var isHex = new Uint8Array([
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1
-  ]);
-  function isValidHex(id, length) {
-    if (typeof id !== "string" || id.length !== length)
-      return false;
-    let r = 0;
-    for (let i = 0;i < id.length; i += 4) {
-      r += (isHex[id.charCodeAt(i)] | 0) + (isHex[id.charCodeAt(i + 1)] | 0) + (isHex[id.charCodeAt(i + 2)] | 0) + (isHex[id.charCodeAt(i + 3)] | 0);
-    }
-    return r === length;
-  }
+  var VALID_TRACEID_REGEX = /^([0-9a-f]{32})$/i;
+  var VALID_SPANID_REGEX = /^[0-9a-f]{16}$/i;
   function isValidTraceId(traceId) {
-    return isValidHex(traceId, 32) && traceId !== invalid_span_constants_1.INVALID_TRACEID;
+    return VALID_TRACEID_REGEX.test(traceId) && traceId !== invalid_span_constants_1.INVALID_TRACEID;
   }
   exports.isValidTraceId = isValidTraceId;
   function isValidSpanId(spanId) {
-    return isValidHex(spanId, 16) && spanId !== invalid_span_constants_1.INVALID_SPANID;
+    return VALID_SPANID_REGEX.test(spanId) && spanId !== invalid_span_constants_1.INVALID_SPANID;
   }
   exports.isValidSpanId = isValidSpanId;
   function isSpanContextValid(spanContext) {
@@ -8849,7 +8776,7 @@ var require_spancontext_utils = __commonJS(function(exports) {
   exports.wrapSpanContext = wrapSpanContext;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js
 var require_NoopTracer = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.NoopTracer = undefined;
@@ -8896,11 +8823,11 @@ var require_NoopTracer = __commonJS(function(exports) {
   }
   exports.NoopTracer = NoopTracer;
   function isSpanContext(spanContext) {
-    return spanContext !== null && typeof spanContext === "object" && "spanId" in spanContext && typeof spanContext["spanId"] === "string" && "traceId" in spanContext && typeof spanContext["traceId"] === "string" && "traceFlags" in spanContext && typeof spanContext["traceFlags"] === "number";
+    return typeof spanContext === "object" && typeof spanContext["spanId"] === "string" && typeof spanContext["traceId"] === "string" && typeof spanContext["traceFlags"] === "number";
   }
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js
 var require_ProxyTracer = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.ProxyTracer = undefined;
@@ -8908,8 +8835,8 @@ var require_ProxyTracer = __commonJS(function(exports) {
   var NOOP_TRACER = new NoopTracer_1.NoopTracer;
 
   class ProxyTracer {
-    constructor(provider, name, version, options) {
-      this._provider = provider;
+    constructor(_provider, name, version, options) {
+      this._provider = _provider;
       this.name = name;
       this.version = version;
       this.options = options;
@@ -8936,7 +8863,7 @@ var require_ProxyTracer = __commonJS(function(exports) {
   exports.ProxyTracer = ProxyTracer;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/NoopTracerProvider.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace/NoopTracerProvider.js
 var require_NoopTracerProvider = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.NoopTracerProvider = undefined;
@@ -8950,7 +8877,7 @@ var require_NoopTracerProvider = __commonJS(function(exports) {
   exports.NoopTracerProvider = NoopTracerProvider;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/ProxyTracerProvider.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace/ProxyTracerProvider.js
 var require_ProxyTracerProvider = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.ProxyTracerProvider = undefined;
@@ -8978,7 +8905,7 @@ var require_ProxyTracerProvider = __commonJS(function(exports) {
   exports.ProxyTracerProvider = ProxyTracerProvider;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/SamplingResult.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace/SamplingResult.js
 var require_SamplingResult = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.SamplingDecision = undefined;
@@ -8990,7 +8917,7 @@ var require_SamplingResult = __commonJS(function(exports) {
   })(SamplingDecision = exports.SamplingDecision || (exports.SamplingDecision = {}));
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/span_kind.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace/span_kind.js
 var require_span_kind = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.SpanKind = undefined;
@@ -9004,7 +8931,7 @@ var require_span_kind = __commonJS(function(exports) {
   })(SpanKind = exports.SpanKind || (exports.SpanKind = {}));
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/status.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace/status.js
 var require_status = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.SpanStatusCode = undefined;
@@ -9016,7 +8943,7 @@ var require_status = __commonJS(function(exports) {
   })(SpanStatusCode = exports.SpanStatusCode || (exports.SpanStatusCode = {}));
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/internal/tracestate-validators.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace/internal/tracestate-validators.js
 var require_tracestate_validators = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.validateValue = exports.validateKey = undefined;
@@ -9036,7 +8963,7 @@ var require_tracestate_validators = __commonJS(function(exports) {
   exports.validateValue = validateValue;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/internal/tracestate-impl.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace/internal/tracestate-impl.js
 var require_tracestate_impl = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.TraceStateImpl = undefined;
@@ -9069,7 +8996,7 @@ var require_tracestate_impl = __commonJS(function(exports) {
       return this._internalState.get(key);
     }
     serialize() {
-      return Array.from(this._internalState.keys()).reduceRight((agg, key) => {
+      return this._keys().reduce((agg, key) => {
         agg.push(key + LIST_MEMBER_KEY_VALUE_SPLITTER + this.get(key));
         return agg;
       }, []).join(LIST_MEMBERS_SEPARATOR);
@@ -9077,7 +9004,7 @@ var require_tracestate_impl = __commonJS(function(exports) {
     _parse(rawTraceState) {
       if (rawTraceState.length > MAX_TRACE_STATE_LEN)
         return;
-      this._internalState = rawTraceState.split(LIST_MEMBERS_SEPARATOR).reduceRight((agg, part) => {
+      this._internalState = rawTraceState.split(LIST_MEMBERS_SEPARATOR).reverse().reduce((agg, part) => {
         const listMember = part.trim();
         const i = listMember.indexOf(LIST_MEMBER_KEY_VALUE_SPLITTER);
         if (i !== -1) {
@@ -9105,7 +9032,7 @@ var require_tracestate_impl = __commonJS(function(exports) {
   exports.TraceStateImpl = TraceStateImpl;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/internal/utils.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace/internal/utils.js
 var require_utils2 = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.createTraceState = undefined;
@@ -9116,7 +9043,7 @@ var require_utils2 = __commonJS(function(exports) {
   exports.createTraceState = createTraceState;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/context-api.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/context-api.js
 var require_context_api = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.context = undefined;
@@ -9124,7 +9051,7 @@ var require_context_api = __commonJS(function(exports) {
   exports.context = context_1.ContextAPI.getInstance();
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/diag-api.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/diag-api.js
 var require_diag_api = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.diag = undefined;
@@ -9132,7 +9059,7 @@ var require_diag_api = __commonJS(function(exports) {
   exports.diag = diag_1.DiagAPI.instance();
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/metrics/NoopMeterProvider.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/metrics/NoopMeterProvider.js
 var require_NoopMeterProvider = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.NOOP_METER_PROVIDER = exports.NoopMeterProvider = undefined;
@@ -9147,7 +9074,7 @@ var require_NoopMeterProvider = __commonJS(function(exports) {
   exports.NOOP_METER_PROVIDER = new NoopMeterProvider;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/api/metrics.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/api/metrics.js
 var require_metrics = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.MetricsAPI = undefined;
@@ -9180,7 +9107,7 @@ var require_metrics = __commonJS(function(exports) {
   exports.MetricsAPI = MetricsAPI;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/metrics-api.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/metrics-api.js
 var require_metrics_api = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.metrics = undefined;
@@ -9188,7 +9115,7 @@ var require_metrics_api = __commonJS(function(exports) {
   exports.metrics = metrics_1.MetricsAPI.getInstance();
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/propagation/NoopTextMapPropagator.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/propagation/NoopTextMapPropagator.js
 var require_NoopTextMapPropagator = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.NoopTextMapPropagator = undefined;
@@ -9205,7 +9132,7 @@ var require_NoopTextMapPropagator = __commonJS(function(exports) {
   exports.NoopTextMapPropagator = NoopTextMapPropagator;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/baggage/context-helpers.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/baggage/context-helpers.js
 var require_context_helpers = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.deleteBaggage = exports.setBaggage = exports.getActiveBaggage = exports.getBaggage = undefined;
@@ -9230,7 +9157,7 @@ var require_context_helpers = __commonJS(function(exports) {
   exports.deleteBaggage = deleteBaggage;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/api/propagation.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/api/propagation.js
 var require_propagation = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.PropagationAPI = undefined;
@@ -9279,7 +9206,7 @@ var require_propagation = __commonJS(function(exports) {
   exports.PropagationAPI = PropagationAPI;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/propagation-api.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/propagation-api.js
 var require_propagation_api = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.propagation = undefined;
@@ -9287,7 +9214,7 @@ var require_propagation_api = __commonJS(function(exports) {
   exports.propagation = propagation_1.PropagationAPI.getInstance();
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/api/trace.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/api/trace.js
 var require_trace = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.TraceAPI = undefined;
@@ -9337,7 +9264,7 @@ var require_trace = __commonJS(function(exports) {
   exports.TraceAPI = TraceAPI;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace-api.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace-api.js
 var require_trace_api = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.trace = undefined;
@@ -9345,7 +9272,7 @@ var require_trace_api = __commonJS(function(exports) {
   exports.trace = trace_1.TraceAPI.getInstance();
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/index.js
+// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/index.js
 var require_src = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.trace = exports.propagation = exports.metrics = exports.diag = exports.context = exports.INVALID_SPAN_CONTEXT = exports.INVALID_TRACEID = exports.INVALID_SPANID = exports.isValidSpanId = exports.isValidTraceId = exports.isSpanContextValid = exports.createTraceState = exports.TraceFlags = exports.SpanStatusCode = exports.SpanKind = exports.SamplingDecision = exports.ProxyTracerProvider = exports.ProxyTracer = exports.defaultTextMapSetter = exports.defaultTextMapGetter = exports.ValueType = exports.createNoopMeter = exports.DiagLogLevel = exports.DiagConsoleLogger = exports.ROOT_CONTEXT = exports.createContextKey = exports.baggageEntryMetadataFromString = undefined;
@@ -9460,7 +9387,7 @@ var require_src = __commonJS(function(exports) {
   };
 });
 
-// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/extensions/error-tracking/trace-context.mjs
+// node_modules/.bun/posthog-node@5.56.2+460773ef8ff1e07c/node_modules/posthog-node/dist/extensions/error-tracking/trace-context.mjs
 async function getActiveTraceProperties() {
   try {
     const api = await (otelApi ??= Promise.resolve().then(() => __toESM(require_src(), 1)));
@@ -9481,7 +9408,7 @@ var init_trace_context = __esm(() => {
   SPAN_ID_PATTERN = /^[0-9a-f]{16}$/i;
 });
 
-// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/storage-memory.mjs
+// node_modules/.bun/posthog-node@5.56.2+460773ef8ff1e07c/node_modules/posthog-node/dist/storage-memory.mjs
 class PostHogMemoryStorage {
   getProperty(key) {
     return this._memoryStorage[key];
@@ -9495,7 +9422,7 @@ class PostHogMemoryStorage {
 }
 var init_storage_memory = () => {};
 
-// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/capture-v1/config.mjs
+// node_modules/.bun/posthog-node@5.56.2+460773ef8ff1e07c/node_modules/posthog-node/dist/capture-v1/config.mjs
 function isCaptureMode(value) {
   return value === "v0" || value === "v1";
 }
@@ -9505,14 +9432,14 @@ function resolveCaptureMode() {
 }
 var init_config3 = () => {};
 
-// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/capture-v1/routing.mjs
+// node_modules/.bun/posthog-node@5.56.2+460773ef8ff1e07c/node_modules/posthog-node/dist/capture-v1/routing.mjs
 function isLegacyOnlyEvent(message) {
   return typeof message.event == "string" && message.event.startsWith(AI_EVENT_PREFIX);
 }
 var AI_EVENT_PREFIX = "$ai_", ANALYTICS_ROUTE = "analytics", AI_ROUTE = "ai";
 var init_routing = () => {};
 
-// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/capture-v1/errors.mjs
+// node_modules/.bun/posthog-node@5.56.2+460773ef8ff1e07c/node_modules/posthog-node/dist/capture-v1/errors.mjs
 var CaptureV1Error;
 var init_errors = __esm(() => {
   CaptureV1Error = class CaptureV1Error extends Error {
@@ -9532,7 +9459,7 @@ var init_errors = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/capture-v1/transform.mjs
+// node_modules/.bun/posthog-node@5.56.2+460773ef8ff1e07c/node_modules/posthog-node/dist/capture-v1/transform.mjs
 function coerceBool(value) {
   if (typeof value == "boolean")
     return value;
@@ -9650,7 +9577,7 @@ var init_transform = __esm(() => {
   ];
 });
 
-// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/capture-v1/sender.mjs
+// node_modules/.bun/posthog-node@5.56.2+460773ef8ff1e07c/node_modules/posthog-node/dist/capture-v1/sender.mjs
 class V1CaptureSender {
   constructor(config, hooks) {
     this.config = config;
@@ -9906,11 +9833,11 @@ var init_sender = __esm(() => {
   ]);
 });
 
-// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/ai-capture/routing.mjs
+// node_modules/.bun/posthog-node@5.56.2+460773ef8ff1e07c/node_modules/posthog-node/dist/ai-capture/routing.mjs
 var AI_CAPTURE_ROUTE = "ai-capture", AI_CAPTURE_ENDPOINT_PATH = "/i/v0/ai/batch/", AI_MAX_EVENT_BYTES = 8388608, AI_BATCH_TARGET_BYTES = 5242880;
 var init_routing2 = () => {};
 
-// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/ai-capture/batching.mjs
+// node_modules/.bun/posthog-node@5.56.2+460773ef8ff1e07c/node_modules/posthog-node/dist/ai-capture/batching.mjs
 function eventByteSize(message) {
   return encoder.encode(safeJsonStringify(message)).length;
 }
@@ -9952,7 +9879,7 @@ var init_batching = __esm(() => {
   encoder = new TextEncoder;
 });
 
-// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/client.mjs
+// node_modules/.bun/posthog-node@5.56.2+460773ef8ff1e07c/node_modules/posthog-node/dist/client.mjs
 function emitDeprecationWarningOnce(id, message) {
   if (_emittedDeprecations.has(id))
     return;
@@ -10029,8 +9956,8 @@ var init_client = __esm(() => {
         this.options.waitUntilDebounceMs = Math.max(normalizedOptions.waitUntilDebounceMs, 0);
       if (typeof normalizedOptions.waitUntilMaxWaitMs == "number")
         this.options.waitUntilMaxWaitMs = Math.max(normalizedOptions.waitUntilMaxWaitMs, 0);
-      if (!this.disabled && normalizedOptions.personalApiKey) {
-        if (normalizedOptions.personalApiKey.includes("phc_"))
+      if (!this.disabled && (normalizedOptions.personalApiKey || normalizedOptions.flagDefinitionCacheProvider)) {
+        if (normalizedOptions.personalApiKey?.includes("phc_"))
           throw new Error('A project API key ("phc_...") was provided as secretKey or personalApiKey. Pass the project API key as the first constructor argument. For local evaluation, set secretKey (or the deprecated personalApiKey alias) to a server-only Project Secret API Key ("phs_...") or Personal API Key ("phx_...") with feature flag read access.');
         const shouldEnableLocalEvaluation = normalizedOptions.enableLocalEvaluation !== false;
         if (shouldEnableLocalEvaluation)
@@ -11304,7 +11231,7 @@ var init_client = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/extensions/context/context.mjs
+// node_modules/.bun/posthog-node@5.56.2+460773ef8ff1e07c/node_modules/posthog-node/dist/extensions/context/context.mjs
 import { AsyncLocalStorage } from "node:async_hooks";
 
 class PostHogContext {
@@ -11336,7 +11263,7 @@ class PostHogContext {
 }
 var init_context2 = () => {};
 
-// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/extensions/context/span-context.node.mjs
+// node_modules/.bun/posthog-node@5.56.2+460773ef8ff1e07c/node_modules/posthog-node/dist/extensions/context/span-context.node.mjs
 import { AsyncLocalStorage as AsyncLocalStorage2 } from "node:async_hooks";
 
 class AsyncLocalStorageSpanContextManager {
@@ -11352,7 +11279,7 @@ class AsyncLocalStorageSpanContextManager {
 }
 var init_span_context_node = () => {};
 
-// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/gzip.node.mjs
+// node_modules/.bun/posthog-node@5.56.2+460773ef8ff1e07c/node_modules/posthog-node/dist/gzip.node.mjs
 import { gzip } from "node:zlib";
 import { promisify } from "node:util";
 async function gzipCompress2(input, isDebug = true) {
@@ -11370,7 +11297,7 @@ var init_gzip_node = __esm(() => {
   gzipAsync = promisify(gzip);
 });
 
-// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/host-os.node.mjs
+// node_modules/.bun/posthog-node@5.56.2+460773ef8ff1e07c/node_modules/posthog-node/dist/host-os.node.mjs
 import { platform, release as release2 } from "node:os";
 function hostOsResourceAttributes() {
   let osName;
@@ -11385,7 +11312,7 @@ var init_host_os_node = __esm(() => {
   init_dist();
 });
 
-// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/extensions/sentry-integration.mjs
+// node_modules/.bun/posthog-node@5.56.2+460773ef8ff1e07c/node_modules/posthog-node/dist/extensions/sentry-integration.mjs
 function createEventProcessor(_posthog, { organization, projectId, prefix, severityAllowList = [
   "error"
 ], sendExceptionsToPostHog = true } = {}) {
@@ -11462,22 +11389,22 @@ var init_sentry_integration = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/extensions/tracing-headers.mjs
+// node_modules/.bun/posthog-node@5.56.2+460773ef8ff1e07c/node_modules/posthog-node/dist/extensions/tracing-headers.mjs
 var init_tracing_headers2 = () => {};
 
-// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/extensions/url-utils.mjs
+// node_modules/.bun/posthog-node@5.56.2+460773ef8ff1e07c/node_modules/posthog-node/dist/extensions/url-utils.mjs
 var init_url_utils = __esm(() => {
   init_dist();
 });
 
-// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/extensions/express.mjs
+// node_modules/.bun/posthog-node@5.56.2+460773ef8ff1e07c/node_modules/posthog-node/dist/extensions/express.mjs
 var init_express = __esm(() => {
   init_error_tracking2();
   init_tracing_headers2();
   init_url_utils();
 });
 
-// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/exports.mjs
+// node_modules/.bun/posthog-node@5.56.2+460773ef8ff1e07c/node_modules/posthog-node/dist/exports.mjs
 var init_exports = __esm(() => {
   init_feature_flag_evaluations();
   init_dist();
@@ -11486,7 +11413,7 @@ var init_exports = __esm(() => {
   init_types3();
 });
 
-// node_modules/.bun/posthog-node@5.56.1/node_modules/posthog-node/dist/entrypoints/index.node.mjs
+// node_modules/.bun/posthog-node@5.56.2+460773ef8ff1e07c/node_modules/posthog-node/dist/entrypoints/index.node.mjs
 var PostHog;
 var init_index_node = __esm(() => {
   init_module_node();
@@ -11774,7 +11701,7 @@ var init_package = __esm(() => {
       "@oh-my-opencode/utils": "workspace:*"
     },
     devDependencies: {
-      "bun-types": "1.4.2"
+      "bun-types": "1.4.3"
     }
   };
 });
@@ -20024,15 +19951,15 @@ var initializer2 = (inst, issues) => {
   if (_installedErrorProtos.has(proto))
     return;
   _installedErrorProtos.add(proto);
-  _lazyMethod(proto, "format", (self2) => (mapper) => formatError(self2, mapper));
-  _lazyMethod(proto, "flatten", (self2) => (mapper) => flattenError(self2, mapper));
-  _lazyMethod(proto, "addIssue", (self2) => (issue) => {
-    self2.issues.push(issue);
-    self2.message = JSON.stringify(self2.issues, jsonStringifyReplacer, 2);
+  _lazyMethod(proto, "format", (self) => (mapper) => formatError(self, mapper));
+  _lazyMethod(proto, "flatten", (self) => (mapper) => flattenError(self, mapper));
+  _lazyMethod(proto, "addIssue", (self) => (issue) => {
+    self.issues.push(issue);
+    self.message = JSON.stringify(self.issues, jsonStringifyReplacer, 2);
   });
-  _lazyMethod(proto, "addIssues", (self2) => (issues) => {
-    self2.issues.push(...issues);
-    self2.message = JSON.stringify(self2.issues, jsonStringifyReplacer, 2);
+  _lazyMethod(proto, "addIssues", (self) => (issues) => {
+    self.issues.push(...issues);
+    self.message = JSON.stringify(self.issues, jsonStringifyReplacer, 2);
   });
   Object.defineProperty(proto, "isEmpty", {
     configurable: true,
@@ -20608,7 +20535,7 @@ var ZodObject = /* @__PURE__ */ $constructor("ZodObject", (inst, def) => {
   $ZodObjectJIT.init(inst, def);
   ZodType.init(inst, def);
   inst._zod.processJSONSchema = (ctx, json, params) => objectProcessor(inst, ctx, json, params);
-  installLazyProp(inst, "shape", (self2) => self2._zod.def.shape, false);
+  installLazyProp(inst, "shape", (self) => self._zod.def.shape, false);
 }, {
   keyof() {
     return _enum(Object.keys(this._zod.def.shape));
