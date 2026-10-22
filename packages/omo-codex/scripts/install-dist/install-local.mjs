@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// omo-codex-install:b93c8a23ccfb735feb527d0eb908268e037e0bf2991d36923501d67a335c7f6e:08341abbe9edb4ad98443d960d9be6109ca7bf698a7b33ed9523f2acdd166261
+// omo-codex-install:52ea7fb7fcc3e5b7d51d59dabac302d0e43fbda35731843925f14a0ca2485529:2c9a453113da94b4b99b69c07412fa23e08a12507b68c603d092f0e37a5ffa7d
 var __create = Object.create;
 var __getProtoOf = Object.getPrototypeOf;
 var __defProp = Object.defineProperty;
@@ -677,7 +677,7 @@ function normalizeWindowsPath(path) {
 }
 var init_module_node = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/types.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/types.mjs
 var types_PostHogPersistedProperty;
 var init_types = __esm(() => {
   types_PostHogPersistedProperty = /* @__PURE__ */ function(PostHogPersistedProperty) {
@@ -719,7 +719,7 @@ var init_types = __esm(() => {
   }({});
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/utils/string-utils.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/string-utils.mjs
 function safeJsonStringify(value) {
   const ancestors = [];
   return JSON.stringify(value, function(_key, replacementValue) {
@@ -745,7 +745,7 @@ function safeJsonStringify(value) {
 }
 var init_string_utils = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/utils/type-utils.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/type-utils.mjs
 function isPrimitive(value) {
   return value === null || typeof value != "object";
 }
@@ -790,7 +790,7 @@ var init_type_utils = __esm(() => {
   };
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/utils/bot-detection.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/bot-detection.mjs
 function buildCacheKey(ua, custom) {
   let customEncoded = "";
   for (let i = 0;i < custom.length; i++) {
@@ -896,12 +896,12 @@ var init_bot_detection = __esm(() => {
   UA_CACHE = new Map;
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/utils/browser-utils.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/browser-utils.mjs
 var init_browser_utils = __esm(() => {
   init_string_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/utils/number-utils.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/number-utils.mjs
 function clampToRange(value, min, max, logger, fallbackValue) {
   if (min > max) {
     logger.warn("min cannot be greater than max.");
@@ -924,7 +924,7 @@ var init_number_utils = __esm(() => {
   init_type_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/utils/bucketed-rate-limiter.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/bucketed-rate-limiter.mjs
 function resolveExceptionRateLimiterConfig(config = {}) {
   return {
     refillRate: config.exceptionRateLimiterRefillRate ?? config.__exceptionRateLimiterRefillRate ?? DEFAULT_EXCEPTION_RATE_LIMITER_REFILL_RATE,
@@ -978,7 +978,7 @@ var init_bucketed_rate_limiter = __esm(() => {
   init_number_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/vendor/uuidv7.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/vendor/uuidv7.mjs
 class UUID {
   constructor(bytes) {
     this.bytes = bytes;
@@ -1153,7 +1153,7 @@ var init_uuidv7 = __esm(() => {
   /*! LICENSE: uuidv7.mjs.LICENSE.txt */
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/utils/promise-queue.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/promise-queue.mjs
 class PromiseQueue {
   add(promise) {
     const promiseUUID = uuidv7();
@@ -1195,7 +1195,7 @@ var init_promise_queue = __esm(() => {
   init_uuidv7();
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/utils/logger.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/logger.mjs
 function createConsole(consoleLike = console) {
   const lockedMethods = {
     log: consoleLike.log.bind(consoleLike),
@@ -1237,7 +1237,7 @@ var _createLogger = (prefix, maybeCall, consoleLike) => {
 }, passThrough = (fn) => fn();
 var init_logger = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/utils/user-agent-utils.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/user-agent-utils.mjs
 var MOBILE = "Mobile", IOS = "iOS", ANDROID = "Android", TABLET = "Tablet", ANDROID_TABLET, APPLE = "Apple", APPLE_WATCH, SAFARI = "Safari", BLACKBERRY = "BlackBerry", SAMSUNG = "Samsung", SAMSUNG_BROWSER, SAMSUNG_INTERNET, CHROME = "Chrome", CHROME_OS, CHROME_IOS, INTERNET_EXPLORER = "Internet Explorer", INTERNET_EXPLORER_MOBILE, OPERA = "Opera", OPERA_MINI, EDGE = "Edge", MICROSOFT_EDGE, FIREFOX = "Firefox", FIREFOX_IOS, NINTENDO = "Nintendo", PLAYSTATION = "PlayStation", XBOX = "Xbox", ANDROID_MOBILE, MOBILE_SAFARI, WINDOWS = "Windows", WINDOWS_PHONE, GENERIC = "Generic", GENERIC_MOBILE, GENERIC_TABLET, KONQUEROR = "Konqueror", OCULUS_BROWSER = "Oculus Browser", VIVALDI = "Vivaldi", YANDEX = "Yandex", WHALE = "Whale", DUCKDUCKGO = "DuckDuckGo", PALE_MOON = "Pale Moon", WATERFOX = "Waterfox", BRAVE = "Brave", CLAUDE = "Claude", CODEX = "Codex", CHATGPT = "ChatGPT", GOOGLE_SEARCH_APP = "Google Search App", BROWSER_VERSION_REGEX_SUFFIX = "(\\d+(\\.\\d+)?)", DEFAULT_BROWSER_VERSION_REGEX, AI_APP_VERSION_REGEX, XBOX_REGEX, PLAYSTATION_REGEX, NINTENDO_REGEX, BLACKBERRY_REGEX, windowsVersionMap, versionRegexes, osMatchers;
 var init_user_agent_utils = __esm(() => {
   init_string_utils();
@@ -1516,10 +1516,10 @@ var init_user_agent_utils = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/utils/webview-app-utils.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/webview-app-utils.mjs
 var init_webview_app_utils = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/utils/json-utils.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/json-utils.mjs
 function sanitizeString(value) {
   let output = "";
   for (let index = 0;index < value.length; index++) {
@@ -1567,7 +1567,7 @@ var init_json_utils = __esm(() => {
   dateToISOString = Date.prototype.toISOString;
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/utils/retry-after.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/retry-after.mjs
 function parseRetryAfterMs(value, now = Date.now()) {
   if (typeof value != "string" || !value)
     return;
@@ -1630,7 +1630,7 @@ class RetryAfterWindow {
 var MAX_RETRY_AFTER_MS = 300000, CLOCK_STEP_TOLERANCE_MS = 5000;
 var init_retry_after = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/utils/index.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/index.mjs
 function isValidUUID(value) {
   return typeof value == "string" && UUID_REGEX.test(value);
 }
@@ -1723,7 +1723,7 @@ var init_utils = __esm(() => {
   UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/error-tracking/chunk-ids.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/chunk-ids.mjs
 function getFilenameToChunkIdMap(stackParser) {
   const posthogChunkIds = globalThis._posthogChunkIds;
   const nativeDebugIds = globalThis._debugIds;
@@ -1776,7 +1776,7 @@ function matchesSnapshot(chunkIds, keys, snapshot) {
 var parsedStackResults, lastPostHogChunkIds, lastNativeDebugIds, cachedFilenameChunkIds;
 var init_chunk_ids = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/error-tracking/error-properties-builder.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/error-properties-builder.mjs
 class ErrorPropertiesBuilder {
   constructor(coercers, stackParser, modifiers = []) {
     this.coercers = coercers;
@@ -2006,7 +2006,7 @@ var init_error_properties_builder = __esm(() => {
   init_chunk_ids();
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/error-tracking/parsers/base.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/parsers/base.mjs
 function isAppFilename(filename) {
   if (!filename || filename === ANONYMOUS_FILENAME)
     return false;
@@ -2044,7 +2044,7 @@ var init_base = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/error-tracking/parsers/safari.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/parsers/safari.mjs
 var extractSafariExtensionDetails = (func, filename) => {
   const isSafariExtension = func.indexOf("safari-extension") !== -1;
   const isSafariWebExtension = func.indexOf("safari-web-extension") !== -1;
@@ -2060,7 +2060,7 @@ var init_safari = __esm(() => {
   init_base();
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/error-tracking/parsers/chrome.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/parsers/chrome.mjs
 var chromeRegexNoFnName, chromeRegex, chromeEvalRegex, chromeStackLineParser = (line, platform) => {
   const noFnParts = chromeRegexNoFnName.exec(line);
   if (noFnParts) {
@@ -2090,7 +2090,7 @@ var init_chrome = __esm(() => {
   chromeEvalRegex = /\((\S*)(?::(\d+))(?::(\d+))\)/;
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/error-tracking/parsers/gecko.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/parsers/gecko.mjs
 var geckoREgex, geckoEvalRegex, geckoStackLineParser = (line, platform) => {
   const parts = geckoREgex.exec(line);
   if (parts) {
@@ -2117,17 +2117,17 @@ var init_gecko = __esm(() => {
   geckoEvalRegex = /(\S+) line (\d+)(?: > eval line \d+)* > eval/i;
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/error-tracking/parsers/winjs.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/parsers/winjs.mjs
 var init_winjs = __esm(() => {
   init_base();
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/error-tracking/parsers/opera.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/parsers/opera.mjs
 var init_opera = __esm(() => {
   init_base();
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/error-tracking/parsers/node.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/parsers/node.mjs
 function filenameIsInApp(filename, isNative = false) {
   const isInternal = isNative || filename && !filename.startsWith("/") && !filename.match(/^[A-Z]:/) && !filename.startsWith(".") && !filename.match(/^[a-zA-Z]([a-zA-Z0-9.\-+])*:\/\//);
   return !isInternal && filename !== undefined && !filename.includes("node_modules/");
@@ -2203,7 +2203,7 @@ var init_node = __esm(() => {
   PROMISE_INDEX = /^index \d+$/;
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/error-tracking/parsers/index.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/parsers/index.mjs
 function isSameFrame(a, b) {
   return a.filename === b.filename && a.function === b.function && a.module === b.module && a.lineno === b.lineno && a.colno === b.colno;
 }
@@ -2353,12 +2353,12 @@ var init_parsers = __esm(() => {
   WEBPACK_ERROR_REGEXP = /\(error: (.*)\)/;
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/error-tracking/coercers/dom-exception-coercer.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/coercers/dom-exception-coercer.mjs
 var init_dom_exception_coercer = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/error-tracking/coercers/error-coercer.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/coercers/error-coercer.mjs
 class ErrorCoercer {
   match(err) {
     return isError(err);
@@ -2400,12 +2400,12 @@ var init_error_coercer = __esm(() => {
   init_type_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/error-tracking/coercers/error-event-coercer.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/coercers/error-event-coercer.mjs
 var init_error_event_coercer = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/error-tracking/coercers/string-coercer.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/coercers/string-coercer.mjs
 class StringCoercer {
   match(input) {
     return typeof input == "string";
@@ -2438,7 +2438,7 @@ var init_string_coercer = __esm(() => {
   ERROR_TYPES_PATTERN = /^(?:[Uu]ncaught (?:exception: )?)?(?:((?:Eval|Internal|Range|Reference|Syntax|Type|URI|)Error): )?(.*)$/i;
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/error-tracking/types.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/types.mjs
 var severityLevels;
 var init_types2 = __esm(() => {
   severityLevels = [
@@ -2451,7 +2451,7 @@ var init_types2 = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/error-tracking/coercers/utils.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/coercers/utils.mjs
 function extractExceptionKeysForMessage(err, maxLength = 40) {
   const keys = Object.keys(err);
   keys.sort();
@@ -2469,7 +2469,7 @@ function extractExceptionKeysForMessage(err, maxLength = 40) {
 }
 var init_utils2 = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/error-tracking/coercers/object-coercer.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/coercers/object-coercer.mjs
 class ObjectCoercer {
   match(candidate) {
     return typeof candidate == "object" && candidate !== null;
@@ -2540,7 +2540,7 @@ var init_object_coercer = __esm(() => {
   init_utils2();
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/error-tracking/coercers/event-coercer.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/coercers/event-coercer.mjs
 class EventCoercer {
   match(err) {
     return isEvent(err);
@@ -2560,7 +2560,7 @@ var init_event_coercer = __esm(() => {
   init_utils2();
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/error-tracking/coercers/primitive-coercer.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/coercers/primitive-coercer.mjs
 class PrimitiveCoercer {
   match(candidate) {
     return isPrimitive(candidate);
@@ -2578,12 +2578,12 @@ var init_primitive_coercer = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/error-tracking/coercers/promise-rejection-event.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/coercers/promise-rejection-event.mjs
 var init_promise_rejection_event = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/error-tracking/coercers/index.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/coercers/index.mjs
 var init_coercers = __esm(() => {
   init_dom_exception_coercer();
   init_error_coercer();
@@ -2595,7 +2595,7 @@ var init_coercers = __esm(() => {
   init_promise_rejection_event();
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/error-tracking/utils.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/utils.mjs
 class ReduceableCache {
   constructor(_maxSize) {
     this._maxSize = _maxSize;
@@ -2622,7 +2622,7 @@ class ReduceableCache {
 }
 var init_utils3 = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/error-tracking/exception-steps.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/exception-steps.mjs
 var EXCEPTION_STEP_INTERNAL_FIELDS, RESERVED_EXCEPTION_STEP_KEYS;
 var init_exception_steps = __esm(() => {
   init_utils();
@@ -2636,7 +2636,7 @@ var init_exception_steps = __esm(() => {
   ]);
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/error-tracking/release.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/release.mjs
 function getInjectedReleaseId() {
   if ("u" > typeof process) {
     const fromEnvironment = process.env.POSTHOG_RELEASE_ID?.trim();
@@ -2648,7 +2648,7 @@ function getInjectedReleaseId() {
 }
 var init_release = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/error-tracking/index.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/index.mjs
 var init_error_tracking = __esm(() => {
   init_error_properties_builder();
   init_parsers();
@@ -2658,13 +2658,13 @@ var init_error_tracking = __esm(() => {
   init_release();
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/cookie.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/cookie.mjs
 var init_cookie = __esm(() => {
   init_utils();
   init_uuidv7();
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/featureFlagUtils.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/featureFlagUtils.mjs
 function getFlagDetailFromFlagAndPayload(key, value, payload) {
   return {
     key,
@@ -2795,7 +2795,7 @@ var init_featureFlagUtils = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/eventemitter.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/eventemitter.mjs
 class SimpleEventEmitter {
   constructor() {
     this.events = {};
@@ -2818,7 +2818,7 @@ class SimpleEventEmitter {
 }
 var init_eventemitter = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/gzip.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/gzip.mjs
 function isGzipSupported() {
   return "CompressionStream" in globalThis && "TextEncoder" in globalThis && "Response" in globalThis && typeof Response.prototype.blob == "function";
 }
@@ -2885,7 +2885,7 @@ var init_gzip = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/posthog-core-stateless.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/posthog-core-stateless.mjs
 async function logFlushError(err) {
   if (err instanceof PostHogFetchHttpError) {
     let text = "";
@@ -4021,7 +4021,7 @@ var init_posthog_core_stateless = __esm(() => {
   };
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/posthog-core.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/posthog-core.mjs
 var init_posthog_core = __esm(() => {
   init_featureFlagUtils();
   init_types();
@@ -4030,7 +4030,7 @@ var init_posthog_core = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/privacy.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/privacy.mjs
 var URL_PATTERN, URL_PATTERN_ONCE, URL_AUTHORITY_SEARCH, URL_AUTHORITY_PATTERN, URL_AUTHORITY_SEARCH_ALL;
 var init_privacy = __esm(() => {
   URL_PATTERN = /[a-z][a-z0-9+.-]{0,63}:[^\s<>"]+/gi;
@@ -4040,12 +4040,12 @@ var init_privacy = __esm(() => {
   URL_AUTHORITY_SEARCH_ALL = new RegExp(URL_AUTHORITY_SEARCH.source, "gi");
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/tracing-headers.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/tracing-headers.mjs
 var init_tracing_headers = __esm(() => {
   init_type_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/featureFlagLocalEvaluation.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/featureFlagLocalEvaluation.mjs
 function isTruthyOrFalsyPropertyValue(value) {
   if (typeof value == "boolean")
     return true;
@@ -4558,7 +4558,7 @@ var init_featureFlagLocalEvaluation = __esm(() => {
   };
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/utils/otlp-any-value.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/otlp-any-value.mjs
 function newState() {
   return {
     ancestors: new WeakSet,
@@ -4739,7 +4739,7 @@ var init_otlp_any_value = __esm(() => {
   propertyIsEnumerable = Object.prototype.propertyIsEnumerable;
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/utils/otlp-resource.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/otlp-resource.mjs
 function buildOtlpResourceAttributes(config, sdkName, sdkVersion) {
   return {
     ...assignUserAttributes({}, config.resourceAttributes),
@@ -4810,7 +4810,7 @@ var init_otlp_resource = __esm(() => {
   };
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/logs/logs-utils.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/logs/logs-utils.mjs
 var OTLP_SEVERITY_MAP, DEFAULT_OTLP_SEVERITY;
 var init_logs_utils = __esm(() => {
   init_utils();
@@ -4846,7 +4846,7 @@ var init_logs_utils = __esm(() => {
   DEFAULT_OTLP_SEVERITY = OTLP_SEVERITY_MAP.info;
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/utils/flush-timer.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/flush-timer.mjs
 class FlushTimer {
   constructor(_onFire) {
     this._onFire = _onFire;
@@ -4879,7 +4879,7 @@ var init_flush_timer = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/utils/backoff.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/backoff.mjs
 function drawJitter() {
   return 1 - JITTER + Math.random() * JITTER * 2;
 }
@@ -4892,7 +4892,7 @@ function backoffDelayMs(baseMs, failures, jitter, maxMs) {
 var MAX_FLUSH_BACKOFF_EXPONENT = 6, MAX_FLUSH_BACKOFF_MS = 30000, JITTER = 0.25, NO_JITTER = 1;
 var init_backoff = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/logs/index.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/logs/index.mjs
 var init_logs = __esm(() => {
   init_logs_utils();
   init_types();
@@ -4902,7 +4902,7 @@ var init_logs = __esm(() => {
   init_backoff();
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/traces/ids.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/traces/ids.mjs
 function getRandomBytes(byteLength) {
   const bytes = new Uint8Array(byteLength);
   const cryptoLike = globalThis.crypto;
@@ -4948,7 +4948,7 @@ var init_ids = __esm(() => {
   HEX_RE = /^[0-9a-f]+$/;
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/traces/traceparent.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/traces/traceparent.mjs
 function parseTraceparent(value) {
   const fields = matchTraceparent(value);
   return fields && {
@@ -5025,7 +5025,7 @@ var init_traceparent = __esm(() => {
   TRACEPARENT_RE = /^([0-9a-f]{2})-([0-9a-f]{32})-([0-9a-f]{16})-([0-9a-f]{2})(-.*)?$/;
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/metrics/metrics-utils.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/metrics/metrics-utils.mjs
 function msToUnixNano(ms) {
   return String(ms) + "000000";
 }
@@ -5088,7 +5088,7 @@ var init_metrics_utils = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/metrics/config.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/metrics/config.mjs
 function resolveMetricsConfig(config) {
   const resourceAttributes = config?.resourceAttributes;
   return {
@@ -5104,7 +5104,7 @@ function resolveMetricsConfig(config) {
 var DEFAULT_FLUSH_INTERVAL_MS = 1e4, DEFAULT_MAX_SERIES_PER_FLUSH = 1000;
 var init_config = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/metrics/index.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/metrics/index.mjs
 class PostHogMetrics {
   constructor(_instance, _config, _logger) {
     this._instance = _instance;
@@ -5483,7 +5483,7 @@ var init_metrics = __esm(() => {
   init_config();
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/traces/sanitize.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/traces/sanitize.mjs
 function sanitizeName(name, label, maxLength, logger) {
   if (typeof name == "string" && name.trim())
     return name.length > maxLength ? name.slice(0, maxLength) : name;
@@ -5534,7 +5534,7 @@ function resolveSuppliedTime(value, derived, label, logger) {
 var FALLBACK_SPAN_NAME = "unknown", MAX_TIMESTAMP_MS = 9223372036854, MIN_TIMESTAMP_MS = 0, DEEP_BACKDATE_WARNING_MS = 86400000;
 var init_sanitize = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/traces/span.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/traces/span.mjs
 function monotonicNow() {
   const perf = globalThis.performance;
   return typeof perf?.now == "function" ? perf.now() : undefined;
@@ -6037,7 +6037,7 @@ var init_span = __esm(() => {
   };
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/traces/otlp.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/traces/otlp.mjs
 function spanFlags(record) {
   const traceFlags = parseInt(record.traceFlags, 16);
   const w3c = Number.isFinite(traceFlags) ? 255 & traceFlags : TRACE_FLAGS_SAMPLED2;
@@ -6157,7 +6157,7 @@ var init_otlp = __esm(() => {
   };
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/traces/index.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/traces/index.mjs
 function clockNow() {
   return monotonicNow() ?? Date.now();
 }
@@ -6724,7 +6724,7 @@ var init_traces = __esm(() => {
   init_backoff();
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/traces/context.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/traces/context.mjs
 class SyncSpanContextManager {
   active() {
     return this._active;
@@ -6741,7 +6741,7 @@ class SyncSpanContextManager {
 }
 var init_context = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/traces/config.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/traces/config.mjs
 function positiveInteger2(value, fallback) {
   return typeof value == "number" && Number.isInteger(value) && value >= 1 ? value : fallback;
 }
@@ -6805,12 +6805,12 @@ var init_config2 = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/surveys/validation.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/surveys/validation.mjs
 var init_validation = __esm(() => {
   init_types();
 });
 
-// node_modules/.bun/@posthog+core@1.59.3/node_modules/@posthog/core/dist/index.mjs
+// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/index.mjs
 var init_dist = __esm(() => {
   init_error_tracking();
   init_featureFlagUtils();
@@ -21330,9 +21330,11 @@ var OmoMemoryAgentOverridesSchema = object({
   projection: OmoMemoryProjectionLayerSchema.optional(),
   compile_warn_tokens: number2().int().positive().optional()
 }).strict();
+var OmoMemoryAutoIdentitySchema = _enum(["path", "git"]);
 var OmoMemorySettingsSchema = object({
   enabled: boolean2().default(true),
   agent: string2().min(1).default("auto"),
+  auto_identity: OmoMemoryAutoIdentitySchema.default("path"),
   reflection: OmoMemoryReflectionSchema.default({
     enabled: true,
     trigger: { step_count: 25, on_compaction: true },
@@ -21374,6 +21376,7 @@ var OmoMemorySettingsSchema = object({
 var OmoMemorySettingsLayerSchema = object({
   enabled: boolean2().optional(),
   agent: string2().min(1).optional(),
+  auto_identity: OmoMemoryAutoIdentitySchema.optional(),
   reflection: OmoMemoryReflectionLayerSchema.optional(),
   nudge: OmoMemoryNudgeLayerSchema.optional(),
   facts: OmoMemoryFactsLayerSchema.optional(),
@@ -21412,6 +21415,7 @@ function isRecord6(value) {
 }
 var OmoModelProfileInputSchema = object({
   display_name: string2().optional(),
+  caution: string2().optional(),
   family: _enum(["daily", "geeky"]).optional(),
   tier: _enum(["normal", "heavy"]).optional(),
   models: array(union([string2(), OmoFallbackModelObjectSchema])).optional()
@@ -21683,6 +21687,7 @@ var OmoGatewaySectionSchema = record(string2(), unknown()).describe("Chat-surfac
 // packages/omo-config-core/src/schema/config.ts
 var OmoOpenCodeHarnessConfigSchema = record(string2(), unknown());
 var OmoDisabledSkillsSchema = array(string2());
+var OmoExcludedModelsSchema = array(string2());
 var OmoTypedHarnessConfigSchema = object({
   formatOnMutation: OmoFormatOnMutationLayerSchema.optional(),
   gateway: OmoGatewaySectionSchema.optional(),
@@ -21698,7 +21703,8 @@ var OmoTypedHarnessConfigSchema = object({
   telemetry: OmoTelemetrySettingsLayerSchema.optional(),
   side_panel: OmoSidePanelSettingsLayerSchema.optional(),
   computer: OmoComputerSettingsLayerSchema.optional(),
-  disabled_skills: OmoDisabledSkillsSchema.optional()
+  disabled_skills: OmoDisabledSkillsSchema.optional(),
+  exclude_models: OmoExcludedModelsSchema.optional()
 }).strict();
 var OmoConfigProfileSchema = object({
   formatOnMutation: OmoFormatOnMutationLayerSchema.optional(),
@@ -21715,6 +21721,7 @@ var OmoConfigProfileSchema = object({
   side_panel: OmoSidePanelSettingsLayerSchema.optional(),
   computer: OmoComputerSettingsLayerSchema.optional(),
   disabled_skills: OmoDisabledSkillsSchema.optional(),
+  exclude_models: OmoExcludedModelsSchema.optional(),
   "[opencode]": OmoOpenCodeHarnessConfigSchema.optional(),
   "[native]": OmoTypedHarnessConfigSchema.optional(),
   "[senpi]": OmoTypedHarnessConfigSchema.optional(),
@@ -21737,6 +21744,7 @@ var OmoConfigSchema = object({
   side_panel: OmoSidePanelSettingsSchema.optional(),
   computer: OmoComputerSettingsSchema.optional(),
   disabled_skills: OmoDisabledSkillsSchema.optional(),
+  exclude_models: OmoExcludedModelsSchema.optional(),
   "[opencode]": OmoOpenCodeHarnessConfigSchema.optional(),
   "[native]": OmoTypedHarnessConfigSchema.optional(),
   "[senpi]": OmoTypedHarnessConfigSchema.optional(),
@@ -21762,6 +21770,7 @@ var OmoConfigLayerSchema = object({
   side_panel: OmoSidePanelSettingsLayerSchema.optional(),
   computer: OmoComputerSettingsLayerSchema.optional(),
   disabled_skills: OmoDisabledSkillsSchema.optional(),
+  exclude_models: OmoExcludedModelsSchema.optional(),
   "[opencode]": OmoOpenCodeHarnessConfigSchema.optional(),
   "[native]": OmoTypedHarnessConfigSchema.optional(),
   "[senpi]": OmoTypedHarnessConfigSchema.optional(),
@@ -21884,6 +21893,50 @@ var DEFAULT_READ_FILE_SYSTEM = {
   readFileSync: readFileSync2,
   realpathSync: realpathSync2
 };
+
+// packages/omo-config-core/src/loader/disabled-skills.ts
+function toRecord(value) {
+  if (value === null || typeof value !== "object" || Array.isArray(value))
+    return;
+  return value;
+}
+function namesAt(record, key) {
+  const value = record?.[key];
+  if (!Array.isArray(value))
+    return [];
+  return value.filter((entry) => typeof entry === "string" && entry.trim() !== "");
+}
+function harnessBlockKeys(harness) {
+  const canonical = canonicalHarnessName(harness);
+  const legacy = Object.entries(OMO_CONFIG_LEGACY_HARNESS_ALIASES).filter(([, target]) => target === canonical).map(([name]) => harnessBlockKey(name));
+  return [harnessBlockKey(canonical), ...legacy];
+}
+function scopesOf(config, harness) {
+  if (harness === undefined)
+    return [config];
+  return [config, ...harnessBlockKeys(harness).map((key) => toRecord(config[key]))];
+}
+function collectExcludedModels(options) {
+  return collectUnionedList("exclude_models", options);
+}
+function collectUnionedList(key, options) {
+  const names = new Set;
+  for (const layer of options.layers) {
+    const config = toRecord(layer.config);
+    if (config === undefined)
+      continue;
+    const profile = options.profile === undefined ? undefined : toRecord(toRecord(config["profiles"])?.[options.profile]);
+    const scopes = [
+      ...scopesOf(config, options.harness),
+      ...profile === undefined ? [] : scopesOf(profile, options.harness)
+    ];
+    for (const scope of scopes) {
+      for (const name of namesAt(scope, key))
+        names.add(name.trim());
+    }
+  }
+  return [...names];
+}
 
 // node_modules/.bun/jsonc-parser@3.3.1/node_modules/jsonc-parser/lib/esm/impl/scanner.js
 function createScanner(text, ignoreTrivia = false) {
@@ -22957,7 +23010,7 @@ function stripUnrecognizedKeys(record, issues) {
   }
   return { issuePaths, stripped };
 }
-function toRecord(value) {
+function toRecord2(value) {
   if (value === null || typeof value !== "object" || Array.isArray(value))
     return null;
   const record = {};
@@ -22972,7 +23025,7 @@ var validateLayerRecord = (record) => {
 };
 function validateConfigLayer(path, data) {
   const sanitized = sanitizeUnsafeKeys(data);
-  const record = toRecord(sanitized.value);
+  const record = toRecord2(sanitized.value);
   const unsafeIssuePaths = sanitized.issues.flatMap((issue) => issue.keys.map((key) => [...issue.path, key].join(".")));
   const unsafeDiagnostics = unsafeIssuePaths.length === 0 ? [] : [{ kind: "unknown-keys", message: `Ignored unknown keys in ${path}: ${unsafeIssuePaths.join(", ")}`, path, issuePaths: unsafeIssuePaths }];
   const validation = OmoConfigLayerSchema.safeParse(sanitized.value);
@@ -23112,7 +23165,7 @@ function resolveOmoProfileName(options = {}) {
   const env = options.env ?? process.env;
   return profileName(options.profile) ?? profileName(env["OMO_PROFILE"]) ?? profileName(env["OCX_PROFILE"]) ?? profileNameFromOpenCodeConfigDir(env["OPENCODE_CONFIG_DIR"]);
 }
-function toRecord2(value) {
+function toRecord3(value) {
   if (value === null || typeof value !== "object" || Array.isArray(value))
     return;
   return Object.fromEntries(Object.entries(value));
@@ -23133,13 +23186,13 @@ function harnessLayer(config, harness) {
   const legacyKeys = Object.entries(OMO_CONFIG_LEGACY_HARNESS_ALIASES).filter(([, target]) => target === canonical).map(([legacy]) => harnessBlockKey(legacy));
   let layer = {};
   for (const key of [...legacyKeys, harnessBlockKey(canonical)]) {
-    layer = mergeOmoConfigRecords(layer, toRecord2(config[key]) ?? {});
+    layer = mergeOmoConfigRecords(layer, toRecord3(config[key]) ?? {});
   }
   return layer;
 }
 function resolveOmoConfigView(options) {
-  const profiles = toRecord2(options.config["profiles"]);
-  const profile = options.profile === undefined ? undefined : toRecord2(profiles?.[options.profile]);
+  const profiles = toRecord3(options.config["profiles"]);
+  const profile = options.profile === undefined ? undefined : toRecord3(profiles?.[options.profile]);
   const diagnostics = profile === undefined && options.profile !== undefined ? [{
     kind: "profile",
     message: `Activated omo profile "${options.profile}" does not exist; using the base configuration`,
@@ -23280,9 +23333,15 @@ function loadOmoConfig(options = {}) {
   });
   const finalInput = mergeOmoConfigRecords(DEFAULT_RAW_CONFIG, resolved.config);
   const finalConfig = OmoConfigSchema.safeParse(finalInput);
+  const excludeModels = collectExcludedModels({
+    layers,
+    ...options.harness === undefined ? {} : { harness: options.harness },
+    ...resolved.profile === undefined ? {} : { profile: resolved.profile }
+  });
+  const withExcludedModels = (config) => excludeModels.length === 0 ? config : { ...config, exclude_models: [...excludeModels] };
   if (finalConfig.success) {
     return {
-      config: stripResolutionControlKeys(finalConfig.data),
+      config: withExcludedModels(stripResolutionControlKeys(finalConfig.data)),
       diagnostics: [...diagnostics, ...resolved.diagnostics],
       layers,
       ...resolved.profile === undefined ? {} : { profile: resolved.profile },
@@ -23295,7 +23354,7 @@ function loadOmoConfig(options = {}) {
   });
   if (pruned.ok) {
     return {
-      config: stripResolutionControlKeys(OmoConfigSchema.parse(pruned.config)),
+      config: withExcludedModels(stripResolutionControlKeys(OmoConfigSchema.parse(pruned.config))),
       diagnostics: [...diagnostics, ...resolved.diagnostics, ...invalidValueDiagnostics(MERGED_OMO_CONFIG_PATH, pruned.dropped)],
       layers,
       ...resolved.profile === undefined ? {} : { profile: resolved.profile },
