@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// omo-codex-install:52ea7fb7fcc3e5b7d51d59dabac302d0e43fbda35731843925f14a0ca2485529:2c9a453113da94b4b99b69c07412fa23e08a12507b68c603d092f0e37a5ffa7d
+// omo-codex-install:2ea0e34a063b5132105599626c6b47d94d137afb13e7a55c26c6c4921c162571:68d93d2eed65cb649234935c48f12a12d4db5cda919abe941a300ea601884cc9
 var __create = Object.create;
 var __getProtoOf = Object.getPrototypeOf;
 var __defProp = Object.defineProperty;
@@ -317,6 +317,8 @@ function toDiagnosticRecord(input, now) {
     timestamp: now.toISOString(),
     event: input.event,
     source: input.source,
+    ...input.entryKind === undefined ? {} : { entry_kind: input.entryKind },
+    ...input.errorCode === undefined ? {} : { error_code: input.errorCode },
     ...input.count === undefined ? {} : { count: input.count },
     ...serializeError(input.error, input.errorKind)
   };
@@ -640,7 +642,7 @@ var init_injected_client = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.56.4+460773ef8ff1e07c/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/module.node.mjs
+// node_modules/.bun/posthog-node@5.57.0+e40b0dfdd726a224/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/module.node.mjs
 import { dirname as dirname11, posix as posix3, sep as sep7 } from "node:path";
 function createModulerModifier() {
   const getModuleFromFileName = createGetModuleFromFilename();
@@ -677,7 +679,7 @@ function normalizeWindowsPath(path) {
 }
 var init_module_node = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/types.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/types.mjs
 var types_PostHogPersistedProperty;
 var init_types = __esm(() => {
   types_PostHogPersistedProperty = /* @__PURE__ */ function(PostHogPersistedProperty) {
@@ -719,7 +721,7 @@ var init_types = __esm(() => {
   }({});
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/string-utils.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/utils/string-utils.mjs
 function safeJsonStringify(value) {
   const ancestors = [];
   return JSON.stringify(value, function(_key, replacementValue) {
@@ -745,7 +747,7 @@ function safeJsonStringify(value) {
 }
 var init_string_utils = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/type-utils.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/utils/type-utils.mjs
 function isPrimitive(value) {
   return value === null || typeof value != "object";
 }
@@ -790,7 +792,7 @@ var init_type_utils = __esm(() => {
   };
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/bot-detection.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/utils/bot-detection.mjs
 function buildCacheKey(ua, custom) {
   let customEncoded = "";
   for (let i = 0;i < custom.length; i++) {
@@ -896,12 +898,12 @@ var init_bot_detection = __esm(() => {
   UA_CACHE = new Map;
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/browser-utils.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/utils/browser-utils.mjs
 var init_browser_utils = __esm(() => {
   init_string_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/number-utils.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/utils/number-utils.mjs
 function clampToRange(value, min, max, logger, fallbackValue) {
   if (min > max) {
     logger.warn("min cannot be greater than max.");
@@ -924,7 +926,7 @@ var init_number_utils = __esm(() => {
   init_type_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/bucketed-rate-limiter.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/utils/bucketed-rate-limiter.mjs
 function resolveExceptionRateLimiterConfig(config = {}) {
   return {
     refillRate: config.exceptionRateLimiterRefillRate ?? config.__exceptionRateLimiterRefillRate ?? DEFAULT_EXCEPTION_RATE_LIMITER_REFILL_RATE,
@@ -978,7 +980,7 @@ var init_bucketed_rate_limiter = __esm(() => {
   init_number_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/vendor/uuidv7.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/vendor/uuidv7.mjs
 class UUID {
   constructor(bytes) {
     this.bytes = bytes;
@@ -1153,7 +1155,7 @@ var init_uuidv7 = __esm(() => {
   /*! LICENSE: uuidv7.mjs.LICENSE.txt */
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/promise-queue.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/utils/promise-queue.mjs
 class PromiseQueue {
   add(promise) {
     const promiseUUID = uuidv7();
@@ -1195,7 +1197,7 @@ var init_promise_queue = __esm(() => {
   init_uuidv7();
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/logger.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/utils/logger.mjs
 function createConsole(consoleLike = console) {
   const lockedMethods = {
     log: consoleLike.log.bind(consoleLike),
@@ -1237,7 +1239,7 @@ var _createLogger = (prefix, maybeCall, consoleLike) => {
 }, passThrough = (fn) => fn();
 var init_logger = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/user-agent-utils.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/utils/user-agent-utils.mjs
 var MOBILE = "Mobile", IOS = "iOS", ANDROID = "Android", TABLET = "Tablet", ANDROID_TABLET, APPLE = "Apple", APPLE_WATCH, SAFARI = "Safari", BLACKBERRY = "BlackBerry", SAMSUNG = "Samsung", SAMSUNG_BROWSER, SAMSUNG_INTERNET, CHROME = "Chrome", CHROME_OS, CHROME_IOS, INTERNET_EXPLORER = "Internet Explorer", INTERNET_EXPLORER_MOBILE, OPERA = "Opera", OPERA_MINI, EDGE = "Edge", MICROSOFT_EDGE, FIREFOX = "Firefox", FIREFOX_IOS, NINTENDO = "Nintendo", PLAYSTATION = "PlayStation", XBOX = "Xbox", ANDROID_MOBILE, MOBILE_SAFARI, WINDOWS = "Windows", WINDOWS_PHONE, GENERIC = "Generic", GENERIC_MOBILE, GENERIC_TABLET, KONQUEROR = "Konqueror", OCULUS_BROWSER = "Oculus Browser", VIVALDI = "Vivaldi", YANDEX = "Yandex", WHALE = "Whale", DUCKDUCKGO = "DuckDuckGo", PALE_MOON = "Pale Moon", WATERFOX = "Waterfox", BRAVE = "Brave", CLAUDE = "Claude", CODEX = "Codex", CHATGPT = "ChatGPT", GOOGLE_SEARCH_APP = "Google Search App", BROWSER_VERSION_REGEX_SUFFIX = "(\\d+(\\.\\d+)?)", DEFAULT_BROWSER_VERSION_REGEX, AI_APP_VERSION_REGEX, XBOX_REGEX, PLAYSTATION_REGEX, NINTENDO_REGEX, BLACKBERRY_REGEX, windowsVersionMap, versionRegexes, osMatchers;
 var init_user_agent_utils = __esm(() => {
   init_string_utils();
@@ -1516,10 +1518,10 @@ var init_user_agent_utils = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/webview-app-utils.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/utils/webview-app-utils.mjs
 var init_webview_app_utils = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/json-utils.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/utils/json-utils.mjs
 function sanitizeString(value) {
   let output = "";
   for (let index = 0;index < value.length; index++) {
@@ -1567,7 +1569,7 @@ var init_json_utils = __esm(() => {
   dateToISOString = Date.prototype.toISOString;
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/retry-after.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/utils/retry-after.mjs
 function parseRetryAfterMs(value, now = Date.now()) {
   if (typeof value != "string" || !value)
     return;
@@ -1630,7 +1632,7 @@ class RetryAfterWindow {
 var MAX_RETRY_AFTER_MS = 300000, CLOCK_STEP_TOLERANCE_MS = 5000;
 var init_retry_after = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/index.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/utils/index.mjs
 function isValidUUID(value) {
   return typeof value == "string" && UUID_REGEX.test(value);
 }
@@ -1723,7 +1725,7 @@ var init_utils = __esm(() => {
   UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/chunk-ids.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/error-tracking/chunk-ids.mjs
 function getFilenameToChunkIdMap(stackParser) {
   const posthogChunkIds = globalThis._posthogChunkIds;
   const nativeDebugIds = globalThis._debugIds;
@@ -1776,7 +1778,7 @@ function matchesSnapshot(chunkIds, keys, snapshot) {
 var parsedStackResults, lastPostHogChunkIds, lastNativeDebugIds, cachedFilenameChunkIds;
 var init_chunk_ids = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/error-properties-builder.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/error-tracking/error-properties-builder.mjs
 class ErrorPropertiesBuilder {
   constructor(coercers, stackParser, modifiers = []) {
     this.coercers = coercers;
@@ -2006,7 +2008,7 @@ var init_error_properties_builder = __esm(() => {
   init_chunk_ids();
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/parsers/base.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/error-tracking/parsers/base.mjs
 function isAppFilename(filename) {
   if (!filename || filename === ANONYMOUS_FILENAME)
     return false;
@@ -2044,7 +2046,7 @@ var init_base = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/parsers/safari.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/error-tracking/parsers/safari.mjs
 var extractSafariExtensionDetails = (func, filename) => {
   const isSafariExtension = func.indexOf("safari-extension") !== -1;
   const isSafariWebExtension = func.indexOf("safari-web-extension") !== -1;
@@ -2060,7 +2062,7 @@ var init_safari = __esm(() => {
   init_base();
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/parsers/chrome.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/error-tracking/parsers/chrome.mjs
 var chromeRegexNoFnName, chromeRegex, chromeEvalRegex, chromeStackLineParser = (line, platform) => {
   const noFnParts = chromeRegexNoFnName.exec(line);
   if (noFnParts) {
@@ -2090,7 +2092,7 @@ var init_chrome = __esm(() => {
   chromeEvalRegex = /\((\S*)(?::(\d+))(?::(\d+))\)/;
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/parsers/gecko.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/error-tracking/parsers/gecko.mjs
 var geckoREgex, geckoEvalRegex, geckoStackLineParser = (line, platform) => {
   const parts = geckoREgex.exec(line);
   if (parts) {
@@ -2117,17 +2119,17 @@ var init_gecko = __esm(() => {
   geckoEvalRegex = /(\S+) line (\d+)(?: > eval line \d+)* > eval/i;
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/parsers/winjs.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/error-tracking/parsers/winjs.mjs
 var init_winjs = __esm(() => {
   init_base();
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/parsers/opera.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/error-tracking/parsers/opera.mjs
 var init_opera = __esm(() => {
   init_base();
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/parsers/node.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/error-tracking/parsers/node.mjs
 function filenameIsInApp(filename, isNative = false) {
   const isInternal = isNative || filename && !filename.startsWith("/") && !filename.match(/^[A-Z]:/) && !filename.startsWith(".") && !filename.match(/^[a-zA-Z]([a-zA-Z0-9.\-+])*:\/\//);
   return !isInternal && filename !== undefined && !filename.includes("node_modules/");
@@ -2203,7 +2205,7 @@ var init_node = __esm(() => {
   PROMISE_INDEX = /^index \d+$/;
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/parsers/index.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/error-tracking/parsers/index.mjs
 function isSameFrame(a, b) {
   return a.filename === b.filename && a.function === b.function && a.module === b.module && a.lineno === b.lineno && a.colno === b.colno;
 }
@@ -2353,12 +2355,12 @@ var init_parsers = __esm(() => {
   WEBPACK_ERROR_REGEXP = /\(error: (.*)\)/;
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/coercers/dom-exception-coercer.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/error-tracking/coercers/dom-exception-coercer.mjs
 var init_dom_exception_coercer = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/coercers/error-coercer.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/error-tracking/coercers/error-coercer.mjs
 class ErrorCoercer {
   match(err) {
     return isError(err);
@@ -2400,12 +2402,12 @@ var init_error_coercer = __esm(() => {
   init_type_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/coercers/error-event-coercer.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/error-tracking/coercers/error-event-coercer.mjs
 var init_error_event_coercer = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/coercers/string-coercer.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/error-tracking/coercers/string-coercer.mjs
 class StringCoercer {
   match(input) {
     return typeof input == "string";
@@ -2438,7 +2440,7 @@ var init_string_coercer = __esm(() => {
   ERROR_TYPES_PATTERN = /^(?:[Uu]ncaught (?:exception: )?)?(?:((?:Eval|Internal|Range|Reference|Syntax|Type|URI|)Error): )?(.*)$/i;
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/types.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/error-tracking/types.mjs
 var severityLevels;
 var init_types2 = __esm(() => {
   severityLevels = [
@@ -2451,7 +2453,7 @@ var init_types2 = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/coercers/utils.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/error-tracking/coercers/utils.mjs
 function extractExceptionKeysForMessage(err, maxLength = 40) {
   const keys = Object.keys(err);
   keys.sort();
@@ -2469,7 +2471,7 @@ function extractExceptionKeysForMessage(err, maxLength = 40) {
 }
 var init_utils2 = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/coercers/object-coercer.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/error-tracking/coercers/object-coercer.mjs
 class ObjectCoercer {
   match(candidate) {
     return typeof candidate == "object" && candidate !== null;
@@ -2540,7 +2542,7 @@ var init_object_coercer = __esm(() => {
   init_utils2();
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/coercers/event-coercer.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/error-tracking/coercers/event-coercer.mjs
 class EventCoercer {
   match(err) {
     return isEvent(err);
@@ -2560,7 +2562,7 @@ var init_event_coercer = __esm(() => {
   init_utils2();
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/coercers/primitive-coercer.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/error-tracking/coercers/primitive-coercer.mjs
 class PrimitiveCoercer {
   match(candidate) {
     return isPrimitive(candidate);
@@ -2578,12 +2580,12 @@ var init_primitive_coercer = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/coercers/promise-rejection-event.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/error-tracking/coercers/promise-rejection-event.mjs
 var init_promise_rejection_event = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/coercers/index.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/error-tracking/coercers/index.mjs
 var init_coercers = __esm(() => {
   init_dom_exception_coercer();
   init_error_coercer();
@@ -2595,7 +2597,7 @@ var init_coercers = __esm(() => {
   init_promise_rejection_event();
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/utils.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/error-tracking/utils.mjs
 class ReduceableCache {
   constructor(_maxSize) {
     this._maxSize = _maxSize;
@@ -2622,7 +2624,7 @@ class ReduceableCache {
 }
 var init_utils3 = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/exception-steps.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/error-tracking/exception-steps.mjs
 var EXCEPTION_STEP_INTERNAL_FIELDS, RESERVED_EXCEPTION_STEP_KEYS;
 var init_exception_steps = __esm(() => {
   init_utils();
@@ -2636,7 +2638,7 @@ var init_exception_steps = __esm(() => {
   ]);
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/release.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/error-tracking/release.mjs
 function getInjectedReleaseId() {
   if ("u" > typeof process) {
     const fromEnvironment = process.env.POSTHOG_RELEASE_ID?.trim();
@@ -2648,7 +2650,7 @@ function getInjectedReleaseId() {
 }
 var init_release = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/error-tracking/index.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/error-tracking/index.mjs
 var init_error_tracking = __esm(() => {
   init_error_properties_builder();
   init_parsers();
@@ -2658,13 +2660,13 @@ var init_error_tracking = __esm(() => {
   init_release();
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/cookie.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/cookie.mjs
 var init_cookie = __esm(() => {
   init_utils();
   init_uuidv7();
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/featureFlagUtils.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/featureFlagUtils.mjs
 function getFlagDetailFromFlagAndPayload(key, value, payload) {
   return {
     key,
@@ -2795,7 +2797,7 @@ var init_featureFlagUtils = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/eventemitter.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/eventemitter.mjs
 class SimpleEventEmitter {
   constructor() {
     this.events = {};
@@ -2818,7 +2820,7 @@ class SimpleEventEmitter {
 }
 var init_eventemitter = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/gzip.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/gzip.mjs
 function isGzipSupported() {
   return "CompressionStream" in globalThis && "TextEncoder" in globalThis && "Response" in globalThis && typeof Response.prototype.blob == "function";
 }
@@ -2885,7 +2887,7 @@ var init_gzip = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/posthog-core-stateless.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/posthog-core-stateless.mjs
 async function logFlushError(err) {
   if (err instanceof PostHogFetchHttpError) {
     let text = "";
@@ -4021,7 +4023,7 @@ var init_posthog_core_stateless = __esm(() => {
   };
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/posthog-core.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/posthog-core.mjs
 var init_posthog_core = __esm(() => {
   init_featureFlagUtils();
   init_types();
@@ -4030,7 +4032,7 @@ var init_posthog_core = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/privacy.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/privacy.mjs
 var URL_PATTERN, URL_PATTERN_ONCE, URL_AUTHORITY_SEARCH, URL_AUTHORITY_PATTERN, URL_AUTHORITY_SEARCH_ALL;
 var init_privacy = __esm(() => {
   URL_PATTERN = /[a-z][a-z0-9+.-]{0,63}:[^\s<>"]+/gi;
@@ -4040,12 +4042,21 @@ var init_privacy = __esm(() => {
   URL_AUTHORITY_SEARCH_ALL = new RegExp(URL_AUTHORITY_SEARCH.source, "gi");
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/tracing-headers.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/tracing-headers.mjs
 var init_tracing_headers = __esm(() => {
   init_type_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/featureFlagLocalEvaluation.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/featureFlagLocalEvaluation.mjs
+function readContextValue(read) {
+  try {
+    return read();
+  } catch (e) {
+    if (e instanceof InconclusiveMatchError)
+      throw new InconclusiveMatchError(e.message, "missing_context");
+    throw e;
+  }
+}
 function isTruthyOrFalsyPropertyValue(value) {
   if (typeof value == "boolean")
     return true;
@@ -4362,7 +4373,72 @@ function relativeDateParseForFeatureFlagMatching(value) {
   }
   return parsedDt;
 }
+function parseDateFilter(value) {
+  if (typeof value == "boolean")
+    throw new InconclusiveMatchError("Date operations cannot be performed on boolean values");
+  return relativeDateParseForFeatureFlagMatching(String(value)) ?? convertToDateTime(value);
+}
+function assertFeatureFlagFilterSupported(property, options = {}) {
+  const value = property.value;
+  const parsingPolicy = options.semverParsingPolicy ?? "strict";
+  switch (property.operator || "exact") {
+    case "exact":
+    case "is_not":
+      for (const item of Array.isArray(value) ? value : [
+        value
+      ])
+        exactMatchString(item);
+      return;
+    case "is_set":
+    case "is_not_set":
+    case "icontains":
+    case "not_icontains":
+    case "starts_with":
+    case "not_starts_with":
+    case "ends_with":
+    case "not_ends_with":
+    case "regex":
+    case "not_regex":
+    case "gt":
+    case "gte":
+    case "lt":
+    case "lte":
+      return;
+    case "is_date_after":
+    case "is_date_before":
+      parseDateFilter(value);
+      return;
+    case "semver_eq":
+    case "semver_neq":
+    case "semver_gt":
+    case "semver_gte":
+    case "semver_lt":
+    case "semver_lte":
+      parseFeatureFlagSemver(String(value), parsingPolicy);
+      return;
+    case "semver_tilde":
+      computeTildeBounds(String(value), parsingPolicy);
+      return;
+    case "semver_caret":
+      computeCaretBounds(String(value), parsingPolicy);
+      return;
+    case "semver_wildcard":
+      computeWildcardBounds(String(value), parsingPolicy);
+      return;
+    default:
+      throw new InconclusiveMatchError(`Unknown operator: ${property.operator}`);
+  }
+}
 function matchFeatureFlagProperty(property, propertyValues, options = {}) {
+  try {
+    return matchPropertyValue(property, propertyValues, options);
+  } catch (e) {
+    if (e instanceof InconclusiveMatchError && e.reason === "missing_context")
+      assertFeatureFlagFilterSupported(property, options);
+    throw e;
+  }
+}
+function matchPropertyValue(property, propertyValues, options) {
   const key = property.key;
   const value = property.value;
   const operator = property.operator || "exact";
@@ -4374,7 +4450,7 @@ function matchFeatureFlagProperty(property, propertyValues, options = {}) {
     else if (operator === "is_set")
       return true;
   } else
-    throw new InconclusiveMatchError(`Property ${key} not found in propertyValues`);
+    throw new InconclusiveMatchError(`Property ${key} not found in propertyValues`, "missing_context");
   const overrideValue = propertyValues[key];
   if (overrideValue === undefined) {
     options.warnFunction?.(`Property ${key} cannot have a value of undefined with the ${operator} operator`);
@@ -4386,18 +4462,19 @@ function matchFeatureFlagProperty(property, propertyValues, options = {}) {
   }
   const computeExactMatch = (target, actual) => {
     if (options.propertyMatchingVersion !== 2 && isTruthyOrFalsyPropertyValue(target) || Array.isArray(target) && target.length === 0) {
-      assertJsonRepresentable(actual);
+      readContextValue(() => assertJsonRepresentable(actual));
       return isTruthyPropertyValue(target) === isTruthyPropertyValue(actual);
     }
     if (options.propertyMatchingVersion === 2 && typeof actual == "number" && isTruthyOrFalsyPropertyValue(target)) {
-      assertJsonRepresentable(actual);
+      readContextValue(() => assertJsonRepresentable(actual));
       return false;
     }
     if (Array.isArray(target)) {
-      const actualString = exactMatchString(actual).toLowerCase();
+      const actualString = readContextValue(() => exactMatchString(actual)).toLowerCase();
       return target.some((item) => exactMatchString(item).toLowerCase() === actualString);
     }
-    return exactMatchString(target).toLowerCase() === exactMatchString(actual).toLowerCase();
+    const targetString = exactMatchString(target).toLowerCase();
+    return targetString === readContextValue(() => exactMatchString(actual)).toLowerCase();
   };
   const compare = (lhs, rhs, comparisonOperator) => {
     if (comparisonOperator === "gt")
@@ -4409,6 +4486,15 @@ function matchFeatureFlagProperty(property, propertyValues, options = {}) {
     if (comparisonOperator === "lte")
       return lhs <= rhs;
     throw new Error(`Invalid operator: ${comparisonOperator}`);
+  };
+  const parseContextSemver = () => readContextValue(() => parseFeatureFlagSemver(String(overrideValue), parsingPolicy));
+  const compareContextSemverToFilter = () => {
+    const filterParsed = parseFeatureFlagSemver(String(value), parsingPolicy);
+    return compareSemverTuples(parseContextSemver(), filterParsed);
+  };
+  const isContextSemverWithin = ({ lower, upper }) => {
+    const overrideParsed = parseContextSemver();
+    return compareSemverTuples(overrideParsed, lower) >= 0 && compareSemverTuples(overrideParsed, upper) < 0;
   };
   switch (operator) {
     case "exact":
@@ -4445,41 +4531,28 @@ function matchFeatureFlagProperty(property, propertyValues, options = {}) {
     }
     case "is_date_after":
     case "is_date_before": {
-      if (typeof value == "boolean")
-        throw new InconclusiveMatchError("Date operations cannot be performed on boolean values");
-      let parsedDate = relativeDateParseForFeatureFlagMatching(String(value));
-      if (parsedDate == null)
-        parsedDate = convertToDateTime(value);
-      const overrideDate = convertToDateTime(overrideValue);
+      const parsedDate = parseDateFilter(value);
+      const overrideDate = readContextValue(() => convertToDateTime(overrideValue));
       return operator === "is_date_before" ? overrideDate < parsedDate : overrideDate > parsedDate;
     }
     case "semver_eq":
-      return compareSemverTuples(parseFeatureFlagSemver(String(overrideValue), parsingPolicy), parseFeatureFlagSemver(String(value), parsingPolicy)) === 0;
+      return compareContextSemverToFilter() === 0;
     case "semver_neq":
-      return compareSemverTuples(parseFeatureFlagSemver(String(overrideValue), parsingPolicy), parseFeatureFlagSemver(String(value), parsingPolicy)) !== 0;
+      return compareContextSemverToFilter() !== 0;
     case "semver_gt":
-      return compareSemverTuples(parseFeatureFlagSemver(String(overrideValue), parsingPolicy), parseFeatureFlagSemver(String(value), parsingPolicy)) > 0;
+      return compareContextSemverToFilter() > 0;
     case "semver_gte":
-      return compareSemverTuples(parseFeatureFlagSemver(String(overrideValue), parsingPolicy), parseFeatureFlagSemver(String(value), parsingPolicy)) >= 0;
+      return compareContextSemverToFilter() >= 0;
     case "semver_lt":
-      return compareSemverTuples(parseFeatureFlagSemver(String(overrideValue), parsingPolicy), parseFeatureFlagSemver(String(value), parsingPolicy)) < 0;
+      return compareContextSemverToFilter() < 0;
     case "semver_lte":
-      return compareSemverTuples(parseFeatureFlagSemver(String(overrideValue), parsingPolicy), parseFeatureFlagSemver(String(value), parsingPolicy)) <= 0;
-    case "semver_tilde": {
-      const overrideParsed = parseFeatureFlagSemver(String(overrideValue), parsingPolicy);
-      const { lower, upper } = computeTildeBounds(String(value), parsingPolicy);
-      return compareSemverTuples(overrideParsed, lower) >= 0 && compareSemverTuples(overrideParsed, upper) < 0;
-    }
-    case "semver_caret": {
-      const overrideParsed = parseFeatureFlagSemver(String(overrideValue), parsingPolicy);
-      const { lower, upper } = computeCaretBounds(String(value), parsingPolicy);
-      return compareSemverTuples(overrideParsed, lower) >= 0 && compareSemverTuples(overrideParsed, upper) < 0;
-    }
-    case "semver_wildcard": {
-      const overrideParsed = parseFeatureFlagSemver(String(overrideValue), parsingPolicy);
-      const { lower, upper } = computeWildcardBounds(String(value), parsingPolicy);
-      return compareSemverTuples(overrideParsed, lower) >= 0 && compareSemverTuples(overrideParsed, upper) < 0;
-    }
+      return compareContextSemverToFilter() <= 0;
+    case "semver_tilde":
+      return isContextSemverWithin(computeTildeBounds(String(value), parsingPolicy));
+    case "semver_caret":
+      return isContextSemverWithin(computeCaretBounds(String(value), parsingPolicy));
+    case "semver_wildcard":
+      return isContextSemverWithin(computeWildcardBounds(String(value), parsingPolicy));
     default:
       throw new InconclusiveMatchError(`Unknown operator: ${operator}`);
   }
@@ -4550,15 +4623,16 @@ var init_featureFlagLocalEvaluation = __esm(() => {
     "not_regex"
   ];
   InconclusiveMatchError = class InconclusiveMatchError extends Error {
-    constructor(message) {
+    constructor(message, reason = "unsupported_definition") {
       super(message);
       this.name = this.constructor.name;
+      this.reason = reason;
       Object.setPrototypeOf(this, InconclusiveMatchError.prototype);
     }
   };
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/otlp-any-value.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/utils/otlp-any-value.mjs
 function newState() {
   return {
     ancestors: new WeakSet,
@@ -4739,7 +4813,7 @@ var init_otlp_any_value = __esm(() => {
   propertyIsEnumerable = Object.prototype.propertyIsEnumerable;
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/otlp-resource.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/utils/otlp-resource.mjs
 function buildOtlpResourceAttributes(config, sdkName, sdkVersion) {
   return {
     ...assignUserAttributes({}, config.resourceAttributes),
@@ -4810,7 +4884,7 @@ var init_otlp_resource = __esm(() => {
   };
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/logs/logs-utils.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/logs/logs-utils.mjs
 var OTLP_SEVERITY_MAP, DEFAULT_OTLP_SEVERITY;
 var init_logs_utils = __esm(() => {
   init_utils();
@@ -4846,7 +4920,7 @@ var init_logs_utils = __esm(() => {
   DEFAULT_OTLP_SEVERITY = OTLP_SEVERITY_MAP.info;
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/flush-timer.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/utils/flush-timer.mjs
 class FlushTimer {
   constructor(_onFire) {
     this._onFire = _onFire;
@@ -4879,7 +4953,7 @@ var init_flush_timer = __esm(() => {
   init_utils();
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/utils/backoff.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/utils/backoff.mjs
 function drawJitter() {
   return 1 - JITTER + Math.random() * JITTER * 2;
 }
@@ -4892,7 +4966,7 @@ function backoffDelayMs(baseMs, failures, jitter, maxMs) {
 var MAX_FLUSH_BACKOFF_EXPONENT = 6, MAX_FLUSH_BACKOFF_MS = 30000, JITTER = 0.25, NO_JITTER = 1;
 var init_backoff = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/logs/index.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/logs/index.mjs
 var init_logs = __esm(() => {
   init_logs_utils();
   init_types();
@@ -4902,7 +4976,7 @@ var init_logs = __esm(() => {
   init_backoff();
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/traces/ids.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/traces/ids.mjs
 function getRandomBytes(byteLength) {
   const bytes = new Uint8Array(byteLength);
   const cryptoLike = globalThis.crypto;
@@ -4948,7 +5022,7 @@ var init_ids = __esm(() => {
   HEX_RE = /^[0-9a-f]+$/;
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/traces/traceparent.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/traces/traceparent.mjs
 function parseTraceparent(value) {
   const fields = matchTraceparent(value);
   return fields && {
@@ -5025,7 +5099,7 @@ var init_traceparent = __esm(() => {
   TRACEPARENT_RE = /^([0-9a-f]{2})-([0-9a-f]{32})-([0-9a-f]{16})-([0-9a-f]{2})(-.*)?$/;
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/metrics/metrics-utils.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/metrics/metrics-utils.mjs
 function msToUnixNano(ms) {
   return String(ms) + "000000";
 }
@@ -5088,7 +5162,7 @@ var init_metrics_utils = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/metrics/config.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/metrics/config.mjs
 function resolveMetricsConfig(config) {
   const resourceAttributes = config?.resourceAttributes;
   return {
@@ -5104,7 +5178,7 @@ function resolveMetricsConfig(config) {
 var DEFAULT_FLUSH_INTERVAL_MS = 1e4, DEFAULT_MAX_SERIES_PER_FLUSH = 1000;
 var init_config = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/metrics/index.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/metrics/index.mjs
 class PostHogMetrics {
   constructor(_instance, _config, _logger) {
     this._instance = _instance;
@@ -5167,12 +5241,12 @@ class PostHogMetrics {
   drainWindow() {
     if (this._series.size === 0)
       return null;
-    const window = this._series;
+    const window2 = this._series;
     this._series = new Map;
     this._seriesCapWarned = false;
     this._typeByName = new Map;
     this._typeCollisionWarned = new Set;
-    return this._buildPayload(window);
+    return this._buildPayload(window2);
   }
   reset() {
     this._generation++;
@@ -5319,13 +5393,13 @@ class PostHogMetrics {
     this._flushTimer.clear();
     if (this._series.size === 0)
       return;
-    const window = this._series;
+    const window2 = this._series;
     this._series = new Map;
     this._seriesCapWarned = false;
     this._typeByName = new Map;
     this._typeCollisionWarned = new Set;
     const generation = this._generation;
-    const outcome = await this._instance._sendMetricsBatch(this._buildPayload(window));
+    const outcome = await this._instance._sendMetricsBatch(this._buildPayload(window2));
     if (generation !== this._generation)
       return;
     this._retryAfter.record(outcome);
@@ -5342,7 +5416,7 @@ class PostHogMetrics {
       case "ok":
         return;
       case "retry-later":
-        this._mergeWindowBack(window);
+        this._mergeWindowBack(window2);
         this._flushTimer.armNoEarlierThan(this._nextFlushDelay());
         return;
       case "too-large":
@@ -5353,13 +5427,13 @@ class PostHogMetrics {
         return;
     }
   }
-  _buildPayload(window) {
-    return buildOtlpMetricsPayload(this._buildMetrics(window), buildMetricsResourceAttributes(this._config, this._instance.getLibraryId(), this._instance.getLibraryVersion()), this._instance.getLibraryId(), this._instance.getLibraryVersion());
+  _buildPayload(window2) {
+    return buildOtlpMetricsPayload(this._buildMetrics(window2), buildMetricsResourceAttributes(this._config, this._instance.getLibraryId(), this._instance.getLibraryVersion()), this._instance.getLibraryId(), this._instance.getLibraryVersion());
   }
-  _buildMetrics(window) {
+  _buildMetrics(window2) {
     const nowNano = msToUnixNano(Date.now());
     const byMetric = new Map;
-    for (const state of window.values()) {
+    for (const state of window2.values()) {
       const metricKey = seriesKey(state.type, state.name, state.unit, undefined);
       let metric = byMetric.get(metricKey);
       if (!metric) {
@@ -5424,8 +5498,8 @@ class PostHogMetrics {
     }
     return Array.from(byMetric.values());
   }
-  _mergeWindowBack(window) {
-    for (const [key, old] of window) {
+  _mergeWindowBack(window2) {
+    for (const [key, old] of window2) {
       const current = this._series.get(key);
       if (!current) {
         if (this._admitNewSeries())
@@ -5483,7 +5557,7 @@ var init_metrics = __esm(() => {
   init_config();
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/traces/sanitize.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/traces/sanitize.mjs
 function sanitizeName(name, label, maxLength, logger) {
   if (typeof name == "string" && name.trim())
     return name.length > maxLength ? name.slice(0, maxLength) : name;
@@ -5534,7 +5608,7 @@ function resolveSuppliedTime(value, derived, label, logger) {
 var FALLBACK_SPAN_NAME = "unknown", MAX_TIMESTAMP_MS = 9223372036854, MIN_TIMESTAMP_MS = 0, DEEP_BACKDATE_WARNING_MS = 86400000;
 var init_sanitize = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/traces/span.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/traces/span.mjs
 function monotonicNow() {
   const perf = globalThis.performance;
   return typeof perf?.now == "function" ? perf.now() : undefined;
@@ -6037,7 +6111,7 @@ var init_span = __esm(() => {
   };
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/traces/otlp.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/traces/otlp.mjs
 function spanFlags(record) {
   const traceFlags = parseInt(record.traceFlags, 16);
   const w3c = Number.isFinite(traceFlags) ? 255 & traceFlags : TRACE_FLAGS_SAMPLED2;
@@ -6157,7 +6231,7 @@ var init_otlp = __esm(() => {
   };
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/traces/index.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/traces/index.mjs
 function clockNow() {
   return monotonicNow() ?? Date.now();
 }
@@ -6724,7 +6798,7 @@ var init_traces = __esm(() => {
   init_backoff();
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/traces/context.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/traces/context.mjs
 class SyncSpanContextManager {
   active() {
     return this._active;
@@ -6741,7 +6815,7 @@ class SyncSpanContextManager {
 }
 var init_context = () => {};
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/traces/config.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/traces/config.mjs
 function positiveInteger2(value, fallback) {
   return typeof value == "number" && Number.isInteger(value) && value >= 1 ? value : fallback;
 }
@@ -6805,12 +6879,12 @@ var init_config2 = __esm(() => {
   ];
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/surveys/validation.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/surveys/validation.mjs
 var init_validation = __esm(() => {
   init_types();
 });
 
-// node_modules/.bun/@posthog+core@1.59.4/node_modules/@posthog/core/dist/index.mjs
+// node_modules/.bun/@posthog+core@1.60.0/node_modules/@posthog/core/dist/index.mjs
 var init_dist = __esm(() => {
   init_error_tracking();
   init_featureFlagUtils();
@@ -6836,7 +6910,7 @@ var init_dist = __esm(() => {
   init_types();
 });
 
-// node_modules/.bun/posthog-node@5.56.4+460773ef8ff1e07c/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/context-lines.node.mjs
+// node_modules/.bun/posthog-node@5.57.0+e40b0dfdd726a224/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/context-lines.node.mjs
 import { constants as constants2 } from "node:fs";
 import { open as promises_open } from "node:fs/promises";
 import { isAbsolute as isAbsolute7 } from "node:path";
@@ -7123,7 +7197,7 @@ var init_context_lines_node = __esm(() => {
   LRU_FILE_CONTENTS_FS_READ_FAILED = new ReduceableCache(20);
 });
 
-// node_modules/.bun/posthog-node@5.56.4+460773ef8ff1e07c/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/relative-path.node.mjs
+// node_modules/.bun/posthog-node@5.57.0+e40b0dfdd726a224/node_modules/posthog-node/dist/extensions/error-tracking/modifiers/relative-path.node.mjs
 import { isAbsolute as isAbsolute8, relative as relative4, sep as sep8 } from "node:path";
 function createRelativePathModifier(basePath = process.cwd()) {
   const isWindows = sep8 === "\\";
@@ -7140,22 +7214,23 @@ function createRelativePathModifier(basePath = process.cwd()) {
 }
 var init_relative_path_node = () => {};
 
-// node_modules/.bun/posthog-node@5.56.4+460773ef8ff1e07c/node_modules/posthog-node/dist/version.mjs
-var version2 = "5.56.4";
+// node_modules/.bun/posthog-node@5.57.0+e40b0dfdd726a224/node_modules/posthog-node/dist/version.mjs
+var version2 = "5.57.0";
 var init_version = () => {};
 
-// node_modules/.bun/posthog-node@5.56.4+460773ef8ff1e07c/node_modules/posthog-node/dist/types.mjs
+// node_modules/.bun/posthog-node@5.57.0+e40b0dfdd726a224/node_modules/posthog-node/dist/types.mjs
 var FeatureFlagError2;
 var init_types3 = __esm(() => {
   FeatureFlagError2 = {
     ERRORS_WHILE_COMPUTING: "errors_while_computing_flags",
     FLAG_MISSING: "flag_missing",
+    LOCAL_EVALUATION_INCONCLUSIVE: "local_evaluation_inconclusive",
     QUOTA_LIMITED: "quota_limited",
     UNKNOWN_ERROR: "unknown_error"
   };
 });
 
-// node_modules/.bun/posthog-node@5.56.4+460773ef8ff1e07c/node_modules/posthog-node/dist/feature-flag-evaluations.mjs
+// node_modules/.bun/posthog-node@5.57.0+e40b0dfdd726a224/node_modules/posthog-node/dist/feature-flag-evaluations.mjs
 class FeatureFlagEvaluations {
   constructor(init) {
     this._host = init.host;
@@ -7163,6 +7238,9 @@ class FeatureFlagEvaluations {
     this._groups = init.groups;
     this._disableGeoip = init.disableGeoip;
     this._flags = init.flags;
+    this._unresolvedFlags = Object.freeze({
+      ...init.unresolvedFlags
+    });
     this._requestId = init.requestId;
     this._evaluatedAt = init.evaluatedAt;
     this._flagDefinitionsLoadedAt = init.flagDefinitionsLoadedAt;
@@ -7213,6 +7291,9 @@ class FeatureFlagEvaluations {
   }
   get keys() {
     return Object.keys(this._flags);
+  }
+  get unresolvedFlags() {
+    return this._unresolvedFlags;
   }
   _getEventProperties() {
     const properties = {};
@@ -7274,7 +7355,7 @@ class FeatureFlagEvaluations {
     if (this._quotaLimited)
       errors.push(FeatureFlagError2.QUOTA_LIMITED);
     if (flag === undefined)
-      errors.push(FeatureFlagError2.FLAG_MISSING);
+      errors.push(Object.prototype.hasOwnProperty.call(this._unresolvedFlags, key) ? FeatureFlagError2.LOCAL_EVALUATION_INCONCLUSIVE : FeatureFlagError2.FLAG_MISSING);
     if (errors.length > 0)
       properties.$feature_flag_error = errors.join(",");
     this._host.captureFlagCalledEventIfNeeded({
@@ -7291,7 +7372,7 @@ var init_feature_flag_evaluations = __esm(() => {
   init_types3();
 });
 
-// node_modules/.bun/posthog-node@5.56.4+460773ef8ff1e07c/node_modules/posthog-node/dist/extensions/feature-flags/feature-flags.mjs
+// node_modules/.bun/posthog-node@5.57.0+e40b0dfdd726a224/node_modules/posthog-node/dist/extensions/feature-flags/feature-flags.mjs
 function normalizeEvaluationRuntime(value) {
   return value === "client" || value === "server" ? value : "all";
 }
@@ -7303,6 +7384,11 @@ function setCustomErrorPrototype(error, constructor) {
   Error.captureStackTrace(error, constructor);
   Object.setPrototypeOf(error, constructor.prototype);
 }
+function pickUnresolvedReason(current, next) {
+  if (current === undefined)
+    return next;
+  return UNRESOLVED_REASON_PRECEDENCE.indexOf(next) < UNRESOLVED_REASON_PRECEDENCE.indexOf(current) ? next : current;
+}
 
 class FeatureFlagsPoller {
   constructor({ pollingInterval, personalApiKey, projectApiKey, timeout, host, customHeaders, ...options }) {
@@ -7311,6 +7397,7 @@ class FeatureFlagsPoller {
     this.backOffCount = 0;
     this.pollerStopped = false;
     this.filteredOutFlagKeys = new Set;
+    this.warnedUnresolvableFlags = new Map;
     this.pollingInterval = pollingInterval;
     this.personalApiKey = personalApiKey;
     this.featureFlags = [];
@@ -7339,19 +7426,22 @@ class FeatureFlagsPoller {
     if (this.debugMode)
       fn();
   }
+  currentDefinitions() {
+    return {
+      featureFlagsByKey: this.featureFlagsByKey,
+      groupTypeMapping: this.groupTypeMapping,
+      cohorts: this.cohorts,
+      filteredOutFlagKeys: this.filteredOutFlagKeys,
+      propertyMatchingVersion: this.propertyMatchingVersion
+    };
+  }
   withEvaluationSnapshot(context) {
     if (context.definitions)
       return context;
     return {
       ...context,
       evaluationCache: {},
-      definitions: {
-        featureFlagsByKey: this.featureFlagsByKey,
-        groupTypeMapping: this.groupTypeMapping,
-        cohorts: this.cohorts,
-        filteredOutFlagKeys: this.filteredOutFlagKeys,
-        propertyMatchingVersion: this.propertyMatchingVersion
-      }
+      definitions: this.currentDefinitions()
     };
   }
   createEvaluationContext(distinctId, groups = {}, personProperties = {}, groupProperties = {}, evaluationCache = {}) {
@@ -7389,6 +7479,7 @@ class FeatureFlagsPoller {
     await this.loadFeatureFlags();
     const response = {};
     const payloads = {};
+    const unresolved = {};
     let fallbackToFlags = this.featureFlags.length == 0;
     const flagsToEvaluate = flagKeysToExplicitlyEvaluate ? flagKeysToExplicitlyEvaluate.map((key) => this.featureFlagsByKey[key]).filter(Boolean) : this.featureFlags;
     const sharedEvaluationContext = this.withEvaluationSnapshot({
@@ -7404,9 +7495,10 @@ class FeatureFlagsPoller {
         if (matchPayload)
           payloads[flag.key] = matchPayload;
       } catch (e) {
-        if (e instanceof RequiresServerEvaluation || e instanceof InconclusiveMatchError)
+        if (e instanceof RequiresServerEvaluation || e instanceof InconclusiveMatchError) {
           this.logMsgIfDebug(() => console.debug(`${e.name} when computing flag locally: ${flag.key}: ${e.message}`));
-        else if (e instanceof Error)
+          unresolved[flag.key] = e.reason;
+        } else if (e instanceof Error)
           this.onError?.(new Error(`Error computing flag locally: ${flag.key}: ${e}`));
         fallbackToFlags = true;
       }
@@ -7414,6 +7506,7 @@ class FeatureFlagsPoller {
     return {
       response,
       payloads,
+      unresolved,
       fallbackToFlags
     };
   }
@@ -7443,7 +7536,7 @@ class FeatureFlagsPoller {
     if (!flag.active)
       return false;
     if (flag.ensure_experience_continuity)
-      throw new InconclusiveMatchError("Flag has experience continuity enabled");
+      throw new InconclusiveMatchError("Flag has experience continuity enabled", "experience_continuity");
     const flagFilters = flag.filters || {};
     const aggregation_group_type_index = flagFilters.aggregation_group_type_index;
     if (aggregation_group_type_index != null) {
@@ -7465,7 +7558,7 @@ class FeatureFlagsPoller {
       const bucketingValue = this.getBucketingValueForFlag(flag, distinctId, personProperties);
       if (bucketingValue === undefined) {
         this.logMsgIfDebug(() => console.warn(`[FEATURE FLAGS] Can't compute feature flag: ${flag.key} without $device_id, falling back to server evaluation`));
-        throw new InconclusiveMatchError(`Can't compute feature flag: ${flag.key} without $device_id`);
+        throw new InconclusiveMatchError(`Can't compute feature flag: ${flag.key} without $device_id`, getDefinitionUnresolvedReason(flag, evaluationContext.definitions) ?? "missing_context");
       }
       return await this.matchFeatureFlagProperties(flag, bucketingValue, personProperties, evaluationContext);
     }
@@ -7493,6 +7586,9 @@ class FeatureFlagsPoller {
       throw new InconclusiveMatchError(`Flag dependency property for '${targetFlagKey}' has an invalid 'dependency_chain' (expected array, got ${typeof dependencyChain})`);
     if (dependencyChain.length === 0)
       throw new InconclusiveMatchError(`Circular dependency detected for flag '${targetFlagKey}' (empty dependency chain)`);
+    const missingDependency = dependencyChain.find((depFlagKey) => !(depFlagKey in evaluationCache) && !evaluationContext.definitions.featureFlagsByKey[depFlagKey] && !evaluationContext.definitions.filteredOutFlagKeys.has(depFlagKey));
+    if (missingDependency !== undefined)
+      throw new InconclusiveMatchError(`Missing flag dependency '${missingDependency}' for flag '${targetFlagKey}'`);
     for (const depFlagKey of dependencyChain) {
       if (!(depFlagKey in evaluationCache)) {
         const depFlag = evaluationContext.definitions.featureFlagsByKey[depFlagKey];
@@ -7502,18 +7598,16 @@ class FeatureFlagsPoller {
               const depResult = await this.computeFlagValueLocally(depFlag, evaluationContext);
               evaluationCache[depFlagKey] = depResult;
             } catch (error) {
-              throw new InconclusiveMatchError(`Error evaluating flag dependency '${depFlagKey}' for flag '${targetFlagKey}': ${error}`);
+              throw new InconclusiveMatchError(`Error evaluating flag dependency '${depFlagKey}' for flag '${targetFlagKey}': ${error}`, "unresolved_dependency");
             }
           else
             evaluationCache[depFlagKey] = false;
-        else if (evaluationContext.definitions.filteredOutFlagKeys.has(depFlagKey))
-          evaluationCache[depFlagKey] = false;
         else
-          throw new InconclusiveMatchError(`Missing flag dependency '${depFlagKey}' for flag '${targetFlagKey}'`);
+          evaluationCache[depFlagKey] = false;
       }
       const cachedResult = evaluationCache[depFlagKey];
       if (cachedResult == null)
-        throw new InconclusiveMatchError(`Dependency '${depFlagKey}' could not be evaluated`);
+        throw new InconclusiveMatchError(`Dependency '${depFlagKey}' could not be evaluated`, "unresolved_dependency");
     }
     const targetFlagValue = evaluationCache[targetFlagKey];
     return this.flagEvaluatesToExpectedValue(property.value, targetFlagValue);
@@ -7535,7 +7629,7 @@ class FeatureFlagsPoller {
     const flagAggregation = flagFilters.aggregation_group_type_index;
     const earlyExitEnabled = flagFilters.early_exit ?? false;
     const { groups, groupProperties } = evaluationContext;
-    let isInconclusive = false;
+    let inconclusiveReason;
     let result;
     for (const condition of flagConditions)
       try {
@@ -7550,7 +7644,7 @@ class FeatureFlagsPoller {
               continue;
             }
             if (!(groupName in groupProperties)) {
-              isInconclusive = true;
+              inconclusiveReason = pickUnresolvedReason(inconclusiveReason, "missing_context");
               continue;
             }
             effectiveProperties = groupProperties[groupName];
@@ -7565,7 +7659,7 @@ class FeatureFlagsPoller {
           break;
         }
         if (earlyExitEnabled && matchResult === "out_of_rollout_bound") {
-          if (isInconclusive)
+          if (inconclusiveReason)
             break;
           return false;
         }
@@ -7573,14 +7667,14 @@ class FeatureFlagsPoller {
         if (e instanceof RequiresServerEvaluation)
           throw e;
         if (e instanceof InconclusiveMatchError)
-          isInconclusive = true;
+          inconclusiveReason = pickUnresolvedReason(inconclusiveReason, e.reason);
         else
           throw e;
       }
     if (result !== undefined)
       return result;
-    if (isInconclusive)
-      throw new InconclusiveMatchError("Can't determine if feature flag is enabled or not with given properties");
+    if (inconclusiveReason)
+      throw new InconclusiveMatchError("Can't determine if feature flag is enabled or not with given properties", inconclusiveReason);
     return false;
   }
   async isConditionMatch(flag, bucketingValue, condition, properties, evaluationContext) {
@@ -7591,17 +7685,44 @@ class FeatureFlagsPoller {
       this.logMsgIfDebug(() => console.warn(msg));
     };
     if ((condition.properties || []).length > 0) {
+      let inconclusiveReason;
+      let serverEvaluationError;
       for (const prop of condition.properties) {
         const propertyType = prop.type;
         let matches = false;
-        if (propertyType === "cohort") {
-          const inCohort = await matchCohort(prop, properties, definitions.cohorts, this.debugMode, (depProp) => this.evaluateFlagDependency(depProp, properties, evaluationContext), definitions.propertyMatchingVersion);
-          matches = prop.operator === "not_in" ? !inCohort : inCohort;
-        } else
-          matches = propertyType === "flag" ? await this.evaluateFlagDependency(prop, properties, evaluationContext) : matchProperty(prop, properties, warnFunction, definitions.propertyMatchingVersion);
+        try {
+          if (propertyType === "cohort") {
+            const inCohort = await matchCohort(prop, properties, definitions.cohorts, this.debugMode, (depProp) => this.evaluateFlagDependency(depProp, properties, evaluationContext), definitions.propertyMatchingVersion);
+            matches = prop.operator === "not_in" ? !inCohort : inCohort;
+          } else if (propertyType === "flag")
+            matches = await this.evaluateFlagDependency(prop, properties, evaluationContext);
+          else if (Object.prototype.hasOwnProperty.call(properties, prop.key))
+            matches = matchProperty(prop, properties, warnFunction, definitions.propertyMatchingVersion);
+          else {
+            assertFeatureFlagFilterSupported(prop);
+            inconclusiveReason = pickUnresolvedReason(inconclusiveReason, "missing_context");
+            continue;
+          }
+        } catch (e) {
+          if (e instanceof RequiresServerEvaluation) {
+            if (inconclusiveReason === undefined)
+              serverEvaluationError ??= e;
+            inconclusiveReason = pickUnresolvedReason(inconclusiveReason, e.reason);
+            continue;
+          }
+          if (e instanceof InconclusiveMatchError) {
+            inconclusiveReason = pickUnresolvedReason(inconclusiveReason, e.reason);
+            continue;
+          }
+          throw e;
+        }
         if (!matches)
           return "no_match";
       }
+      if (serverEvaluationError)
+        throw serverEvaluationError;
+      if (inconclusiveReason)
+        throw new InconclusiveMatchError(`Can't determine if a condition of flag ${flag.key} matches`, inconclusiveReason);
       if (rolloutPercentage == undefined)
         return "match";
     }
@@ -7647,12 +7768,32 @@ class FeatureFlagsPoller {
     this.loadedSuccessfullyOnce = true;
     this.onMinimalFlagCalledEvents?.((flagData.minimal_flag_called_events ?? flagData.minimalFlagCalledEvents) === true);
   }
-  warnAboutExperienceContinuityFlags(flags) {
-    if (this.strictLocalEvaluation)
-      return;
-    const experienceContinuityFlags = flags.filter((f) => f.ensure_experience_continuity);
-    if (experienceContinuityFlags.length > 0)
-      console.warn(`[PostHog] You are using local evaluation but ${experienceContinuityFlags.length} flag(s) have experience continuity enabled: ${experienceContinuityFlags.map((f) => f.key).join(", ")}. Experience continuity is incompatible with local evaluation and will cause a server request on every flag evaluation, negating local evaluation cost savings. To avoid server requests and unexpected costs, either disable experience continuity on these flags in PostHog, use strictLocalEvaluation: true in client init, or pass onlyEvaluateLocally: true per flag call (flags that cannot be evaluated locally will return undefined).`);
+  warnAboutUnresolvableFlags(flags) {
+    const experienceContinuityFlags = [];
+    const unsupportedDefinitionFlags = [];
+    const warnedFlags = new Map;
+    const definitions = this.currentDefinitions();
+    for (const flag of flags) {
+      const reason = getDefinitionUnresolvedReason(flag, definitions);
+      if (!reason)
+        continue;
+      const fingerprint = JSON.stringify(flag);
+      warnedFlags.set(flag.key, fingerprint);
+      if (this.warnedUnresolvableFlags.get(flag.key) !== fingerprint)
+        if (reason === "experience_continuity")
+          experienceContinuityFlags.push(flag.key);
+        else
+          unsupportedDefinitionFlags.push(flag.key);
+    }
+    this.warnedUnresolvableFlags = warnedFlags;
+    if (experienceContinuityFlags.length > 0) {
+      const consequence = this.strictLocalEvaluation ? "With strictLocalEvaluation enabled these flags are left unresolved. To evaluate them locally, disable experience continuity on these flags in PostHog." : "Experience continuity is incompatible with local evaluation and will cause a server request on every flag evaluation, negating local evaluation cost savings. To avoid server requests and unexpected costs, either disable experience continuity on these flags in PostHog, use strictLocalEvaluation: true in client init, or pass onlyEvaluateLocally: true per flag call (flags that cannot be evaluated locally will return undefined).";
+      console.warn(`[PostHog] You are using local evaluation but ${experienceContinuityFlags.length} flag(s) have experience continuity enabled and cannot be resolved locally (reason: experience_continuity): ${experienceContinuityFlags.join(", ")}. ` + consequence);
+    }
+    if (unsupportedDefinitionFlags.length > 0) {
+      const consequence = this.strictLocalEvaluation ? "With strictLocalEvaluation enabled these flags are left unresolved when evaluation reaches that part." : "Evaluating these flags falls back to a server request when evaluation reaches that part.";
+      console.warn(`[PostHog] You are using local evaluation but ${unsupportedDefinitionFlags.length} flag(s) use something local evaluation does not support, such as a static cohort, an unknown operator, or a missing or circular flag dependency (reason: unsupported_definition): ${unsupportedDefinitionFlags.join(", ")}. ${consequence} To evaluate them locally, change these flags in PostHog or upgrade posthog-node.`);
+    }
   }
   async loadFromCache(debugMessage) {
     if (!this.cacheProvider)
@@ -7663,7 +7804,7 @@ class FeatureFlagsPoller {
         this.updateFlagState(cached);
         this.logMsgIfDebug(() => console.debug(`[FEATURE FLAGS] ${debugMessage} (${cached.flags.length} flags)`));
         this.onLoad?.(this.featureFlags.length);
-        this.warnAboutExperienceContinuityFlags(this.featureFlags);
+        this.warnAboutUnresolvableFlags(this.featureFlags);
         return true;
       }
       return false;
@@ -7783,7 +7924,7 @@ class FeatureFlagsPoller {
               this.onError?.(new Error(`Failed to store in cache: ${err}`));
             }
           this.onLoad?.(this.featureFlags.length);
-          this.warnAboutExperienceContinuityFlags(this.featureFlags);
+          this.warnAboutUnresolvableFlags(this.featureFlags);
           break;
         }
         default:
@@ -7871,6 +8012,45 @@ class FeatureFlagsPoller {
       }
   }
 }
+function getDefinitionUnresolvedReason(flag, definitions) {
+  if (!flag.active)
+    return;
+  if (flag.ensure_experience_continuity)
+    return "experience_continuity";
+  const flagFilters = flag.filters || {};
+  const aggregation = flagFilters.aggregation_group_type_index;
+  if (aggregation != null && !definitions.groupTypeMapping[String(aggregation)])
+    return "unsupported_definition";
+  const usesUnsupportedProperty = (flagFilters.groups || []).some((condition) => (condition.properties || []).some((property) => isUnsupportedProperty(property, definitions, new Set)));
+  return usesUnsupportedProperty ? "unsupported_definition" : undefined;
+}
+function isUnsupportedProperty(property, definitions, visitedCohortIds) {
+  if (property.type === "flag") {
+    const dependencyChain = property.dependency_chain;
+    if (!Array.isArray(dependencyChain) || dependencyChain.length === 0)
+      return true;
+    return dependencyChain.some((key) => !definitions.featureFlagsByKey[key] && !definitions.filteredOutFlagKeys.has(key));
+  }
+  if (property.type !== "cohort")
+    try {
+      assertFeatureFlagFilterSupported(property);
+      return false;
+    } catch (e) {
+      if (e instanceof InconclusiveMatchError)
+        return true;
+      throw e;
+    }
+  const cohortId = String(property.value);
+  if (!(cohortId in definitions.cohorts))
+    return true;
+  if (visitedCohortIds.has(cohortId))
+    return false;
+  visitedCohortIds.add(cohortId);
+  return isUnsupportedPropertyGroup(definitions.cohorts[cohortId], definitions, visitedCohortIds);
+}
+function isUnsupportedPropertyGroup(group, definitions, visitedCohortIds) {
+  return (group?.values ?? []).some((value) => ("values" in value) ? isUnsupportedPropertyGroup(value, definitions, visitedCohortIds) : isUnsupportedProperty(value, definitions, visitedCohortIds));
+}
 function matchProperty(property, propertyValues, warnFunction, propertyMatchingVersion) {
   return matchFeatureFlagProperty(property, propertyValues, {
     warnFunction,
@@ -7894,7 +8074,7 @@ async function matchPropertyGroup(propertyGroup, propertyValues, cohortPropertie
   const properties = propertyGroup.values;
   if (!properties || properties.length === 0)
     return true;
-  let errorMatchingLocally = false;
+  let inconclusiveReason;
   if ("values" in properties[0]) {
     for (const prop of properties)
       try {
@@ -7910,12 +8090,12 @@ async function matchPropertyGroup(propertyGroup, propertyValues, cohortPropertie
         if (err instanceof InconclusiveMatchError) {
           if (debugMode)
             console.debug(`Failed to compute property ${prop} locally: ${err}`);
-          errorMatchingLocally = true;
+          inconclusiveReason = pickUnresolvedReason(inconclusiveReason, err.reason);
         } else
           throw err;
       }
-    if (errorMatchingLocally)
-      throw new InconclusiveMatchError("Can't match cohort without a given cohort property value");
+    if (inconclusiveReason)
+      throw new InconclusiveMatchError("Can't match cohort without a given cohort property value", inconclusiveReason);
     return propertyGroupType === "AND";
   }
   for (const prop of properties)
@@ -7947,15 +8127,15 @@ async function matchPropertyGroup(propertyGroup, propertyValues, cohortPropertie
       if (err instanceof InconclusiveMatchError) {
         if (debugMode)
           console.debug(`Failed to compute property ${prop} locally: ${err}`);
-        errorMatchingLocally = true;
+        inconclusiveReason = pickUnresolvedReason(inconclusiveReason, err.reason);
       } else
         throw err;
     }
-  if (errorMatchingLocally)
-    throw new InconclusiveMatchError("can't match cohort without a given cohort property value");
+  if (inconclusiveReason)
+    throw new InconclusiveMatchError("can't match cohort without a given cohort property value", inconclusiveReason);
   return propertyGroupType === "AND";
 }
-var SIXTY_SECONDS = 60000, ClientError, RequiresServerEvaluation;
+var SIXTY_SECONDS = 60000, ClientError, RequiresServerEvaluation, UNRESOLVED_REASON_PRECEDENCE;
 var init_feature_flags = __esm(() => {
   init_dist();
   ClientError = class ClientError extends Error {
@@ -7969,13 +8149,19 @@ var init_feature_flags = __esm(() => {
   };
   RequiresServerEvaluation = class RequiresServerEvaluation extends Error {
     constructor(message) {
-      super(message);
+      super(message), this.reason = "unsupported_definition";
       setCustomErrorPrototype(this, RequiresServerEvaluation);
     }
   };
+  UNRESOLVED_REASON_PRECEDENCE = [
+    "experience_continuity",
+    "unsupported_definition",
+    "unresolved_dependency",
+    "missing_context"
+  ];
 });
 
-// node_modules/.bun/posthog-node@5.56.4+460773ef8ff1e07c/node_modules/posthog-node/dist/extensions/error-tracking/autocapture.mjs
+// node_modules/.bun/posthog-node@5.57.0+e40b0dfdd726a224/node_modules/posthog-node/dist/extensions/error-tracking/autocapture.mjs
 function splitNodeOptions(nodeOptions) {
   const args = [];
   let current = "";
@@ -8076,7 +8262,7 @@ var init_autocapture = __esm(() => {
   STARTUP_UNHANDLED_REJECTION_MODE = getUnhandledRejectionMode();
 });
 
-// node_modules/.bun/posthog-node@5.56.4+460773ef8ff1e07c/node_modules/posthog-node/dist/extensions/error-tracking/index.mjs
+// node_modules/.bun/posthog-node@5.57.0+e40b0dfdd726a224/node_modules/posthog-node/dist/extensions/error-tracking/index.mjs
 class error_tracking_ErrorTracking {
   constructor(client, options, _logger) {
     this.client = client;
@@ -8151,65 +8337,14 @@ var init_error_tracking2 = __esm(() => {
   error_tracking_default = error_tracking_ErrorTracking;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/platform/node/globalThis.js
-var require_globalThis = __commonJS(function(exports) {
-  Object.defineProperty(exports, "__esModule", { value: true });
-  exports._globalThis = undefined;
-  exports._globalThis = typeof globalThis === "object" ? globalThis : global;
-});
-
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/platform/node/index.js
-var require_node = __commonJS(function(exports) {
-  var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
-    if (k2 === undefined)
-      k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() {
-      return m[k];
-    } });
-  } : function(o, m, k, k2) {
-    if (k2 === undefined)
-      k2 = k;
-    o[k2] = m[k];
-  });
-  var __exportStar = exports && exports.__exportStar || function(m, exports2) {
-    for (var p in m)
-      if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports2, p))
-        __createBinding(exports2, m, p);
-  };
-  Object.defineProperty(exports, "__esModule", { value: true });
-  __exportStar(require_globalThis(), exports);
-});
-
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/platform/index.js
-var require_platform = __commonJS(function(exports) {
-  var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
-    if (k2 === undefined)
-      k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() {
-      return m[k];
-    } });
-  } : function(o, m, k, k2) {
-    if (k2 === undefined)
-      k2 = k;
-    o[k2] = m[k];
-  });
-  var __exportStar = exports && exports.__exportStar || function(m, exports2) {
-    for (var p in m)
-      if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports2, p))
-        __createBinding(exports2, m, p);
-  };
-  Object.defineProperty(exports, "__esModule", { value: true });
-  __exportStar(require_node(), exports);
-});
-
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/version.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/version.js
 var require_version = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.VERSION = undefined;
-  exports.VERSION = "1.9.0";
+  exports.VERSION = "1.9.1";
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/internal/semver.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/internal/semver.js
 var require_semver = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.isCompatible = exports._makeCompatibilityCheck = undefined;
@@ -8280,16 +8415,15 @@ var require_semver = __commonJS(function(exports) {
   exports.isCompatible = _makeCompatibilityCheck(version_1.VERSION);
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/internal/global-utils.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/internal/global-utils.js
 var require_global_utils = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.unregisterGlobal = exports.getGlobal = exports.registerGlobal = undefined;
-  var platform_1 = require_platform();
   var version_1 = require_version();
   var semver_1 = require_semver();
   var major = version_1.VERSION.split(".")[0];
   var GLOBAL_OPENTELEMETRY_API_KEY = Symbol.for(`opentelemetry.js.api.${major}`);
-  var _global = platform_1._globalThis;
+  var _global = typeof globalThis === "object" ? globalThis : typeof self === "object" ? self : typeof window === "object" ? window : typeof global === "object" ? global : {};
   function registerGlobal(type, instance, diag, allowOverride = false) {
     var _a;
     const api = _global[GLOBAL_OPENTELEMETRY_API_KEY] = (_a = _global[GLOBAL_OPENTELEMETRY_API_KEY]) !== null && _a !== undefined ? _a : {
@@ -8329,7 +8463,7 @@ var require_global_utils = __commonJS(function(exports) {
   exports.unregisterGlobal = unregisterGlobal;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/diag/ComponentLogger.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/diag/ComponentLogger.js
 var require_ComponentLogger = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.DiagComponentLogger = undefined;
@@ -8361,12 +8495,11 @@ var require_ComponentLogger = __commonJS(function(exports) {
     if (!logger) {
       return;
     }
-    args.unshift(namespace);
-    return logger[funcName](...args);
+    return logger[funcName](namespace, ...args);
   }
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/diag/types.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/diag/types.js
 var require_types = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.DiagLogLevel = undefined;
@@ -8382,7 +8515,7 @@ var require_types = __commonJS(function(exports) {
   })(DiagLogLevel = exports.DiagLogLevel || (exports.DiagLogLevel = {}));
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/diag/internal/logLevelLogger.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/diag/internal/logLevelLogger.js
 var require_logLevelLogger = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.createLogLevelDiagLogger = undefined;
@@ -8412,7 +8545,7 @@ var require_logLevelLogger = __commonJS(function(exports) {
   exports.createLogLevelDiagLogger = createLogLevelDiagLogger;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/api/diag.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/api/diag.js
 var require_diag = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.DiagAPI = undefined;
@@ -8423,6 +8556,12 @@ var require_diag = __commonJS(function(exports) {
   var API_NAME = "diag";
 
   class DiagAPI {
+    static instance() {
+      if (!this._instance) {
+        this._instance = new DiagAPI;
+      }
+      return this._instance;
+    }
     constructor() {
       function _logProxy(funcName) {
         return function(...args) {
@@ -8432,12 +8571,12 @@ var require_diag = __commonJS(function(exports) {
           return logger[funcName](...args);
         };
       }
-      const self = this;
+      const self2 = this;
       const setLogger = (logger, optionsOrLogLevel = { logLevel: types_1.DiagLogLevel.INFO }) => {
         var _a, _b, _c;
-        if (logger === self) {
+        if (logger === self2) {
           const err = new Error("Cannot use diag as the logger for itself. Please use a DiagLogger implementation like ConsoleDiagLogger or a custom implementation");
-          self.error((_a = err.stack) !== null && _a !== undefined ? _a : err.message);
+          self2.error((_a = err.stack) !== null && _a !== undefined ? _a : err.message);
           return false;
         }
         if (typeof optionsOrLogLevel === "number") {
@@ -8452,32 +8591,26 @@ var require_diag = __commonJS(function(exports) {
           oldLogger.warn(`Current logger will be overwritten from ${stack}`);
           newLogger.warn(`Current logger will overwrite one already registered from ${stack}`);
         }
-        return (0, global_utils_1.registerGlobal)("diag", newLogger, self, true);
+        return (0, global_utils_1.registerGlobal)("diag", newLogger, self2, true);
       };
-      self.setLogger = setLogger;
-      self.disable = () => {
-        (0, global_utils_1.unregisterGlobal)(API_NAME, self);
+      self2.setLogger = setLogger;
+      self2.disable = () => {
+        (0, global_utils_1.unregisterGlobal)(API_NAME, self2);
       };
-      self.createComponentLogger = (options) => {
+      self2.createComponentLogger = (options) => {
         return new ComponentLogger_1.DiagComponentLogger(options);
       };
-      self.verbose = _logProxy("verbose");
-      self.debug = _logProxy("debug");
-      self.info = _logProxy("info");
-      self.warn = _logProxy("warn");
-      self.error = _logProxy("error");
-    }
-    static instance() {
-      if (!this._instance) {
-        this._instance = new DiagAPI;
-      }
-      return this._instance;
+      self2.verbose = _logProxy("verbose");
+      self2.debug = _logProxy("debug");
+      self2.info = _logProxy("info");
+      self2.warn = _logProxy("warn");
+      self2.error = _logProxy("error");
     }
   }
   exports.DiagAPI = DiagAPI;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/baggage/internal/baggage-impl.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/baggage/internal/baggage-impl.js
 var require_baggage_impl = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.BaggageImpl = undefined;
@@ -8494,7 +8627,7 @@ var require_baggage_impl = __commonJS(function(exports) {
       return Object.assign({}, entry);
     }
     getAllEntries() {
-      return Array.from(this._entries.entries()).map(([k, v]) => [k, v]);
+      return Array.from(this._entries.entries());
     }
     setEntry(key, entry) {
       const newBaggage = new BaggageImpl(this._entries);
@@ -8520,14 +8653,14 @@ var require_baggage_impl = __commonJS(function(exports) {
   exports.BaggageImpl = BaggageImpl;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/baggage/internal/symbol.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/baggage/internal/symbol.js
 var require_symbol = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.baggageEntryMetadataSymbol = undefined;
   exports.baggageEntryMetadataSymbol = Symbol("BaggageEntryMetadata");
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/baggage/utils.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/baggage/utils.js
 var require_utils = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.baggageEntryMetadataFromString = exports.createBaggage = undefined;
@@ -8554,7 +8687,7 @@ var require_utils = __commonJS(function(exports) {
   exports.baggageEntryMetadataFromString = baggageEntryMetadataFromString;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/context/context.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/context/context.js
 var require_context = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.ROOT_CONTEXT = exports.createContextKey = undefined;
@@ -8565,16 +8698,16 @@ var require_context = __commonJS(function(exports) {
 
   class BaseContext {
     constructor(parentContext) {
-      const self = this;
-      self._currentContext = parentContext ? new Map(parentContext) : new Map;
-      self.getValue = (key) => self._currentContext.get(key);
-      self.setValue = (key, value) => {
-        const context = new BaseContext(self._currentContext);
+      const self2 = this;
+      self2._currentContext = parentContext ? new Map(parentContext) : new Map;
+      self2.getValue = (key) => self2._currentContext.get(key);
+      self2.setValue = (key, value) => {
+        const context = new BaseContext(self2._currentContext);
         context._currentContext.set(key, value);
         return context;
       };
-      self.deleteValue = (key) => {
-        const context = new BaseContext(self._currentContext);
+      self2.deleteValue = (key) => {
+        const context = new BaseContext(self2._currentContext);
         context._currentContext.delete(key);
         return context;
       };
@@ -8583,10 +8716,10 @@ var require_context = __commonJS(function(exports) {
   exports.ROOT_CONTEXT = new BaseContext;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/diag/consoleLogger.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/diag/consoleLogger.js
 var require_consoleLogger = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
-  exports.DiagConsoleLogger = undefined;
+  exports.DiagConsoleLogger = exports._originalConsoleMethods = undefined;
   var consoleMap = [
     { n: "error", c: "error" },
     { n: "warn", c: "warn" },
@@ -8594,19 +8727,39 @@ var require_consoleLogger = __commonJS(function(exports) {
     { n: "debug", c: "debug" },
     { n: "verbose", c: "trace" }
   ];
+  exports._originalConsoleMethods = {};
+  if (typeof console !== "undefined") {
+    const keys = [
+      "error",
+      "warn",
+      "info",
+      "debug",
+      "trace",
+      "log"
+    ];
+    for (const key of keys) {
+      if (typeof console[key] === "function") {
+        exports._originalConsoleMethods[key] = console[key];
+      }
+    }
+  }
 
   class DiagConsoleLogger {
     constructor() {
       function _consoleFunc(funcName) {
         return function(...args) {
-          if (console) {
-            let theFunc = console[funcName];
+          let theFunc = exports._originalConsoleMethods[funcName];
+          if (typeof theFunc !== "function") {
+            theFunc = exports._originalConsoleMethods["log"];
+          }
+          if (typeof theFunc !== "function" && console) {
+            theFunc = console[funcName];
             if (typeof theFunc !== "function") {
               theFunc = console.log;
             }
-            if (typeof theFunc === "function") {
-              return theFunc.apply(console, args);
-            }
+          }
+          if (typeof theFunc === "function") {
+            return theFunc.apply(console, args);
           }
         };
       }
@@ -8618,7 +8771,7 @@ var require_consoleLogger = __commonJS(function(exports) {
   exports.DiagConsoleLogger = DiagConsoleLogger;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/metrics/NoopMeter.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/metrics/NoopMeter.js
 var require_NoopMeter = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.createNoopMeter = exports.NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC = exports.NOOP_OBSERVABLE_GAUGE_METRIC = exports.NOOP_OBSERVABLE_COUNTER_METRIC = exports.NOOP_UP_DOWN_COUNTER_METRIC = exports.NOOP_HISTOGRAM_METRIC = exports.NOOP_GAUGE_METRIC = exports.NOOP_COUNTER_METRIC = exports.NOOP_METER = exports.NoopObservableUpDownCounterMetric = exports.NoopObservableGaugeMetric = exports.NoopObservableCounterMetric = exports.NoopObservableMetric = exports.NoopHistogramMetric = exports.NoopGaugeMetric = exports.NoopUpDownCounterMetric = exports.NoopCounterMetric = exports.NoopMetric = exports.NoopMeter = undefined;
@@ -8706,7 +8859,7 @@ var require_NoopMeter = __commonJS(function(exports) {
   exports.createNoopMeter = createNoopMeter;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/metrics/Metric.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/metrics/Metric.js
 var require_Metric = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.ValueType = undefined;
@@ -8717,7 +8870,7 @@ var require_Metric = __commonJS(function(exports) {
   })(ValueType = exports.ValueType || (exports.ValueType = {}));
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/propagation/TextMapPropagator.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/propagation/TextMapPropagator.js
 var require_TextMapPropagator = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.defaultTextMapSetter = exports.defaultTextMapGetter = undefined;
@@ -8745,7 +8898,7 @@ var require_TextMapPropagator = __commonJS(function(exports) {
   };
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js
 var require_NoopContextManager = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.NoopContextManager = undefined;
@@ -8771,7 +8924,7 @@ var require_NoopContextManager = __commonJS(function(exports) {
   exports.NoopContextManager = NoopContextManager;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/api/context.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/api/context.js
 var require_context2 = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.ContextAPI = undefined;
@@ -8812,7 +8965,7 @@ var require_context2 = __commonJS(function(exports) {
   exports.ContextAPI = ContextAPI;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace/trace_flags.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/trace_flags.js
 var require_trace_flags = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.TraceFlags = undefined;
@@ -8823,7 +8976,7 @@ var require_trace_flags = __commonJS(function(exports) {
   })(TraceFlags = exports.TraceFlags || (exports.TraceFlags = {}));
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace/invalid-span-constants.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/invalid-span-constants.js
 var require_invalid_span_constants = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.INVALID_SPAN_CONTEXT = exports.INVALID_TRACEID = exports.INVALID_SPANID = undefined;
@@ -8837,15 +8990,15 @@ var require_invalid_span_constants = __commonJS(function(exports) {
   };
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace/NonRecordingSpan.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/NonRecordingSpan.js
 var require_NonRecordingSpan = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.NonRecordingSpan = undefined;
   var invalid_span_constants_1 = require_invalid_span_constants();
 
   class NonRecordingSpan {
-    constructor(_spanContext = invalid_span_constants_1.INVALID_SPAN_CONTEXT) {
-      this._spanContext = _spanContext;
+    constructor(spanContext = invalid_span_constants_1.INVALID_SPAN_CONTEXT) {
+      this._spanContext = spanContext;
     }
     spanContext() {
       return this._spanContext;
@@ -8880,7 +9033,7 @@ var require_NonRecordingSpan = __commonJS(function(exports) {
   exports.NonRecordingSpan = NonRecordingSpan;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace/context-utils.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/context-utils.js
 var require_context_utils = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.getSpanContext = exports.setSpanContext = exports.deleteSpan = exports.setSpan = exports.getActiveSpan = exports.getSpan = undefined;
@@ -8915,20 +9068,132 @@ var require_context_utils = __commonJS(function(exports) {
   exports.getSpanContext = getSpanContext;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace/spancontext-utils.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/spancontext-utils.js
 var require_spancontext_utils = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.wrapSpanContext = exports.isSpanContextValid = exports.isValidSpanId = exports.isValidTraceId = undefined;
   var invalid_span_constants_1 = require_invalid_span_constants();
   var NonRecordingSpan_1 = require_NonRecordingSpan();
-  var VALID_TRACEID_REGEX = /^([0-9a-f]{32})$/i;
-  var VALID_SPANID_REGEX = /^[0-9a-f]{16}$/i;
+  var isHex = new Uint8Array([
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ]);
+  function isValidHex(id, length) {
+    if (typeof id !== "string" || id.length !== length)
+      return false;
+    let r = 0;
+    for (let i = 0;i < id.length; i += 4) {
+      r += (isHex[id.charCodeAt(i)] | 0) + (isHex[id.charCodeAt(i + 1)] | 0) + (isHex[id.charCodeAt(i + 2)] | 0) + (isHex[id.charCodeAt(i + 3)] | 0);
+    }
+    return r === length;
+  }
   function isValidTraceId(traceId) {
-    return VALID_TRACEID_REGEX.test(traceId) && traceId !== invalid_span_constants_1.INVALID_TRACEID;
+    return isValidHex(traceId, 32) && traceId !== invalid_span_constants_1.INVALID_TRACEID;
   }
   exports.isValidTraceId = isValidTraceId;
   function isValidSpanId(spanId) {
-    return VALID_SPANID_REGEX.test(spanId) && spanId !== invalid_span_constants_1.INVALID_SPANID;
+    return isValidHex(spanId, 16) && spanId !== invalid_span_constants_1.INVALID_SPANID;
   }
   exports.isValidSpanId = isValidSpanId;
   function isSpanContextValid(spanContext) {
@@ -8941,7 +9206,7 @@ var require_spancontext_utils = __commonJS(function(exports) {
   exports.wrapSpanContext = wrapSpanContext;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js
 var require_NoopTracer = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.NoopTracer = undefined;
@@ -8988,11 +9253,11 @@ var require_NoopTracer = __commonJS(function(exports) {
   }
   exports.NoopTracer = NoopTracer;
   function isSpanContext(spanContext) {
-    return typeof spanContext === "object" && typeof spanContext["spanId"] === "string" && typeof spanContext["traceId"] === "string" && typeof spanContext["traceFlags"] === "number";
+    return spanContext !== null && typeof spanContext === "object" && "spanId" in spanContext && typeof spanContext["spanId"] === "string" && "traceId" in spanContext && typeof spanContext["traceId"] === "string" && "traceFlags" in spanContext && typeof spanContext["traceFlags"] === "number";
   }
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js
 var require_ProxyTracer = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.ProxyTracer = undefined;
@@ -9000,8 +9265,8 @@ var require_ProxyTracer = __commonJS(function(exports) {
   var NOOP_TRACER = new NoopTracer_1.NoopTracer;
 
   class ProxyTracer {
-    constructor(_provider, name, version, options) {
-      this._provider = _provider;
+    constructor(provider, name, version, options) {
+      this._provider = provider;
       this.name = name;
       this.version = version;
       this.options = options;
@@ -9028,7 +9293,7 @@ var require_ProxyTracer = __commonJS(function(exports) {
   exports.ProxyTracer = ProxyTracer;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace/NoopTracerProvider.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/NoopTracerProvider.js
 var require_NoopTracerProvider = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.NoopTracerProvider = undefined;
@@ -9042,7 +9307,7 @@ var require_NoopTracerProvider = __commonJS(function(exports) {
   exports.NoopTracerProvider = NoopTracerProvider;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace/ProxyTracerProvider.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/ProxyTracerProvider.js
 var require_ProxyTracerProvider = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.ProxyTracerProvider = undefined;
@@ -9070,7 +9335,7 @@ var require_ProxyTracerProvider = __commonJS(function(exports) {
   exports.ProxyTracerProvider = ProxyTracerProvider;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace/SamplingResult.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/SamplingResult.js
 var require_SamplingResult = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.SamplingDecision = undefined;
@@ -9082,7 +9347,7 @@ var require_SamplingResult = __commonJS(function(exports) {
   })(SamplingDecision = exports.SamplingDecision || (exports.SamplingDecision = {}));
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace/span_kind.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/span_kind.js
 var require_span_kind = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.SpanKind = undefined;
@@ -9096,7 +9361,7 @@ var require_span_kind = __commonJS(function(exports) {
   })(SpanKind = exports.SpanKind || (exports.SpanKind = {}));
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace/status.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/status.js
 var require_status = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.SpanStatusCode = undefined;
@@ -9108,7 +9373,7 @@ var require_status = __commonJS(function(exports) {
   })(SpanStatusCode = exports.SpanStatusCode || (exports.SpanStatusCode = {}));
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace/internal/tracestate-validators.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/internal/tracestate-validators.js
 var require_tracestate_validators = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.validateValue = exports.validateKey = undefined;
@@ -9128,7 +9393,7 @@ var require_tracestate_validators = __commonJS(function(exports) {
   exports.validateValue = validateValue;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace/internal/tracestate-impl.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/internal/tracestate-impl.js
 var require_tracestate_impl = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.TraceStateImpl = undefined;
@@ -9161,7 +9426,7 @@ var require_tracestate_impl = __commonJS(function(exports) {
       return this._internalState.get(key);
     }
     serialize() {
-      return this._keys().reduce((agg, key) => {
+      return Array.from(this._internalState.keys()).reduceRight((agg, key) => {
         agg.push(key + LIST_MEMBER_KEY_VALUE_SPLITTER + this.get(key));
         return agg;
       }, []).join(LIST_MEMBERS_SEPARATOR);
@@ -9169,7 +9434,7 @@ var require_tracestate_impl = __commonJS(function(exports) {
     _parse(rawTraceState) {
       if (rawTraceState.length > MAX_TRACE_STATE_LEN)
         return;
-      this._internalState = rawTraceState.split(LIST_MEMBERS_SEPARATOR).reverse().reduce((agg, part) => {
+      this._internalState = rawTraceState.split(LIST_MEMBERS_SEPARATOR).reduceRight((agg, part) => {
         const listMember = part.trim();
         const i = listMember.indexOf(LIST_MEMBER_KEY_VALUE_SPLITTER);
         if (i !== -1) {
@@ -9197,7 +9462,7 @@ var require_tracestate_impl = __commonJS(function(exports) {
   exports.TraceStateImpl = TraceStateImpl;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace/internal/utils.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace/internal/utils.js
 var require_utils2 = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.createTraceState = undefined;
@@ -9208,7 +9473,7 @@ var require_utils2 = __commonJS(function(exports) {
   exports.createTraceState = createTraceState;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/context-api.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/context-api.js
 var require_context_api = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.context = undefined;
@@ -9216,7 +9481,7 @@ var require_context_api = __commonJS(function(exports) {
   exports.context = context_1.ContextAPI.getInstance();
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/diag-api.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/diag-api.js
 var require_diag_api = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.diag = undefined;
@@ -9224,7 +9489,7 @@ var require_diag_api = __commonJS(function(exports) {
   exports.diag = diag_1.DiagAPI.instance();
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/metrics/NoopMeterProvider.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/metrics/NoopMeterProvider.js
 var require_NoopMeterProvider = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.NOOP_METER_PROVIDER = exports.NoopMeterProvider = undefined;
@@ -9239,7 +9504,7 @@ var require_NoopMeterProvider = __commonJS(function(exports) {
   exports.NOOP_METER_PROVIDER = new NoopMeterProvider;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/api/metrics.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/api/metrics.js
 var require_metrics = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.MetricsAPI = undefined;
@@ -9272,7 +9537,7 @@ var require_metrics = __commonJS(function(exports) {
   exports.MetricsAPI = MetricsAPI;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/metrics-api.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/metrics-api.js
 var require_metrics_api = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.metrics = undefined;
@@ -9280,7 +9545,7 @@ var require_metrics_api = __commonJS(function(exports) {
   exports.metrics = metrics_1.MetricsAPI.getInstance();
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/propagation/NoopTextMapPropagator.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/propagation/NoopTextMapPropagator.js
 var require_NoopTextMapPropagator = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.NoopTextMapPropagator = undefined;
@@ -9297,7 +9562,7 @@ var require_NoopTextMapPropagator = __commonJS(function(exports) {
   exports.NoopTextMapPropagator = NoopTextMapPropagator;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/baggage/context-helpers.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/baggage/context-helpers.js
 var require_context_helpers = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.deleteBaggage = exports.setBaggage = exports.getActiveBaggage = exports.getBaggage = undefined;
@@ -9322,7 +9587,7 @@ var require_context_helpers = __commonJS(function(exports) {
   exports.deleteBaggage = deleteBaggage;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/api/propagation.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/api/propagation.js
 var require_propagation = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.PropagationAPI = undefined;
@@ -9371,7 +9636,7 @@ var require_propagation = __commonJS(function(exports) {
   exports.PropagationAPI = PropagationAPI;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/propagation-api.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/propagation-api.js
 var require_propagation_api = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.propagation = undefined;
@@ -9379,7 +9644,7 @@ var require_propagation_api = __commonJS(function(exports) {
   exports.propagation = propagation_1.PropagationAPI.getInstance();
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/api/trace.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/api/trace.js
 var require_trace = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.TraceAPI = undefined;
@@ -9429,7 +9694,7 @@ var require_trace = __commonJS(function(exports) {
   exports.TraceAPI = TraceAPI;
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace-api.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/trace-api.js
 var require_trace_api = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.trace = undefined;
@@ -9437,7 +9702,7 @@ var require_trace_api = __commonJS(function(exports) {
   exports.trace = trace_1.TraceAPI.getInstance();
 });
 
-// node_modules/.bun/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/index.js
+// node_modules/.bun/@opentelemetry+api@1.9.1/node_modules/@opentelemetry/api/build/src/index.js
 var require_src = __commonJS(function(exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.trace = exports.propagation = exports.metrics = exports.diag = exports.context = exports.INVALID_SPAN_CONTEXT = exports.INVALID_TRACEID = exports.INVALID_SPANID = exports.isValidSpanId = exports.isValidTraceId = exports.isSpanContextValid = exports.createTraceState = exports.TraceFlags = exports.SpanStatusCode = exports.SpanKind = exports.SamplingDecision = exports.ProxyTracerProvider = exports.ProxyTracer = exports.defaultTextMapSetter = exports.defaultTextMapGetter = exports.ValueType = exports.createNoopMeter = exports.DiagLogLevel = exports.DiagConsoleLogger = exports.ROOT_CONTEXT = exports.createContextKey = exports.baggageEntryMetadataFromString = undefined;
@@ -9552,7 +9817,7 @@ var require_src = __commonJS(function(exports) {
   };
 });
 
-// node_modules/.bun/posthog-node@5.56.4+460773ef8ff1e07c/node_modules/posthog-node/dist/extensions/error-tracking/trace-context.mjs
+// node_modules/.bun/posthog-node@5.57.0+e40b0dfdd726a224/node_modules/posthog-node/dist/extensions/error-tracking/trace-context.mjs
 async function getActiveTraceProperties() {
   try {
     const api = await (otelApi ??= Promise.resolve().then(() => __toESM(require_src(), 1)));
@@ -9573,7 +9838,7 @@ var init_trace_context = __esm(() => {
   SPAN_ID_PATTERN = /^[0-9a-f]{16}$/i;
 });
 
-// node_modules/.bun/posthog-node@5.56.4+460773ef8ff1e07c/node_modules/posthog-node/dist/storage-memory.mjs
+// node_modules/.bun/posthog-node@5.57.0+e40b0dfdd726a224/node_modules/posthog-node/dist/storage-memory.mjs
 class PostHogMemoryStorage {
   getProperty(key) {
     return this._memoryStorage[key];
@@ -9587,7 +9852,7 @@ class PostHogMemoryStorage {
 }
 var init_storage_memory = () => {};
 
-// node_modules/.bun/posthog-node@5.56.4+460773ef8ff1e07c/node_modules/posthog-node/dist/capture-v1/config.mjs
+// node_modules/.bun/posthog-node@5.57.0+e40b0dfdd726a224/node_modules/posthog-node/dist/capture-v1/config.mjs
 function isCaptureMode(value) {
   return value === "v0" || value === "v1";
 }
@@ -9597,14 +9862,14 @@ function resolveCaptureMode() {
 }
 var init_config3 = () => {};
 
-// node_modules/.bun/posthog-node@5.56.4+460773ef8ff1e07c/node_modules/posthog-node/dist/capture-v1/routing.mjs
+// node_modules/.bun/posthog-node@5.57.0+e40b0dfdd726a224/node_modules/posthog-node/dist/capture-v1/routing.mjs
 function isLegacyOnlyEvent(message) {
   return typeof message.event == "string" && message.event.startsWith(AI_EVENT_PREFIX);
 }
 var AI_EVENT_PREFIX = "$ai_", ANALYTICS_ROUTE = "analytics", AI_ROUTE = "ai";
 var init_routing = () => {};
 
-// node_modules/.bun/posthog-node@5.56.4+460773ef8ff1e07c/node_modules/posthog-node/dist/capture-v1/errors.mjs
+// node_modules/.bun/posthog-node@5.57.0+e40b0dfdd726a224/node_modules/posthog-node/dist/capture-v1/errors.mjs
 var CaptureV1Error;
 var init_errors = __esm(() => {
   CaptureV1Error = class CaptureV1Error extends Error {
@@ -9624,7 +9889,7 @@ var init_errors = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.56.4+460773ef8ff1e07c/node_modules/posthog-node/dist/capture-v1/transform.mjs
+// node_modules/.bun/posthog-node@5.57.0+e40b0dfdd726a224/node_modules/posthog-node/dist/capture-v1/transform.mjs
 function coerceBool(value) {
   if (typeof value == "boolean")
     return value;
@@ -9742,7 +10007,7 @@ var init_transform = __esm(() => {
   ];
 });
 
-// node_modules/.bun/posthog-node@5.56.4+460773ef8ff1e07c/node_modules/posthog-node/dist/capture-v1/sender.mjs
+// node_modules/.bun/posthog-node@5.57.0+e40b0dfdd726a224/node_modules/posthog-node/dist/capture-v1/sender.mjs
 class V1CaptureSender {
   constructor(config, hooks) {
     this.config = config;
@@ -9998,11 +10263,11 @@ var init_sender = __esm(() => {
   ]);
 });
 
-// node_modules/.bun/posthog-node@5.56.4+460773ef8ff1e07c/node_modules/posthog-node/dist/ai-capture/routing.mjs
+// node_modules/.bun/posthog-node@5.57.0+e40b0dfdd726a224/node_modules/posthog-node/dist/ai-capture/routing.mjs
 var AI_CAPTURE_ROUTE = "ai-capture", AI_CAPTURE_ENDPOINT_PATH = "/i/v0/ai/batch/", AI_MAX_EVENT_BYTES = 8388608, AI_BATCH_TARGET_BYTES = 5242880;
 var init_routing2 = () => {};
 
-// node_modules/.bun/posthog-node@5.56.4+460773ef8ff1e07c/node_modules/posthog-node/dist/ai-capture/batching.mjs
+// node_modules/.bun/posthog-node@5.57.0+e40b0dfdd726a224/node_modules/posthog-node/dist/ai-capture/batching.mjs
 function eventByteSize(message) {
   return encoder.encode(safeJsonStringify(message)).length;
 }
@@ -10044,7 +10309,7 @@ var init_batching = __esm(() => {
   encoder = new TextEncoder;
 });
 
-// node_modules/.bun/posthog-node@5.56.4+460773ef8ff1e07c/node_modules/posthog-node/dist/client.mjs
+// node_modules/.bun/posthog-node@5.57.0+e40b0dfdd726a224/node_modules/posthog-node/dist/client.mjs
 function emitDeprecationWarningOnce(id, message) {
   if (_emittedDeprecations.has(id))
     return;
@@ -10980,12 +11245,17 @@ var init_client = __esm(() => {
           if (!requestedFlagKeys.has(key))
             delete records[key];
       }
+      const unresolvedFlags = {};
+      for (const [key, reason] of Object.entries(localResult?.unresolved ?? {}))
+        if (!Object.prototype.hasOwnProperty.call(records, key))
+          unresolvedFlags[key] = reason;
       return new FeatureFlagEvaluations({
         host: this._getFeatureFlagEvaluationsHost(),
         distinctId: resolvedDistinctId,
         groups,
         disableGeoip,
         flags: records,
+        unresolvedFlags,
         requestId,
         evaluatedAt,
         flagDefinitionsLoadedAt: this.featureFlagsPoller?.getFlagDefinitionsLoadedAt(),
@@ -11396,7 +11666,7 @@ var init_client = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.56.4+460773ef8ff1e07c/node_modules/posthog-node/dist/extensions/context/context.mjs
+// node_modules/.bun/posthog-node@5.57.0+e40b0dfdd726a224/node_modules/posthog-node/dist/extensions/context/context.mjs
 import { AsyncLocalStorage } from "node:async_hooks";
 
 class PostHogContext {
@@ -11428,7 +11698,7 @@ class PostHogContext {
 }
 var init_context2 = () => {};
 
-// node_modules/.bun/posthog-node@5.56.4+460773ef8ff1e07c/node_modules/posthog-node/dist/extensions/context/span-context.node.mjs
+// node_modules/.bun/posthog-node@5.57.0+e40b0dfdd726a224/node_modules/posthog-node/dist/extensions/context/span-context.node.mjs
 import { AsyncLocalStorage as AsyncLocalStorage2 } from "node:async_hooks";
 
 class AsyncLocalStorageSpanContextManager {
@@ -11444,7 +11714,7 @@ class AsyncLocalStorageSpanContextManager {
 }
 var init_span_context_node = () => {};
 
-// node_modules/.bun/posthog-node@5.56.4+460773ef8ff1e07c/node_modules/posthog-node/dist/gzip.node.mjs
+// node_modules/.bun/posthog-node@5.57.0+e40b0dfdd726a224/node_modules/posthog-node/dist/gzip.node.mjs
 import { gzip } from "node:zlib";
 import { promisify } from "node:util";
 async function gzipCompress2(input, isDebug = true) {
@@ -11462,7 +11732,7 @@ var init_gzip_node = __esm(() => {
   gzipAsync = promisify(gzip);
 });
 
-// node_modules/.bun/posthog-node@5.56.4+460773ef8ff1e07c/node_modules/posthog-node/dist/host-os.node.mjs
+// node_modules/.bun/posthog-node@5.57.0+e40b0dfdd726a224/node_modules/posthog-node/dist/host-os.node.mjs
 import { platform, release as release2 } from "node:os";
 function hostOsResourceAttributes() {
   let osName;
@@ -11477,7 +11747,7 @@ var init_host_os_node = __esm(() => {
   init_dist();
 });
 
-// node_modules/.bun/posthog-node@5.56.4+460773ef8ff1e07c/node_modules/posthog-node/dist/extensions/sentry-integration.mjs
+// node_modules/.bun/posthog-node@5.57.0+e40b0dfdd726a224/node_modules/posthog-node/dist/extensions/sentry-integration.mjs
 function createEventProcessor(_posthog, { organization, projectId, prefix, severityAllowList = [
   "error"
 ], sendExceptionsToPostHog = true } = {}) {
@@ -11554,22 +11824,22 @@ var init_sentry_integration = __esm(() => {
   };
 });
 
-// node_modules/.bun/posthog-node@5.56.4+460773ef8ff1e07c/node_modules/posthog-node/dist/extensions/tracing-headers.mjs
+// node_modules/.bun/posthog-node@5.57.0+e40b0dfdd726a224/node_modules/posthog-node/dist/extensions/tracing-headers.mjs
 var init_tracing_headers2 = () => {};
 
-// node_modules/.bun/posthog-node@5.56.4+460773ef8ff1e07c/node_modules/posthog-node/dist/extensions/url-utils.mjs
+// node_modules/.bun/posthog-node@5.57.0+e40b0dfdd726a224/node_modules/posthog-node/dist/extensions/url-utils.mjs
 var init_url_utils = __esm(() => {
   init_dist();
 });
 
-// node_modules/.bun/posthog-node@5.56.4+460773ef8ff1e07c/node_modules/posthog-node/dist/extensions/express.mjs
+// node_modules/.bun/posthog-node@5.57.0+e40b0dfdd726a224/node_modules/posthog-node/dist/extensions/express.mjs
 var init_express = __esm(() => {
   init_error_tracking2();
   init_tracing_headers2();
   init_url_utils();
 });
 
-// node_modules/.bun/posthog-node@5.56.4+460773ef8ff1e07c/node_modules/posthog-node/dist/exports.mjs
+// node_modules/.bun/posthog-node@5.57.0+e40b0dfdd726a224/node_modules/posthog-node/dist/exports.mjs
 var init_exports = __esm(() => {
   init_feature_flag_evaluations();
   init_dist();
@@ -11578,7 +11848,7 @@ var init_exports = __esm(() => {
   init_types3();
 });
 
-// node_modules/.bun/posthog-node@5.56.4+460773ef8ff1e07c/node_modules/posthog-node/dist/entrypoints/index.node.mjs
+// node_modules/.bun/posthog-node@5.57.0+e40b0dfdd726a224/node_modules/posthog-node/dist/entrypoints/index.node.mjs
 var PostHog;
 var init_index_node = __esm(() => {
   init_module_node();
@@ -11679,7 +11949,7 @@ var package_default;
 var init_package = __esm(() => {
   package_default = {
     name: "@oh-my-opencode/omo-codex",
-    version: "5.1.41",
+    version: "5.1.43",
     type: "module",
     private: true,
     description: "Codex harness adapter for oh-my-openagent. Vendored Codex plugin namespace (omo) + TypeScript installer + telemetry.",
@@ -19964,15 +20234,15 @@ var initializer2 = (inst, issues) => {
   if (_installedErrorProtos.has(proto))
     return;
   _installedErrorProtos.add(proto);
-  _lazyMethod(proto, "format", (self) => (mapper) => formatError(self, mapper));
-  _lazyMethod(proto, "flatten", (self) => (mapper) => flattenError(self, mapper));
-  _lazyMethod(proto, "addIssue", (self) => (issue) => {
-    self.issues.push(issue);
-    self.message = JSON.stringify(self.issues, jsonStringifyReplacer, 2);
+  _lazyMethod(proto, "format", (self2) => (mapper) => formatError(self2, mapper));
+  _lazyMethod(proto, "flatten", (self2) => (mapper) => flattenError(self2, mapper));
+  _lazyMethod(proto, "addIssue", (self2) => (issue) => {
+    self2.issues.push(issue);
+    self2.message = JSON.stringify(self2.issues, jsonStringifyReplacer, 2);
   });
-  _lazyMethod(proto, "addIssues", (self) => (issues) => {
-    self.issues.push(...issues);
-    self.message = JSON.stringify(self.issues, jsonStringifyReplacer, 2);
+  _lazyMethod(proto, "addIssues", (self2) => (issues) => {
+    self2.issues.push(...issues);
+    self2.message = JSON.stringify(self2.issues, jsonStringifyReplacer, 2);
   });
   Object.defineProperty(proto, "isEmpty", {
     configurable: true,
@@ -20548,7 +20818,7 @@ var ZodObject = /* @__PURE__ */ $constructor("ZodObject", (inst, def) => {
   $ZodObjectJIT.init(inst, def);
   ZodType.init(inst, def);
   inst._zod.processJSONSchema = (ctx, json, params) => objectProcessor(inst, ctx, json, params);
-  installLazyProp(inst, "shape", (self) => self._zod.def.shape, false);
+  installLazyProp(inst, "shape", (self2) => self2._zod.def.shape, false);
 }, {
   keyof() {
     return _enum(Object.keys(this._zod.def.shape));
